@@ -1,7 +1,13 @@
 import kreate.App
 
 
-def deployment(app: kreate.App) -> None:
+class Deployment(kreate.Base):
+    def __init__(self, app: kreate.App):
+        kreate.Base.__init__(self, app, "Deployment")
+
+    def kreate(self):
+        self.kreate_file(self.template)
+
     template = """apiVersion: apps/v1
 kind: {{ app.kind }}
 metadata:
@@ -50,4 +56,3 @@ spec:
             cpu: {{ cont.cpu_request }}
             memory: {{ cont.mem_request }}
 {% endfor %}"""
-    app.kreate_file(app.name+"_deploy.yaml", template)

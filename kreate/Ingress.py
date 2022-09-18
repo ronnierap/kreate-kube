@@ -10,7 +10,7 @@ class Ingress(kreate.Base):
                  path="/",
                  host="TODO",
                  port=8080):
-        kreate.Base.__init__(self, app, "ingress", name)
+        kreate.Base.__init__(self, app, "Ingress", subname="-" + name)
         self.sticky = sticky
         self.path = path
         self.host = host

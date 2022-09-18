@@ -5,8 +5,11 @@ import kreate.Environment
 
 
 class Base:
-    def __init__(self, app: kreate.App, kind: str, name: str):
-        self.name = name
+    def __init__(self, app: kreate.App, kind: str, name: str = None, subname: str = ""):
+        if name is None:
+            self.name = app.name + "-" + kind.lower() + subname
+        else:
+            self.name = name
         self.app = app
         self.kind = kind
         self.labels = dict()
@@ -19,7 +22,7 @@ class Base:
         self.labels[name] = val
 
     def __file(self) -> str:
-        return self.app.target_dir + "/" + self.name
+        return self.app.target_dir + "/" + self.name + ".yaml"
 
     def kreate_file(self, template: str) -> None:
         os.makedirs(self.app.target_dir, exist_ok=True)
