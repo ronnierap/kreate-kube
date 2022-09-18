@@ -47,6 +47,5 @@ spec:
           requests:
             cpu: {{ cont.cpu_request }}
             memory: {{ cont.mem_request }}
-{% endfor %}
-"""
+{% endfor %}"""
     app.kreate_file(app.name+"_deploy.yaml", template)
