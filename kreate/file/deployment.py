@@ -1,5 +1,7 @@
+import kreate.App
 
-def deployment(app, env):
+
+def deployment(app: kreate.App) -> None:
     template = """apiVersion: apps/v1
 kind: {{ app.kind }}
 metadata:
