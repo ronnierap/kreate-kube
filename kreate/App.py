@@ -10,6 +10,7 @@ class App:
                  kind: str = 'Deployment'):
         self.name = name
         self.env = env
+        self.namespace = self.name + "-" + self.env.name
         self.kind = kind
         self.replicas = env.replicas
         self.container = [Container('app')]
