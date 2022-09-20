@@ -4,4 +4,4 @@ from .ingress import Ingress
 from .environment import Environment
 from .deployment import Deployment
 
-# __all__ = ["App", "Environment", "Base", "Ingress", "Deployment"]
+__all__ = ["App", "Environment", "Base", "Ingress", "Deployment"]

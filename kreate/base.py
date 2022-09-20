@@ -3,6 +3,7 @@ import jinja2
 
 import kreate
 
+
 class Base:
     def __init__(self, app: kreate.App, kind: str,
                  name: str = None, subname: str = ""):
