@@ -1,5 +1,4 @@
-import kreate.App
-import kreate.Base
+import kreate
 
 
 class Ingress(kreate.Base):

@@ -1,4 +1,4 @@
-import kreate.Environment
+from .environment import Environment
 import jinja2
 import shutil
 import os
@@ -6,7 +6,7 @@ import os
 
 class App:
     def __init__(self, name: str,
-                 env: kreate.Environment,
+                 env: Environment,
                  kind: str = 'Deployment'):
         self.name = name
         self.env = env

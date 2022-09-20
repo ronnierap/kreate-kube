@@ -1,4 +1,4 @@
-import kreate.App
+import kreate
 
 
 class Deployment(kreate.Base):

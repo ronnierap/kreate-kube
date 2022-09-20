@@ -1,7 +1,7 @@
 import os
 import jinja2
 
-import kreate.Environment
+import kreate
 
 class Base:
     def __init__(self, app: kreate.App, kind: str,
