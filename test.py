@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import kreate.App
-import kreate.Environment
-import kreate.Ingress
-import kreate.Deployment
+import kreate
 
 env = kreate.Environment('acc')
 env.project = "kreate-test"

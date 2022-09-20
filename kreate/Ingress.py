@@ -37,7 +37,7 @@ class Ingress(kreate.Base):
     def session_cookie_samesite(self) -> None:
         self.nginx_annon("session-cookie-samesite", "None")
 
-    def basic_auth(self, secret : str = "basic-auth") -> None:
+    def basic_auth(self, secret: str = "basic-auth") -> None:
         self.nginx_annon("auth-type", "basic")
         self.nginx_annon("auth-secret", secret)
         self.nginx_annon("auth-realm", self.app.name + "-realm")

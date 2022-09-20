@@ -3,9 +3,9 @@ import jinja2
 
 import kreate.Environment
 
-
 class Base:
-    def __init__(self, app: kreate.App, kind: str, name: str = None, subname: str = ""):
+    def __init__(self, app: kreate.App, kind: str,
+                 name: str = None, subname: str = ""):
         if name is None:
             self.name = app.name + "-" + kind.lower() + subname
         else:
