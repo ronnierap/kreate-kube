@@ -1,11 +1,12 @@
 import os
 import jinja2
 
-import kreate
+from .app import App
+from .environment import Environment
 
 
 class Base:
-    def __init__(self, app: kreate.App, kind: str,
+    def __init__(self, app: App, kind: str,
                  name: str = None, subname: str = ""):
         if name is None:
             self.name = app.name + "-" + kind.lower() + subname
@@ -25,7 +26,7 @@ class Base:
     def __file(self) -> str:
         return self.app.target_dir + "/" + self.name + ".yaml"
 
-    def kreate_file(self, template: str) -> None:
+    def kreate_file(self, env: Environment, template: str) -> None:
         os.makedirs(self.app.target_dir, exist_ok=True)
         tmpl = jinja2.Template(
             self.template,
@@ -35,6 +36,6 @@ class Base:
         vars = {
             self.kind.lower(): self,
             "app": self.app,
-            "env": self.app.env}
+            "env": env}
         tmpl.stream(vars).dump(self.__file())
         print(tmpl.render(vars))

@@ -18,10 +18,10 @@ class Kustomization(kreate.Base):
         return comp # return to allow changing a freshly create component
 
 
-    def kreate(self):
+    def kreate(self, env: kreate.Environment):
         for rsrc in self.resources:
-          rsrc.kreate()
-        self.kreate_file(self.template)
+          rsrc.kreate(env)
+        self.kreate_file(env, self.template)
 
     template = """apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -31,7 +31,7 @@ resources:
 - {{ rsrc.name }}.yaml
 {% endfor %}
 
-namespace: {{ app.namespace }}
+namespace: {{ env.namespace }}
 
 patches:
 {% for patch in kustomize.patches %}

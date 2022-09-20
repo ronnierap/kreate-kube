@@ -1,21 +1,22 @@
-import kreate
+from .app import App
+from .environment import Environment
+from .base import Base
 
-
-class Ingress(kreate.Base):
+class Ingress(Base):
     def __init__(self,
-                 app: kreate.App,
+                 app: App,
                  name="root",
                  sticky=False,
                  path="/",
                  host="TODO",
                  port=8080):
-        kreate.Base.__init__(self, app, "Ingress", subname="-" + name)
+        Base.__init__(self, app, "Ingress", subname="-" + name)
         self.sticky = sticky
         self.path = path
         self.host = host
         self.port = port
 
-    def apply(self, app: kreate.App) -> None:
+    def apply(self, app: App) -> None:
         app.kreate_file(app.name + "_" + self.name + ".yaml", self.template)
 
     def nginx_annon(self, name: str, val: str) -> None:
@@ -41,14 +42,15 @@ class Ingress(kreate.Base):
         self.nginx_annon("auth-secret", secret)
         self.nginx_annon("auth-realm", self.app.name + "-realm")
 
-    def kreate(self):
-        self.kreate_file(self.template)
+    def kreate(self, env: Environment):
+        print(env)
+        self.kreate_file(env, self.template)
 
     template = """apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ ingress.name }}
-  namespace: {{ app.namespace }}
+  namespace: {{ env.namespace }}
   annotations:
   {% if ingress.sticky %}
       nginx.ingress.kubernetes.io/affinity: cookie

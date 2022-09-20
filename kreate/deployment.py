@@ -1,19 +1,23 @@
 import kreate
-
+from .cont import Container
 
 class Deployment(kreate.Base):
     def __init__(self, app: kreate.App):
         kreate.Base.__init__(self, app, "Deployment")
+        # self.replicas = env.replicas
+        self.container = [Container('app')]
+        self.container[0].image_name = app.name + ".app"
 
-    def kreate(self):
-        self.kreate_file(self.template)
+
+    def kreate(self, env: kreate.Environment):
+        self.kreate_file(env, self.template)
 
     template = """apiVersion: apps/v1
 kind: {{ app.kind }}
 metadata:
   name: {{ app.name }}
 spec:
-  replicas: {{ app.replicas }}
+  replicas: {{ env.replicas }}
   revisionHistoryLimit: 1
   selector:
     matchLabels:
@@ -27,7 +31,7 @@ spec:
 {% endfor %}
       annotations:
         app.kubernetes.io/name: {{ app.name }}
-        app.kubernetes.io/version: "{{ app.container[0].image_version }}"
+        app.kubernetes.io/version: "{{ deployment.container[0].image_version }}"
         app.kubernetes.io/component: webservice
         app.kubernetes.io/part-of: {{ env.project }}
         app.kubernetes.io/managed-by: kustomize
@@ -36,15 +40,15 @@ spec:
     spec:
       #restartPolicy: Never
       containers:
-{% for cont in app.container %}
+{% for cont in deployment.container %}
       - name: {{ cont.name }}
-        image: {{ cont.image_name }}:{{ cont.image_version }}
+        image: {{ env.image_repo }}/{{ cont.image_name }}:{{ cont.image_version }}
         imagePullPolicy: Always
         envFrom:
         - secretRef:
             name: ${SECRETS_NAME:-${APP}-secrets}
         - configMapRef:
-            name: ${APP}-vars
+            name: {{ app.name }}-vars
         ports:
         - containerPort: {{ cont.port }}
           protocol: TCP

@@ -2,12 +2,12 @@
 
 import kreate
 
-env = kreate.Environment('acc')
+app = kreate.App('cls')
+app.labels["egress-to-oracle"] = "enabled"
+
+env = kreate.Environment('acc', app)
 env.project = "kreate-test"
 
-app = kreate.App('cls', env)
-app.container[0].image_version = "1.2.3"
-app.labels["egress-to-oracle"] = "enabled"
 
 kust = kreate.Kustomization(app)
 
@@ -15,6 +15,8 @@ ingr = kust.add(kreate.Ingress(app, sticky=True))
 ingr.whitelist("ggg")
 ingr.basic_auth()
 
-kust.add(kreate.Deployment(app))
+depl=kust.add(kreate.Deployment(app))
+depl.container[0].image_version = "1.2.3"
 
-kust.kreate()
+
+kust.kreate(env)
