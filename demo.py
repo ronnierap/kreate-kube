@@ -2,7 +2,7 @@
 
 import kreate
 
-app = kreate.App('cls')
+app = kreate.App('demo')
 app.labels["egress-to-oracle"] = "enabled"
 
 env = kreate.Environment('acc', app)
