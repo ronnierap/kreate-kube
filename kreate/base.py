@@ -8,6 +8,8 @@ from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
 
 from .app import App
+from .wrapper import DictWrapper
+
 
 class Base:
     def __init__(self,  app: App, kind: str, clz,
@@ -49,24 +51,3 @@ class Base:
             "env": self.app.env}
         tmpl.stream(vars).dump(self.__file())
         return tmpl.render(vars)
-
-
-class DictWrapper():
-    def __init__(self, somedict) -> None:
-        self._dict = somedict
-
-    def __getattr__(self, attr):
-        if attr in self.__dict__ or attr=="_dict":
-            return super().__getattribute__(attr)
-        result = self._dict[attr]
-        if isinstance(result, dict):
-            return DictWrapper(result)
-        return result
-
-    def add(self, key, value):
-        self._dict[key]=value
-
-    def __setattr__(self, attr, val):
-        if attr in self.__dict__ or attr=="_dict":
-            return super().__setattr__(attr, val)
-        self._dict[attr]=val

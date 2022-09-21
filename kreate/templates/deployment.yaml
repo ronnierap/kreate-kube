@@ -15,7 +15,7 @@ spec:
         - app: {{ app.name }}
       annotations:
         app.kubernetes.io/name: {{ app.name }}
-        app.kubernetes.io/version: "{{ this.container[0].image_version }}"
+        app.kubernetes.io/version: "TODO"
         app.kubernetes.io/component: webservice
         app.kubernetes.io/part-of: {{ env.project }}
         app.kubernetes.io/managed-by: kustomize
@@ -24,9 +24,8 @@ spec:
     spec:
       #restartPolicy: Never
       containers:
-{% for cont in deployment.container %}
-      - name: {{ cont.name }}
-        image: {{ env.image_repo }}/{{ cont.image_name }}:{{ cont.image_version }}
+      - name: app
+        image: {{ env.image_repo }}/{{ app.name }}.app:TODO
         imagePullPolicy: Always
         envFrom:
         - secretRef:
@@ -34,13 +33,12 @@ spec:
         - configMapRef:
             name: {{ app.name }}-vars
         ports:
-        - containerPort: {{ cont.port }}
+        - containerPort: 8080
           protocol: TCP
         resources:
           limits:
-            cpu: {{ cont.cpu_limit }}
-            memory: {{ cont.mem_limit }}
+            cpu: 1
+            memory: 512M
           requests:
-            cpu: {{ cont.cpu_request }}
-            memory: {{ cont.mem_request }}
-{% endfor %}
+            cpu: 200m
+            memory: 512M

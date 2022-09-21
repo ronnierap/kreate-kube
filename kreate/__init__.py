@@ -1,9 +1,8 @@
 from .app import App
-from .base import Base
 from .ingress import Ingress
-from .environment import Environment
+from .app import Environment
 from .deployment import Deployment
 from .kust import Kustomization
 
-__all__ = ["App", "Environment", "Base",
+__all__ = ["App", "Environment",
            "Ingress", "Deployment", "Kustomization"]
