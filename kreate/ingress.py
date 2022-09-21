@@ -1,6 +1,6 @@
 from .app import App
-from .environment import Environment
 from .base import Base
+
 
 class Ingress(Base):
     def __init__(self,

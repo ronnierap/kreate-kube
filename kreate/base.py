@@ -40,6 +40,7 @@ class Base:
             trim_blocks=True,
             lstrip_blocks=True)
         vars = {
+            "this": self,  # TODO: better name, self is already used by jinja
             self.kind.lower(): self,
             "app": self.app,
             "env": env}

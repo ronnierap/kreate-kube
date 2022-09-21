@@ -11,14 +11,13 @@ class Kustomization(kreate.Base):
 
     def add(self, comp: kreate.Base):
         self.resources.append(comp)
-        return comp # return to allow changing a freshly create component
+        return comp  # return to allow changing a freshly create component
 
     def patch(self, comp: kreate.Base):
         self.patches.append(comp)
-        return comp # return to allow changing a freshly create component
-
+        return comp  # return to allow changing a freshly create component
 
     def kreate(self, env: kreate.Environment):
         for rsrc in self.resources:
-          rsrc.kreate(env)
-        kreate.Base.kreate(self,env)
+            rsrc.kreate(env)
+        kreate.Base.kreate(self, env)
