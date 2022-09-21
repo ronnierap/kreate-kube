@@ -10,11 +10,11 @@ class Ingress(Base):
                  path="/",
                  host="TODO",
                  port=8080):
-        Base.__init__(self, app, "Ingress", subname="-" + name)
         self.sticky = sticky
         self.path = path
         self.host = host
         self.port = port
+        Base.__init__(self, app, "Ingress", subname="-" + name)
 
     def apply(self, app: App) -> None:
         app.kreate_file(app.name + "_" + self.name + ".yaml", self.template)

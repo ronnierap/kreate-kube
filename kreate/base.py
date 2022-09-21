@@ -2,6 +2,8 @@ import os
 import jinja2
 import pkgutil
 
+from ruamel.yaml import YAML
+
 from .app import App
 from .environment import Environment
 
@@ -17,6 +19,8 @@ class Base:
         self.kind = kind
         self.labels = dict()
         self.annotations = dict()
+        self.__yaml = YAML()
+        self.yaml = self.__yaml.load(self.render())
 
     def add_annotation(self, name: str, val: str) -> None:
         self.annotations[name] = val
@@ -27,13 +31,15 @@ class Base:
     def __file(self) -> str:
         return self.app.target_dir + "/" + self.name + ".yaml"
 
-    def kreate(self, env: Environment) -> None:
+    def kreate(self) -> None:
+        self.kreate_file()
+
+    def kreate_file(self) -> None:
+        print(self.render())
+
+    def render(self) -> None:
         filename = self.kind.lower() + ".yaml"
         template = pkgutil.get_data(__package__, filename).decode('utf-8')
-        self.kreate_file(env, template)
-
-    def kreate_file(self, env: Environment, template: str) -> None:
-        os.makedirs(self.app.target_dir, exist_ok=True)
         tmpl = jinja2.Template(
             template,
             undefined=jinja2.StrictUndefined,
@@ -43,6 +49,6 @@ class Base:
             "this": self,  # TODO: better name, self is already used by jinja
             self.kind.lower(): self,
             "app": self.app,
-            "env": env}
+            "env": self.app.env}
         tmpl.stream(vars).dump(self.__file())
-        print(tmpl.render(vars))
+        return tmpl.render(vars)

@@ -3,11 +3,11 @@ import kreate
 
 class Kustomization(kreate.Base):
     def __init__(self, app: kreate.App):
-        kreate.Base.__init__(self, app, "Kustomization")
         self.name = "kustomization"
         self.resources = []
         self.patches = []
         self.vars = {}
+        kreate.Base.__init__(self, app, "Kustomization")
 
     def add(self, comp: kreate.Base):
         self.resources.append(comp)
@@ -19,5 +19,5 @@ class Kustomization(kreate.Base):
 
     def kreate(self, env: kreate.Environment):
         for rsrc in self.resources:
-            rsrc.kreate(env)
-        kreate.Base.kreate(self, env)
+            rsrc.kreate()
+        kreate.Base.kreate(self)

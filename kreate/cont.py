@@ -5,4 +5,5 @@ class Container:
         self.cpu_request = '500m'
         self.mem_limit = '512Mi'
         self.mem_request = '512Mi'
+        self.image_version = 'v1'
         self.port = 8080
