@@ -1,4 +1,4 @@
-
+from ruamel.yaml.comments import CommentedSeq
 
 class DictWrapper():
     def __init__(self, somedict) -> None:
@@ -8,6 +8,8 @@ class DictWrapper():
         if attr in self.__dict__ or attr=="_dict":
             return super().__getattribute__(attr)
         result = self._dict[attr]
+        if isinstance(result, CommentedSeq):
+            return SeqWrapper(result)
         if isinstance(result, dict):
             return DictWrapper(result)
         return result
@@ -22,3 +24,22 @@ class DictWrapper():
         if attr in self.__dict__ or attr=="_dict":
             return super().__setattr__(attr, val)
         self._dict[attr]=val
+
+
+class SeqWrapper():
+    def __init__(self, seq) -> None:
+        self._seq = seq
+
+    def __getitem__(self, idx):
+        result = self._seq[idx]
+        if isinstance(result, CommentedSeq):
+            return SeqWrapper(result)
+        if isinstance(result, dict):
+            return DictWrapper(result)
+        return result
+
+    def __setitem__(self, idx, val):
+        self._seq[idx]=val
+
+    def append(self, item):
+        self._seq.append(item)

@@ -17,6 +17,6 @@ ingr.basic_auth()
 
 depl = kust.add(kreate.Deployment(app))
 depl.yaml.spec.template.spec.containers[0].image_version = "1.2.3"
-#print(depl.yaml.spec.template.spec.containers.get(0).resources)
+print(type(depl.yaml.spec.template.spec.containers[0]))
 
 kust.kreate()
