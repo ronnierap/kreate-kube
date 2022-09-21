@@ -7,12 +7,7 @@ class DictWrapper():
     def __getattr__(self, attr):
         if attr in self.__dict__ or attr=="_dict":
             return super().__getattribute__(attr)
-        result = self._dict[attr]
-        if isinstance(result, CommentedSeq):
-            return SeqWrapper(result)
-        if isinstance(result, dict):
-            return DictWrapper(result)
-        return result
+        return wrap(self._dict[attr])
 
     def add(self, key, value):
         self._dict[key]=value
@@ -31,15 +26,17 @@ class SeqWrapper():
         self._seq = seq
 
     def __getitem__(self, idx):
-        result = self._seq[idx]
-        if isinstance(result, CommentedSeq):
-            return SeqWrapper(result)
-        if isinstance(result, dict):
-            return DictWrapper(result)
-        return result
+        return wrap(self._seq[idx])
 
     def __setitem__(self, idx, val):
         self._seq[idx]=val
 
     def append(self, item):
         self._seq.append(item)
+
+def wrap(result):
+    if isinstance(result, CommentedSeq):
+        return SeqWrapper(result)
+    if isinstance(result, dict):
+        return DictWrapper(result)
+    return result
