@@ -4,12 +4,10 @@ metadata:
   name: {{ ingress.name }}
   namespace: {{ env.namespace }}
   annotations:
+    app.kubernetes.io/name: {{ app.name }}
   {% if ingress.sticky %}
-      nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/affinity: cookie
   {% endif %}
-  {% for anno, val in ingress.annotations| dictsort %}
-      {{ anno }}: {{ val }}
-  {% endfor %}
 spec:
   rules:
     - host: {{ ingress.host }}

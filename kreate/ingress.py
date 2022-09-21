@@ -16,11 +16,8 @@ class Ingress(Base):
         self.port = port
         Base.__init__(self, app, "Ingress", subname="-" + name)
 
-    def apply(self, app: App) -> None:
-        app.kreate_file(app.name + "_" + self.name + ".yaml", self.template)
-
     def nginx_annon(self, name: str, val: str) -> None:
-        self.annotations["nginx.ingress.kubernetes.io/" + name] = val
+        self.annotate("nginx.ingress.kubernetes.io/" + name, val)
 
     def rewrite_url(self, url: str) -> None:
         self.nginx_annon("rewrite-target", url)

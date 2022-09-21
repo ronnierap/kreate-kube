@@ -1,4 +1,5 @@
 import os
+import sys
 import jinja2
 import pkgutil
 
@@ -17,25 +18,21 @@ class Base:
             self.name = name
         self.app = app
         self.kind = kind
-        self.labels = dict()
-        self.annotations = dict()
         self.__yaml = YAML()
         self.yaml = self.__yaml.load(self.render())
 
-    def add_annotation(self, name: str, val: str) -> None:
-        self.annotations[name] = val
+    def annotate(self, name: str, val: str) -> None:
+        self.yaml["metadata"]["annotations"][name] = val
 
     def add_label(self, name: str, val: str) -> None:
-        self.labels[name] = val
+        self.yaml.labels[name] = val
 
     def __file(self) -> str:
         return self.app.target_dir + "/" + self.name + ".yaml"
 
     def kreate(self) -> None:
-        self.kreate_file()
-
-    def kreate_file(self) -> None:
-        print(self.render())
+        os.makedirs(self.app.target_dir, exist_ok=True)
+        self.__yaml.dump(self.yaml, sys.stdout)
 
     def render(self) -> None:
         filename = self.kind.lower() + ".yaml"
