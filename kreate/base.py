@@ -35,7 +35,7 @@ class Base:
         self.__yaml.dump(self.yaml._dict, sys.stdout)
 
     def render(self) -> None:
-        filename = self.kind.lower() + ".yaml"
+        filename = "templates/" + self.kind.lower() + ".yaml"
         template = pkgutil.get_data(__package__, filename).decode('utf-8')
         tmpl = jinja2.Template(
             template,
