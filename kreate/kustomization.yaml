@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+{% for rsrc in kustomization.resources %}
+- {{ rsrc.name }}.yaml
+{% endfor %}
+
+namespace: {{ env.namespace }}
+
+patches:
+{% for patch in kustomization.patches %}
+- {{ patch.name }}.yaml
+{% endfor %}
+
+configMapGenerator:
+- name: {{ app.name }}-vars
+  options:
+    labels:
+      config-map: {{ app.name }}-vars
+  literals:
+  {% for vars in kustomization.vars %}
+  - {{ patch.name }}.yaml
+  {% endfor %}

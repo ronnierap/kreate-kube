@@ -41,32 +41,3 @@ class Ingress(Base):
         self.nginx_annon("auth-type", "basic")
         self.nginx_annon("auth-secret", secret)
         self.nginx_annon("auth-realm", self.app.name + "-realm")
-
-    def kreate(self, env: Environment):
-        print(env)
-        self.kreate_file(env, self.template)
-
-    template = """apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ ingress.name }}
-  namespace: {{ env.namespace }}
-  annotations:
-  {% if ingress.sticky %}
-      nginx.ingress.kubernetes.io/affinity: cookie
-  {% endif %}
-  {% for anno, val in ingress.annotations| dictsort %}
-      {{ anno }}: {{ val }}
-  {% endfor %}
-spec:
-  rules:
-    - host: {{ ingress.host }}
-      http:
-        paths:
-          - pathType: Prefix
-            path: {{ ingress.path }}
-            backend:
-              service:
-                name: {{ app.name }}-service
-                port:
-                  number: {{ ingress.port }}"""
