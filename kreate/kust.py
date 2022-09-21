@@ -6,18 +6,18 @@ class Kustomization(kreate.Base):
         self.name = "kustomization"
         self.resources = []
         self.patches = []
-        self.vars = {}
-        kreate.Base.__init__(self, app, "Kustomization")
+        kreate.Base.__init__(self, app, "Kustomization", Kustomization)
 
     def add(self, comp: kreate.Base):
         self.resources.append(comp)
+        self.yaml.resources.append(comp.name+".yaml")
         return comp  # return to allow changing a freshly create component
 
     def patch(self, comp: kreate.Base):
-        self.patches.append(comp)
+        self.yaml.patches.append(comp)
         return comp  # return to allow changing a freshly create component
 
-    def kreate(self, env: kreate.Environment):
+    def kreate(self):
         for rsrc in self.resources:
             rsrc.kreate()
         kreate.Base.kreate(self)

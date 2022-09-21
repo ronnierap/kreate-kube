@@ -19,4 +19,4 @@ depl = kust.add(kreate.Deployment(app))
 depl.container[0].image_version = "1.2.3"
 
 
-kust.kreate(env)
+kust.kreate()

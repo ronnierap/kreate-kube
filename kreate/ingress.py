@@ -14,7 +14,8 @@ class Ingress(Base):
         self.path = path
         self.host = host
         self.port = port
-        Base.__init__(self, app, "Ingress", subname="-" + name)
+        Base.__init__(self, app, "Ingress", subname="-" + name, clz=Ingress)
+        self.nginx_annon("affinity","blabla")
 
     def nginx_annon(self, name: str, val: str) -> None:
         self.annotate("nginx.ingress.kubernetes.io/" + name, val)
