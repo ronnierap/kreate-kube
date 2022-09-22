@@ -14,7 +14,7 @@ class Ingress(Base):
         self.path = path
         self.host = host
         self.port = port
-        Base.__init__(self, app, "Ingress", subname="-" + name, clz=Ingress)
+        Base.__init__(self, app, name=app.name + "-ingress-" + name)
         self.nginx_annon("affinity","blabla")
 
     def nginx_annon(self, name: str, val: str) -> None:

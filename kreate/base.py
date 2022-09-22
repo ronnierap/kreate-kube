@@ -2,52 +2,57 @@ import os
 import sys
 import jinja2
 import pkgutil
-from collections import OrderedDict
 
 from ruamel.yaml import YAML
-from ruamel.yaml.comments import CommentedMap
 
 from .app import App
 from .wrapper import DictWrapper
 
-
 class Base:
-    def __init__(self,  app: App, kind: str, clz,
-                 name: str = None, subname: str = ""):
-        if name is None:
-            self.name = app.name + "-" + kind.lower() + subname
-        else:
-            self.name = name
+    def __init__(self,
+                 app: App,
+                 name: str = None,
+                 filename: str = None,
+                 template: str = None):
         self.app = app
-        self.kind = kind
+        self.kind = type(self).__name__
+        self.name = name or app.name + "-" + self.kind.lower()
+        self.filename = filename or self.name + ".yaml"
+        self.template = template or self.kind.lower() + ".yaml"
+        self.annotations = {}
+        self.labels = {}
+        self.yaml = None  # Used if you want to modify the yaml
+
+    def kreate_yaml(self):
         self.__yaml = YAML()
         self.yaml = DictWrapper(self.__yaml.load(self.render()))
 
+    def kreate(self) -> None:
+        os.makedirs(self.app.target_dir, exist_ok=True)
+        if ( self.yaml is None ):
+            print(self.render())
+        else:
+            self.__yaml.dump(self.yaml._dict, sys.stdout)
+
     def annotate(self, name: str, val: str) -> None:
-        self.yaml.metadata.annotations.add(name,val)
+        self.annotations[name] = val
 
     def add_label(self, name: str, val: str) -> None:
         self.yaml.labels.add(name, val)
 
     def __file(self) -> str:
-        return self.app.target_dir + "/" + self.name + ".yaml"
-
-    def kreate(self) -> None:
-        os.makedirs(self.app.target_dir, exist_ok=True)
-        self.__yaml.dump(self.yaml._dict, sys.stdout)
+        return self.app.target_dir + "/" + self.filename + ".yaml"
 
     def render(self) -> None:
-        filename = "templates/" + self.kind.lower() + ".yaml"
-        template = pkgutil.get_data(__package__, filename).decode('utf-8')
+        template_data = pkgutil.get_data(self.app.template_package.__package__, self.template).decode('utf-8')
         tmpl = jinja2.Template(
-            template,
+            template_data,
             undefined=jinja2.StrictUndefined,
             trim_blocks=True,
             lstrip_blocks=True)
         vars = {
-            "this": self,  # TODO: better name, self is already used by jinja
-            self.kind.lower(): self,
             "app": self.app,
-            "env": self.app.env}
-        tmpl.stream(vars).dump(self.__file())
+            "env": self.app.env,
+            self.kind.lower(): self}
+        tmpl.stream(vars).dump(self.template)
         return tmpl.render(vars)

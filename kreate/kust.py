@@ -11,14 +11,15 @@ class Kustomization(Base):
 
     def add(self, comp: Base):
         self.resources.append(comp)
-        self.yaml.resources.append(comp.name+".yaml")
         return comp  # return to allow changing a freshly create component
 
     def patch(self, comp: Base):
-        self.yaml.patches.append(comp)
+        self.patches.append(comp)
         return comp  # return to allow changing a freshly create component
 
     def kreate(self):
         for rsrc in self.resources:
             rsrc.kreate()
+        for patch in self.patches:
+            patch.kreate()
         Base.kreate(self)

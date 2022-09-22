@@ -7,7 +7,7 @@ class Deployment(Base):
         # self.replicas = env.replicas
         #self.container = [Container('app')]
         #self.container[0].image_name = app.name + ".app"
-        Base.__init__(self, app, "Deployment", clz=Deployment)
+        Base.__init__(self, app)
 
 class Container:
     def __init__(self, name: str):
@@ -16,5 +16,4 @@ class Container:
         self.cpu_request = '500m'
         self.mem_limit = '512Mi'
         self.mem_request = '512Mi'
-        self.image_version = 'v1'
         self.port = 8080

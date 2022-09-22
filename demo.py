@@ -5,7 +5,7 @@ import kreate
 env = kreate.Environment('acc')
 env.project = "kreate-test"
 
-app = kreate.App('demo', env)
+app = kreate.App('demo', 'v1.2', env)
 app.labels["egress-to-oracle"] = "enabled"
 
 
@@ -16,7 +16,7 @@ ingr.whitelist("ggg")
 ingr.basic_auth()
 
 depl = kust.add(kreate.Deployment(app))
-depl.yaml.spec.template.spec.containers[0].image_version = "1.2.3"
-print(type(depl.yaml.spec.template.spec.containers[0]))
+#depl.yaml.spec.template.spec.containers[0].image_version = "1.2.3"
+#print(type(depl.yaml.spec.template.spec.containers[0]))
 
 kust.kreate()
