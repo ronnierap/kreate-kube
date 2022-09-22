@@ -5,9 +5,10 @@ from .app import App
 class Deployment(Base):
     def __init__(self, app: App):
         # self.replicas = env.replicas
-        #self.container = [Container('app')]
-        #self.container[0].image_name = app.name + ".app"
+        # self.container = [Container('app')]
+        # self.container[0].image_name = app.name + ".app"
         Base.__init__(self, app)
+
 
 class Container:
     def __init__(self, name: str):

@@ -16,7 +16,5 @@ ingr.whitelist("ggg")
 ingr.basic_auth()
 
 depl = kust.add(kreate.Deployment(app))
-#depl.yaml.spec.template.spec.containers[0].image_version = "1.2.3"
-#print(type(depl.yaml.spec.template.spec.containers[0]))
 
 kust.kreate()

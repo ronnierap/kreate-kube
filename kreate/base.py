@@ -7,6 +7,7 @@ from ruamel.yaml import YAML
 from .app import App
 from .wrapper import DictWrapper
 
+
 class Base:
     def __init__(self,
                  app: App,
@@ -27,7 +28,7 @@ class Base:
         self.yaml = DictWrapper(self.__yaml.load(self.render()))
 
     def kreate(self) -> None:
-        if ( self.yaml is None ):
+        if self.yaml is None:
             print(self.filename)
             self.render(outfile=self.app.target_dir + "/" + self.filename)
         else:
@@ -40,7 +41,8 @@ class Base:
         self.yaml.labels.add(name, val)
 
     def render(self, outfile=None) -> None:
-        template_data = pkgutil.get_data(self.app.template_package.__package__, self.template).decode('utf-8')
+        template_data = pkgutil.get_data(self.app.template_package.__package__,
+                                         self.template).decode('utf-8')
         tmpl = jinja2.Template(
             template_data,
             undefined=jinja2.StrictUndefined,
@@ -52,4 +54,4 @@ class Base:
             self.kind.lower(): self}
         if outfile:
             tmpl.stream(vars).dump(outfile)
-        #return tmpl.render(vars)
+        # return tmpl.render(vars)

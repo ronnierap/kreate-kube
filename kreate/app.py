@@ -13,12 +13,12 @@ class Environment:
 
 
 class App:
-    def __init__(self, name: str,  version: str, env: Environment, template_package=templates,
-                 image_name: str = None):
+    def __init__(self, name: str,  version: str, env: Environment,
+                 template_package=templates, image_name: str = None):
         self.name = name
         self.version = version
         self.env = env
-        self.image_name = name + ".app"
+        self.image_name = image_name or name + ".app"
         self.image_repo = "somewhere.todo/"
         self.labels = dict()
         self.target_dir = "./target"
