@@ -7,7 +7,7 @@ class Kustomization(Base):
         self.name = "kustomization"
         self.resources = []
         self.patches = []
-        Base.__init__(self, app, "Kustomization", Kustomization)
+        Base.__init__(self, app, name="kustomization")
 
     def add(self, comp: Base):
         self.resources.append(comp)

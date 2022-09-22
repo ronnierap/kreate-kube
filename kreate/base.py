@@ -30,7 +30,8 @@ class Base:
     def kreate(self) -> None:
         os.makedirs(self.app.target_dir, exist_ok=True)
         if ( self.yaml is None ):
-            print(self.render())
+            print(self.filename)
+            self.render(outfile=self.app.target_dir + "/" + self.filename)
         else:
             self.__yaml.dump(self.yaml._dict, sys.stdout)
 
@@ -40,10 +41,7 @@ class Base:
     def add_label(self, name: str, val: str) -> None:
         self.yaml.labels.add(name, val)
 
-    def __file(self) -> str:
-        return self.app.target_dir + "/" + self.filename + ".yaml"
-
-    def render(self) -> None:
+    def render(self, outfile=None) -> None:
         template_data = pkgutil.get_data(self.app.template_package.__package__, self.template).decode('utf-8')
         tmpl = jinja2.Template(
             template_data,
@@ -54,5 +52,6 @@ class Base:
             "app": self.app,
             "env": self.app.env,
             self.kind.lower(): self}
-        tmpl.stream(vars).dump(self.template)
-        return tmpl.render(vars)
+        if outfile:
+            tmpl.stream(vars).dump(outfile)
+        #return tmpl.render(vars)
