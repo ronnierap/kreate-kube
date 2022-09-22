@@ -1,3 +1,6 @@
+import shutil
+import os
+
 from .base import Base
 from .app import App
 
@@ -18,6 +21,10 @@ class Kustomization(Base):
         return comp  # return to allow changing a freshly create component
 
     def kreate(self):
+        # TODO better place: to clear directory
+        shutil.rmtree(self.app.target_dir)
+        os.makedirs(self.app.target_dir, exist_ok=True)
+
         for rsrc in self.resources:
             rsrc.kreate()
         for patch in self.patches:

@@ -1,4 +1,3 @@
-import os
 import sys
 import jinja2
 import pkgutil
@@ -28,7 +27,6 @@ class Base:
         self.yaml = DictWrapper(self.__yaml.load(self.render()))
 
     def kreate(self) -> None:
-        os.makedirs(self.app.target_dir, exist_ok=True)
         if ( self.yaml is None ):
             print(self.filename)
             self.render(outfile=self.app.target_dir + "/" + self.filename)
