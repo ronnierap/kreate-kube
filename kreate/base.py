@@ -38,9 +38,9 @@ class Base:
         self.annotations[name] = val
 
     def add_label(self, name: str, val: str) -> None:
-        self.yaml.labels.add(name, val)
+        self.labels.add[name] = val
 
-    def render(self, outfile=None) -> None:
+    def render(self, outfile=None):
         template_data = pkgutil.get_data(self.app.template_package.__package__,
                                          self.template).decode('utf-8')
         tmpl = jinja2.Template(
@@ -54,4 +54,5 @@ class Base:
             self.kind.lower(): self}
         if outfile:
             tmpl.stream(vars).dump(outfile)
-        # return tmpl.render(vars)
+        else:
+            return tmpl.render(vars)
