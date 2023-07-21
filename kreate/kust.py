@@ -22,7 +22,8 @@ class Kustomization(Base):
 
     def kreate(self):
         # TODO better place: to clear directory
-        shutil.rmtree(self.app.target_dir)
+        if os.path.exists(self.app.target_dir) and os.path.isdir(self.app.target_dir):
+            shutil.rmtree(self.app.target_dir)
         os.makedirs(self.app.target_dir, exist_ok=True)
 
         for rsrc in self.resources:
