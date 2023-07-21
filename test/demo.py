@@ -24,7 +24,7 @@ def demo_app():
     cm.add_var("ORACLE_SCHEMA")
 
 
-    kust = kreate.Kustomization(app)
+    kust = kreate.Kustomization(app, cm)
 
     app.kreate_resources()
 

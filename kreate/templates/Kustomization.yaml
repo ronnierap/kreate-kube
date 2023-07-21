@@ -11,8 +11,13 @@ namespace: {{ app.namespace }}
 patches: []
 
 configMapGenerator:
-- name: {{ app.name }}-vars2 # to prevent conflict with the normal ConfigMap
+{% for cm in my.configmaps %}
+- name: {{ cm.name }}
   options:
     labels:
-      config-map: {{ app.name }}-vars
-  literals: []
+      config-map: {{ cm.name }}
+  literals:
+{% for key in cm.vars %}
+    - {{ key }}={{ cm.vars[key] }}
+{% endfor %}
+{% endfor %}
