@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ app.name }}
 spec:
-  replicas: {{ env.replicas }}
+  replicas: {{ app.replicas }}
   revisionHistoryLimit: 1
   selector:
     matchLabels:

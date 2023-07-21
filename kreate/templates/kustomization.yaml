@@ -5,7 +5,7 @@ resources:
 {% for res in kustomization.resources %}
 - {{ res.filename }}
 {% endfor %}
-namespace: {{ env.namespace }}
+namespace: {{ app.namespace }}
 
 patches: []
 
