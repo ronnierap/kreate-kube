@@ -2,10 +2,11 @@
 import sys; sys.path.append(".")  # to find the kreate package
 import kreate
 
-env = kreate.Environment('acc')
-env.project = "kreate-test"
+#env = kreate.Environment('acc')
+#env.project = "kreate-test"
 
-app = kreate.App('demo', 'v1.2', env)
+app = kreate.App('demo')
+#app.vars["project"] = "kreate-demo"
 #app.labels["egress-to-oracle"] = "enabled"
 
 

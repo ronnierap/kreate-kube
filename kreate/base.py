@@ -49,7 +49,7 @@ class Base:
             lstrip_blocks=True)
         vars = {
             "app": self.app,
-            "env": self.app.env,
+            "vars": self.app.vars,
             self.kind.lower(): self}
         if outfile:
             tmpl.stream(vars).dump(outfile)

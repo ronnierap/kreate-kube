@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ app.name }}
 spec:
-  replicas: {{ app.replicas }}
+  replicas: {{ vars.replicas }}
   revisionHistoryLimit: 1
   selector:
     matchLabels:
@@ -15,9 +15,9 @@ spec:
         app: {{ app.name }}
       annotations:
         app.kubernetes.io/name: {{ app.name }}
-        app.kubernetes.io/version: "{{ app.version }}"
+        app.kubernetes.io/version: "{{ vars.version }}"
         app.kubernetes.io/component: webservice
-        app.kubernetes.io/part-of: {{ env.project }}
+        app.kubernetes.io/part-of: {{ vars.project }}
         app.kubernetes.io/managed-by: kustomize
         co.elastic.logs/enabled: "true"
         co.elastic.logs/exclude_lines: DEBUG
@@ -25,7 +25,7 @@ spec:
       #restartPolicy: Never
       containers:
       - name: app
-        image: {{ app.image_repo }}/{{ app.name }}.app:{{ app.version }}
+        image: {{ vars.image_repo }}/{{ app.name }}.app:{{ vars.version }}
         imagePullPolicy: Always
         envFrom:
         - secretRef:

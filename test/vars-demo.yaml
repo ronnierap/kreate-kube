@@ -1,0 +1,6 @@
+team: devteam1
+env: dev
+version: latest-master
+project: kreate-demo
+replicas: 1
+image_repo: todo.com
