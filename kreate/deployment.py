@@ -18,3 +18,7 @@ class Container:
         self.mem_limit = '512Mi'
         self.mem_request = '512Mi'
         self.port = 8080
+
+class PodDisruptionBudget(Base):
+    def __init__(self, app: App):
+        Base.__init__(self, app)

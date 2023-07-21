@@ -16,5 +16,7 @@ ingr.whitelist("ggg")
 ingr.basic_auth()
 
 depl = kust.add(kreate.Deployment(app))
+pdb = kust.add(kreate.PodDisruptionBudget(app))
+pdb.yaml.spec.minAvailable = 2
 
 kust.kreate()
