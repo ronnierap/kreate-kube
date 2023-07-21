@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import sys; sys.path.append(".")  # to find the kreate package
 import kreate
 
 env = kreate.Environment('acc')
