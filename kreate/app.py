@@ -21,5 +21,5 @@ class App:
         self.image_name = image_name or name + ".app"
         self.image_repo = "somewhere.todo/"
         self.labels = dict()
-        self.target_dir = "./target"
+        self.target_dir = "./build/target"
         self.template_package = template_package
