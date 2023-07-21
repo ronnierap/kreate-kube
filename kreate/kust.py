@@ -6,6 +6,7 @@ class Kustomization(Base):
     def __init__(self, app: App):
         self.name = "kustomization"
         Base.__init__(self, app, name="kustomization")
+        self.yaml.resources._seq.pop() #delete("kustomization.yaml")
 
 class ConfigMap(Base):
     def __init__(self, app: App):

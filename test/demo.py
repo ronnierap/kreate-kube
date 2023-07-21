@@ -3,26 +3,29 @@ import sys; sys.path.append(".")  # to find the kreate package from test subdir
 
 import kreate
 
-app = kreate.App('demo')
+def demo_app():
+    app = kreate.App('demo')
 
-ingr = kreate.Ingress(app)
-ingr.sticky()
-ingr.whitelist("ggg")
-ingr.basic_auth()
-ingr.add_label("dummy", "jan")
+    ingr = kreate.Ingress(app)
+    ingr.sticky()
+    ingr.whitelist("ggg")
+    ingr.basic_auth()
+    ingr.add_label("dummy", "jan")
 
-depl = kreate.Deployment(app)
-depl.add_template_label("egress-to-oracle", "enabled")
+    depl = kreate.Deployment(app)
+    depl.add_template_label("egress-to-oracle", "enabled")
 
-pdb = kreate.PodDisruptionBudget(app)
-pdb.yaml.spec.minAvailable = 2
+    pdb = kreate.PodDisruptionBudget(app)
+    pdb.yaml.spec.minAvailable = 2
 
-cm = kreate.ConfigMap(app)
-cm.add_var("ORACLE_URL")
-cm.add_var("ORACLE_USR")
-cm.add_var("ORACLE_SCHEMA")
+    cm = kreate.ConfigMap(app)
+    cm.add_var("ORACLE_URL")
+    cm.add_var("ORACLE_USR")
+    cm.add_var("ORACLE_SCHEMA")
 
 
-kust = kreate.Kustomization(app)
+    kust = kreate.Kustomization(app)
 
-app.kreate_resources()
+    app.kreate_resources()
+
+kreate.cli(demo_app)
