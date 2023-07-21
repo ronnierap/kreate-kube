@@ -12,7 +12,7 @@ ingr.basic_auth()
 ingr.add_label("dummy", "jan")
 
 depl = kreate.Deployment(app)
-depl.yaml.spec.template.metadata.labels.add("egress-to-oracle", "enabled")
+depl.add_template_label("egress-to-oracle", "enabled")
 
 pdb = kreate.PodDisruptionBudget(app)
 pdb.yaml.spec.minAvailable = 2
