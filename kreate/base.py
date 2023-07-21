@@ -20,8 +20,6 @@ class Base:
         self.name = name or app.name + "-" + self.kind.lower()
         self.filename = filename or self.name + ".yaml"
         self.template = template or self.kind + ".yaml"
-        self.annotations = {}
-        self.labels = {}
         self.__yaml = YAML()
         self.__parsed = self.__yaml.load(self.render())
         self.yaml = DictWrapper(self.__parsed)
@@ -35,10 +33,14 @@ class Base:
         self.__yaml.dump(self.yaml._dict, sys.stdout)
 
     def annotate(self, name: str, val: str) -> None:
+        if not self.yaml.metadata.has_key("annotations"):
+            self.yaml.metadata.add("annotations", {})
         self.yaml.metadata.annotations.add(name, val)
 
     def add_label(self, name: str, val: str) -> None:
-        self.labels.add[name] = val
+        if not self.yaml.metadata.has_key("labels"):
+            self.yaml.metadata.add("labels", {})
+        self.yaml.metadata.labels.add(name, val)
 
     def render(self, outfile=None):
         template_data = pkgutil.get_data(self.app.template_package.__package__,

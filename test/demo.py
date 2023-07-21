@@ -9,6 +9,7 @@ ingr = kreate.Ingress(app)
 ingr.sticky()
 ingr.whitelist("ggg")
 ingr.basic_auth()
+ingr.add_label("dummy", "jan")
 
 depl = kreate.Deployment(app)
 depl.yaml.spec.template.metadata.labels.add("egress-to-oracle", "enabled")

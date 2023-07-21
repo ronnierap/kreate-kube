@@ -16,6 +16,9 @@ class DictWrapper():
     def get(self, key):
         return self._dict[key]
 
+    def has_key(self, key) -> bool:
+        return key in self._dict
+
     def __setattr__(self, attr, val):
         if attr in self.__dict__ or attr == "_dict":
             return super().__setattr__(attr, val)
