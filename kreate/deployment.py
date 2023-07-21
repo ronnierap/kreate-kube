@@ -7,7 +7,7 @@ class Deployment(Base):
         # self.replicas = env.replicas
         # self.container = [Container('app')]
         # self.container[0].image_name = app.name + ".app"
-        Base.__init__(self, app)
+        Base.__init__(self, app, name=app.name, filename=app.name+"-deployment.yaml")
 
 
 class Container:
