@@ -15,6 +15,12 @@ depl.yaml.spec.template.metadata.labels.add("egress-to-oracle", "enabled")
 pdb = kreate.PodDisruptionBudget(app)
 pdb.yaml.spec.minAvailable = 2
 
+cm = kreate.ConfigMap(app)
+cm.add_var("ORACLE_URL")
+cm.add_var("ORACLE_USR")
+cm.add_var("ORACLE_SCHEMA")
+
+
 kust = kreate.Kustomization(app)
 
 app.kreate_resources()

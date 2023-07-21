@@ -4,3 +4,7 @@ version: latest-master
 project: kreate-demo
 replicas: 1
 image_repo: todo.com
+
+ORACLE_URL: localhost:1521
+ORACLE_USR: demo_usr
+ORACLE_SCHEMA: demo_schema

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    config-map: {{ my.name }}
+  name: {{ my.name }}
+  namespace: {{ app.namespace }}
+data:
+  ENV: {{ app.vars.env }}  # TODO: this is needed to have at least one entry
+  # TODO: the loop below is rendered before my.vars is filled
+{% for var in my.vars %}
+  {{ var.name }}: {{ var.value }}
+{% endfor %}
