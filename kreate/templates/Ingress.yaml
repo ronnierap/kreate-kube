@@ -5,9 +5,6 @@ metadata:
   namespace: {{ app.namespace }}
   annotations:
     app.kubernetes.io/name: {{ app.name }}
-  {% if my.sticky %}
-    nginx.ingress.kubernetes.io/affinity: cookie
-  {% endif %}
 spec:
   rules:
     - host: {{ my.host }}

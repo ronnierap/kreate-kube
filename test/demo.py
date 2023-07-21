@@ -5,7 +5,8 @@ import kreate
 
 app = kreate.App('demo')
 
-ingr = kreate.Ingress(app, sticky=True)
+ingr = kreate.Ingress(app)
+ingr.sticky()
 ingr.whitelist("ggg")
 ingr.basic_auth()
 

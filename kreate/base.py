@@ -35,7 +35,7 @@ class Base:
         self.__yaml.dump(self.yaml._dict, sys.stdout)
 
     def annotate(self, name: str, val: str) -> None:
-        self.annotations[name] = val
+        self.yaml.metadata.annotations.add(name, val)
 
     def add_label(self, name: str, val: str) -> None:
         self.labels.add[name] = val

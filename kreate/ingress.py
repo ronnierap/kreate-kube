@@ -6,19 +6,19 @@ class Ingress(Base):
     def __init__(self,
                  app: App,
                  name="root",
-                 sticky=False,
                  path="/",
                  host="TODO",
                  port=8080):
-        self.sticky = sticky
         self.path = path
         self.host = host
         self.port = port
         Base.__init__(self, app, name=app.name + "-ingress-" + name)
-        self.nginx_annon("affinity", "blabla")
 
     def nginx_annon(self, name: str, val: str) -> None:
         self.annotate("nginx.ingress.kubernetes.io/" + name, val)
+
+    def sticky(self) -> None:
+        self.nginx_annon("affinity", "cookie")
 
     def rewrite_url(self, url: str) -> None:
         self.nginx_annon("rewrite-target", url)
