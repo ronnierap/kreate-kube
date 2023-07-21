@@ -1,22 +1,22 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ ingress.name }}
+  name: {{ my.name }}
   namespace: {{ app.namespace }}
   annotations:
     app.kubernetes.io/name: {{ app.name }}
-  {% if ingress.sticky %}
+  {% if my.sticky %}
     nginx.ingress.kubernetes.io/affinity: cookie
   {% endif %}
 spec:
   rules:
-    - host: {{ ingress.host }}
+    - host: {{ my.host }}
       http:
         paths:
           - pathType: Prefix
-            path: {{ ingress.path }}
+            path: {{ my.path }}
             backend:
               service:
-                name: {{ app.name }}-service
+                name: {{ my.name }}
                 port:
-                  number: {{ ingress.port }}
+                  number: {{ my.port }}

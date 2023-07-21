@@ -52,7 +52,7 @@ class Base:
             "app": self.app,
             "vars": self.app.vars,
             "my": self,
-            self.kind.lower(): self}
+        }
         if outfile:
             tmpl.stream(vars).dump(outfile)
         else:

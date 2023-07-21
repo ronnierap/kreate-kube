@@ -1,7 +1,7 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ app.name }}-pdb
+  name: {{ my.name }}
 spec:
   # This can be set from python code
   minAvailable: 1
