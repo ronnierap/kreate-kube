@@ -15,6 +15,7 @@ class Base:
                  filename: str = None,
                  template: str = None):
         self.app = app
+        self.app.resources.append(self)
         self.kind = type(self).__name__
         self.name = name or app.name + "-" + self.kind.lower()
         self.filename = filename or self.name + ".yaml"
