@@ -21,18 +21,17 @@ class Base:
         self.template = template or self.kind.lower() + ".yaml"
         self.annotations = {}
         self.labels = {}
-        self.yaml = None  # Used if you want to modify the yaml
-
-    def kreate_yaml(self):
         self.__yaml = YAML()
-        self.yaml = DictWrapper(self.__yaml.load(self.render()))
+        self.__parsed = self.__yaml.load(self.render())
+        self.yaml = DictWrapper(self.__parsed)
 
     def kreate(self) -> None:
-        if self.yaml is None:
-            print(self.filename)
-            self.render(outfile=self.app.target_dir + "/" + self.filename)
-        else:
-            self.__yaml.dump(self.yaml._dict, sys.stdout)
+        print(self.filename)
+        with open(self.app.target_dir + "/" + self.filename, 'wb') as f:
+            self.__yaml.dump(self.__parsed, f)
+
+    def dump(self) -> None:
+        self.__yaml.dump(self.yaml._dict, sys.stdout)
 
     def annotate(self, name: str, val: str) -> None:
         self.annotations[name] = val
