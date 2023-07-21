@@ -19,7 +19,7 @@ class Base:
         self.kind = type(self).__name__
         self.name = name or app.name + "-" + self.kind.lower()
         self.filename = filename or self.name + ".yaml"
-        self.template = template or self.kind.lower() + ".yaml"
+        self.template = template or self.kind + ".yaml"
         self.annotations = {}
         self.labels = {}
         self.__yaml = YAML()
