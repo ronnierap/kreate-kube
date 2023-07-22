@@ -7,6 +7,18 @@ from ruamel.yaml import YAML
 from .app import App
 from .wrapper import DictWrapper
 
+# see: https://towardsdatascience.com/what-is-lazy-evaluation-in-python-9efb1d3bfed0
+def lazy_property(fn):
+    attr_name = '_lazy_' + fn.__name__
+
+    @property
+    def _lazy_property(self):
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, fn(self))
+        return getattr(self, attr_name)
+    return _lazy_property
+
+
 
 class Base:
     def __init__(self,
@@ -21,8 +33,13 @@ class Base:
         self.filename = filename or self.name + ".yaml"
         self.template = template or self.kind + ".yaml"
         self.__yaml = YAML()
+
+    @lazy_property
+    def yaml(self):
+        # Only parse yaml when needed
+        #print("yaml property is parsed for "+self.name)
         self.__parsed = self.__yaml.load(self.render())
-        self.yaml = DictWrapper(self.__parsed)
+        return DictWrapper(self.__parsed)
 
     def kreate(self) -> None:
         print(self.filename)

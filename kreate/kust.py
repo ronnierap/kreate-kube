@@ -12,14 +12,20 @@ class ConfigMap(Base):
         self.yaml.data.add(name, self.app.vars[name])
 
 class Kustomization(Base):
-    def __init__(self, app: App, cm : ConfigMap = None):
+    def __init__(self, app: App):
         self.name = "kustomization"
-        self.configmaps = [ cm ]
+        self.configmaps = []
         Base.__init__(self, app, name="kustomization")
-        self.yaml.resources._seq.pop() #delete("kustomization.yaml")
-        self.yaml.resources._seq.remove(cm.filename)
+        #self.yaml.resources._seq.pop() #delete("kustomization.yaml")
+        #self.yaml.resources._seq.remove(cm.filename)
 
+    def kreate(self) -> None:
+        self.yaml.resources._seq.pop() #delete("kustomization.yaml")
+        Base.kreate(self)
 
     def add_cm(self, cm: ConfigMap):
         self.configmaps.append(cm)
-        self.yaml.resources._seq.remove(cm.filename)
+        cm.app.resources.remove(cm)
+        #print(cm.filename)
+        #print(self.yaml.resources._seq)
+        #self.yaml.resources._seq.remove(cm.filename)

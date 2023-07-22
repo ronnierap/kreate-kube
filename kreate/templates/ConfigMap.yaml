@@ -8,6 +8,6 @@ metadata:
 data:
   ENV: {{ app.vars.env }}  # TODO: this is needed to have at least one entry
   # TODO: the loop below is rendered before my.vars is filled
-{% for var in my.vars %}
-  {{ var.name }}: {{ var.value }}
+{% for key in my.vars %}
+  {{ key }}: {{ my.vars[key] }}
 {% endfor %}
