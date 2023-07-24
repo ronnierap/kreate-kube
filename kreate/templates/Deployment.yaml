@@ -24,21 +24,21 @@ spec:
     spec:
       #restartPolicy: Never
       containers:
-      - name: {{ config.container.name }}
+      - name: {{ config.containers[0].name }}
         image: {{ config.image_repo }}/{{ app.name }}.app:{{ config.version }}
-        imagePullPolicy: {{ config.container.imagePullPolicy }}
+        imagePullPolicy: {{ config.containers[0].imagePullPolicy }}
         envFrom:
         - secretRef:
             name: {{ app.name }}-secrets
         - configMapRef:
             name: {{ app.name }}-vars
         ports:
-        - containerPort: {{ config.container.ports.containerPort }}
-          protocol: {{ config.container.ports.protocol }}
+        - containerPort: {{ config.containers[0].ports[0].containerPort }}
+          protocol: {{ config.containers[0].ports[0].protocol }}
         resources:
           limits:
-            cpu: {{ config.container.resources.limits.cpu }}
-            memory: {{ config.container.resources.limits.memory }}
+            cpu: {{ config.containers[0].resources.limits.cpu }}
+            memory: {{ config.containers[0].resources.limits.memory }}
           requests:
-            cpu: {{ config.container.resources.requests.cpu }}
-            memory: {{ config.container.resources.requests.memory }}
+            cpu: {{ config.containers[0].resources.requests.cpu }}
+            memory: {{ config.containers[0].resources.requests.memory }}

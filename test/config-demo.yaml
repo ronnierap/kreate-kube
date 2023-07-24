@@ -12,11 +12,11 @@ livenessProbe:
 readinessProbe:
   url: actuator/info
 
-container: # This is not a list, just a single container for a "standard" deployment
-  name: app
+containers:
+- name: app
   imagePullPolicy: Always
-  ports: # This is not a list, just a single port for a "standard" deployment
-    containerPort: 8080
+  ports:
+  - containerPort: 8080
     protocol: TCP
   resources:
     limits:

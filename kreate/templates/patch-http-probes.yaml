@@ -6,7 +6,7 @@ spec:
   template:
     spec:
       containers:
-      - name: {{ config.container }}
+      - name: {{ config.containers[0].name }}
         startupProbe:
           initialDelaySeconds: {{ config.startupProbe.delay | default(10) }}
           periodSeconds: {{ config.startupProbe.period | default(2) }}
