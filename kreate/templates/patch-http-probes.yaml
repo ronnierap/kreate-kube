@@ -8,14 +8,14 @@ spec:
       containers:
       - name: {{ config.containers[0].name }}
         startupProbe:
-          initialDelaySeconds: {{ config.startupProbe.delay | default(10) }}
-          periodSeconds: {{ config.startupProbe.period | default(2) }}
+          initialDelaySeconds: {{ config.containers[0].startupProbe.delay | default(10) }}
+          periodSeconds: {{ config.containers[0].startupProbe.period | default(2) }}
           timeoutSeconds: 1
           successThreshold: 1
-          failureThreshold: {{ config.startupProbe.tries | default(30) }}
+          failureThreshold: {{ config.containers[0].startupProbe.tries | default(30) }}
           httpGet:
             scheme: HTTP
-            path: {{ config.startupProbe.url }}
+            path: {{ config.containers[0].startupProbe.httpGet.path }}
             port: 8080
             #httpHeaders:
             #- name: Authorization
@@ -27,7 +27,7 @@ spec:
           failureThreshold: 1
           httpGet:
             scheme: HTTP
-            path: {{ config.readinessProbe.url }}
+            path: {{ config.containers[0].readinessProbe.httpGet.path }}
             port: 8080
             #httpHeaders:
             #- name: Authorization
@@ -39,7 +39,7 @@ spec:
           failureThreshold: 3
           httpGet:
             scheme: HTTP
-            path: {{ config.livenessProbe.url }}
+            path: {{ config.containers[0].livenessProbe.httpGet.path }}
             port: 8080
             #httpHeaders:
             #- name: Authorization
