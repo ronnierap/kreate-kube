@@ -11,7 +11,7 @@ def demo_app():
     ingr.whitelist("ggg")
     ingr.basic_auth()
     ingr.add_label("dummy", "jan")
-    ingr = kreate.Ingress(app, path="/api", name="demo-api")
+    ingr = kreate.Ingress(app, path="/api", name="api")
 
     depl = kreate.Deployment(app)
     depl.add_template_label("egress-to-oracle", "enabled")

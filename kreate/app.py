@@ -25,7 +25,7 @@ class App:
             with open(config_file) as f:
                 self.config.update(yaml.load(f))
 
-        self.namespace = self.name + "-" + self.vars["env"]
+        self.namespace = self.name + "-" + self.config["env"]
         #self.labels = dict()
         self.target_dir = "./build/" + self.namespace
         self.template_package = template_package

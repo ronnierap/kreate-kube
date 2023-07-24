@@ -6,8 +6,7 @@ metadata:
   name: {{ my.name }}
   namespace: {{ app.namespace }}
 data:
-  ENV: {{ app.vars.env }}  # TODO: this is needed to have at least one entry
-  # TODO: the loop below is rendered before my.vars is filled
+  ENV: {{ app.config.env }}
 {% for key in my.vars %}
   {{ key }}: {{ my.vars[key] }}
 {% endfor %}

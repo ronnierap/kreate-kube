@@ -41,7 +41,7 @@ class Base:
         return DictWrapper(self.__parsed)
 
     def kreate(self) -> None:
-        print(self.filename)
+        print("kreating "+self.filename)
         self.yaml
         with open(self.app.target_dir + "/" + self.filename, 'wb') as f:
             self.__yaml.dump(self.__parsed, f)
