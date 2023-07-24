@@ -1,6 +1,5 @@
 from .app import App
-from .ingress import Ingress
-from .deployment import Deployment, PodDisruptionBudget, ConfigMap
+from .resources import Deployment, PodDisruptionBudget, ConfigMap, Ingress
 from .kust import Kustomization
 from .cli import cli
 
