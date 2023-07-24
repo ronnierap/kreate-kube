@@ -8,10 +8,6 @@ class Kustomization(Base):
         self.configmaps = []
         Base.__init__(self, app, name="kustomization")
 
-    def kreate(self) -> None:
-        self.yaml.resources._seq.pop() #delete("kustomization.yaml")
-        Base.kreate(self)
-
     def kreate_files(self) -> None:
         self.app.kreate_resources()
         self.kreate()
