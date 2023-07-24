@@ -5,10 +5,23 @@ project: kreate-demo
 replicas: 1
 image_repo: todo.com
 
-container: app
 startupProbe:
   url: actuator/info
 livenessProbe:
   url: actuator/info
 readinessProbe:
   url: actuator/info
+
+container: # This is not a list, just a single container for a "standard" deployment
+  name: app
+  imagePullPolicy: Always
+  ports: # This is not a list, just a single port for a "standard" deployment
+    containerPort: 8080
+    protocol: TCP
+  resources:
+    limits:
+      cpu: 1
+      memory: 512M
+    requests:
+      cpu: 200m
+      memory: 512M

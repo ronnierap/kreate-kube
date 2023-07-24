@@ -24,21 +24,21 @@ spec:
     spec:
       #restartPolicy: Never
       containers:
-      - name: app
+      - name: {{ config.container.name }}
         image: {{ config.image_repo }}/{{ app.name }}.app:{{ config.version }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ config.container.imagePullPolicy }}
         envFrom:
         - secretRef:
             name: {{ app.name }}-secrets
         - configMapRef:
             name: {{ app.name }}-vars
         ports:
-        - containerPort: 8080
-          protocol: TCP
+        - containerPort: {{ config.container.ports.containerPort }}
+          protocol: {{ config.container.ports.protocol }}
         resources:
           limits:
-            cpu: 1
-            memory: 512M
+            cpu: {{ config.container.resources.limits.cpu }}
+            memory: {{ config.container.resources.limits.memory }}
           requests:
-            cpu: 200m
-            memory: 512M
+            cpu: {{ config.container.resources.requests.cpu }}
+            memory: {{ config.container.resources.requests.memory }}
