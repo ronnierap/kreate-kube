@@ -16,6 +16,7 @@ def demo_app():
     depl.add_template_label("egress-to-oracle", "enabled")
 
     pdb = kreate.PodDisruptionBudget(app)
+    print(app.resources)
     pdb.yaml.spec.minAvailable = 2
 
     cm = kreate.ConfigMap(app)
@@ -24,8 +25,8 @@ def demo_app():
     cm.add_var("ORACLE_SCHEMA")
 
     kust = kreate.Kustomization(app)
-    kust.add_cm(cm)
+    #kust.add_cm(cm)
 
-    app.kreate_resources()
+    kust.kreate_files()
 
 kreate.cli(demo_app)
