@@ -42,6 +42,7 @@ class Base:
 
     def kreate(self) -> None:
         print(self.filename)
+        self.yaml
         with open(self.app.target_dir + "/" + self.filename, 'wb') as f:
             self.__yaml.dump(self.__parsed, f)
 
@@ -69,9 +70,14 @@ class Base:
         vars = {
             "app": self.app,
             "vars": self.app.vars,
+            "config": self.app.config,
             "my": self,
         }
+        self._add_jinja_vars(vars)
         if outfile:
             tmpl.stream(vars).dump(outfile)
         else:
             return tmpl.render(vars)
+
+    def _add_jinja_vars(self, vars):
+        pass

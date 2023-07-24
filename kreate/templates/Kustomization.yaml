@@ -8,7 +8,13 @@ resources:
 {% endfor %}
 namespace: {{ app.namespace }}
 
-patches: []
+patches:
+{% for res in app.resources %}
+{% for pat in res.patches %}
+- {{ pat.filename }}
+{% endfor %}
+{% endfor %}
+
 
 configMapGenerator:
 {% for cm in my.configmaps %}

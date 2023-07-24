@@ -5,14 +5,18 @@ class Resource(Base):
     def __init__(self, app: App, name=None, filename=None):
         Base.__init__(self, app, name, filename)
         self.app.resources.append(self)
-        patches = {}
+        self.patches = []
 
+    def kreate(self) -> None:
+        Base.kreate(self)
+        for p in self.patches:
+            p.kreate()
 
 class Patch(Base):
     def __init__(self, target: Resource, name=None, filename=None):
         Base.__init__(self, target.app, name, filename)
         self.target =target
-        self.target.patches.append(self)
+        self.target.patches.add(self)
 
 
 class Deployment(Resource):

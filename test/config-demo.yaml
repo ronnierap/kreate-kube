@@ -1,0 +1,7 @@
+container: app
+startupProbe:
+  url: actuator/info
+livenessProbe:
+  url: actuator/info
+readinessProbe:
+  url: actuator/info

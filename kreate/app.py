@@ -10,14 +10,20 @@ class App:
                  template_package=templates, image_name: str = None):
         self.name = name
         self.vars = dict()
+        self.config = dict()
         script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
-        vars_file = script_directory + "/vars-" + self.name + ".yaml"
         if parent:
             self.vars.update(parent.vars)
+            self.config.update(parent.config)
+        yaml=YAML()
+        vars_file = script_directory + "/vars-" + self.name + ".yaml"
         if os.path.exists(vars_file):
-            yaml=YAML()
             with open(vars_file) as f:
                 self.vars.update(yaml.load(f))
+        config_file = script_directory + "/config-" + self.name + ".yaml"
+        if os.path.exists(config_file):
+            with open(config_file) as f:
+                self.config.update(yaml.load(f))
 
         self.namespace = self.name + "-" + self.vars["env"]
         #self.labels = dict()
