@@ -2,8 +2,7 @@ from . import templates
 import os
 import sys
 import shutil
-from ruamel.yaml import YAML
-
+from . import yaml
 
 class App:
     def __init__(self, name: str, parent = None,
@@ -15,15 +14,10 @@ class App:
         if parent:
             self.vars.update(parent.vars)
             self.config.update(parent.config)
-        yaml=YAML()
         vars_file = script_directory + "/vars-" + self.name + ".yaml"
-        if os.path.exists(vars_file):
-            with open(vars_file) as f:
-                self.vars.update(yaml.load(f))
+        self.vars.update(yaml.loadOptionalYaml(vars_file))
         config_file = script_directory + "/config-" + self.name + ".yaml"
-        if os.path.exists(config_file):
-            with open(config_file) as f:
-                self.config.update(yaml.load(f))
+        self.config.update(yaml.loadOptionalYaml(config_file))
 
         self.namespace = self.name + "-" + self.config["env"]
         #self.labels = dict()
