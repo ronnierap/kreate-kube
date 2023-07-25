@@ -12,6 +12,10 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "ruamel-yaml>=0.17.32",
+    "jinja2>=3.1.2",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/MarkHooijkaas/kreate-kube-app"
