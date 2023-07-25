@@ -1,6 +1,6 @@
 from .app import App
 from .resources import Deployment, PodDisruptionBudget, ConfigMap, Ingress
-from .patches import HttpProbes
+from .patches import HttpProbesPatch, AntiAffinityPatch
 from .kust import Kustomization
 from .cli import cli
 from  ruamel.yaml import YAML

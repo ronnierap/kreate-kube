@@ -15,7 +15,8 @@ def demo_app():
 
     depl = kreate.Deployment(app)
     depl.add_template_label("egress-to-oracle", "enabled")
-    kreate.HttpProbes(depl)
+    kreate.HttpProbesPatch(depl)
+    kreate.AntiAffinityPatch(depl)
 
     pdb = kreate.PodDisruptionBudget(app, name="demo-pdb")
     pdb.yaml.spec.minAvailable = 2

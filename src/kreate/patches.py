@@ -12,6 +12,10 @@ class Patch(Base):
         vars["target"]=self.target
 
 
-class HttpProbes(Patch):
+class HttpProbesPatch(Patch):
     def __init__(self, target: Resource):
         Patch.__init__(self, target, "patch-http-probes.yaml", name=target.name+"-probes")
+
+class AntiAffinityPatch(Patch):
+    def __init__(self, target: Resource):
+        Patch.__init__(self, target, "patch-anti-affinity.yaml", name=target.name+"-probes")
