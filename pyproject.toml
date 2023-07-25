@@ -1,10 +1,10 @@
 [project]
-name = "kreate-kube-app"
+name = "kreate-kube-apps"
 version = "0.0.1"
 authors = [
   { name="Mark Hooijkaas", email="mark@hooijkaas.net" },
 ]
-description = "kreate kubernetes application resources from templates"
+description = "kreate kubernetes application from templates"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
