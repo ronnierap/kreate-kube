@@ -1,0 +1,22 @@
+[project]
+name = "kreate-kube-app"
+version = "0.0.1"
+authors = [
+  { name="Mark Hooijkaas", email="mark@hooijkaas.net" },
+]
+description = "kreate kubernetes application resources from templates"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/MarkHooijkaas/kreate-kube-app"
+"Bug Tracker" = "https://github.com/MarkHooijkaas/kreate-kube-app/issues"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
