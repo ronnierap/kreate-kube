@@ -38,14 +38,15 @@ class Deployment(Resource):
 
 
 class PodDisruptionBudget(Resource):
-    def __init__(self, app: App):
-        Resource.__init__(self, app)
+    def __init__(self, app: App, name=None):
+
+        Resource.__init__(self, app, name=name)
 
 
 class ConfigMap(Resource):
-    def __init__(self, app: App):
+    def __init__(self, app: App, name=None):
         self.vars = {}
-        Resource.__init__(self, app)
+        Resource.__init__(self, app, name=name)
 
     def add_var(self, name):
         self.vars[name] = self.app.vars[name]

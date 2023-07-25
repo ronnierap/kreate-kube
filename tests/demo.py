@@ -17,10 +17,10 @@ def demo_app():
     depl.add_template_label("egress-to-oracle", "enabled")
     kreate.HttpProbes(depl)
 
-    pdb = kreate.PodDisruptionBudget(app)
+    pdb = kreate.PodDisruptionBudget(app, name="demo-pdb")
     pdb.yaml.spec.minAvailable = 2
 
-    cm = kreate.ConfigMap(app)
+    cm = kreate.ConfigMap(app, name="demo-vars")
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")
     cm.add_var("ORACLE_SCHEMA")
