@@ -18,4 +18,4 @@ class HttpProbesPatch(Patch):
 
 class AntiAffinityPatch(Patch):
     def __init__(self, target: Resource):
-        Patch.__init__(self, target, "patch-anti-affinity.yaml", name=target.name+"-probes")
+        Patch.__init__(self, target, "patch-anti-affinity.yaml", name=target.name+"-anti-affinity")
