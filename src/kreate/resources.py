@@ -48,9 +48,11 @@ class ConfigMap(Resource):
         self.vars = {}
         Resource.__init__(self, app, name=name)
 
-    def add_var(self, name):
-        self.vars[name] = self.app.vars[name]
-        self.yaml.data.add(name, self.app.vars[name])
+    def add_var(self, name, value=None):
+        if value is None:
+            value = self.app.vars[name]
+        self.vars[name] = value
+        self.yaml.data.add(name, value)
 
 
 class Ingress(Resource):

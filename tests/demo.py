@@ -21,6 +21,7 @@ def demo_app():
     pdb.yaml.spec.minAvailable = 2
 
     cm = kreate.ConfigMap(app, name="demo-vars")
+    cm.add_var("ENV", value=app.config["env"])
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")
     cm.add_var("ORACLE_SCHEMA")
