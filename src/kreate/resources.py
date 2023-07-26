@@ -39,8 +39,15 @@ class Deployment(Resource):
 
 class PodDisruptionBudget(Resource):
     def __init__(self, app: App, name=None):
-
         Resource.__init__(self, app, name=name)
+
+class Service(Resource):
+    def __init__(self, app: App, name=None, ports=[{"port": 8080}]):
+        self.ports=ports
+        Resource.__init__(self, app, name=name)
+
+    def headless(self):
+        self.yaml.spec.clusterIP="None"
 
 
 class ConfigMap(Resource):

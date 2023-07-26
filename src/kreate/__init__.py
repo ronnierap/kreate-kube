@@ -1,5 +1,5 @@
 from .app import App
-from .resources import Deployment, PodDisruptionBudget, ConfigMap, Ingress
+from .resources import Deployment, PodDisruptionBudget, ConfigMap, Ingress, Service
 from .patches import HttpProbesPatch, AntiAffinityPatch
 from .kust import Kustomization
 from .cli import cli

@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ my.name }}
+  namespace: {{ app.namespace }}
+  labels:
+    app: {{ app.name }}
+spec:
+  selector:
+    app: {{ app.name }}
+  ports:
+{% for port in my.ports %}
+  - protocol: TCP
+    port: {{ port.port }}
+    targetPort: {{ port.targetPort | default(port.port) }}
+    name: {{ port.name | default("http") }}
+{% endfor %}
