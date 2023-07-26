@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import sys; sys.path.append("./src")  # to find the kreate package from test subdir
-
 import kreate
 
 def demo_app():

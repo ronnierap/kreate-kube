@@ -1,6 +1,7 @@
 __pycache__
 build
 venv
+.venv
 zzz-tmp
 dist
 .pdm-python
