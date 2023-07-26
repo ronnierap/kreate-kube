@@ -1,8 +1,9 @@
-from . import templates
 import os
 import sys
 import shutil
-from . import yaml
+from . import yaml, templates
+#from .resources import Resource
+
 
 class App:
     def __init__(self, name: str, parent = None,
@@ -24,6 +25,25 @@ class App:
         self.target_dir = "./build/" + self.namespace
         self.template_package = template_package
         self.resources=[]
+        self._attr_map={}
+
+    def add(self, res, abbrevs) -> None:
+        self.resources.append(res)
+        attr_name = res.name.replace("-","_").lower()
+        self._attr_map[attr_name] = res
+        for abbrev in abbrevs:
+            abbrev = abbrev.replace("-","_").lower()
+            if abbrev not in self._attr_map: # Do not overwrite
+                self._attr_map[abbrev] = res
+        if attr_name.startswith(self.name.lower()+"_"):
+            short_name = attr_name[len(self.name)+1:]
+            if short_name not in self._attr_map: # Do not overwrite
+                self._attr_map[short_name] = res
+
+    def __getattr__(self, attr):
+        if attr in self.__dict__ or attr == "_dict":
+            return super().__getattribute__(attr)
+        return self._attr_map[attr]
 
     def kreate_resources(self):
         # TODO better place: to clear directory

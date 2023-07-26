@@ -2,9 +2,9 @@ from .base import Base
 from .app import App
 
 class Resource(Base):
-    def __init__(self, app: App, name=None, filename=None):
+    def __init__(self, app: App, name=None, filename=None, abbrevs=[]):
         Base.__init__(self, app, name, filename)
-        self.app.resources.append(self)
+        self.app.add(self, abbrevs=abbrevs)
         self.patches = []
 
     def kreate(self) -> None:
@@ -24,7 +24,7 @@ class Deployment(Resource):
         # self.replicas = env.replicas
         # self.container = [Container('app')]
         # self.container[0].image_name = app.name + ".app"
-        Resource.__init__(self, app, name=app.name, filename=app.name+"-deployment.yaml")
+        Resource.__init__(self, app, name=app.name, filename=app.name+"-deployment.yaml", abbrevs=["depl","deployment"])
 
     def add_template_annotation(self, name: str, val: str) -> None:
         if not self.yaml.spec.template.metadata.has_key("annotations"):
@@ -39,12 +39,12 @@ class Deployment(Resource):
 
 class PodDisruptionBudget(Resource):
     def __init__(self, app: App, name=None):
-        Resource.__init__(self, app, name=name)
+        Resource.__init__(self, app, name=name, abbrevs=["pdb"])
 
 class Service(Resource):
     def __init__(self, app: App, name=None, ports=[{"port": 8080}]):
         self.ports=ports
-        Resource.__init__(self, app, name=name)
+        Resource.__init__(self, app, name=name, abbrevs=["pdb"])
 
     def headless(self):
         self.yaml.spec.clusterIP="None"
@@ -53,7 +53,7 @@ class Service(Resource):
 class ConfigMap(Resource):
     def __init__(self, app: App, name=None):
         self.vars = {}
-        Resource.__init__(self, app, name=name)
+        Resource.__init__(self, app, name=name, abbrevs=["cm"])
 
     def add_var(self, name, value=None):
         if value is None:
