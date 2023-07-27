@@ -1,11 +1,9 @@
 import os
-import sys
 import jinja2
 import pkgutil
 
-from  ruamel.yaml import YAML
-
-from .wrapper import DictWrapper
+from ruamel.yaml import YAML
+from .wrapper import wrap
 
 parser = YAML()
 
@@ -15,7 +13,6 @@ def loadOptionalYaml(filename):
             return parser.load(f)
     else:
         return {}
-
 
 class YamlBase:
     def __init__(self,
@@ -29,23 +26,24 @@ class YamlBase:
         self.filename = filename or self.name + ".yaml"
         self.template = template or self.kind + ".yaml"
 
-        self.__parsed = parser.load(self.render())
-        self.yaml = DictWrapper(self.__parsed)
+        _parsed = parser.load(self.render())
+        self.yaml = wrap(_parsed)
 
     def kreate(self) -> None:
         print("kreating "+self.filename)
         with open(self.app.target_dir + "/" + self.filename, 'wb') as f:
-            parser.dump(self.__parsed, f)
+            #pprint.pprint(self.yaml.data)
+            parser.dump(self.yaml.data, f)
 
     def annotate(self, name: str, val: str) -> None:
-        if not self.yaml.metadata.has_key("annotations"):
-            self.yaml.metadata.add("annotations", {})
-        self.yaml.metadata.annotations.add(name, val)
+        if "annotations" not in self.yaml.metadata:
+            self.yaml.metadata["annotations"]={}
+        self.yaml.metadata.annotations[name]=val
 
     def add_label(self, name: str, val: str) -> None:
-        if not self.yaml.metadata.has_key("labels"):
-            self.yaml.metadata.add("labels", {})
-        self.yaml.metadata.labels.add(name, val)
+        if "labels" not in self.yaml.metadata:
+            self.yaml.metadata["labels"]={}
+        self.yaml.metadata.labels[name]=val
 
     def render(self, outfile=None):
         template_data = pkgutil.get_data(self.app.template_package.__package__,
@@ -70,6 +68,27 @@ class YamlBase:
     def _add_jinja_vars(self, vars):
         pass
 
+
+
+
+def merge(a, b, path=None):
+    "merges b into a"
+    if path is None: path = []
+    for key in b:
+        valb = b[key]
+        if key in a:
+            vala=a[key]
+            if isinstance(vala, dict) and isinstance(valb, dict):
+                merge(vala, valb, path + [str(key)])
+            elif a[key] == valb:
+                pass # same leaf value
+            else:
+                a[key] = valb
+                print('overriding %s' % '.'.join(path + [str(key)]))
+        else:
+            a[key] = valb
+    return a
+
 ## see: https://towardsdatascience.com/what-is-lazy-evaluation-in-python-9efb1d3bfed0
 #def lazy_property(fn):
 #    attr_name = '_lazy_' + fn.__name__
@@ -84,5 +103,5 @@ class YamlBase:
 #    def yaml(self):
 #        # Only parse yaml when needed
 #        #print("yaml property is parsed for "+self.name)
-#        self.__parsed = self.__yaml.load(self.render())
-#        return DictWrapper(self.__parsed)
+#        self._parsed = self.__yaml.load(self.render())
+#        return DictWrapper(self._parsed)

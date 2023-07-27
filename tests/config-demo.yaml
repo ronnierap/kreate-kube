@@ -5,6 +5,16 @@ project: kreate-demo
 replicas: 1
 image_repo: todo.com
 
+services:
+  ports:
+  - protocol: TCP
+    port: 8161
+    targetPort: 8161
+    name: amq-ui
+  - protocol: TCP
+    port: 61616
+    targetPort: 61616
+    name: amq
 
 
 containers:

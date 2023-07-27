@@ -38,7 +38,7 @@ class PodDisruptionBudget(Resource):
 class Service(Resource):
     def __init__(self, app: App, name=None, ports=[{"port": 8080}]):
         self.ports=ports
-        Resource.__init__(self, app, name=name, abbrevs=["pdb"])
+        Resource.__init__(self, app, name=name, abbrevs=["svc"])
 
     def headless(self):
         self.yaml.spec.clusterIP="None"
@@ -53,7 +53,7 @@ class ConfigMap(Resource):
         if value is None:
             value = self.app.vars[name]
         self.vars[name] = value
-        self.yaml.data.add(name, value)
+        self.yaml.data[name] = value
 
 
 class Ingress(Resource):

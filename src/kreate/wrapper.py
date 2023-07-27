@@ -1,31 +1,35 @@
 from ruamel.yaml.comments import CommentedSeq
-
-
-class DictWrapper():
-    def __init__(self, somedict) -> None:
-        self._dict = somedict
+from collections import UserDict
+class DictWrapper(UserDict):
+    def __init__(self, dict):
+        super().__setattr__("data", dict)
 
     def __getattr__(self, attr):
-        if attr in self.__dict__ or attr == "_dict":
+        if attr in self.__dict__ or attr=="data":
             return super().__getattribute__(attr)
-        return wrap(self._dict[attr])
-
-    def add(self, key, value):
-        self._dict[key] = value
-
-    def get(self, key):
-        return self._dict[key]
-
-    def has_key(self, key) -> bool:
-        return key in self._dict
+        #print(f"getting {attr}")
+        if attr not in self.data:
+            print(f"emtpy attr  {attr}")
+            return wrap({}) # TODO
+        else:
+            return wrap(self.data[attr])
 
     def __setattr__(self, attr, val):
-        if attr in self.__dict__ or attr == "_dict":
+        #print(f"###setting {attr} to [{val}]")
+        if attr in self.__dict__ or attr == "data":
             return super().__setattr__(attr, val)
-        self._dict[attr] = val
+        self.data[attr] = val
+
+#    def add(self, key, value):
+#        print(f"called add {key} [{value}]")
+#        self.data[key] = wrap(value)
+#        print("done")
+#
+#    def get(self, key):
+#        return self.data[key]
 
 
-class SeqWrapper():
+class ListWrapper():
     def __init__(self, seq) -> None:
         self._seq = seq
 
@@ -41,7 +45,7 @@ class SeqWrapper():
 
 def wrap(result):
     if isinstance(result, CommentedSeq):
-        return SeqWrapper(result)
+        return ListWrapper(result)
     if isinstance(result, dict):
         return DictWrapper(result)
     return result
