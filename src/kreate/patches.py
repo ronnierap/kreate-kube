@@ -1,12 +1,12 @@
-from .base import Base
+from .yaml import YamlBase
 from .app import App
 from .resources import Resource
 
-class Patch(Base):
+class Patch(YamlBase):
     def __init__(self, target: Resource, template, name=None, filename=None):
         self.target =target
         self.target.patches.append  (self)
-        Base.__init__(self, target.app, name, filename, template=template)
+        YamlBase.__init__(self, target.app, name, filename, template=template)
 
     def _add_jinja_vars(self, vars):
         vars["target"]=self.target

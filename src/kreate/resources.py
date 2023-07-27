@@ -1,22 +1,16 @@
-from .base import Base
+from .yaml import YamlBase
 from .app import App
 
-class Resource(Base):
+class Resource(YamlBase):
     def __init__(self, app: App, name=None, filename=None, abbrevs=[]):
-        Base.__init__(self, app, name, filename)
+        YamlBase.__init__(self, app, name, filename)
         self.app.add(self, abbrevs=abbrevs)
         self.patches = []
 
     def kreate(self) -> None:
-        Base.kreate(self)
+        YamlBase.kreate(self)
         for p in self.patches:
             p.kreate()
-
-class Patch(Base):
-    def __init__(self, target: Resource, name=None, filename=None):
-        Base.__init__(self, target.app, name, filename)
-        self.target =target
-        self.target.patches.add(self)
 
 
 class Deployment(Resource):

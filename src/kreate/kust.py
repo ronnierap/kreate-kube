@@ -1,12 +1,12 @@
-from .base import Base
+from .yaml import YamlBase
 from .app import App
 
 
-class Kustomization(Base):
+class Kustomization(YamlBase):
     def __init__(self, app: App):
         self.name = "kustomization"
         self.configmaps = []
-        Base.__init__(self, app, name="kustomization")
+        YamlBase.__init__(self, app, name="kustomization")
 
     def kreate_files(self) -> None:
         self.app.kreate_resources()
@@ -18,10 +18,10 @@ class Kustomization(Base):
 #        cm.app.resources.remove(cm)
 
 
-class GeneratedConfigMap(Base):
+class GeneratedConfigMap(YamlBase):
     def __init__(self, kust:  Kustomization):
         self.vars = {}
-        Base.__init__(self, kust.app)
+        YamlBase.__init__(self, kust.app)
 
     def add_var(self, name):
         self.vars[name] = self.app.vars[name]
