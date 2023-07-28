@@ -1,49 +1,33 @@
 from ruamel.yaml.comments import CommentedSeq
-from collections import UserDict
+from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 
 class DictWrapper(UserDict):
     def __init__(self, dict):
+        # do not copy the original dict as the normal UserDict does
+        # but wrap the original so that updates go to the original
         super().__setattr__("data", dict)
 
     def __getattr__(self, attr):
-        if attr in self.__dict__ or attr=="data":
-            return super().__getattribute__(attr)
-        #print(f"getting {attr}")
         if attr not in self.data:
-            print(f"emtpy attr  {attr}")
-            return wrap({}) # TODO
+            # TODO: more informative error message
+            raise AttributeError(f"Yaml object does not have attribute {attr}")
         else:
             return wrap(self.data[attr])
 
     def __setattr__(self, attr, val):
-        #print(f"###setting {attr} to [{val}]")
-        if attr in self.__dict__ or attr == "data":
-            return super().__setattr__(attr, val)
         self.data[attr] = val
 
-#    def add(self, key, value):
-#        print(f"called add {key} [{value}]")
-#        self.data[key] = wrap(value)
-#        print("done")
-#
-#    def get(self, key):
-#        return self.data[key]
 
-
-class ListWrapper():
+class ListWrapper(UserList):
     def __init__(self, seq) -> None:
-        self._seq = seq
+        # do not copy the original list as the normal UserList does
+        # but wrap the original so that updates go to the original
+        self.data = seq
 
     def __getitem__(self, idx):
+        # Wrap the returned value
         return wrap(self._seq[idx])
-
-    def __setitem__(self, idx, val):
-        self._seq[idx] = val
-
-    def append(self, item):
-        self._seq.append(item)
-
 
 def wrap(obj):
     if isinstance(obj, Sequence) and not isinstance(obj, ListWrapper):
