@@ -53,7 +53,8 @@ class ConfigMap(Resource):
         if value is None:
             value = self.app.vars[name]
         self.vars[name] = value
-        self.yaml.data[name] = value
+        # We can not use self.yaml.data, since data is a field in UserDict
+        self.yaml["data"][name] = value
 
 
 class Ingress(Resource):
