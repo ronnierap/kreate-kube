@@ -1,5 +1,7 @@
 from ruamel.yaml.comments import CommentedSeq
 from collections import UserDict
+from collections.abc import Mapping, Sequence
+
 class DictWrapper(UserDict):
     def __init__(self, dict):
         super().__setattr__("data", dict)
@@ -43,9 +45,9 @@ class ListWrapper():
         self._seq.append(item)
 
 
-def wrap(result):
-    if isinstance(result, CommentedSeq):
-        return ListWrapper(result)
-    if isinstance(result, dict):
-        return DictWrapper(result)
-    return result
+def wrap(obj):
+    if isinstance(obj, Sequence) and not isinstance(obj, ListWrapper):
+        return ListWrapper(obj)
+    if isinstance(obj, Mapping) and not isinstance(obj, DictWrapper):
+        return DictWrapper(obj)
+    return obj
