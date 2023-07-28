@@ -1,0 +1,15 @@
+TODO
+- decrypt secrets
+- run kustomize/kubectl
+- docstrings
+- tests
+- config+defaults design/impl
+- high level app structure
+- publish to pypi
+- devide in smaller packages?
+  - kreate-core (yaml, wrapper, cli?)
+  - kreate-cli
+  - kreate-kube-apps (app, resource, patches)
+  - kreate-kustomize (extra cli commands, )
+  - kreate-app-templates
+  - kreate-other-templates
