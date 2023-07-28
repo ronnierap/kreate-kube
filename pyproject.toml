@@ -1,5 +1,5 @@
 [project]
-name = "kreate-kube-apps"
+name = "kreate-core"
 version = "0.0.1"
 authors = [
   { name="Mark Hooijkaas", email="mark@hooijkaas.net" },
@@ -18,8 +18,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/MarkHooijkaas/kreate-kube-app"
-"Bug Tracker" = "https://github.com/MarkHooijkaas/kreate-kube-app/issues"
+"Homepage" = "https://github.com/MarkHooijkaas/kreate-core"
+"Bug Tracker" = "https://github.com/MarkHooijkaas/kreate-core/issues"
 
 [build-system]
 requires = ["pdm-backend"]
