@@ -1,4 +1,3 @@
-from ruamel.yaml.comments import CommentedSeq
 from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 
@@ -6,6 +5,7 @@ class DictWrapper(UserDict):
     def __init__(self, dict):
         # do not copy the original dict as the normal UserDict does
         # but wrap the original so that updates go to the original
+        # __setattr__ is used, because the data attribute does not exist yet
         super().__setattr__("data", dict)
 
     def __getattr__(self, attr):
@@ -36,22 +36,6 @@ def wrap(obj):
         return DictWrapper(obj)
     return obj
 
-class LayeredMap():
-    def __init__(self, dict):
-        # do not copy the original dict as the normal UserDict does
-        # but wrap the original so that updates go to the original
-        super().__setattr__("data", dict)
-
-    def __getattr__(self, attr):
-        if attr not in self.data:
-            # TODO: more informative error message
-            raise AttributeError(f"Yaml object does not have attribute {attr}")
-        else:
-            return wrap(self.data[attr])
-
-
-
-
 
 class DeepChain(Mapping):
     def __init__(self, map: Mapping, parent: Mapping):
@@ -66,7 +50,6 @@ class DeepChain(Mapping):
         if isinstance(val,Mapping) or isinstance(pval,Mapping):
             raise AttributeError(f"key {key} is not mergeable for {type(val)} and {type(pval)}")
         return self._map.get(key, pval) # TODO will return None instead of attribute error
-
 
     def __getattr__(self, attr):
         if attr not in self:
