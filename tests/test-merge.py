@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import kreate.yaml
-from kreate.wrapper import wrap, DeepChain
+import kreate.core
+from kreate.core import wrap, DeepChain
 import copy
 from collections import ChainMap
 from collections.abc import Mapping
@@ -42,11 +42,11 @@ print("\n\n\n")
 
 print (a)
 print (b)
-kreate.yaml.merge(a,b)
+kreate.core.merge(a,b)
 print (a)
 print("\n\n\n")
 
 print (wa)
 print (wb)
-kreate.yaml.merge(wa,wb)
+kreate.core.merge(wa,wb)
 print (wb)
