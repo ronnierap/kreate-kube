@@ -2,8 +2,6 @@
 import kreate.core
 from kreate.core import wrap, DeepChain
 import copy
-from collections import ChainMap
-from collections.abc import Mapping
 
 a={
     "a": 1,
@@ -28,7 +26,10 @@ wb=wrap(b)
 #print(wa)
 #print(wb)
 c=DeepChain(wb,wa)
-
+print(c.keys())
+print(type(c.b))
+print(c.b)
+print(c.b.keys())
 print(f"a={c.a}")
 print(f"b={c.b}")
 print(f"b.b1={c.b.b1}")

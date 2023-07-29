@@ -2,7 +2,6 @@ import os
 import sys
 import shutil
 from . import templates, core
-#from .core import YamlBase
 
 class App:
     def __init__(self, name: str, parent = None,

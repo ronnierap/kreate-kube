@@ -16,7 +16,7 @@ class DictWrapper(UserDict):
     def __getattr__(self, attr):
         if attr not in self.data:
             # TODO: more informative error message
-            raise AttributeError(f"Yaml object does not have attribute {attr}")
+            raise AttributeError(f"could not find attribute {attr} in {self}")
         else:
             return wrap(self.data[attr])
 
@@ -43,41 +43,48 @@ def wrap(obj):
 
 
 class DeepChain(Mapping):
-    def __init__(self, map: Mapping, parent: Mapping):
-        self._parent = parent
-        self._map = map
+    def __init__(self, *maps: Mapping):
+        self._maps = maps
 
     def __getitem__(self, key):
-        val = self._map.get(key, None)
-        pval = self._parent.get(key, None)
-        if isinstance(val,Mapping) and isinstance(pval,Mapping):
-            return DeepChain(val, pval)
-        if isinstance(val,Mapping) or isinstance(pval,Mapping):
-            raise AttributeError(f"key {key} is not mergeable for {type(val)} and {type(pval)}")
-        return self._map.get(key, pval) # TODO will return None instead of attribute error
+        all_vals = tuple(m.get(key, None) for m in self._maps)
+        vals = tuple(v for v in all_vals if v is not None)
+        nrof_map_vals = sum(isinstance(v,Mapping) for v in vals)
+        if nrof_map_vals>0:
+            if nrof_map_vals < len(vals):
+                raise AttributeError(f"key {key} is not mergeable into dictionary since not all values are maps {vals}")
+            args=list(m for m in vals)
+            return DeepChain(*args)
+        return vals[0] # TODO will return None instead of attribute error
 
     def __getattr__(self, attr):
         if attr not in self:
             # TODO: more informative error message
             raise AttributeError(f"DeepChain object does not have attribute {attr}")
         else:
-            return wrap(self[attr])
+            return self[attr]
+
+    def keys(self):
+        result = set()
+        for m in self._maps:
+            for k in m.keys():
+                result.add(k)
+        return result
 
     def __len__(self):
-        keys = { **self._map, **self._parent }
-        return len(keys)
+        return len(self.keys())
 
-    def __iter__(self): # chain_from_iterable=chain.from_iterable
-        keys = { **self._map, **self._parent }
-        return iter(keys)
+    def __iter__(self):
+        return iter(self.keys())
 
     def __contains__(self, key):
-        if key in self._map:
-            return True
-        return key in self._parent
+        for m in self._maps:
+            if key in m:
+                return True
+        return False
 
     def __repr__(self):
-        return f"DeepChain({self._map},{self._parent})"
+        return f"DeepChain({self._maps})"
 
 
 parser = YAML()
