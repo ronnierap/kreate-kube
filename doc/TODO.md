@@ -13,3 +13,9 @@ TODO
   - kreate-kustomize (extra cli commands, )
   - kreate-app-templates
   - kreate-other-templates
+
+- dist name: kisst.kreate (kisst ownership: https://peps.python.org/pep-0423/#top-level-namespace-relates-to-code-ownership)
+- modules:
+  - kreate.core
+  - kreate.cli
+  - ...

@@ -42,20 +42,22 @@ resemble kubernetes
 
 ## app-structure.yaml
 This file describes high level what the application needs to have.
-It does not provide any environment specific values,
-just high level structure
+It does not provide any environment specific values, just high level structure
 ```
 kind: Deployment/StatefulSet/CronJob
-trigger: cron?, service, queue
-replicas: fixed, hpa, stateful
+image: abc.app
 ingress:
-  - root
-  - api
-egress:
-  - oracle/postgres/db
-  - redis
-  - s3
-vars:
+  root:
+    path: /
+    sticky: True
+  api:
+    path: /api
+    read-timeout: 60  # This always is a slow api, so it should be longer
+egress: # dict to be mergable with fields, but bt ugly with all emtpyP{}
+  db: {}
+  redis: {}
+  xyz: {}
+vars: # list to just list what is required (for the image to work)
   - ENV
   - DB_URL
   - DB_SCHEMA
@@ -68,3 +70,36 @@ files:
 secret-files
   - cert.key
 ```
+
+## config structure
+```
+trigger: cron?, service, queue
+replicas: fixed, hpa, stateful
+ingress:
+  root:
+    context-root: "/foo"
+    basic-auth:
+      auth-file: "secrets/auth"
+  api:
+    read-timeout: 300  # On this environment it is even slower
+egress:
+  db:
+    hosts: {{ shared.oracle.hosts }}
+    port: 1521
+  redis: None?
+  xyz:
+    hosts: {{ shared.xyz.hosts }}
+    port: 8080
+vars:
+  ENV: {{ app.env }}
+  DB_URL: {{ oracle_cn('db_svc123') }}
+  DB_SCHEMA: 'my_schema'
+  DB_USR: 'my_usr'
+  DB_PSW: {{ dekrypt(secrets.db_psw) }}
+  XYZ_URL: {{ shared.xyz.url }}
+```
+template data:
+- app?
+- vars
+- shared
+-
