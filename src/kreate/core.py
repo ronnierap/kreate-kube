@@ -55,7 +55,9 @@ class DeepChain(Mapping):
                 raise AttributeError(f"key {key} is not mergeable into dictionary since not all values are maps {vals}")
             args=list(m for m in vals)
             return DeepChain(*args)
-        return vals[0] # TODO will return None instead of attribute error
+        if len(vals)>0:
+            return vals[0]
+        return None
 
     def __getattr__(self, attr):
         if attr not in self:
@@ -63,6 +65,11 @@ class DeepChain(Mapping):
             raise AttributeError(f"DeepChain object does not have attribute {attr}")
         else:
             return self[attr]
+
+    def get(self, attr, default):
+        if attr in self:
+            return self[attr]
+        return super().get(attr, default)
 
     def keys(self):
         result = set()
@@ -107,22 +114,26 @@ class YamlBase:
         self.app = app
         self.kind = type(self).__name__
         self.name = name or app.name + "-" + self.kind.lower()
+        self.ignored = False
         self.filename = filename or self.name + ".yaml"
         self.template = template or self.kind + ".yaml"
+        self.typename = str(type(self)).lower()[19:-2]    #.lstrip("<class 'kreate.app").rstrip("'>")
         if config:
             self.config = config
         else:
-            typename = str(type(self)).lower()[19:-2]    #.lstrip("<class 'kreate.app").rstrip("'>")
-            if typename in app.config and name in app.config[typename]:
-                print(f"DEBUG using config {typename}.{name}")
-                self.config = app.config[typename][name]
-                print(self.config)
+            if self.typename in app.config and name in app.config[self.typename]:
+                #print(f"DEBUG using config {self.typename}.{name}")
+                self.config = app.config[self.typename][name]
+                #print(self.config)
             else:
                 #print(f"DEBUG could not find config {typename}.{name}")
                 self.config = {}
-
-        _parsed = parser.load(self.render())
-        self.yaml = wrap(_parsed)
+        if self.config.get("ignore", False):
+            print(f"INFO: ignoring {self.typename}.{self.name}")
+            self.ignored = True
+        else:
+            _parsed = parser.load(self.render())
+            self.yaml = wrap(_parsed)
 
     def kreate(self) -> None:
         print("kreating "+self.filename)

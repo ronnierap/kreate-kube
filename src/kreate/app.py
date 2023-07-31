@@ -78,7 +78,8 @@ class GeneratedConfigMap(core.YamlBase):
 class Resource(core.YamlBase):
     def __init__(self, app: App, name=None, filename=None, abbrevs=[], config=None):
         core.YamlBase.__init__(self, app, name, filename, config)
-        self.app.add(self, abbrevs=abbrevs)
+        if not self.ignored:
+            self.app.add(self, abbrevs=abbrevs)
         self.patches = []
 
     def kreate(self) -> None:

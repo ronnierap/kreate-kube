@@ -16,8 +16,9 @@ def kreate_demo_app(env: str):
     app.ingress_root.add_label("dummy", "jan")
     kreate.Ingress(app, path="/api", name="api")
 
-    print(app.config.egress.db.cidr)
     kreate.Egress(app, name="db")
+    kreate.Egress(app, name="redis")
+    kreate.Egress(app, name="xyz")
 
     kreate.Deployment(app)
     #app.depl.add_template_label("egress-to-oracle", "enabled")
