@@ -3,7 +3,6 @@ import kreate
 
 def kreate_demo_app():
     cfg = kreate.ConfigChain("tests/script/config-demo.yaml", "src/kreate/templates/default-values.yaml")
-    #print(cfg)
     app = kreate.App('demo', kustomize=True, config=cfg)
 
     kreate.Ingress(app)

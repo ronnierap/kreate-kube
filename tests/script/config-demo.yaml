@@ -6,56 +6,12 @@ project: kreate-demo
 replicas: 1
 image_repo: todo.com
 
-services:
-  ports:
-    amq-ui:
-      protocol: TCP
-      port: 8161
-      targetPort: 8161
-    amq:
-      protocol: TCP
-      port: 61616
-      targetPort: 61616
-
-
 containers:
   app:
-    imagePullPolicy: Always
-    ports:
-    - containerPort: 8080
-      protocol: TCP
     resources:
       limits:
-        cpu: 1
-        memory: 512M
+        cpu: 2
       requests:
-        cpu: 200m
-        memory: 512M
+        cpu: 400m
     startupProbe:
-      initialDelaySeconds: 10
-      periodSeconds: 2
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 30
-      httpGet:
-        scheme: HTTP
-        path: actuator/info
-        port: 8080
-    readinessProbe:
-      periodSeconds: 2
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 1
-      httpGet:
-        scheme: HTTP
-        path: actuator/info
-        port: 8080
-    livenessProbe:
-      periodSeconds: 2
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 3
-      httpGet:
-        scheme: HTTP
-        path: actuator/info
-        port: 8080
+      failureThreshold: 120
