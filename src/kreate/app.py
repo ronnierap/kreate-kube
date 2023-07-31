@@ -5,9 +5,11 @@ from . import templates, core
 
 class App:
     def __init__(self, name: str, parent = None,
-                 template_package=templates, image_name: str = None):
+                 template_package=templates, image_name: str = None,
+                 kustomize=False):
         self.name = name
         self.vars = dict()
+        self.kustomize = kustomize
         self.config = dict()
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         if parent:
@@ -43,7 +45,7 @@ class App:
             return super().__getattribute__(attr)
         return self._attr_map[attr]
 
-    def kreate_resources(self):
+    def kreate_files(self):
         # TODO better place: to clear directory
         if os.path.exists(self.target_dir) and os.path.isdir(self.target_dir):
             shutil.rmtree(self.target_dir)
@@ -51,16 +53,17 @@ class App:
 
         for rsrc in self.resources:
             rsrc.kreate()
+        if self.kustomize:
+            kust = Kustomization(self)
+            kust.kreate()
+
+
 
 class Kustomization(core.YamlBase):
     def __init__(self, app: App):
         self.name = "kustomization"
         self.configmaps = []
         core.YamlBase.__init__(self, app, name="kustomization")
-
-    def kreate_files(self) -> None:
-        self.app.kreate_resources()
-        self.kreate()
 
 
 class GeneratedConfigMap(core.YamlBase):

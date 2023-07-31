@@ -1,36 +1,41 @@
 import argparse
 import os
 
-def do_files(kreate_files):
-    kreate_files()
+def do_files(kreate_app):
+    app=kreate_app()
+    app.kreate_files()
 
-def do_out(kreate_files):
-    app=kreate_files()
+def do_out(kreate_app):
+    app=kreate_app()
+    app.kreate_files()
     cmd = f"kustomize build {app.target_dir}"
     print(cmd)
     os.system(cmd)
 
-def do_diff(kreate_files):
-    app=kreate_files()
+def do_diff(kreate_app):
+    app=kreate_app()
+    app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl diff -f - "
     print(cmd)
     os.system(cmd)
 
-def do_apply(kreate_files):
-    app=kreate_files()
+def do_apply(kreate_app):
+    app=kreate_app()
+    app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl apply --dry-run -f - "
     print(cmd)
     os.system(cmd)
 
-def do_test(kreate_files):
-    app=kreate_files()
+def do_test(kreate_app):
+    app=kreate_app()
+    app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | diff - {app.script_dir}/test.out"
     print(cmd)
     os.system(cmd)
 
 
 
-def cli(kreate_files):
+def run_cli(kreate_app):
     parser = argparse.ArgumentParser()
     cmds=["a", "apply", "d", "diff", "files"]
     help="the command to be executed, e.g. apply or diff"
@@ -50,4 +55,4 @@ def cli(kreate_files):
     parser.set_defaults(func=do_files) # TODO: better way to set default command?
 
     args = parser.parse_args()
-    args.func(kreate_files)
+    args.func(kreate_app)

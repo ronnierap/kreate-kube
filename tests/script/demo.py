@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 import kreate
-import pprint
 
-def demo_app():
-    app = kreate.App('demo')
+def kreate_demo_app():
+    app = kreate.App('demo', kustomize=True)
 
     kreate.Ingress(app)
     app.ingress_root.sticky()
@@ -29,13 +28,6 @@ def demo_app():
     app.cm.add_var("ORACLE_USR")
     app.cm.add_var("ORACLE_SCHEMA")
 
-    #print(app.cm.vars)
-    #print(app.cm.yaml.data)
-
-    kust = kreate.Kustomization(app)
-    #kust.add_cm(cm)
-
-    kust.kreate_files()
     return app
 
-kreate.cli(demo_app)
+kreate.run_cli(kreate_demo_app)
