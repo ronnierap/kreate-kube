@@ -170,13 +170,3 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-kreating demo-ingress-root.yaml
-kreating demo-ingress-api.yaml
-kreating demo-deployment.yaml
-kreating demo-probes.yaml
-kreating demo-anti-affinity.yaml
-kreating demo-service.yaml
-kreating demo-pdb.yaml
-kreating demo-vars.yaml
-kreating kustomization.yaml
-kustomize build ./build/demo-dev

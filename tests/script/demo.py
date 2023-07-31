@@ -2,7 +2,9 @@
 import kreate
 
 def kreate_demo_app():
-    app = kreate.App('demo', kustomize=True)
+    cfg = kreate.ConfigChain("tests/script/config-demo.yaml", "src/kreate/templates/default-values.yaml")
+    #print(cfg)
+    app = kreate.App('demo', kustomize=True, config=cfg)
 
     kreate.Ingress(app)
     app.ingress_root.sticky()
@@ -13,7 +15,7 @@ def kreate_demo_app():
 
     kreate.Deployment(app)
     #app.depl.add_template_label("egress-to-oracle", "enabled")
-    kreate.HttpProbesPatch(app.depl)
+    kreate.HttpProbesPatch(app.depl, config=cfg.containers.app)
     kreate.AntiAffinityPatch(app.depl)
     kreate.Service(app)
     app.service.headless()
@@ -21,6 +23,7 @@ def kreate_demo_app():
     kreate.PodDisruptionBudget(app, name="demo-pdb")
     app.pdb.yaml.spec.minAvailable = 2
     app.pdb.add_label("testje","test")
+
 
     kreate.ConfigMap(app, name="demo-vars")
     app.cm.add_var("ENV", value=app.config["env"])

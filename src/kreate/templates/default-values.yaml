@@ -1,25 +1,18 @@
 team: devteam1
 env: dev
 
-version: latest-master
-project: kreate-demo
 replicas: 1
-image_repo: todo.com
 
 services:
   ports:
-    amq-ui:
+    http:
       protocol: TCP
-      port: 8161
-      targetPort: 8161
-    amq:
-      protocol: TCP
-      port: 61616
-      targetPort: 61616
-
+      port: 8080
+      targetPort: 8080
 
 containers:
   app:
+    name: app
     imagePullPolicy: Always
     ports:
     - containerPort: 8080

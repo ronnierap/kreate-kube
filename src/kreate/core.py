@@ -101,12 +101,14 @@ class YamlBase:
                  app,
                  name: str = None,
                  filename: str = None,
+                 config = None,
                  template: str = None):
         self.app = app
         self.kind = type(self).__name__
         self.name = name or app.name + "-" + self.kind.lower()
         self.filename = filename or self.name + ".yaml"
         self.template = template or self.kind + ".yaml"
+        self.config = config or app.config
 
         _parsed = parser.load(self.render())
         self.yaml = wrap(_parsed)
@@ -138,7 +140,8 @@ class YamlBase:
         vars = {
             "app": self.app,
             "vars": self.app.vars,
-            "config": self.app.config,
+            "cfg": self.config,
+            "config": self.config,
             "my": self,
         }
         self._add_jinja_vars(vars)
@@ -169,10 +172,19 @@ def merge(a, b, path=None):
                 print('overriding %s' % '.'.join(path + [str(key)]))
         else:
             a[key] = valb
-    return a
+    return
 
 
-#class ConfigMap(DeepChain):
-#    def __init__(self, *filenames):
-#        maps = []
-#        for f in filenames:
+
+class ConfigChain(DeepChain):
+    def __init__(self, *args):
+        maps = []
+        for fname in args:
+            if os.path.exists(fname):
+                print(f"loading config {fname}")
+                with open(fname) as f:
+                    m = parser.load(f)
+                maps.append(m)
+            else:
+                print(f"WARN: skipping config file {fname}")
+        DeepChain.__init__(self, *maps) #maps[0], maps[1])

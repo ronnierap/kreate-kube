@@ -4,21 +4,19 @@ import shutil
 from . import templates, core
 
 class App:
-    def __init__(self, name: str, parent = None,
+    def __init__(self, name: str,
                  template_package=templates, image_name: str = None,
+                 config=None,
                  kustomize=False):
         self.name = name
-        self.vars = dict()
-        self.kustomize = kustomize
-        self.config = dict()
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-        if parent:
-            self.vars.update(parent.vars)
-            self.config.update(parent.config)
+        self.vars = dict()
+        self.config = config
+        self.kustomize = kustomize
         vars_file = self.script_dir + "/vars-" + self.name + ".yaml"
         self.vars.update(core.loadOptionalYaml(vars_file))
-        config_file = self.script_dir + "/config-" + self.name + ".yaml"
-        self.config.update(core.loadOptionalYaml(config_file))
+        #config_file = self.script_dir + "/config-" + self.name + ".yaml"
+        #self.config.update(core.loadOptionalYaml(config_file))
 
         self.namespace = self.name + "-" + self.config["env"]
         #self.labels = dict()
@@ -78,8 +76,9 @@ class GeneratedConfigMap(core.YamlBase):
 ##################################################################
 
 class Resource(core.YamlBase):
-    def __init__(self, app: App, name=None, filename=None, abbrevs=[]):
-        core.YamlBase.__init__(self, app, name, filename)
+    def __init__(self, app: App, name=None, filename=None, abbrevs=[], config=None):
+        self.config = config or app.config
+        core.YamlBase.__init__(self, app, name, filename, config)
         self.app.add(self, abbrevs=abbrevs)
         self.patches = []
 
@@ -143,7 +142,7 @@ class Ingress(Resource):
         self.path = path
         self.host = host
         self.port = port
-        Resource.__init__(self, app, name=app.name + "-ingress-" + name)
+        Resource.__init__(self, app, name=app.name + "-ingress-" + name) # TODO, config=app.config.ingress[name])
 
     def nginx_annon(self, name: str, val: str) -> None:
         self.annotate("nginx.ingress.kubernetes.io/" + name, val)
@@ -173,18 +172,18 @@ class Ingress(Resource):
 
 #########################################################################################
 class Patch(core.YamlBase):
-    def __init__(self, target: Resource, template, name=None, filename=None):
+    def __init__(self, target: Resource, template, name=None, filename=None, config=None):
         self.target =target
         self.target.patches.append  (self)
-        core.YamlBase.__init__(self, target.app, name, filename, template=template)
+        core.YamlBase.__init__(self, target.app, name, filename, template=template, config=config)
 
     def _add_jinja_vars(self, vars):
         vars["target"]=self.target
 
 
 class HttpProbesPatch(Patch):
-    def __init__(self, target: Resource):
-        Patch.__init__(self, target, "patch-http-probes.yaml", name=target.name+"-probes")
+    def __init__(self, target: Resource, config):
+        Patch.__init__(self, target, "patch-http-probes.yaml", name=target.name+"-probes", config=config)
 
 class AntiAffinityPatch(Patch):
     def __init__(self, target: Resource):

@@ -6,41 +6,32 @@ spec:
   template:
     spec:
       containers:
-      - name: {{ config.containers[0].name }}
+      - name: {{ cfg.name }}
         startupProbe:
-          initialDelaySeconds: {{ config.containers[0].startupProbe.delay | default(10) }}
-          periodSeconds: {{ config.containers[0].startupProbe.period | default(2) }}
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: {{ config.containers[0].startupProbe.tries | default(30) }}
+          initialDelaySeconds: {{ cfg.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ cfg.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ cfg.startupProbe.timeoutSeconds }}
+          successThreshold: {{ cfg.startupProbe.successThreshold }}
+          failureThreshold: {{ cfg.startupProbe.failureThreshold }}
           httpGet:
-            scheme: HTTP
-            path: {{ config.containers[0].startupProbe.httpGet.path }}
-            port: 8080
-            #httpHeaders:
-            #- name: Authorization
-            #  value: Basic $(printf "%s:%s" $STARTUP_PROBE_USR $STARTUP_PROBE_PSW | base64)
+            scheme: {{ cfg.startupProbe.httpGet.scheme }}
+            path: {{ cfg.startupProbe.httpGet.path }}
+            port: {{ cfg.startupProbe.httpGet.port }}
         readinessProbe:
-          periodSeconds: 2
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: 1
+          periodSeconds: {{ cfg.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ cfg.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ cfg.readinessProbe.failureThreshold }}
+          successThreshold: {{ cfg.readinessProbe.successThreshold }}
           httpGet:
-            scheme: HTTP
-            path: {{ config.containers[0].readinessProbe.httpGet.path }}
-            port: 8080
-            #httpHeaders:
-            #- name: Authorization
-            #  value: Basic $(printf "%s:%s" $READINESS_PROBE_USR $READINESS_PROBE_PSW | base64)
+            scheme: {{ cfg.readinessProbe.httpGet.scheme }}
+            path: {{ cfg.readinessProbe.httpGet.path }}
+            port: {{ cfg.readinessProbe.httpGet.port }}
         livenessProbe:
-          periodSeconds: 2
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: 3
+          periodSeconds: {{ cfg.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ cfg.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ cfg.livenessProbe.failureThreshold }}
+          successThreshold: {{ cfg.livenessProbe.successThreshold }}
           httpGet:
-            scheme: HTTP
-            path: {{ config.containers[0].livenessProbe.httpGet.path }}
-            port: 8080
-            #httpHeaders:
-            #- name: Authorization
-            #  value: Basic $(printf "%s:%s" $LIVENESS_PROBE_USR $LIVENESS_PROBE_PSW | base64)
+            scheme: {{ cfg.livenessProbe.httpGet.scheme }}
+            path: {{ cfg.livenessProbe.httpGet.path }}
+            port: {{ cfg.livenessProbe.httpGet.port }}

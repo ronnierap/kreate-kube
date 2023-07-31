@@ -29,7 +29,7 @@ def do_apply(kreate_app):
 def do_test(kreate_app):
     app=kreate_app()
     app.kreate_files()
-    cmd = f"kustomize build {app.target_dir} | diff - {app.script_dir}/test.out"
+    cmd = f"kustomize build {app.target_dir} | diff  {app.script_dir}/test.out -"
     print(cmd)
     os.system(cmd)
 
