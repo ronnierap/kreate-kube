@@ -1,0 +1,28 @@
+kind: Deployment/StatefulSet/CronJob
+containers:
+  app:
+    image: abc.app
+    #probePath: actuator/info
+ingress:
+  root:
+    path: /
+    sticky: True
+  api:
+    path: /api
+    read-timeout: 60  # This always is a slow api, so it should be longer
+egress: # dict to be mergable with fields, but bit ugly with all emtpy {}'s
+  db: {}
+  redis: {}
+  xyz: {}
+vars: # just list what vars are required for the image to work
+  - ENV
+  - DB_URL
+  - DB_SCHEMA
+secrets:
+  - DB_USR
+  - DB_PSW
+files:
+  - application.properties
+  - logging.properties
+secret-files
+  - certificate.key
