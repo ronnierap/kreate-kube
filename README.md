@@ -14,8 +14,8 @@ For simplpicity sake, it does not show more extensive configuration
 #!/usr/bin/env python3
 import kreate
 
-def demo_app():
-    app = kreate.App('demo')
+def kreate_demo_app():
+    app = kreate.App('demo', kustomize=True)
 
     root=kreate.Ingress(app)  # create a root ingress object and remember it in var root
     root.sticky()       # fine tune the root ingress by adding session affinity
@@ -43,10 +43,9 @@ def demo_app():
     app.cm.add_var("ORACLE_USR")
     app.cm.add_var("ORACLE_SCHEMA")
 
-    kust = kreate.Kustomization(app)
-    kust.kreate_files()
+    return app
 
-kreate.cli(demo_app)
+kreate.run_cli(kreate_demo_app)
 ```
 
 ## Example using application structure file
