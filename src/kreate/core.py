@@ -109,7 +109,17 @@ class YamlBase:
         self.name = name or app.name + "-" + self.kind.lower()
         self.filename = filename or self.name + ".yaml"
         self.template = template or self.kind + ".yaml"
-        self.config = config or app.config
+        if config:
+            self.config = config
+        else:
+            typename = str(type(self)).lower()[19:-2]    #.lstrip("<class 'kreate.app").rstrip("'>")
+            if typename in app.config and name in app.config[typename]:
+                print(f"DEBUG using config {typename}.{name}")
+                self.config = app.config[typename][name]
+                print(self.config)
+            else:
+                #print(f"DEBUG could not find config {typename}.{name}")
+                self.config = {}
 
         _parsed = parser.load(self.render())
         self.yaml = wrap(_parsed)
@@ -140,9 +150,7 @@ class YamlBase:
             lstrip_blocks=True)
         vars = {
             "app": self.app,
-            "vars": self.app.vars,
             "cfg": self.config,
-            "config": self.config,
             "my": self,
         }
         self._add_jinja_vars(vars)

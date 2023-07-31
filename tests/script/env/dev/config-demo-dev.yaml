@@ -1,6 +1,8 @@
 env: dev
 
-replicas: 0
+deployment:
+  demo:
+    replicas: 0
 
 containers:
   app:
@@ -11,3 +13,11 @@ containers:
         cpu: 100m
     startupProbe:
       failureThreshold: 120
+
+egress:
+  redis:
+    ignore: True
+  db:
+    cidr: 1.2.3.4/32
+    port: 8123
+  xyz:

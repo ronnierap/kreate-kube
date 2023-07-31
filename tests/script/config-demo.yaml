@@ -1,9 +1,11 @@
 team: devteam1
 
-version: latest-master
-project: kreate-demo
-replicas: 1
-image_repo: todo.com
+deployment:
+  demo:
+    version: latest-master
+    project: kreate-demo
+    replicas: 1
+    image_repo: todo.com
 
 containers:
   app:

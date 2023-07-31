@@ -9,6 +9,7 @@ class App:
     def __init__(self, name: str,
                  env : str,
                  template_package=templates,
+                 config_dir : str =".",
                  config: Mapping = None,
                  kustomize: bool =False):
         self.name = name
@@ -76,7 +77,6 @@ class GeneratedConfigMap(core.YamlBase):
 
 class Resource(core.YamlBase):
     def __init__(self, app: App, name=None, filename=None, abbrevs=[], config=None):
-        self.config = config or app.config
         core.YamlBase.__init__(self, app, name, filename, config)
         self.app.add(self, abbrevs=abbrevs)
         self.patches = []
@@ -117,6 +117,8 @@ class Service(Resource):
     def headless(self):
         self.yaml.spec.clusterIP="None"
 
+class Egress(Resource):
+    pass
 
 class ConfigMap(Resource):
     def __init__(self, app: App, name=None):
@@ -181,9 +183,11 @@ class Patch(core.YamlBase):
 
 
 class HttpProbesPatch(Patch):
-    def __init__(self, target: Resource, config):
+    def __init__(self, target: Resource, container_name : str ="app"):
+        config = target.app.config.containers[container_name]
         Patch.__init__(self, target, "patch-http-probes.yaml", name=target.name+"-probes", config=config)
 
 class AntiAffinityPatch(Patch):
-    def __init__(self, target: Resource):
-        Patch.__init__(self, target, "patch-anti-affinity.yaml", name=target.name+"-anti-affinity")
+    def __init__(self, target: Resource, container_name : str ="app"):
+        config = target.app.config.containers[container_name]
+        Patch.__init__(self, target, "patch-anti-affinity.yaml", name=target.name+"-anti-affinity", config=config)

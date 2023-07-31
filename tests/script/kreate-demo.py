@@ -16,9 +16,12 @@ def kreate_demo_app(env: str):
     app.ingress_root.add_label("dummy", "jan")
     kreate.Ingress(app, path="/api", name="api")
 
+    print(app.config.egress.db.cidr)
+    kreate.Egress(app, name="db")
+
     kreate.Deployment(app)
     #app.depl.add_template_label("egress-to-oracle", "enabled")
-    kreate.HttpProbesPatch(app.depl, config=cfg.containers.app)
+    kreate.HttpProbesPatch(app.depl)
     kreate.AntiAffinityPatch(app.depl)
     kreate.Service(app)
     app.service.headless()

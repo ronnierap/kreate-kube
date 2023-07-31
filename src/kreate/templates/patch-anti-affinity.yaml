@@ -10,7 +10,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
-                  - key: app
+                  - key: {{ cfg.name }}
                     operator: In
                     values:
                       - {{ app.name }}
