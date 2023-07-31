@@ -1,9 +1,9 @@
 apiVersion: v1
 data:
   ENV: dev
-  ORACLE_SCHEMA: demo_schema
-  ORACLE_URL: localhost:1521
-  ORACLE_USR: demo_usr
+  ORACLE_SCHEMA: demo_schema_acc
+  ORACLE_URL: oracle-acc:1521
+  ORACLE_USR: demo_usr_acc
 kind: ConfigMap
 metadata:
   labels:
@@ -34,7 +34,7 @@ metadata:
   name: demo
   namespace: demo-dev
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 1
   selector:
     matchLabels:
@@ -95,13 +95,13 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: 1
+            cpu: 500m
             memory: 512M
           requests:
-            cpu: 200m
+            cpu: 100m
             memory: 512M
         startupProbe:
-          failureThreshold: 30
+          failureThreshold: 120
           httpGet:
             path: actuator/info
             port: 8080
@@ -170,3 +170,41 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-to-db
+  namespace: demo-dev
+spec:
+  egress:
+  - ports:
+    - port: 8123
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 1.2.3.4/32
+  podSelector:
+    matchLabels:
+      egress-to-db: enabled
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-to-xyz
+  namespace: demo-dev
+spec:
+  egress:
+  - ports:
+    - port: 8443
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 4.4.4.4/32
+  podSelector:
+    matchLabels:
+      egress-to-xyz: enabled
+  policyTypes:
+  - Egress
