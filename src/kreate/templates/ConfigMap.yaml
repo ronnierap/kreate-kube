@@ -5,8 +5,4 @@ metadata:
     config-map: {{ my.name }}
   name: {{ my.name }}
   namespace: {{ app.namespace }}
-data:
-  ENV: {{ app.config.env }}
-{% for key in my.vars %}
-  {{ key }}: {{ my.vars[key] }}
-{% endfor %}
+data: {}

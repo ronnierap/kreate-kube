@@ -11,3 +11,8 @@ egress:
     to:
     - cidr: 4.4.4.4/32
       port: 8443
+
+vars:
+  ORACLE_URL: oracle-acc:1521
+  ORACLE_USR: demo_usr_acc
+  ORACLE_SCHEMA: demo_schema_acc

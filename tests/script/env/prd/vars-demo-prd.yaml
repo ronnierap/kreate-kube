@@ -1,4 +1,0 @@
-
-ORACLE_URL: oracle-prd1:1521,oracle-prd2:1521,
-ORACLE_USR: demo_usr_prd
-ORACLE_SCHEMA: demo_schema_prd

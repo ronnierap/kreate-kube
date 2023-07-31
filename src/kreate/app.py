@@ -123,13 +123,11 @@ class Egress(Resource):
 
 class ConfigMap(Resource):
     def __init__(self, app: App, name=None):
-        self.vars = {}
         Resource.__init__(self, app, name=name, abbrevs=["cm"])
 
     def add_var(self, name, value=None):
         if value is None:
-            value = self.app.vars[name]
-        self.vars[name] = value
+            value = self.app.config.vars[name]
         # We can not use self.yaml.data, since data is a field in UserDict
         self.yaml["data"][name] = value
 
