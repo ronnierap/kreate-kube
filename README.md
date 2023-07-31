@@ -7,14 +7,58 @@ This is especially useful if you have many different applications
 that you would like to keep as similar as possible,
 while also having flexibility to tweak each application.
 
+## Simple example using python script
+This script creates different python objects that can be deployed to kubernetes
+For simplpicity sake, it does not show more extensive configuration
+```
+#!/usr/bin/env python3
+import kreate
+
+def demo_app():
+    app = kreate.App('demo')
+
+    root=kreate.Ingress(app)  # create a root ingress object and remember it in var root
+    root.sticky()       # fine tune the root ingress by adding session affinity
+    root.basic_auth()   # fine tune the root ingress by adding basic authentication
+
+    kreate.Ingress(app, path="/api", name="api")  # kreate a second ingress that needs no tuning
+
+    kreate.Deployment(app)
+    # alternative syntax `app.depl` to get the deployment from the app for finetuning
+    app.depl.add_template_label("egress-to-oracle", "enabled")
+
+    # kreate some (kustomize patches on the deployment)
+    kreate.HttpProbesPatch(app.depl)
+    kreate.AntiAffinityPatch(app.depl)
+
+    kreate.Service(app)
+
+    kreate.PodDisruptionBudget(app, name="demo-pdb")
+    app.pdb.yaml.spec.minAvailable = 2
+    app.pdb.add_label("testje","test")
+
+    kreate.ConfigMap(app, name="demo-vars")
+    app.cm.add_var("ENV", value=app.config["env"])
+    app.cm.add_var("ORACLE_URL")
+    app.cm.add_var("ORACLE_USR")
+    app.cm.add_var("ORACLE_SCHEMA")
+
+    kust = kreate.Kustomization(app)
+    kust.kreate_files()
+
+kreate.cli(demo_app)
+```
+
 ## Example using application structure file
+The Python objects in the above script are the basis for the kreating resources
+based on a application strukture definition file.
+
 We will use a simple script that loads an application structure file,
 and generates all components from that file.
 
 Note: this is still a rough design, and many details and names might
 change in the near future
 ### kreate.py
-The `kreate.AppStructure('demo')` command will create all components
 ```
 #!/usr/bin/env python3
 import kreate
@@ -25,11 +69,14 @@ def demo_app():
 
 kreate.cli(demo_app)
 ```
-
-The kreate py script can load config file(s), such as:
+The `kreate.AppStructure('demo')` command will create all components, described in a
+`demo-app-structure.yaml` file with configuration/tuning from several config files,
+that can be load automatically, such as:
 - `kreate-defaults.yaml`: default files for all kreate templates in kreate package
 - `demo-app-struct.yaml`: high level application definition
 - `demo-prd-values.yaml`: specific values for the prd (production) environment
+All these files are automatically loaded based on the application name (demo)
+and the environment variable (prd)
 
 ### demo-app-structure.yaml
 The structure file is a yaml describing in a high level which resources
@@ -47,7 +94,7 @@ ingress:
   api:
     path: /api
     read-timeout: 60  # This always is a slow api, so it should be longer
-egress: # dict to be mergable with fields, but bt ugly with all emtpyP{}
+egress: # dict to be mergable with fields, but bit ugly with all emtpy {}'s
   db: {}
   redis: {}
   xyz: {}
@@ -67,33 +114,23 @@ secret-files
 These resources will be created using
 
 
-## Simple using example
-```
-#!/usr/bin/env python3
-import kreate
-
-def demo_app():
-    app = kreate.App('demo')
-
-    kreate.Ingress(app)
-    kreate.Ingress(app, path="/api", name="api")
-
-    depl = kreate.Deployment(app)
-    kreate.HttpProbes(depl)
-
-    kreate.PodDisruptionBudget(app)
-
-    cm = kreate.ConfigMap(app)
-    cm.add_var("ORACLE_URL")
-    cm.add_var("ORACLE_USR")
-    cm.add_var("ORACLE_SCHEMA")
-
-    kust = kreate.Kustomization(app)
-    kust.kreate_files()
-
-kreate.cli(demo_app)
-```
-
 
 ## History
-This is a rewrite of a similar project written as bash scripts
+This is a rewrite of a similar project written as bash scripts.
+The bash scripts have been used for deploying over 30 applications to
+development, acceptance and production environments.
+
+However the bash scripting language was not the best choice, so Python was chosen
+for several reasons:
+- Large bash scripts are difficult to maintain
+  - google coding guidelines demand that bash scripts over 100 lines long are to be rewritten in Python
+  - not many devops team members are proficient in bash
+  - no OO and limited var scoping (most vars are global vars)
+- Possibility to run natively on Windows (with Python installed)
+  - no CRLF problems
+  - Windows can recognizes `*.py` extension to prevent Linux file permission problems on Windows filesystems
+- Much cleaner code
+  - yaml parser
+  - jinja templates
+  - modular design
+  - powerful requirements.txt/pip dependency management
