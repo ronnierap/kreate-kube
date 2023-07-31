@@ -11,3 +11,21 @@ containers:
         cpu: 400m
     startupProbe:
       failureThreshold: 60
+
+egress:
+  redis:
+    to:
+    - cidr: 1.1.1.1/32
+      port: 6379
+    - cidr: 2.2.2.2/32
+      port: 6379
+    - cidr: 3.3.3.3/32
+      port: 6379
+  db:
+    to:
+    - cidr: 1.2.3.5/32
+      port: 8123
+  xyz:
+    to:
+    - cidr: 4.4.4.5/32
+      port: 8443

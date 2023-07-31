@@ -18,8 +18,8 @@ egress:
   redis:
     ignore: True  # redis is local in dev environment
   db:
-    cidr: 1.2.3.4/32
-    port: 8123
+    to:
+    - cidr: 1.2.3.4/32
+      port: 8123
   xyz:
-    cidr: 4.4.4.4/32
-    port: 8443
+    ignore: True

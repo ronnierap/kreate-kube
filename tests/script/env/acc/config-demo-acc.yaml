@@ -1,1 +1,13 @@
 env: env
+
+egress:
+  redis:
+    ignore: True  # redis is local in acc environment
+  db:
+    to:
+    - cidr: 1.2.3.4/32
+      port: 8123
+  xyz:
+    to:
+    - cidr: 4.4.4.4/32
+      port: 8443

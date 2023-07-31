@@ -201,7 +201,7 @@ class ConfigChain(DeepChain):
         maps = []
         for fname in args:
             if os.path.exists(fname):
-                print(f"loading config {fname}")
+                print(f"loading  config {fname}")
                 with open(fname) as f:
                     m = parser.load(f)
                 maps.append(m)
