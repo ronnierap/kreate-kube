@@ -1,0 +1,13 @@
+env: prd
+
+replicas: 3
+
+containers:
+  app:
+    resources:
+      limits:
+        cpu: 2
+      requests:
+        cpu: 400m
+    startupProbe:
+      failureThreshold: 60

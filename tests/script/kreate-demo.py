@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import kreate
 
-def kreate_demo_app():
+def kreate_demo_app(env: str):
     cfg = kreate.ConfigChain(
-        "tests/script/config-demo-dev.yaml",
+        f"tests/script/env/{env}/config-demo-{env}.yaml",
         "tests/script/config-demo.yaml",
         "src/kreate/templates/default-values.yaml",
         )
-    app = kreate.App('demo', kustomize=True, config=cfg)
+    app = kreate.App('demo', env, kustomize=True, config=cfg)
 
     kreate.Ingress(app)
     app.ingress_root.sticky()

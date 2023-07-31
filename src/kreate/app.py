@@ -1,25 +1,24 @@
 import os
 import sys
 import shutil
+from collections.abc import Mapping
+
 from . import templates, core
 
 class App:
     def __init__(self, name: str,
-                 template_package=templates, image_name: str = None,
-                 config=None,
-                 kustomize=False):
+                 env : str,
+                 template_package=templates,
+                 config: Mapping = None,
+                 kustomize: bool =False):
         self.name = name
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.vars = dict()
         self.config = config
         self.kustomize = kustomize
-        vars_file = self.script_dir + "/vars-" + self.name + ".yaml"
+        vars_file = f"{self.script_dir}/env/{env}/vars-{self.name}-{env}.yaml"
         self.vars.update(core.loadOptionalYaml(vars_file))
-        #config_file = self.script_dir + "/config-" + self.name + ".yaml"
-        #self.config.update(core.loadOptionalYaml(config_file))
-
         self.namespace = self.name + "-" + self.config["env"]
-        #self.labels = dict()
         self.target_dir = "./build/" + self.namespace
         self.template_package = template_package
         self.resources=[]

@@ -1,0 +1,13 @@
+env: dev
+
+replicas: 0
+
+containers:
+  app:
+    resources:
+      limits:
+        cpu: 500m
+      requests:
+        cpu: 100m
+    startupProbe:
+      failureThreshold: 120

@@ -1,0 +1,3 @@
+ORACLE_URL: localhost:1521
+ORACLE_USR: demo_usr_DEV
+ORACLE_SCHEMA: demo_schema_dev

@@ -1,33 +1,33 @@
 import argparse
 import os
 
-def do_files(kreate_app):
-    app=kreate_app()
+def do_files(kreate_app, env):
+    app=kreate_app(env)
     app.kreate_files()
 
-def do_out(kreate_app):
-    app=kreate_app()
+def do_out(kreate_app, env):
+    app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir}"
     print(cmd)
     os.system(cmd)
 
-def do_diff(kreate_app):
-    app=kreate_app()
+def do_diff(kreate_app, env):
+    app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl diff -f - "
     print(cmd)
     os.system(cmd)
 
-def do_apply(kreate_app):
-    app=kreate_app()
+def do_apply(kreate_app, env):
+    app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl apply --dry-run -f - "
     print(cmd)
     os.system(cmd)
 
-def do_test(kreate_app):
-    app=kreate_app()
+def do_test(kreate_app, env):
+    app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | diff  {app.script_dir}/test.out -"
     print(cmd)
@@ -37,8 +37,11 @@ def do_test(kreate_app):
 
 def run_cli(kreate_app):
     parser = argparse.ArgumentParser()
-    cmds=["a", "apply", "d", "diff", "files"]
-    help="the command to be executed, e.g. apply or diff"
+    parser.add_argument("-e","--env", action="store", default="dev")
+    #cmds=["a", "apply", "d", "diff", "files"]
+    #help="the command to be executed, e.g. apply or diff"
+
+
     subparsers = parser.add_subparsers(help="subcommand", description="valid subcommands", title="subcmd")
     #parser.add_subparsers(title="command", help="subcommand")
     files_cmd = subparsers.add_parser("files", help="kreate all the files (default command)", aliases=["f"])
@@ -55,4 +58,5 @@ def run_cli(kreate_app):
     parser.set_defaults(func=do_files) # TODO: better way to set default command?
 
     args = parser.parse_args()
-    args.func(kreate_app)
+    env = args.env
+    args.func(kreate_app, env)

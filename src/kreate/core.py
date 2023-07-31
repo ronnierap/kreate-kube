@@ -94,6 +94,7 @@ def loadOptionalYaml(filename):
         with open(filename) as f:
             return parser.load(f)
     else:
+        print(f"WARN: skipping yaml file {filename}")
         return {}
 
 class YamlBase:
