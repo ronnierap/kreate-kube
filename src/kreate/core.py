@@ -170,3 +170,9 @@ def merge(a, b, path=None):
         else:
             a[key] = valb
     return a
+
+
+#class ConfigMap(DeepChain):
+#    def __init__(self, *filenames):
+#        maps = []
+#        for f in filenames:

@@ -9,13 +9,13 @@ class App:
         self.name = name
         self.vars = dict()
         self.config = dict()
-        script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+        self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         if parent:
             self.vars.update(parent.vars)
             self.config.update(parent.config)
-        vars_file = script_directory + "/vars-" + self.name + ".yaml"
+        vars_file = self.script_dir + "/vars-" + self.name + ".yaml"
         self.vars.update(core.loadOptionalYaml(vars_file))
-        config_file = script_directory + "/config-" + self.name + ".yaml"
+        config_file = self.script_dir + "/config-" + self.name + ".yaml"
         self.config.update(core.loadOptionalYaml(config_file))
 
         self.namespace = self.name + "-" + self.config["env"]

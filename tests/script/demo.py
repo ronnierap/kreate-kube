@@ -36,5 +36,6 @@ def demo_app():
     #kust.add_cm(cm)
 
     kust.kreate_files()
+    return app
 
 kreate.cli(demo_app)
