@@ -216,7 +216,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: egress-to-db
+  name: demo-egress-to-db
   namespace: demo-acc
 spec:
   egress:
@@ -235,7 +235,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: egress-to-xyz
+  name: demo-egress-to-xyz
   namespace: demo-acc
 spec:
   egress:
