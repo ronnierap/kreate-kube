@@ -1,5 +1,3 @@
-team: devteam1
-
 deployment:
   version: {{ val.version }}
   project: kreate-demo
