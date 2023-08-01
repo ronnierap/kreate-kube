@@ -1,4 +1,4 @@
-env: env
+env: acc
 
 egress:
   redis:
@@ -11,6 +11,9 @@ egress:
     to:
     - cidr: 4.4.4.4/32
       port: 8443
+
+serviceaccount:
+  role: some-role-acc
 
 vars:
   ORACLE_URL: oracle-acc:1521

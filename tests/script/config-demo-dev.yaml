@@ -24,7 +24,7 @@ egress:
     ignore: True
 
 serviceaccount:
-  role: some-role
+  role: some-role-dev
 
 ingress:
   root:

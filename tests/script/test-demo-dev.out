@@ -1,4 +1,12 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: some-role-dev
+  name: demo-serviceaccount
+  namespace: demo-dev
+---
+apiVersion: v1
 data:
   ENV: dev
   ORACLE_SCHEMA: demo_schema_dev
@@ -121,6 +129,23 @@ metadata:
   namespace: demo-dev
 spec:
   minAvailable: 2
+  selector:
+    matchLabels:
+      app: demo
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: demo-servicemonitor
+  namespace: demo-dev
+spec:
+  endpoints:
+  - interval: 20s
+    path: /actuator/prometheus
+    port: http
+  namespaceSelector:
+    matchNames:
+    - demo-dev
   selector:
     matchLabels:
       app: demo
