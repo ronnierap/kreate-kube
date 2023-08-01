@@ -29,14 +29,14 @@ def do_apply(kreate_app, env):
 def do_test(kreate_app, env):
     app=kreate_app(env)
     app.kreate_files()
-    cmd = f"kustomize build {app.target_dir} | diff  {app.script_dir}/test-{app.name}-{app.config.env}.out -"
+    cmd = f"kustomize build {app.target_dir} | diff  {app.script_dir}/test-{app.name}-{app.env}.out -"
     print(cmd)
     os.system(cmd)
 
 def do_testupdate(kreate_app, env):
     app=kreate_app(env)
     app.kreate_files()
-    cmd = f"kustomize build {app.target_dir} > {app.script_dir}/test-{app.name}-{app.config.env}.out"
+    cmd = f"kustomize build {app.target_dir} > {app.script_dir}/test-{app.name}-{app.env}.out"
     print(cmd)
     os.system(cmd)
 

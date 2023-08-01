@@ -1,36 +1,22 @@
-env: dev
-
-deployment:
-  replicas: 0
 
 containers:
   app:
     resources:
       limits:
-        cpu: 500m
+        cpu: {{ val.cpu_limit | default(2) }}
       requests:
-        cpu: 100m
+        cpu: {{ val.cpu_request | default("400m") }}
     startupProbe:
       failureThreshold: 120
 
 egress:
   redis:
     ignore: True  # redis is local in dev environment
-  db:
-    to:
-    - cidr: 1.2.3.4/32
-      port: 8123
   xyz:
     ignore: True
 
 serviceaccount:
   role: some-role-dev
-
-ingress:
-  root:
-    host: some-dev-host
-  api:
-    host: some-dev-host
 
 vars:
   ORACLE_URL: localhost:1521

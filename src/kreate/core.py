@@ -95,20 +95,6 @@ class DeepChain(Mapping):
     def __repr__(self):
         return f"DeepChain({self._maps})"
 
-class Values():
-    def __init__(self):
-        self.values = {}
-
-    def add_map_values(self, map: Mapping):
-        self.values.update(map)
-
-    def add_yaml_values(self, filename: str, package=None):
-        self.values.update(load_yaml(filename, package))
-
-    def add_obj_values(self, obj):
-        d = { key: obj.__dict__[key] for key in obj.__dict__.keys() if not key.startswith("_")}
-        self.values.update(d)
-
 
 parser = YAML()
 
@@ -177,17 +163,52 @@ def merge(a, b, path=None):
             a[key] = valb
     return
 
+class Values():
+    def __init__(self):
+        self._map = {}
+
+    def add_map(self, map: Mapping):
+        self._map.update(map)
+
+    def add_yaml(self, filename: str, package=None):
+        self._map.update(load_yaml(filename, package))
+
+    def add_obj(self, obj):
+        d = { key: obj.__dict__[key] for key in obj.__dict__.keys() if not key.startswith("_")}
+        self._map.update(d)
+
+    def add_jinyaml(self, filename: str, package=None):
+        self._map.update(load_yaml(filename, package))
 
 
-class ConfigChain(DeepChain):
+class Config():
     def __init__(self, *args):
+        self._values = Values()
+        self._maps = []
+
+    def add_file(self, filename):
+        if os.path.exists(filename):
+            print(f"INFO: loading config {filename}")
+            with open(filename) as f:
+                tmpl = jinja2.Template(
+                    f.read(),
+                    undefined=jinja2.StrictUndefined,
+                    trim_blocks=True,
+                    lstrip_blocks=True
+                )
+                vars = { "val": self.values() }
+                m = parser.load(tmpl.render(vars))
+                self._maps.append(m)
+        else:
+            print(f"WARN: skipping jinyaml file {filename}")
+
+    def add_files(self, *filenames):
         maps = []
-        for fname in args:
-            if os.path.exists(fname):
-                print(f"INFO: loading  config {fname}")
-                with open(fname) as f:
-                    m = parser.load(f)
-                maps.append(m)
-            else:
-                print(f"WARN: skipping config file {fname}")
-        DeepChain.__init__(self, *maps) #maps[0], maps[1])
+        for fname in filenames:
+            self.add_file(fname)
+
+    def values(self):
+        return self._values._map
+
+    def config(self):
+        return DeepChain(*self._maps)

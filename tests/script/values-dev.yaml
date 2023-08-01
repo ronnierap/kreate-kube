@@ -8,3 +8,14 @@ container_port: 8080
 
 ingress_host_external: api.kisst.org
 ingress_host_internal: private.kisst.org
+
+db_egress_cidr: 1.2.3.4/32
+#db_egress_port: 8123
+
+redis_egress_cidr: dummy
+xyz_egress_cidr: dummy
+
+cpu_limit: "500m"
+cpu_request: "100m"
+
+replicas: 0

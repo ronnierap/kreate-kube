@@ -5,19 +5,20 @@ from collections.abc import Mapping
 
 from . import core
 
-class App(core.Values):
+class App():
     def __init__(
             self, name: str,
-            config: Mapping = None,
+            config: core.Config = None,
             kustomize: bool =False,
         ):
-        core.Values.__init__(self)
         self.name = name
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.vars = dict()
-        self.config = config
+        self.config = config.config()
+        self.values = config.values()
         self.kustomize = kustomize
-        self.namespace = self.name + "-" + self.config["env"]
+        self.env = self.values["env"]
+        self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
         self.resources = []
         self.kust_resources = []
@@ -77,7 +78,7 @@ class Resource(core.YamlBase):
                  name: str = None,
                  filename: str = None,
                  skip: bool = False,
-                 config: Mapping = None):
+                 config = None):
         self.app = app
         if kind is None:
             self.kind = self.__class__.__name__

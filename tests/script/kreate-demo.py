@@ -3,14 +3,16 @@ import kreate
 import appdef
 
 def kreate_demo_app(env: str):
-    cfg = kreate.ConfigChain(
+    cfg = kreate.core.Config()
+    cfg._values.add_obj(appdef)
+    cfg._values.add_yaml(f"tests/script/values-{appdef.env}.yaml")
+    cfg.add_files(
         f"tests/script/config-demo-{env}.yaml",
         "tests/script/config-demo.yaml",
         "src/kreate/templates/default-values.yaml",
         )
+
     app = kreate.App('demo', kustomize=True, config=cfg)
-    app.add_obj_values(appdef)
-    app.add_yaml_values(f"tests/script/values-{appdef.env}.yaml")
 
     kreate.Ingress(app)
     app.ingress.root.sticky()
@@ -38,7 +40,7 @@ def kreate_demo_app(env: str):
     app.kreate("ServiceMonitor")
 
     cm = kreate.ConfigMap(app, "vars", name="demo-vars", kustomize=False)
-    cm.add_var("ENV", value=app.config["env"])
+    cm.add_var("ENV", value=app.env)
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")
     cm.add_var("ORACLE_SCHEMA")
