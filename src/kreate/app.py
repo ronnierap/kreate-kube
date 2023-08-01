@@ -223,21 +223,32 @@ class Ingress(Resource):
 
 #########################################################################################
 class Patch(core.YamlBase):
-    def __init__(self, target: Resource, filename=None, config=None):
-        self.target =target
-        self.target.patches.append  (self)
-        core.YamlBase.__init__(self, target.app, name, filename, template=template, config=config)
+    def __init__(self, target: Resource, template, config: Mapping):
+        self.target = target
+        self.target.patches.append(self)
+        self.config = config
+        self.filename = template
+        core.YamlBase.__init__(self, template=template)
+        self.load_yaml()
 
-    def _add_jinja_vars(self, vars):
-        vars["target"]=self.target
+    def kreate(self) -> None:
+        self.save_yaml(f"{self.target.app.target_dir}/{self.filename}")
+
+    def _get_jinja_vars(self):
+        return {
+            "target": self.target,
+            "cfg" : self.config,
+            "app" : self.target.app,
+            "my" : self
+        }
 
 
 class HttpProbesPatch(Patch):
     def __init__(self, target: Resource, container_name : str ="app"):
         config = target.app.config.containers[container_name]
-        Patch.__init__(self, target, "patch-http-probes.yaml", name=target.name+"-probes", config=config)
+        Patch.__init__(self, target, "patch-http-probes.yaml", config=config)
 
 class AntiAffinityPatch(Patch):
     def __init__(self, target: Resource, container_name : str ="app"):
         config = target.app.config.containers[container_name]
-        Patch.__init__(self, target, "patch-anti-affinity.yaml", name=target.name+"-anti-affinity", config=config)
+        Patch.__init__(self, target, "patch-anti-affinity.yaml", config=config)
