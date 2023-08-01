@@ -24,15 +24,15 @@ def kreate_demo_app(env: str):
     #app.depl.add_template_label("egress-to-oracle", "enabled")
     #kreate.HttpProbesPatch(app.deployment)
     #kreate.AntiAffinityPatch(app.deployment)
-    kreate.Service(app, "http")
-    app.service.http.headless()
+    kreate.Service(app)
+    app.service._.headless()
 
     pdb = kreate.PodDisruptionBudget(app)
     pdb.yaml.spec.minAvailable = 2
     pdb.add_label("testje","test")
 
 
-    cm = kreate.ConfigMap(app, "vars", fullname="demo-vars", kustomize=False)
+    cm = kreate.ConfigMap(app, "vars", name="demo-vars", kustomize=False)
     cm.add_var("ENV", value=app.config["env"])
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")

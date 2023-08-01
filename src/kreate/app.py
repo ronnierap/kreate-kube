@@ -26,22 +26,15 @@ class App:
     def add(self, res, abbrevs) -> None:
         if not res.skip:
             self.resources.append(res)
-        attr_name = res.shortname.replace("-","_").lower()
-        #self._attr_map[attr_name] = res
 
-        #for abbrev in abbrevs:
-        #    abbrev = abbrev.replace("-","_").lower()
-        #    if abbrev not in self._attr_map: # Do not overwrite
-        #        self._attr_map[abbrev] = res
         map = self._kinds.get(res.kind.lower(), None)
         if map is None:
             map = core.DictWrapper({})
             self._kinds[res.kind.lower()] = map
-        #if attr_name.startswith(self.name.lower()+"_"):
-        #    short_name = attr_name[len(self.name)+1:]
-        #    if short_name not in self._attr_map: # Do not overwrite
-        #        self._attr_map[short_name] = res
-        map[res.shortname] = res
+        if res.shortname is None:
+            map["_"] = res # TODO: better name/abbrev ....
+        else:
+            map[res.shortname] = res
 
     def __getattr__(self, attr):
         if attr in self.__dict__ or attr == "_dict":
@@ -75,7 +68,7 @@ class Strukture(App):
 
 class Resource(core.YamlBase):
     def __init__(self, app: App, shortname=None, kind: str = None,
-                 fullname: str = None,
+                 name: str = None,
                  filename: str = None,
                  skip: bool = False,
                  abbrevs=[], config=None):
@@ -86,21 +79,29 @@ class Resource(core.YamlBase):
             self.kind = kind
         self.shortname = shortname
         typename = self.kind.lower()
-        self.fullname = fullname or f"{app.name}-{typename}-{shortname}"
-        self.name = self.fullname
-        self.filename = filename or f"{self.fullname}.yaml"
+        if shortname is None:
+            self.name = name or f"{app.name}-{typename}"
+        else:
+            self.name = name or f"{app.name}-{typename}-{shortname}"
+        self.filename = filename or f"{self.name}.yaml"
         self.patches = []
         self.skip = skip
 
         if config:
             self.config = config
         else:
-            if typename in app.config and shortname in app.config[typename]:
-                #print(f"DEBUG using config {typename}.{name}")
-                self.config = app.config[typename][shortname]
-                #print(self.config)
+            if typename in app.config:
+                if shortname is None:
+                    print(f"DEBUG using default config for {typename}")
+                    self.config = app.config[typename]
+                elif shortname in app.config[typename]:
+                    print(f"DEBUG using named config {typename}.{shortname}")
+                    self.config = app.config[typename][shortname]
+                else:
+                    print(f"DEBUG could not find config for {shortname} in {typename}.")
+                    self.config = {}
             else:
-                print(f"DEBUG could not find config {typename}.{shortname}")
+                print(f"DEBUG could not find any config for {typename}")
                 self.config = {}
         template = f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
@@ -143,12 +144,8 @@ class Kustomization(Resource):
 
 class Deployment(Resource):
     def __init__(self, app: App):
-        # self.replicas = env.replicas
-        # self.container = [Container('app')]
-        # self.container[0].image_name = app.name + ".app"
-        Resource.__init__(self, app, shortname=app.name, fullname=app.name, filename=f"{app.name}-deployment.yaml",
-                          abbrevs=["depl","deployment"])
-        # filename=app.name+"-deployment.yaml",
+        # TODO: make name configurable?
+        Resource.__init__(self, app, shortname=None)
 
     def add_template_annotation(self, name: str, val: str) -> None:
         if not self.yaml.spec.template.metadata.has_key("annotations"):
@@ -163,7 +160,7 @@ class Deployment(Resource):
 
 class PodDisruptionBudget(Resource):
     def __init__(self, app: App):
-        Resource.__init__(self, app, shortname="TODO", fullname=f"{app.name}-pdb", abbrevs=["pdb"])
+        Resource.__init__(self, app, shortname="TODO", name=f"{app.name}-pdb", abbrevs=["pdb"])
 
 class Service(Resource):
     def __init__(self, app: App, shortname=None):
@@ -174,12 +171,12 @@ class Service(Resource):
 
 class Egress(Resource):
     def __init__(self, app: App, shortname: str):
-        Resource.__init__(self, app, shortname=shortname, fullname=f"{app.name}-egress-to-{shortname}")
+        Resource.__init__(self, app, shortname= shortname, name=f"{app.name}-egress-to-{shortname}")
 
 class ConfigMap(Resource):
-    def __init__(self, app: App, shortname=None, fullname: str = None, kustomize=False):
+    def __init__(self, app: App, shortname=None, name: str = None, kustomize=False):
         self.kustomize = kustomize
-        Resource.__init__(self, app, shortname=shortname, fullname=fullname, abbrevs=["cm"], skip=kustomize)
+        Resource.__init__(self, app, shortname=shortname, name=name, abbrevs=["cm"], skip=kustomize)
         if kustomize:
             app.kustomize = True
             app.kust_resources.append(self)

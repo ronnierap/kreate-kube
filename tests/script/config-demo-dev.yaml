@@ -1,8 +1,7 @@
 env: dev
 
 deployment:
-  demo:
-    replicas: 0
+  replicas: 0
 
 containers:
   app:
@@ -25,10 +24,13 @@ egress:
     ignore: True
 
 service:
+  # default service
+  ports:
+    - port: 8080
+      #default name: http
+  # extra named services
   http:
     ports:
-      - port: 8080
-        #default name: http
       - port: 443
         name: https
 

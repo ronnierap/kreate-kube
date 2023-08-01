@@ -2,11 +2,11 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: egress-to-{{ my.name }}
+  name: egress-to-{{ my.shortname }}
 spec:
   podSelector:
     matchLabels:
-      egress-to-{{ my.name }}: enabled
+      egress-to-{{ my.shortname }}: enabled
   policyTypes:
     - Egress
   egress:
