@@ -152,7 +152,7 @@ class Resource(core.YamlBase):
 
 class Kustomization(Resource):
     def __init__(self, app: App):
-        Resource.__init__(self, app, "TODO", filename="kustomization.yaml", skip=True)
+        Resource.__init__(self, app, filename="kustomization.yaml", skip=True)
 
 
 class Deployment(Resource):
@@ -173,7 +173,7 @@ class Deployment(Resource):
 
 class PodDisruptionBudget(Resource):
     def __init__(self, app: App):
-        Resource.__init__(self, app, shortname="TODO", name=f"{app.name}-pdb")
+        Resource.__init__(self, app, name=f"{app.name}-pdb")
 
 class Service(Resource):
     def __init__(self, app: App, shortname=None):
@@ -184,7 +184,7 @@ class Service(Resource):
 
 class Egress(Resource):
     def __init__(self, app: App, shortname: str):
-        Resource.__init__(self, app, shortname= shortname, name=f"{app.name}-egress-to-{shortname}")
+        Resource.__init__(self, app, shortname=shortname, name=f"{app.name}-egress-to-{shortname}")
 
 class ConfigMap(Resource):
     def __init__(self, app: App, shortname=None, name: str = None, kustomize=False):
@@ -209,7 +209,7 @@ class ConfigMap(Resource):
 class Ingress(Resource):
     def __init__(self, app: App, shortname: str ="root", path: str ="/" ):
         self.path = path
-        Resource.__init__(self, app, shortname=shortname) # TODO, config=app.config.ingress[name])
+        Resource.__init__(self, app, shortname=shortname)
 
     def nginx_annon(self, name: str, val: str) -> None:
         self.annotate("nginx.ingress.kubernetes.io/" + name, val)
