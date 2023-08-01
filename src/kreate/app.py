@@ -19,11 +19,13 @@ class App:
         self.namespace = self.name + "-" + self.config["env"]
         self.target_dir = "./build/" + self.namespace
         self.resources = []
+        self.kust_resources = []
         self._attr_map = {}
         self._kinds = {}
 
     def add(self, res, abbrevs) -> None:
-        self.resources.append(res)
+        if not res.skip:
+            self.resources.append(res)
         attr_name = res.name.replace("-","_").lower()
         self._attr_map[attr_name] = res
         #for abbrev in abbrevs:
@@ -86,7 +88,7 @@ class Resource(core.YamlBase):
         self.fullname = fullname or f"{app.name}-{typename}-{name}"
         self.filename = filename or f"{self.fullname}.yaml"
         self.patches = []
-        self.ignored = skip
+        self.skip = skip
 
         if config:
             self.config = config
@@ -105,10 +107,10 @@ class Resource(core.YamlBase):
             # - do not load the template (config might be missing)
             # - do not register
             print(f"INFO: ignoring {typename}.{self.name}")
-            self.ignored = True
+            self.skip = True
         else:
-            self.app.add(self, abbrevs=abbrevs)
             self.load_yaml()
+        self.app.add(self, abbrevs=abbrevs)
 
     def _get_jinja_vars(self):
         return {
@@ -177,6 +179,7 @@ class ConfigMap(Resource):
         Resource.__init__(self, app, name=name, abbrevs=["cm"], skip=kustomize)
         if kustomize:
             app.kustomize = True
+            app.kust_resources.append(self)
             self.fieldname = "literals"
             self.yaml[self.fieldname] = {}
         else:
