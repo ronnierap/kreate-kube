@@ -7,7 +7,9 @@ from . import core
 
 class App():
     def __init__(
-            self, name: str,
+            self,
+            name: str,
+            env: str,
             config: core.Config = None,
             kustomize: bool =False,
         ):
@@ -17,7 +19,7 @@ class App():
         self.config = config.config()
         self.values = config.values()
         self.kustomize = kustomize
-        self.env = self.values["env"]
+        self.env = env
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
         self.resources = []
