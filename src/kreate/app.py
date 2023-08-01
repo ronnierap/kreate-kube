@@ -71,7 +71,11 @@ class Strukture(App):
 ##################################################################
 
 class Resource(core.YamlBase):
-    def __init__(self, app: App, name=None, kind: str = None, abbrevs=[], config=None):
+    def __init__(self, app: App, name=None, kind: str = None,
+                 fullname: str = None,
+                 filename: str = None,
+                 skip: bool = False,
+                 abbrevs=[], config=None):
         self.app = app
         if kind is None:
             self.kind = self.__class__.__name__
@@ -79,9 +83,10 @@ class Resource(core.YamlBase):
             self.kind = kind
         self.name = name
         typename = self.kind.lower()
-        self.fullname = f"{app.name}-{typename}-{name}"
-        self.filename = f"{self.app.target_dir}/{self.fullname}.yaml"
+        self.fullname = fullname or f"{app.name}-{typename}-{name}"
+        self.filename = filename or f"{self.fullname}.yaml"
         self.patches = []
+        self.ignored = skip
 
         if config:
             self.config = config
@@ -102,7 +107,6 @@ class Resource(core.YamlBase):
             print(f"INFO: ignoring {typename}.{self.name}")
             self.ignored = True
         else:
-            self.ignored = False
             self.app.add(self, abbrevs=abbrevs)
             self.load_yaml()
 
@@ -114,7 +118,7 @@ class Resource(core.YamlBase):
         }
 
     def kreate(self) -> None:
-        self.save_yaml(self.filename)
+        self.save_yaml(f"{self.app.target_dir}/{self.filename}")
         for p in self.patches:
             p.kreate()
 
@@ -130,7 +134,7 @@ class Resource(core.YamlBase):
 
 class Kustomization(Resource):
     def __init__(self, app: App):
-        Resource.__init__(self, app, name="kusst")
+        Resource.__init__(self, app, name="kusst", filename="kustomization.yaml", skip=True)
 
 
 class Deployment(Resource):
@@ -170,7 +174,7 @@ class Egress(Resource):
 class ConfigMap(Resource):
     def __init__(self, app: App, name=None, kustomize=False):
         self.kustomize = kustomize
-        Resource.__init__(self, app, name=name, abbrevs=["cm"])
+        Resource.__init__(self, app, name=name, abbrevs=["cm"], skip=kustomize)
         if kustomize:
             app.kustomize = True
             self.fieldname = "literals"

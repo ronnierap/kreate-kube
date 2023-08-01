@@ -4,7 +4,7 @@ namespace: {{ app.namespace }}
 
 resources:
 {% for res in app.resources %}
-{% if cm.__class__.__name__ != "ConfigMap" or not cm.kustomize %}
+{% if not res.ignored %}
 - {{ res.filename }}
 {% endif %}
 {% endfor %}
