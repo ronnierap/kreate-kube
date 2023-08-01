@@ -36,6 +36,22 @@ spec:
   selector:
     app: demo
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: demo
+  name: demo-service-https
+  namespace: demo-prd
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: demo
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
