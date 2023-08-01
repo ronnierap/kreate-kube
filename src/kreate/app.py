@@ -140,9 +140,9 @@ class Kustomization(Resource):
 
 
 class Deployment(Resource):
-    def __init__(self, app: App):
-        # TODO: make name configurable?
-        Resource.__init__(self, app, shortname=None)
+    def __init__(self, app: App, name: str = None):
+        name = name or app.name
+        Resource.__init__(self, app, shortname=None, name=name)
 
     def add_template_annotation(self, name: str, val: str) -> None:
         if not "annotations" in self.yaml.spec.template.metadata:
