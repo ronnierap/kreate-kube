@@ -1,22 +1,10 @@
 
-containers:
-  app:
-    resources:
-      limits:
-        cpu: {{ val.cpu_limit | default(2) }}
-      requests:
-        cpu: {{ val.cpu_request | default("400m") }}
-    startupProbe:
-      failureThreshold: 120
-
 egress:
   redis:
     ignore: True  # redis is local in dev environment
   xyz:
     ignore: True
 
-serviceaccount:
-  role: some-role-dev
 
 vars:
   ORACLE_URL: localhost:1521

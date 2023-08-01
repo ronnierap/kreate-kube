@@ -3,6 +3,5 @@
 # imported in python, but also sourced in some shell scripts
 
 app="demo"
-env="dev"
 team="myteam"
 version="v1.3.4"

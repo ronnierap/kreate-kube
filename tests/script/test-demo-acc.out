@@ -54,7 +54,7 @@ spec:
         app.kubernetes.io/managed-by: kustomize
         app.kubernetes.io/name: demo
         app.kubernetes.io/part-of: kreate-demo
-        app.kubernetes.io/version: latest-master
+        app.kubernetes.io/version: v1.3.4
         co.elastic.logs/enabled: "true"
         co.elastic.logs/exclude_lines: DEBUG
       labels:
@@ -78,7 +78,7 @@ spec:
             name: demo-secrets
         - configMapRef:
             name: demo-vars
-        image: todo.com/demo.app:latest-master
+        image: https://repo.kisst.org/demo.app:v1.3.4
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3
@@ -159,7 +159,7 @@ metadata:
   namespace: demo-acc
 spec:
   rules:
-  - host: some-acc-host
+  - host: private-acc.kisst.org
     http:
       paths:
       - backend:
@@ -186,7 +186,7 @@ metadata:
   namespace: demo-acc
 spec:
   rules:
-  - host: some-acc-host
+  - host: private-acc.kisst.org
     http:
       paths:
       - backend:
@@ -205,7 +205,7 @@ metadata:
 spec:
   egress:
   - ports:
-    - port: 8123
+    - port: 1521
       protocol: TCP
     to:
     - ipBlock:

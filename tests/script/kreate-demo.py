@@ -5,14 +5,14 @@ import appdef
 def kreate_demo_app(env: str):
     cfg = kreate.core.Config()
     cfg._values.add_obj(appdef)
-    cfg._values.add_yaml(f"tests/script/values-{appdef.env}.yaml")
+    cfg._values.add_yaml(f"tests/script/values-{env}.yaml")
     cfg.add_files(
         f"tests/script/config-demo-{env}.yaml",
         "tests/script/config-demo.yaml",
         "src/kreate/templates/default-values.yaml",
         )
 
-    app = kreate.App('demo', kustomize=True, config=cfg)
+    app = kreate.App('demo', env, kustomize=True, config=cfg)
 
     kreate.Ingress(app)
     app.ingress.root.sticky()

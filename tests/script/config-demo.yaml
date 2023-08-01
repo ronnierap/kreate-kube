@@ -6,15 +6,18 @@ deployment:
   replicas: {{ val.replicas | default(1) }}
   image_repo: {{ val.image_repo }}
 
-  containers:
-    app:
-      resources:
-        limits:
-          cpu: {{ val.cpu_limit | default(2) }}
-        requests:
-          cpu: {{ val.cpu_request | default("400m") }}
-      startupProbe:
-        failureThreshold: 120
+containers:
+  app:
+    resources:
+      limits:
+        cpu: {{ val.cpu_limit | default(2) }}
+      requests:
+        cpu: {{ val.cpu_request | default("400m") }}
+    startupProbe:
+      failureThreshold: 120
+
+serviceaccount:
+  role: {{ val.serviceaccount_role }}
 
 servicemonitor:
   endpoints:

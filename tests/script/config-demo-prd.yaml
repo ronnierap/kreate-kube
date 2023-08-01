@@ -1,17 +1,6 @@
-env: prd
 
-replicas: 3
 
-containers:
-  app:
-    resources:
-      limits:
-        cpu: 2
-      requests:
-        cpu: 400m
-    startupProbe:
-      failureThreshold: 60
-
+# redis has multiple hosts on prod
 egress:
   redis:
     to:
@@ -21,17 +10,13 @@ egress:
       port: 6379
     - cidr: 3.3.3.3/32
       port: 6379
-  db:
-    to:
-    - cidr: 1.2.3.5/32
-      port: 8123
-  xyz:
-    to:
-    - cidr: 4.4.4.5/32
-      port: 8443
 
-serviceaccount:
-  role: some-role-prd
+# override threshold that is not a value
+containers:
+  app:
+    startupProbe:
+      failureThreshold: 60
+
 
 vars:
   ORACLE_URL: oracle-prd1:1521,oracle-prd2:1521,
