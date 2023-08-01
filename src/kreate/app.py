@@ -39,7 +39,7 @@ class App():
             map = core.DictWrapper({})
             self._kinds[res.kind.lower()] = map
         if res.shortname is None:
-            map["_"] = res # TODO: better name/abbrev ....
+            map["_"] = res
         else:
             map[res.shortname] = res
 
@@ -52,7 +52,6 @@ class App():
         res = Resource(self, shortname=shortname, kind=kind)
 
     def kreate_files(self):
-        # TODO better place: to clear directory
         if os.path.exists(self.target_dir) and os.path.isdir(self.target_dir):
             shutil.rmtree(self.target_dir)
         os.makedirs(self.target_dir, exist_ok=True)
