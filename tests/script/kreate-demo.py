@@ -20,8 +20,8 @@ def kreate_demo_app(env: str):
     kreate.Egress(app, "redis")
     kreate.Egress(app, "xyz")
 
-    kreate.Deployment(app)
-    #app.depl.add_template_label("egress-to-oracle", "enabled")
+    depl=kreate.Deployment(app)
+    depl.add_template_label("egress-to-db", "enabled")
     #kreate.HttpProbesPatch(app.deployment)
     #kreate.AntiAffinityPatch(app.deployment)
     kreate.Service(app)

@@ -18,7 +18,6 @@ class App:
         self.target_dir = "./build/" + self.namespace
         self.resources = []
         self.kust_resources = []
-        self._attr_map = {}
         self._kinds = {}
 
     def add(self, res) -> None:
@@ -146,14 +145,14 @@ class Deployment(Resource):
         Resource.__init__(self, app, shortname=None)
 
     def add_template_annotation(self, name: str, val: str) -> None:
-        if not self.yaml.spec.template.metadata.has_key("annotations"):
-            self.yaml.spec.template.metadata.add("annotations", {})
-        self.yaml.spec.template.metadata.annotations.add(name, val)
+        if not "annotations" in self.yaml.spec.template.metadata:
+            self.yaml.spec.template.metadata["annotations"] = {}
+        self.yaml.spec.template.metadata.annotations[name] = val
 
     def add_template_label(self, name: str, val: str) -> None:
-        if not self.yaml.spec.template.metadata.has_key("labels"):
-            self.yaml.spec.template.metadata.add("labels", {})
-        self.yaml.spec.template.metadata.labels.add(name, val)
+        if not "labels" in self.yaml.spec.template.metadata:
+            self.yaml.spec.template.metadata["labels"] = {}
+        self.yaml.spec.template.metadata.labels[name] = val
 
 
 class PodDisruptionBudget(Resource):
@@ -224,7 +223,7 @@ class Ingress(Resource):
 
 #########################################################################################
 class Patch(core.YamlBase):
-    def __init__(self, target: Resource, template, name=None, filename=None, config=None):
+    def __init__(self, target: Resource, filename=None, config=None):
         self.target =target
         self.target.patches.append  (self)
         core.YamlBase.__init__(self, target.app, name, filename, template=template, config=config)
