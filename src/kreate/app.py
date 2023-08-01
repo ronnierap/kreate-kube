@@ -26,8 +26,9 @@ class App:
     def add(self, res, abbrevs) -> None:
         if not res.skip:
             self.resources.append(res)
-        attr_name = res.name.replace("-","_").lower()
-        self._attr_map[attr_name] = res
+        attr_name = res.shortname.replace("-","_").lower()
+        #self._attr_map[attr_name] = res
+
         #for abbrev in abbrevs:
         #    abbrev = abbrev.replace("-","_").lower()
         #    if abbrev not in self._attr_map: # Do not overwrite
@@ -40,7 +41,7 @@ class App:
         #    short_name = attr_name[len(self.name)+1:]
         #    if short_name not in self._attr_map: # Do not overwrite
         #        self._attr_map[short_name] = res
-        map[res.name] = res
+        map[res.shortname] = res
 
     def __getattr__(self, attr):
         if attr in self.__dict__ or attr == "_dict":
@@ -73,7 +74,7 @@ class Strukture(App):
 ##################################################################
 
 class Resource(core.YamlBase):
-    def __init__(self, app: App, name=None, kind: str = None,
+    def __init__(self, app: App, shortname=None, kind: str = None,
                  fullname: str = None,
                  filename: str = None,
                  skip: bool = False,
@@ -83,9 +84,10 @@ class Resource(core.YamlBase):
             self.kind = self.__class__.__name__
         else:
             self.kind = kind
-        self.name = name
+        self.shortname = shortname
         typename = self.kind.lower()
-        self.fullname = fullname or f"{app.name}-{typename}-{name}"
+        self.fullname = fullname or f"{app.name}-{typename}-{shortname}"
+        self.name = self.fullname
         self.filename = filename or f"{self.fullname}.yaml"
         self.patches = []
         self.skip = skip
@@ -93,12 +95,12 @@ class Resource(core.YamlBase):
         if config:
             self.config = config
         else:
-            if typename in app.config and name in app.config[typename]:
+            if typename in app.config and shortname in app.config[typename]:
                 #print(f"DEBUG using config {typename}.{name}")
-                self.config = app.config[typename][name]
+                self.config = app.config[typename][shortname]
                 #print(self.config)
             else:
-                print(f"DEBUG could not find config {typename}.{name}")
+                print(f"DEBUG could not find config {typename}.{shortname}")
                 self.config = {}
         template = f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
@@ -136,7 +138,7 @@ class Resource(core.YamlBase):
 
 class Kustomization(Resource):
     def __init__(self, app: App):
-        Resource.__init__(self, app, name="kusst", filename="kustomization.yaml", skip=True)
+        Resource.__init__(self, app, "TODO", filename="kustomization.yaml", skip=True)
 
 
 class Deployment(Resource):
@@ -144,7 +146,8 @@ class Deployment(Resource):
         # self.replicas = env.replicas
         # self.container = [Container('app')]
         # self.container[0].image_name = app.name + ".app"
-        Resource.__init__(self, app, name=app.name, abbrevs=["depl","deployment"])
+        Resource.__init__(self, app, shortname=app.name, fullname=app.name, filename=f"{app.name}-deployment.yaml",
+                          abbrevs=["depl","deployment"])
         # filename=app.name+"-deployment.yaml",
 
     def add_template_annotation(self, name: str, val: str) -> None:
@@ -159,24 +162,24 @@ class Deployment(Resource):
 
 
 class PodDisruptionBudget(Resource):
-    def __init__(self, app: App, name=None):
-        Resource.__init__(self, app, name=name, abbrevs=["pdb"])
+    def __init__(self, app: App):
+        Resource.__init__(self, app, shortname="TODO", fullname=f"{app.name}-pdb", abbrevs=["pdb"])
 
 class Service(Resource):
-    def __init__(self, app: App, name=None):
-        Resource.__init__(self, app, name=name, abbrevs=["svc"])
+    def __init__(self, app: App, shortname=None):
+        Resource.__init__(self, app, shortname=shortname, abbrevs=["svc"])
 
     def headless(self):
         self.yaml.spec.clusterIP="None"
 
 class Egress(Resource):
-    def __init__(self, app: App, name: str):
-        Resource.__init__(self, app, name=name) #=app.name + "-egress-to-" + name) # TODO, config=app.config.ingress[name])
+    def __init__(self, app: App, shortname: str):
+        Resource.__init__(self, app, shortname=shortname, fullname=f"{app.name}-egress-to-{shortname}")
 
 class ConfigMap(Resource):
-    def __init__(self, app: App, name=None, kustomize=False):
+    def __init__(self, app: App, shortname=None, fullname: str = None, kustomize=False):
         self.kustomize = kustomize
-        Resource.__init__(self, app, name=name, abbrevs=["cm"], skip=kustomize)
+        Resource.__init__(self, app, shortname=shortname, fullname=fullname, abbrevs=["cm"], skip=kustomize)
         if kustomize:
             app.kustomize = True
             app.kust_resources.append(self)
@@ -194,9 +197,9 @@ class ConfigMap(Resource):
 
 
 class Ingress(Resource):
-    def __init__(self, app: App, name: str ="root", path: str ="/" ):
+    def __init__(self, app: App, shortname: str ="root", path: str ="/" ):
         self.path = path
-        Resource.__init__(self, app, name) # TODO, config=app.config.ingress[name])
+        Resource.__init__(self, app, shortname=shortname) # TODO, config=app.config.ingress[name])
 
     def nginx_annon(self, name: str, val: str) -> None:
         self.annotate("nginx.ingress.kubernetes.io/" + name, val)
