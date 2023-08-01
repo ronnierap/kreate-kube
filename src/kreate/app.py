@@ -38,6 +38,9 @@ class App:
             return super().__getattribute__(attr)
         return self._kinds.get(attr, None)
 
+    def kreate(self, kind: str, shortname: str = None, fullname: str = None):
+        res = Resource(self, shortname=shortname, kind=kind)
+
     def kreate_files(self):
         # TODO better place: to clear directory
         if os.path.exists(self.target_dir) and os.path.isdir(self.target_dir):
@@ -64,7 +67,9 @@ class Strukture(App):
 ##################################################################
 
 class Resource(core.YamlBase):
-    def __init__(self, app: App, shortname=None, kind: str = None,
+    def __init__(self, app: App,
+                 shortname: str = None,
+                 kind: str = None,
                  name: str = None,
                  filename: str = None,
                  skip: bool = False,

@@ -16,6 +16,12 @@ deployment:
       startupProbe:
         failureThreshold: 120
 
+servicemonitor:
+  endpoints:
+    - interval: 20s
+      path: /actuator/prometheus
+
+
 ingress:
   root:
     host: TODO

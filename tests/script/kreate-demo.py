@@ -31,6 +31,8 @@ def kreate_demo_app(env: str):
     pdb.yaml.spec.minAvailable = 2
     pdb.add_label("testje","test")
 
+    app.kreate("ServiceAccount")
+    app.kreate("ServiceMonitor")
 
     cm = kreate.ConfigMap(app, "vars", name="demo-vars", kustomize=False)
     cm.add_var("ENV", value=app.config["env"])

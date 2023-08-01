@@ -23,6 +23,8 @@ egress:
   xyz:
     ignore: True
 
+serviceaccount:
+  role: some-role
 
 ingress:
   root:
