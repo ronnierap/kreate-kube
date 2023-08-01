@@ -51,6 +51,7 @@ spec:
         co.elastic.logs/exclude_lines: DEBUG
       labels:
         app: demo
+        egress-to-db: enabled
       name: demo
     spec:
       affinity:
@@ -133,7 +134,7 @@ metadata:
   namespace: demo-dev
 spec:
   rules:
-  - host: TODO
+  - host: some-dev-host
     http:
       paths:
       - backend:
@@ -160,7 +161,7 @@ metadata:
   namespace: demo-dev
 spec:
   rules:
-  - host: TODO
+  - host: some-dev-host
     http:
       paths:
       - backend:

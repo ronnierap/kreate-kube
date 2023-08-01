@@ -51,6 +51,7 @@ spec:
         co.elastic.logs/exclude_lines: DEBUG
       labels:
         app: demo
+        egress-to-db: enabled
       name: demo
     spec:
       affinity:

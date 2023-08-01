@@ -51,6 +51,7 @@ spec:
         co.elastic.logs/exclude_lines: DEBUG
       labels:
         app: demo
+        egress-to-db: enabled
       name: demo
     spec:
       affinity:
@@ -95,13 +96,13 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: 2
+            cpu: 1
             memory: 512M
           requests:
-            cpu: 400m
+            cpu: 200m
             memory: 512M
         startupProbe:
-          failureThreshold: 120
+          failureThreshold: 30
           httpGet:
             path: actuator/info
             port: 8080
@@ -133,7 +134,7 @@ metadata:
   namespace: demo-env
 spec:
   rules:
-  - host: TODO
+  - host: some-acc-host
     http:
       paths:
       - backend:
@@ -160,7 +161,7 @@ metadata:
   namespace: demo-env
 spec:
   rules:
-  - host: TODO
+  - host: some-acc-host
     http:
       paths:
       - backend:
