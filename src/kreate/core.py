@@ -43,6 +43,7 @@ def wrap(obj):
     return obj
 
 
+
 class DeepChain(Mapping):
     def __init__(self, *maps: Mapping):
         self._maps = maps
@@ -94,16 +95,36 @@ class DeepChain(Mapping):
     def __repr__(self):
         return f"DeepChain({self._maps})"
 
+class Values():
+    def __init__(self):
+        self.values = {}
+
+    def add_map_values(self, map: Mapping):
+        self.values.update(map)
+
+    def add_yaml_values(self, filename: str, package=None):
+        self.values.update(load_yaml(filename, package))
+
+    def add_obj_values(self, obj):
+        d = { key: obj.__dict__[key] for key in obj.__dict__.keys() if not key.startswith("_")}
+        self.values.update(d)
+
 
 parser = YAML()
 
-def loadOptionalYaml(filename):
+def load_yaml(filename: str, package=None, warn: bool = True) -> Mapping:
+    if package:
+        data = pkgutil.get_data(package, filename).decode('utf-8')
+        return parser.load(data)
     if os.path.exists(filename):
         with open(filename) as f:
             return parser.load(f)
     else:
-        print(f"WARN: skipping yaml file {filename}")
-        return {}
+        if warn:
+            print(f"WARN: skipping yaml file {filename}")
+            return {}
+        else:
+            raise(ValueError(f"could not find yaml file {filename}"))
 
 class YamlBase:
     def __init__(self, template: str):

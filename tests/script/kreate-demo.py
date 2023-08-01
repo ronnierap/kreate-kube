@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import kreate
+import appdef
 
 def kreate_demo_app(env: str):
     cfg = kreate.ConfigChain(
@@ -8,6 +9,8 @@ def kreate_demo_app(env: str):
         "src/kreate/templates/default-values.yaml",
         )
     app = kreate.App('demo', kustomize=True, config=cfg)
+    app.add_obj_values(appdef)
+    app.add_yaml_values(f"tests/script/values-{appdef.env}.yaml")
 
     kreate.Ingress(app)
     app.ingress.root.sticky()

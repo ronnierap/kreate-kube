@@ -1,0 +1,10 @@
+# This file should just provide basic values, no nested hierarchy
+
+probe_path: /demo/actuator/info
+image_repo: https://repo.kisst.org
+redis_url: https://redis.kisst.org:6379
+service_port: 8080
+container_port: 8080
+
+ingress_host_external: api.kisst.org
+ingress_host_internal: private.kisst.org

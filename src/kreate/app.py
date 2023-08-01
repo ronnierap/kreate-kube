@@ -3,12 +3,15 @@ import sys
 import shutil
 from collections.abc import Mapping
 
-from . import templates, core
+from . import core
 
-class App:
-    def __init__(self, name: str,
-                 config: Mapping = None,
-                 kustomize: bool =False):
+class App(core.Values):
+    def __init__(
+            self, name: str,
+            config: Mapping = None,
+            kustomize: bool =False,
+        ):
+        core.Values.__init__(self)
         self.name = name
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.vars = dict()
@@ -19,6 +22,7 @@ class App:
         self.resources = []
         self.kust_resources = []
         self._kinds = {}
+
 
     def add(self, res) -> None:
         if not res.skip:
@@ -122,6 +126,7 @@ class Resource(core.YamlBase):
             "app": self.app,
             "cfg": self.config,
             "my": self,
+            "val": self.app.values
         }
 
     def kreate(self) -> None:
@@ -244,7 +249,8 @@ class Patch(core.YamlBase):
             "target": self.target,
             "cfg" : self.config,
             "app" : self.target.app,
-            "my" : self
+            "my" : self,
+            "val": self.target.app.values
         }
 
 
