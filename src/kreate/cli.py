@@ -1,5 +1,8 @@
 import argparse
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def do_files(kreate_app, env):
     app=kreate_app(env)
@@ -9,43 +12,43 @@ def do_out(kreate_app, env):
     app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir}"
-    print(cmd)
+    logger.info(f"running: {cmd}")
     os.system(cmd)
 
 def do_diff(kreate_app, env):
     app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl diff -f - "
-    print(cmd)
+    logger.info(f"running: {cmd}")
     os.system(cmd)
 
 def do_apply(kreate_app, env):
     app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl apply --dry-run -f - "
-    print(cmd)
+    logger.info(f"running: {cmd}")
     os.system(cmd)
 
 def do_test(kreate_app, env):
     app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | diff  {app.script_dir}/test-{app.name}-{app.env}.out -"
-    print(cmd)
+    logger.info(f"running: {cmd}")
     os.system(cmd)
 
 def do_testupdate(kreate_app, env):
     app=kreate_app(env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} > {app.script_dir}/test-{app.name}-{app.env}.out"
-    print(cmd)
+    logger.info(f"running: {cmd}")
     os.system(cmd)
 
 
 def run_cli(kreate_app):
     parser = argparse.ArgumentParser()
     parser.add_argument("-e","--env", action="store", default="dev")
-    #cmds=["a", "apply", "d", "diff", "files"]
-    #help="the command to be executed, e.g. apply or diff"
+    parser.add_argument("-v","--verbose", action="store_true")
+    parser.add_argument("-q","--quiet", action="store_true")
 
 
     subparsers = parser.add_subparsers(help="subcommand", description="valid subcommands", title="subcmd")
@@ -67,4 +70,13 @@ def run_cli(kreate_app):
 
     args = parser.parse_args()
     env = args.env
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    elif args.quiet:
+        logging.basicConfig(level=logging.ERROR)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+
+
     args.func(kreate_app, env)

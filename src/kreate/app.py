@@ -2,8 +2,11 @@ import os
 import sys
 import shutil
 from collections.abc import Mapping
+import logging
 
 from . import core
+
+logger = logging.getLogger(__name__)
 
 class App():
     def __init__(
@@ -101,16 +104,16 @@ class Resource(core.YamlBase):
         else:
             if typename in app.config:
                 if shortname is None:
-                    print(f"DEBUG using default config for {typename}")
+                    logger.debug(f"using default config for {typename}")
                     self.config = app.config[typename]
                 elif shortname in app.config[typename]:
-                    print(f"DEBUG using named config {typename}.{shortname}")
+                    logger.debug(f"using named config {typename}.{shortname}")
                     self.config = app.config[typename][shortname]
                 else:
-                    print(f"DEBUG could not find config for {shortname} in {typename}.")
+                    logger.debug(f"could not find config for {shortname} in {typename}.")
                     self.config = {}
             else:
-                print(f"DEBUG could not find any config for {typename}")
+                logger.debug(f"could not find any config for {typename}")
                 self.config = {}
         template = f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
@@ -118,7 +121,7 @@ class Resource(core.YamlBase):
             # config indicates to be ignored
             # - do not load the template (config might be missing)
             # - do not register
-            print(f"INFO: ignoring {typename}.{self.name}")
+            logger.info(f"ignoring {typename}.{self.name}")
             self.skip = True
         else:
             self.load_yaml()

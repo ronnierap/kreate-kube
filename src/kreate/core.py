@@ -3,9 +3,12 @@ import jinja2
 import pkgutil
 from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
+import logging
 
 from ruamel.yaml import YAML
 from . import templates
+
+logger = logging.getLogger(__name__)
 
 class DictWrapper(UserDict):
     def __init__(self, dict):
@@ -107,7 +110,7 @@ def load_yaml(filename: str, package=None, warn: bool = True) -> Mapping:
             return parser.load(f)
     else:
         if warn:
-            print(f"WARN: skipping yaml file {filename}")
+            logger.warn(f"skipping yaml file {filename}")
             return {}
         else:
             raise(ValueError(f"could not find yaml file {filename}"))
@@ -121,7 +124,7 @@ class YamlBase:
         self.yaml = wrap(parsed)
 
     def save_yaml(self, outfile) -> None:
-        print(f"INFO: kreating {outfile}")
+        logger.info(f"kreating {outfile}")
         with open(outfile, 'wb') as f:
             parser.dump(self.yaml.data, f)
 
@@ -143,25 +146,6 @@ class YamlBase:
         vars = self._get_jinja_vars()
         return tmpl.render(vars)
 
-
-
-def merge(a, b, path=None):
-    "merges b into a"
-    if path is None: path = []
-    for key in b:
-        valb = b[key]
-        if key in a:
-            vala=a[key]
-            if isinstance(vala, dict) and isinstance(valb, dict):
-                merge(vala, valb, path + [str(key)])
-            elif a[key] == valb:
-                pass # same leaf value
-            else:
-                a[key] = valb
-                print('overriding %s' % '.'.join(path + [str(key)]))
-        else:
-            a[key] = valb
-    return
 
 class Values():
     def __init__(self):
@@ -188,7 +172,7 @@ class Config():
 
     def add_file(self, filename):
         if os.path.exists(filename):
-            print(f"INFO: loading config {filename}")
+            logger.info(f"loading config {filename}")
             with open(filename) as f:
                 tmpl = jinja2.Template(
                     f.read(),
@@ -200,7 +184,7 @@ class Config():
                 m = parser.load(tmpl.render(vars))
                 self._maps.append(m)
         else:
-            print(f"WARN: skipping jinyaml file {filename}")
+            logger.warn(f"skipping jinyaml file {filename}")
 
     def add_files(self, *filenames):
         maps = []
