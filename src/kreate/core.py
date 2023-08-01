@@ -117,7 +117,7 @@ class YamlBase:
         self.ignored = False
         self.filename = filename or self.name + ".yaml"
         self.template = template or self.kind + ".yaml"
-        self.typename = str(type(self)).lower()[19:-2]    #.lstrip("<class 'kreate.app").rstrip("'>")
+        self.typename = self.__class__.__name__.lower()
         if config:
             self.config = config
         else:
@@ -126,7 +126,7 @@ class YamlBase:
                 self.config = app.config[self.typename][name]
                 #print(self.config)
             else:
-                #print(f"DEBUG could not find config {typename}.{name}")
+                print(f"DEBUG could not find config {self.typename}.{name}")
                 self.config = {}
         if self.config.get("ignore", False):
             print(f"INFO: ignoring {self.typename}.{self.name}")

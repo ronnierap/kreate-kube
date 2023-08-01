@@ -3,6 +3,8 @@ import sys
 import shutil
 from collections.abc import Mapping
 
+from kreate import templates
+
 from . import templates, core
 
 class App:
@@ -17,8 +19,9 @@ class App:
         self.vars = dict()
         self.config = config
         self.kustomize = kustomize
-        vars_file = f"{self.script_dir}/env/{env}/vars-{self.name}-{env}.yaml"
-        self.vars.update(core.loadOptionalYaml(vars_file))
+        #vars_file = f"{self.script_dir}/env/{env}/vars-{self.name}-{env}.yaml"
+        #self.vars.update(core.loadOptionalYaml(vars_file))
+        #print(self.config)
         self.namespace = self.name + "-" + self.config["env"]
         self.target_dir = "./build/" + self.namespace
         self.template_package = template_package
@@ -55,6 +58,14 @@ class App:
             kust = Kustomization(self)
             kust.kreate()
 
+class Strukture(App):
+    def __init__(self, name: str, env: str, config: Mapping):
+        super().__init__(name, env, config=config)
+        for name in config.egress.keys():
+            Egress(self, name)
+        for name in config.ingress.keys():
+            Ingress(self, name)
+        #Deployment(self, self.name)
 
 
 class Kustomization(core.YamlBase):
@@ -119,7 +130,8 @@ class Service(Resource):
         self.yaml.spec.clusterIP="None"
 
 class Egress(Resource):
-    pass
+    def __init__(self, app: App, name: str):
+        Resource.__init__(self, app, name=name) #=app.name + "-egress-to-" + name) # TODO, config=app.config.ingress[name])
 
 class ConfigMap(Resource):
     def __init__(self, app: App, name=None):
