@@ -3,7 +3,7 @@ import kreate
 
 def kreate_demo_app(env: str):
     cfg = kreate.ConfigChain(
-        f"tests/script/env/{env}/config-demo-{env}.yaml",
+        f"tests/script/config-demo-{env}.yaml",
         "tests/script/config-demo.yaml",
         "src/kreate/templates/default-values.yaml",
         )

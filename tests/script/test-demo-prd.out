@@ -1,0 +1,241 @@
+apiVersion: v1
+data:
+  ENV: prd
+  ORACLE_SCHEMA: demo_schema_prd
+  ORACLE_URL: oracle-prd1:1521,oracle-prd2:1521,
+  ORACLE_USR: demo_usr_prd
+kind: ConfigMap
+metadata:
+  labels:
+    config-map: demo-vars
+  name: demo-vars
+  namespace: demo-prd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: demo
+  name: demo-service
+  namespace: demo-prd
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+  namespace: demo-prd
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      annotations:
+        app.kubernetes.io/component: webservice
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: demo
+        app.kubernetes.io/part-of: kreate-demo
+        app.kubernetes.io/version: latest-master
+        co.elastic.logs/enabled: "true"
+        co.elastic.logs/exclude_lines: DEBUG
+      labels:
+        app: demo
+      name: demo
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - demo
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - envFrom:
+        - secretRef:
+            name: demo-secrets
+        - configMapRef:
+            name: demo-vars
+        image: todo.com/demo.app:latest-master
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: actuator/info
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: app
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 1
+          httpGet:
+            path: actuator/info
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 2
+            memory: 512M
+          requests:
+            cpu: 400m
+            memory: 512M
+        startupProbe:
+          failureThreshold: 60
+          httpGet:
+            path: actuator/info
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 1
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    testje: test
+  name: demo-pdb
+  namespace: demo-prd
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: demo
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/name: demo
+  name: demo-ingress-api
+  namespace: demo-prd
+spec:
+  rules:
+  - host: TODO
+    http:
+      paths:
+      - backend:
+          service:
+            name: demo-ingress-api
+            port:
+              number: 8080
+        path: /api
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/name: demo
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/auth-realm: demo-realm
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/whitelist-source-range: ggg
+  labels:
+    dummy: jan
+  name: demo-ingress-root
+  namespace: demo-prd
+spec:
+  rules:
+  - host: TODO
+    http:
+      paths:
+      - backend:
+          service:
+            name: demo-ingress-root
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-to-db
+  namespace: demo-prd
+spec:
+  egress:
+  - ports:
+    - port: 8123
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 1.2.3.5/32
+  podSelector:
+    matchLabels:
+      egress-to-db: enabled
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-to-redis
+  namespace: demo-prd
+spec:
+  egress:
+  - ports:
+    - port: 6379
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 1.1.1.1/32
+  - ports:
+    - port: 6379
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 2.2.2.2/32
+  - ports:
+    - port: 6379
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 3.3.3.3/32
+  podSelector:
+    matchLabels:
+      egress-to-redis: enabled
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-to-xyz
+  namespace: demo-prd
+spec:
+  egress:
+  - ports:
+    - port: 8443
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 4.4.4.5/32
+  podSelector:
+    matchLabels:
+      egress-to-xyz: enabled
+  policyTypes:
+  - Egress
