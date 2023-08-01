@@ -3,14 +3,11 @@ import sys
 import shutil
 from collections.abc import Mapping
 
-from kreate import templates
-
 from . import templates, core
 
 class App:
     def __init__(self, name: str,
                  env : str,
-                 template_package=templates,
                  config_dir : str =".",
                  config: Mapping = None,
                  kustomize: bool =False):
@@ -19,32 +16,34 @@ class App:
         self.vars = dict()
         self.config = config
         self.kustomize = kustomize
-        #vars_file = f"{self.script_dir}/env/{env}/vars-{self.name}-{env}.yaml"
-        #self.vars.update(core.loadOptionalYaml(vars_file))
-        #print(self.config)
         self.namespace = self.name + "-" + self.config["env"]
         self.target_dir = "./build/" + self.namespace
-        self.template_package = template_package
-        self.resources=[]
-        self._attr_map={}
+        self.resources = []
+        self._attr_map = {}
+        self._kinds = {}
 
     def add(self, res, abbrevs) -> None:
         self.resources.append(res)
         attr_name = res.name.replace("-","_").lower()
         self._attr_map[attr_name] = res
-        for abbrev in abbrevs:
-            abbrev = abbrev.replace("-","_").lower()
-            if abbrev not in self._attr_map: # Do not overwrite
-                self._attr_map[abbrev] = res
-        if attr_name.startswith(self.name.lower()+"_"):
-            short_name = attr_name[len(self.name)+1:]
-            if short_name not in self._attr_map: # Do not overwrite
-                self._attr_map[short_name] = res
+        #for abbrev in abbrevs:
+        #    abbrev = abbrev.replace("-","_").lower()
+        #    if abbrev not in self._attr_map: # Do not overwrite
+        #        self._attr_map[abbrev] = res
+        map = self._kinds.get(res.kind.lower(), None)
+        if map is None:
+            map = core.DictWrapper({})
+            self._kinds[res.kind.lower()] = map
+        #if attr_name.startswith(self.name.lower()+"_"):
+        #    short_name = attr_name[len(self.name)+1:]
+        #    if short_name not in self._attr_map: # Do not overwrite
+        #        self._attr_map[short_name] = res
+        map[res.name] = res
 
     def __getattr__(self, attr):
         if attr in self.__dict__ or attr == "_dict":
             return super().__getattribute__(attr)
-        return self._attr_map[attr]
+        return self._kinds.get(attr, None)
 
     def kreate_files(self):
         # TODO better place: to clear directory
@@ -68,35 +67,70 @@ class Strukture(App):
         #Deployment(self, self.name)
 
 
-class Kustomization(core.YamlBase):
-    def __init__(self, app: App):
-        self.name = "kustomization"
-        self.configmaps = []
-        core.YamlBase.__init__(self, app, name="kustomization")
-
-
-class GeneratedConfigMap(core.YamlBase):
-    def __init__(self, kust:  Kustomization):
-        self.vars = {}
-        core.YamlBase.__init__(self, kust.app)
-
-    def add_var(self, name):
-        self.vars[name] = self.app.vars[name]
-        self.yaml.data.add(name, self.app.vars[name])
 
 ##################################################################
 
 class Resource(core.YamlBase):
-    def __init__(self, app: App, name=None, filename=None, abbrevs=[], config=None):
-        core.YamlBase.__init__(self, app, name, filename, config)
-        if not self.ignored:
-            self.app.add(self, abbrevs=abbrevs)
+    def __init__(self, app: App, name=None, kind: str = None, abbrevs=[], config=None):
+        self.app = app
+        if kind is None:
+            self.kind = self.__class__.__name__
+        else:
+            self.kind = kind
+        self.name = name
+        typename = self.kind.lower()
+        self.fullname = f"{app.name}-{typename}-{name}"
+        self.filename = f"{self.app.target_dir}/{self.fullname}.yaml"
         self.patches = []
 
+        if config:
+            self.config = config
+        else:
+            if typename in app.config and name in app.config[typename]:
+                #print(f"DEBUG using config {typename}.{name}")
+                self.config = app.config[typename][name]
+                #print(self.config)
+            else:
+                print(f"DEBUG could not find config {typename}.{name}")
+                self.config = {}
+        template = f"{self.kind}.yaml"
+        core.YamlBase.__init__(self, template)
+        if self.config.get("ignore", False):
+            # config indicates to be ignored
+            # - do not load the template (config might be missing)
+            # - do not register
+            print(f"INFO: ignoring {typename}.{self.name}")
+            self.ignored = True
+        else:
+            self.ignored = False
+            self.app.add(self, abbrevs=abbrevs)
+            self.load_yaml()
+
+    def _get_jinja_vars(self):
+        return {
+            "app": self.app,
+            "cfg": self.config,
+            "my": self,
+        }
+
     def kreate(self) -> None:
-        core.YamlBase.kreate(self)
+        self.save_yaml(self.filename)
         for p in self.patches:
             p.kreate()
+
+    def annotate(self, name: str, val: str) -> None:
+        if "annotations" not in self.yaml.metadata:
+            self.yaml.metadata["annotations"]={}
+        self.yaml.metadata.annotations[name]=val
+
+    def add_label(self, name: str, val: str) -> None:
+        if "labels" not in self.yaml.metadata:
+            self.yaml.metadata["labels"]={}
+        self.yaml.metadata.labels[name]=val
+
+class Kustomization(Resource):
+    def __init__(self, app: App):
+        Resource.__init__(self, app, name="kusst")
 
 
 class Deployment(Resource):
@@ -104,7 +138,8 @@ class Deployment(Resource):
         # self.replicas = env.replicas
         # self.container = [Container('app')]
         # self.container[0].image_name = app.name + ".app"
-        Resource.__init__(self, app, name=app.name, filename=app.name+"-deployment.yaml", abbrevs=["depl","deployment"])
+        Resource.__init__(self, app, name=app.name, abbrevs=["depl","deployment"])
+        # filename=app.name+"-deployment.yaml",
 
     def add_template_annotation(self, name: str, val: str) -> None:
         if not self.yaml.spec.template.metadata.has_key("annotations"):
@@ -122,8 +157,7 @@ class PodDisruptionBudget(Resource):
         Resource.__init__(self, app, name=name, abbrevs=["pdb"])
 
 class Service(Resource):
-    def __init__(self, app: App, name=None, ports=[{"port": 8080}]):
-        self.ports=ports
+    def __init__(self, app: App, name=None):
         Resource.__init__(self, app, name=name, abbrevs=["svc"])
 
     def headless(self):
@@ -134,27 +168,28 @@ class Egress(Resource):
         Resource.__init__(self, app, name=name) #=app.name + "-egress-to-" + name) # TODO, config=app.config.ingress[name])
 
 class ConfigMap(Resource):
-    def __init__(self, app: App, name=None):
+    def __init__(self, app: App, name=None, kustomize=False):
+        self.kustomize = kustomize
         Resource.__init__(self, app, name=name, abbrevs=["cm"])
+        if kustomize:
+            app.kustomize = True
+            self.fieldname = "literals"
+            self.yaml[self.fieldname] = {}
+        else:
+            self.fieldname = "data"
+
 
     def add_var(self, name, value=None):
         if value is None:
             value = self.app.config.vars[name]
         # We can not use self.yaml.data, since data is a field in UserDict
-        self.yaml["data"][name] = value
+        self.yaml[self.fieldname][name] = value
 
 
 class Ingress(Resource):
-    def __init__(self,
-                 app: App,
-                 name="root",
-                 path="/",
-                 host="TODO",
-                 port=8080):
+    def __init__(self, app: App, name: str ="root", path: str ="/" ):
         self.path = path
-        self.host = host
-        self.port = port
-        Resource.__init__(self, app, name=app.name + "-ingress-" + name) # TODO, config=app.config.ingress[name])
+        Resource.__init__(self, app, name) # TODO, config=app.config.ingress[name])
 
     def nginx_annon(self, name: str, val: str) -> None:
         self.annotate("nginx.ingress.kubernetes.io/" + name, val)

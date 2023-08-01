@@ -24,6 +24,23 @@ egress:
   xyz:
     ignore: True
 
+service:
+  http:
+    ports:
+      - port: 8080
+        #default name: http
+      - port: 443
+        name: https
+
+
+ingress:
+  root:
+    host: TODO
+    port: 8080
+  api:
+    host: TODO
+    port: 8080
+
 vars:
   ORACLE_URL: localhost:1521
   ORACLE_USR: demo_usr_DEV

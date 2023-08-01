@@ -5,6 +5,7 @@ from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 
 from ruamel.yaml import YAML
+from . import templates
 
 class DictWrapper(UserDict):
     def __init__(self, dict):
@@ -105,74 +106,35 @@ def loadOptionalYaml(filename):
         return {}
 
 class YamlBase:
-    def __init__(self,
-                 app,
-                 name: str = None,
-                 filename: str = None,
-                 config = None,
-                 template: str = None):
-        self.app = app
-        self.kind = type(self).__name__
-        self.name = name or app.name + "-" + self.kind.lower()
-        self.ignored = False
-        self.filename = filename or self.name + ".yaml"
-        self.template = template or self.kind + ".yaml"
-        self.typename = self.__class__.__name__.lower()
-        if config:
-            self.config = config
-        else:
-            if self.typename in app.config and name in app.config[self.typename]:
-                #print(f"DEBUG using config {self.typename}.{name}")
-                self.config = app.config[self.typename][name]
-                #print(self.config)
-            else:
-                print(f"DEBUG could not find config {self.typename}.{name}")
-                self.config = {}
-        if self.config.get("ignore", False):
-            print(f"INFO: ignoring {self.typename}.{self.name}")
-            self.ignored = True
-        else:
-            _parsed = parser.load(self.render())
-            self.yaml = wrap(_parsed)
+    def __init__(self, template: str):
+        self.template = template
 
-    def kreate(self) -> None:
-        print("kreating "+self.filename)
-        with open(self.app.target_dir + "/" + self.filename, 'wb') as f:
-            #pprint.pprint(self.yaml.data)
+    def load_yaml(self):
+        parsed = parser.load(self._render())
+        self.yaml = wrap(parsed)
+
+    def save_yaml(self, outfile) -> None:
+        print(f"INFO: kreating {outfile}")
+        with open(outfile, 'wb') as f:
             parser.dump(self.yaml.data, f)
 
-    def annotate(self, name: str, val: str) -> None:
-        if "annotations" not in self.yaml.metadata:
-            self.yaml.metadata["annotations"]={}
-        self.yaml.metadata.annotations[name]=val
+    def _get_jinja_vars(self):
+        return {}
 
-    def add_label(self, name: str, val: str) -> None:
-        if "labels" not in self.yaml.metadata:
-            self.yaml.metadata["labels"]={}
-        self.yaml.metadata.labels[name]=val
-
-    def render(self, outfile=None):
-        template_data = pkgutil.get_data(self.app.template_package.__package__,
-                                         self.template).decode('utf-8')
+    def _render(self, outfile=None):
+        # TODO: make template package flexible (or directory)
+        template_data = pkgutil.get_data(
+            templates.__package__,
+            self.template
+        ).decode('utf-8')
         tmpl = jinja2.Template(
             template_data,
             undefined=jinja2.StrictUndefined,
             trim_blocks=True,
-            lstrip_blocks=True)
-        vars = {
-            "app": self.app,
-            "cfg": self.config,
-            "my": self,
-        }
-        self._add_jinja_vars(vars)
-        if outfile:
-            tmpl.stream(vars).dump(outfile)
-        else:
-            return tmpl.render(vars)
-
-    def _add_jinja_vars(self, vars):
-        pass
-
+            lstrip_blocks=True
+        )
+        vars = self._get_jinja_vars()
+        return tmpl.render(vars)
 
 
 

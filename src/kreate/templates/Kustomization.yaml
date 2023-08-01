@@ -4,7 +4,9 @@ namespace: {{ app.namespace }}
 
 resources:
 {% for res in app.resources %}
+{% if cm.__class__.__name__ != "ConfigMap" or not cm.kustomize %}
 - {{ res.filename }}
+{% endif %}
 {% endfor %}
 
 patches:
@@ -15,13 +17,15 @@ patches:
 {% endfor %}
 
 configMapGenerator:
-{% for cm in my.configmaps %}
+{% for cm in app.resources %}
+{% if cm.__class__.__name__ == "ConfigMap" and cm.kustomize %}
 - name: {{ cm.name }}
   options:
     labels:
       config-map: {{ cm.name }}
   literals:
-{% for key in cm.vars %}
-    - {{ key }}={{ cm.vars[key] }}
+{% for key in cm.yaml.literals %}
+    - {{ key }}={{ cm.yaml.literals[key] }}
 {% endfor %}
+{% endif %}
 {% endfor %}
