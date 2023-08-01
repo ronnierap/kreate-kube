@@ -7,8 +7,6 @@ from . import templates, core
 
 class App:
     def __init__(self, name: str,
-                 env : str,
-                 config_dir : str =".",
                  config: Mapping = None,
                  kustomize: bool =False):
         self.name = name
@@ -23,7 +21,7 @@ class App:
         self._attr_map = {}
         self._kinds = {}
 
-    def add(self, res, abbrevs) -> None:
+    def add(self, res) -> None:
         if not res.skip:
             self.resources.append(res)
 
@@ -71,7 +69,7 @@ class Resource(core.YamlBase):
                  name: str = None,
                  filename: str = None,
                  skip: bool = False,
-                 abbrevs=[], config=None):
+                 config: Mapping = None):
         self.app = app
         if kind is None:
             self.kind = self.__class__.__name__
@@ -113,7 +111,7 @@ class Resource(core.YamlBase):
             self.skip = True
         else:
             self.load_yaml()
-        self.app.add(self, abbrevs=abbrevs)
+        self.app.add(self)
 
     def _get_jinja_vars(self):
         return {
@@ -160,11 +158,11 @@ class Deployment(Resource):
 
 class PodDisruptionBudget(Resource):
     def __init__(self, app: App):
-        Resource.__init__(self, app, shortname="TODO", name=f"{app.name}-pdb", abbrevs=["pdb"])
+        Resource.__init__(self, app, shortname="TODO", name=f"{app.name}-pdb")
 
 class Service(Resource):
     def __init__(self, app: App, shortname=None):
-        Resource.__init__(self, app, shortname=shortname, abbrevs=["svc"])
+        Resource.__init__(self, app, shortname=shortname)
 
     def headless(self):
         self.yaml.spec.clusterIP="None"
@@ -176,7 +174,7 @@ class Egress(Resource):
 class ConfigMap(Resource):
     def __init__(self, app: App, shortname=None, name: str = None, kustomize=False):
         self.kustomize = kustomize
-        Resource.__init__(self, app, shortname=shortname, name=name, abbrevs=["cm"], skip=kustomize)
+        Resource.__init__(self, app, shortname=shortname, name=name, skip=kustomize)
         if kustomize:
             app.kustomize = True
             app.kust_resources.append(self)

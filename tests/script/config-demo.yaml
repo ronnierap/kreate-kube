@@ -1,18 +1,36 @@
 team: devteam1
 
 deployment:
-  demo:
-    version: latest-master
-    project: kreate-demo
-    replicas: 1
-    image_repo: todo.com
+  version: latest-master
+  project: kreate-demo
+  replicas: 1
+  image_repo: todo.com
 
-containers:
-  app:
-    resources:
-      limits:
-        cpu: 2
-      requests:
-        cpu: 400m
-    startupProbe:
-      failureThreshold: 120
+  containers:
+    app:
+      resources:
+        limits:
+          cpu: 2
+        requests:
+          cpu: 400m
+      startupProbe:
+        failureThreshold: 120
+
+ingress:
+  root:
+    host: TODO
+    port: 8080
+  api:
+    host: TODO
+    port: 8080
+
+service:
+  # default service
+  ports:
+    - port: 8080
+      #default name: http
+  # extra named services
+  http:
+    ports:
+      - port: 443
+        name: https

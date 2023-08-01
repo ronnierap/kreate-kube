@@ -7,7 +7,7 @@ def kreate_demo_app(env: str):
         "tests/script/config-demo.yaml",
         "src/kreate/templates/default-values.yaml",
         )
-    app = kreate.App('demo', env, kustomize=True, config=cfg)
+    app = kreate.App('demo', kustomize=True, config=cfg)
 
     kreate.Ingress(app)
     app.ingress.root.sticky()
