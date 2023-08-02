@@ -6,12 +6,15 @@ Deployment:
     image_repo: {{ val.image_repo }}
 
 containers:
-  app:
+  main:
     resources:
       limits:
         cpu: {{ val.cpu_limit | default(2) }}
       requests:
         cpu: {{ val.cpu_request | default("400m") }}
+
+HttpProbesPatch:
+  main:
     startupProbe:
       failureThreshold: 120
 

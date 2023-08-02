@@ -114,22 +114,44 @@ class App():
 
 ##################################################################
 
-class Resource(core.YamlBase):
+class AppYaml(core.YamlBase):
+    def __init__(self, app: App,
+                 shortname: str = None,
+                 kind: str = None,
+                 template: str = None,
+                 ):
+        self.app = app
+        self.kind = kind or self.__class__.__name__
+        self.shortname = shortname or "main"
+        self.config = self._find_config()
+
+        template = template or f"{self.kind}.yaml"
+        core.YamlBase.__init__(self, template)
+        if self.config.get("ignore", False):
+            logger.info(f"ignoring {self.kind}.{self.shortname}")
+            self.skip = True
+
+    def _find_config(self):
+        typename = self.kind
+        if typename in self.app.config and self.shortname in self.app.config[typename]:
+            logger.debug(f"using named config {typename}.{self.shortname}")
+            return self.app.config[typename][self.shortname]
+        logger.warn(f"could not find config for {typename}.{self.shortname} in")
+        return {} # TODO: should this be wrapped?
+
+    def kreate(self) -> None:
+        self.save_yaml(f"{self.app.target_dir}/{self.filename}")
+
+
+class Resource(AppYaml):
     def __init__(self, app: App,
                  shortname: str = None,
                  kind: str = None,
                  name: str = None,
                  skip: bool = False,
+                 template: str = None,
                  config = None):
-        self.app = app
-        if kind is None:
-            self.kind = self.__class__.__name__
-        else:
-            self.kind = kind
-
-        self.shortname = shortname or "main"
-        self.config = config or self._find_config()
-
+        AppYaml.__init__(self, app, kind=kind, shortname=shortname, template=template)
         typename = self.kind.lower()
         if shortname is None:
             self.name = name or self.config.get("name", f"{app.name}-{typename}")
@@ -142,8 +164,6 @@ class Resource(core.YamlBase):
         self.patches = []
         self.skip = skip
 
-        template = f"{self.kind}.yaml"
-        core.YamlBase.__init__(self, template)
         if self.config.get("ignore", False):
             # config indicates to be ignored
             # - do not load the template (config might be missing)
@@ -165,25 +185,6 @@ class Resource(core.YamlBase):
             if not "labels" in self.yaml.metadata:
                 self.yaml.metadata.labels={}
             self.yaml.metadata.labels[key]=self.config.labels[key]
-
-    def _find_config(self):
-        # In theory we could use any kind_alias for finding the config with the code below
-        #    for typename in app.get_aliases(self.kind):
-        #        if typename in app.config and self.shortname in app.config[typename]:
-        #            logger.debug(f"using named config {typename}.{shortname}")
-        #            self.config = app.config[typename][shortname]
-        #            break
-        # This works, but has several drawbacks:
-        # - Service.main could shadow svc.main, it needs to merge all found maps
-        # - kreate_strukture, needs to iterate over all possible aliases
-        # it seems doable, but can be confusing and for very little convenience
-        typename = self.kind
-        if typename in self.app.config and self.shortname in self.app.config[typename]:
-            logger.debug(f"using named config {typename}.{self.shortname}")
-            return self.app.config[typename][self.shortname]
-        logger.warn(f"could not find config for {typename}.{self.shortname} in")
-        return {} # TODO: should this be wrapped?
-
 
     def _get_jinja_vars(self):
         return {
@@ -300,15 +301,15 @@ class Ingress(Resource):
         self.nginx_annon("auth-realm", self.app.name + "-realm")
 
 #########################################################################################
-class Patch(core.YamlBase):
-    def __init__(self, target: Resource, template):
+class Patch(AppYaml):
+    def __init__(self, target: Resource, template, shortname: str = None):
         self.target = target
         self.target.patches.append(self)
         self.filename = template
-        core.YamlBase.__init__(self, template=template)
+        AppYaml.__init__(self, target.app, template=template, shortname=shortname)
 
-    def kreate(self) -> None:
-        self.save_yaml(f"{self.target.app.target_dir}/{self.filename}")
+    #def kreate(self) -> None:
+    #    self.save_yaml(f"{self.target.app.target_dir}/{self.filename}")
 
     def _get_jinja_vars(self):
         return {
@@ -321,12 +322,12 @@ class Patch(core.YamlBase):
 
 
 class HttpProbesPatch(Patch):
-    def __init__(self, target: Resource, container_name : str ="app"):
-        self.config = target.app.config.containers[container_name]
-        if self.config is None:
-            (f"Unknown contrainer {container_name} to patch")
-            raise ValueError(f"Unknown container name {container_name} to patch with HttpProbes")
+    def __init__(self, target: Resource, container_name : str = None):
         Patch.__init__(self, target, "patch-http-probes.yaml")
+        #config = target.app.config.containers[container_name]
+        #if config is None:
+        #    (f"Unknown contrainer {container_name} to patch")
+        #    raise ValueError(f"Unknown container name {container_name} to patch with HttpProbes")
         self.load_yaml()
 
 class AntiAffinityPatch(Patch):

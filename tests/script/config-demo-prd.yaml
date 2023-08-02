@@ -12,7 +12,7 @@ Egress:
       port: 6379
 
 # override threshold that is not a value
-containers:
-  app:
+HttpProbesPatch:
+  main:
     startupProbe:
       failureThreshold: 60

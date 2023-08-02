@@ -16,7 +16,7 @@ kind: ConfigMap
 metadata:
   labels:
     config-map: demo-vars
-  name: demo-vars
+  name: demo-vars-57ht8m7925
   namespace: demo-acc
 ---
 apiVersion: v1
@@ -93,7 +93,7 @@ spec:
         - secretRef:
             name: demo-secrets
         - configMapRef:
-            name: demo-vars
+            name: demo-vars-57ht8m7925
         image: https://repo.kisst.org/demo.app:v1.3.4
         imagePullPolicy: Always
         livenessProbe:

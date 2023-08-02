@@ -1,17 +1,6 @@
-containers:
-  app:
+HttpProbesPatch:
+  main:
     name: app
-    imagePullPolicy: Always
-    ports:
-    - containerPort: 8080
-      protocol: TCP
-    resources:
-      limits:
-        cpu: 1
-        memory: 512M
-      requests:
-        cpu: 200m
-        memory: 512M
     startupProbe:
       initialDelaySeconds: 10
       periodSeconds: 2
@@ -40,3 +29,22 @@ containers:
         scheme: HTTP
         path: actuator/info
         port: 8080
+
+AntiAffinityPatch:
+  main:
+    selector_key: app
+
+containers:
+  main:
+    name: app
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    resources:
+      limits:
+        cpu: 1
+        memory: 512M
+      requests:
+        cpu: 200m
+        memory: 512M

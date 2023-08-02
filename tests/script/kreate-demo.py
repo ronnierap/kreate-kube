@@ -27,7 +27,7 @@ def kreate_demo_app(env: str):
 
     depl=kreate.Deployment(app)
     depl.add_template_label("egress-to-db", "enabled")
-    kreate.HttpProbesPatch(depl)
+    kreate.HttpProbesPatch(depl, container_name="app")
     kreate.AntiAffinityPatch(depl)
     kreate.Service(app)
     app.service.main.headless()
