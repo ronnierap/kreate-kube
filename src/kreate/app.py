@@ -8,6 +8,11 @@ from . import core
 
 logger = logging.getLogger(__name__)
 
+def none_if_main(shortname: str) -> str:
+    if shortname == "main":
+        return None
+    return shortname
+
 class App():
     def __init__(
             self,
@@ -62,14 +67,20 @@ class App():
             kust = Kustomization(self)
             kust.kreate()
 
-class Strukture(App):
-    def __init__(self, name: str, env: str, config: Mapping):
-        super().__init__(name, env, config=config)
-        for name in config.egress.keys():
-            Egress(self, name)
-        for name in config.ingress.keys():
-            Ingress(self, name)
-        #Deployment(self, self.name)
+    def kreate_strukture(self):
+        for shortname in self.config.egress.keys():
+            Egress(self, none_if_main(shortname))
+        for shortname in self.config.ingress.keys():
+            Ingress(self, none_if_main(shortname))
+        for shortname in self.config.deployment.keys():
+            print(shortname)
+            Deployment(self, none_if_main(shortname))
+        for shortname in self.config.service.keys():
+            Service(self, none_if_main(shortname))
+        for shortname in self.config.serviceaccount.keys():
+            self.kreate("ServiceAccount", none_if_main(shortname))
+        for shortname in self.config.servicemonitor.keys():
+            self.kreate("ServiceMonitor", none_if_main(shortname))
 
 
 
@@ -153,9 +164,14 @@ class Kustomization(Resource):
 
 
 class Deployment(Resource):
-    def __init__(self, app: App, name: str = None):
-        name = name or app.name
-        Resource.__init__(self, app, shortname=None, name=name)
+    def __init__(self, app: App, shortname: str = None):
+        if shortname is None:
+            name = app.name
+            filename = f"{app.name}-deployment.yaml"
+        else:
+            name = None
+            filename = None
+        Resource.__init__(self, app, shortname, name=name, filename=filename)
 
     def add_template_annotation(self, name: str, val: str) -> None:
         if not "annotations" in self.yaml.spec.template.metadata:
