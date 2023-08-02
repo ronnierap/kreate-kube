@@ -8,10 +8,11 @@ deployment:
     replicas: {{ val.replicas | default(1) }}
     image_repo: {{ val.image_repo }}
 
-PodDisruptionBudget:
+PodDisruptionBudget: # TODO: is there a good reason to have it capitalized
   main:
     kreate:
       name: demo-pdb # TODO: have appname in vals or somehow
+    minAvailable: 2
 
 containers:
   app:
