@@ -20,10 +20,10 @@ def kreate_demo_app(env: str):
     # - parse labels and annontations from config for all resources
     # - apply patches for resources
 
-    kreate.HttpProbesPatch(app.deployment.main)
-    kreate.AntiAffinityPatch(app.deployment.main)
+    kreate.HttpProbesPatch(app.depl.main)
+    kreate.AntiAffinityPatch(app.depl.main)
 
-    app.poddisruptionbudget.main.add_label("testje","test") # TODO: abbrev pdb would be nice
+    app.pdb.main.add_label("testje","test")
     return app
 
 kreate.run_cli(kreate_demo_app)

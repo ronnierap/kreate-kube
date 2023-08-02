@@ -33,16 +33,33 @@ class App():
         self.resources = []
         self.kust_resources = []
         self._kinds = {}
+        self.aliases = {}
+        self.add_alias( "Service", "svc")
+        self.add_alias( "Deployment", "depl")
+        self.add_alias( "PodDisruptionBudget", "pdb")
+        self.add_alias( "ConfigMap", "cm")
 
+    def add_alias(self, kind: str, *aliases: str ):
+        if kind in self.aliases:
+            self.aliases[kind].append(aliases)
+        else:
+            self.aliases[kind] = list(aliases)
+    def get_aliases(self, kind: str):
+        result = [kind, kind.lower()]
+        if kind in self.aliases:
+            result.append(*self.aliases[kind])
+        return result
 
     def add(self, res) -> None:
         if not res.skip:
             self.resources.append(res)
-
-        map = self._kinds.get(res.kind.lower(), None)
+        map = self._kinds.get(res.kind, None)
         if map is None:
             map = core.DictWrapper({})
-            self._kinds[res.kind.lower()] = map
+            self.get_aliases(res.kind)
+            for alias in self.get_aliases(res.kind):
+                self._kinds[alias] = map
+
         if res.shortname is None:
             map["_"] = res
         else:
