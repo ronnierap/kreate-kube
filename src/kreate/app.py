@@ -144,7 +144,6 @@ class Resource(core.YamlBase):
         self.patches = []
         self.skip = skip
 
-
         template = f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
         if self.config.get("ignore", False):
@@ -156,6 +155,15 @@ class Resource(core.YamlBase):
         else:
             self.load_yaml()
         self.app.add(self)
+        for key in self.config.get("annotations", {}):
+            if not "annotations" in self.yaml.metadata:
+                self.yaml.metadata.annotations={}
+            self.yaml.metadata.annotations[key]=self.config.annotations[key]
+        for key in self.config.get("labels", {}):
+            if not "labels" in self.yaml.metadata:
+                self.yaml.metadata.labels={}
+            self.yaml.metadata.labels[key]=self.config.labels[key]
+
 
     def _find_config(self):
         # In theory we could use any kind_alias for finding the config with the code below

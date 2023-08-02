@@ -23,7 +23,6 @@ def kreate_demo_app(env: str):
     kreate.HttpProbesPatch(app.depl.main)
     kreate.AntiAffinityPatch(app.depl.main)
 
-    app.pdb.main.add_label("testje","test")
     return app
 
 kreate.run_cli(kreate_demo_app)

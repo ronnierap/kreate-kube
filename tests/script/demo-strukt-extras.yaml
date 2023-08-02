@@ -7,18 +7,22 @@ Deployment:
     name: demo
     kreate:
       patches: {}
+    #labels: TODO: should be in spec/template
+    #  egress-to-db: enabled
 
 # This entire resource is not in demo-strukt, so will not be generated
 PodDisruptionBudget:
   main:
     name: demo-pdb
+    labels:
+      testje: test
     kreate:
       name: demo-pdb # TODO: have appname in vals or somehow
     minAvailable: 2
 
 Ingress:
   root:
-    annontations:
+    annotations:
       nginx.ingress.kubernetes.io/affinity: cookie
       nginx.ingress.kubernetes.io/auth-realm: demo-realm
       nginx.ingress.kubernetes.io/auth-secret: basic-auth

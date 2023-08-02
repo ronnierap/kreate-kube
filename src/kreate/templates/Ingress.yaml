@@ -6,18 +6,6 @@ metadata:
   namespace: {{ app.namespace }}
   annotations:
     app.kubernetes.io/name: {{ app.name }}
-{% if "annontations" in cfg %}
-{% for key in cfg.get("annontations", []) %}
-    {{key}}: {{ cfg.annontations[key] }}
-{% endfor %}
-{% endif %}
-{% if "labels" in cfg %}
-  labels:
-{% for key in cfg.get("labels", []) %}
-    {{key}}: {{ cfg.labels[key] }}
-{% endfor %}
-{% endif %}
-
 spec:
   rules:
     - host: {{ cfg.host }}
