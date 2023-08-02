@@ -233,8 +233,7 @@ class ConfigMap(Resource):
 
 
 class Ingress(Resource):
-    def __init__(self, app: App, shortname: str ="root", path: str ="/" ):
-        self.path = path
+    def __init__(self, app: App, shortname: str ="root"):
         Resource.__init__(self, app, shortname=shortname)
 
     def nginx_annon(self, name: str, val: str) -> None:
