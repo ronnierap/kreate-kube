@@ -2,7 +2,7 @@
 # that is not needed when all is scripted
 
 # some extra
-deployment:
+Deployment:
   main:
     kreate:
       filename: demo-deployment.yaml # TODO: have appname in vals or somehow
@@ -15,7 +15,7 @@ PodDisruptionBudget: # TODO: is there a good reason to have it capitalized
       name: demo-pdb # TODO: have appname in vals or somehow
     minAvailable: 2
 
-ingress:
+Ingress:
   root:
     annontations:
       nginx.ingress.kubernetes.io/affinity: cookie

@@ -140,20 +140,26 @@ class Resource(core.YamlBase):
         self.patches = []
         self.skip = skip
 
+        self.config = {}
         if config:
             self.config = config
-        elif self.kind in app.config and self.shortname in app.config[self.kind]:
-            logger.debug(f"using named config {self.kind}.{shortname}")
-            self.config = app.config[self.kind][shortname]
-        elif typename in app.config:
-            if self.shortname in app.config[typename]:
+        else:
+            # In theory we could use any kind_alias for finding the config with the code below
+            #    for typename in app.get_aliases(self.kind):
+            #        if typename in app.config and self.shortname in app.config[typename]:
+            #            logger.debug(f"using named config {typename}.{shortname}")
+            #            self.config = app.config[typename][shortname]
+            #            break
+            # This works, but has several drawbacks:
+            # - Service.main could shadow svc.main, it needs to merge all found maps
+            # - kreate_strukture, needs to iterate over all possible aliases
+            # it seems doable, but can be confusing and for very little convenience
+            typename = self.kind
+            if typename in app.config and self.shortname in app.config[typename]:
                 logger.debug(f"using named config {typename}.{shortname}")
                 self.config = app.config[typename][shortname]
-            else:
-                logger.debug(f"could not find config for {shortname} in {typename}.")
-                self.config = {}
-        else:
-            logger.debug(f"could not find any config for {typename}")
+        if not self.config:
+            logger.warn(f"could not find config for {self.kind}.{shortname} in")
             self.config = {}
         template = f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)

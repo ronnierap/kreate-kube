@@ -1,4 +1,4 @@
-egress:
+Egress:
   redis:
     ignore: True  # redis is local in acc environment
 

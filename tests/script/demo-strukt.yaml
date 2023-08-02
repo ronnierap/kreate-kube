@@ -1,4 +1,4 @@
-deployment:
+Deployment:
   main:
     version: {{ val.version }}
     project: kreate-demo
@@ -15,17 +15,17 @@ containers:
     startupProbe:
       failureThreshold: 120
 
-serviceaccount:
+ServiceAccount:
   main:
     role: {{ val.serviceaccount_role }}
 
-servicemonitor:
+ServiceMonitor:
   main:
     endpoints:
       - interval: 20s
         path: /actuator/prometheus
 
-egress:
+Egress:
   redis:
     to:
     - cidr: {{ val.redis_egress_cidr }}
@@ -39,7 +39,7 @@ egress:
     - cidr: {{ val.xyz_egress_cidr }}
       port: {{ val.xyz_egress_port | default(8443) }}
 
-ingress:
+Ingress:
   root:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
@@ -50,7 +50,7 @@ ingress:
     path: /api
 
 
-service:
+Service:
   main: # default service
     ports:
       - port: {{ val.service_port }}
