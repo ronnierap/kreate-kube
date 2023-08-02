@@ -95,22 +95,22 @@ class App():
 
     def kreate_strukture(self):
         for shortname in self._shortnames("Egress"):
-            Egress(self, none_if_main(shortname))
+            Egress(self, shortname)
         for shortname in self._shortnames("Ingress"):
-            Ingress(self, none_if_main(shortname))
+            Ingress(self, shortname)
         for shortname in self._shortnames("Deployment"):
-            Deployment(self, none_if_main(shortname))
+            Deployment(self, shortname)
         for shortname in self._shortnames("Service"):
-            Service(self, none_if_main(shortname))
+            Service(self, shortname)
         for shortname in self._shortnames("PodDisruptionBudget"):
             PodDisruptionBudget(self, shortname)
         for shortname in self._shortnames("ConfigMap"):
             ConfigMap(self, shortname)
 
         for shortname in self._shortnames("ServiceAccount"):
-            self.kreate("ServiceAccount", none_if_main(shortname))
+            self.kreate("ServiceAccount", shortname)
         for shortname in self._shortnames("ServiceMonitor"):
-            self.kreate("ServiceMonitor", none_if_main(shortname))
+            self.kreate("ServiceMonitor", shortname)
 
 
 
