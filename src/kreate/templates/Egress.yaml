@@ -17,4 +17,4 @@ spec:
       ports:
         - port: {{ addr.port }}
           protocol: TCP
-{% endfor %}
+  {% endfor %}
