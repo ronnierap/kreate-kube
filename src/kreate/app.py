@@ -208,12 +208,6 @@ class Resource(core.YamlBase):
             self.yaml.metadata["labels"]={}
         self.yaml.metadata.labels[name]=val
 
-class Kustomization(Resource):
-    def __init__(self, app: App):
-        Resource.__init__(self, app, skip=True)
-        self.filename="kustomization.yaml"
-
-
 class Deployment(Resource):
     def __init__(self, app: App, shortname: str = None):
         name = None if shortname else app.name
@@ -242,24 +236,31 @@ class Egress(Resource):
     def __init__(self, app: App, shortname: str):
         Resource.__init__(self, app, shortname=shortname, name=f"{app.name}-egress-to-{shortname}")
 
+
+class Kustomization(Resource):
+    def __init__(self, app: App):
+        Resource.__init__(self, app, skip=True)
+        self.filename="kustomization.yaml"
+
 class ConfigMap(Resource):
     def __init__(
             self,
             app: App,
             shortname: str = None,
             name: str = None,
-            kustomize: bool = False
+            kustomize: bool = True
         ):
-        self.kustomize = kustomize
-        Resource.__init__(self, app, shortname=shortname, name=name, skip=kustomize)
-        if kustomize:
+        # TODO: dirty hack tp find config, to find kustomize attribute, before Resource
+        # is initialized
+        config = app.config["ConfigMap"][shortname or "main"]
+        self.kustomize = config.get("kustomize", kustomize)
+        Resource.__init__(self, app, shortname=shortname, name=name, skip=self.kustomize)
+        if self.kustomize:
             app.kustomize = True
             app.kust_resources.append(self)
-            self.fieldname = "literals"
-            self.yaml[self.fieldname] = {}
-        else:
-            self.fieldname = "data"
-
+            self.fieldname = "literals" # This does not seem to work as expected
+        self.fieldname = "data"
+        self.app.config[self.kind][self.shortname]
 
     def add_var(self, name, value=None):
         if value is None:

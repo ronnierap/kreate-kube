@@ -22,7 +22,7 @@ configMapGenerator:
     labels:
       config-map: {{ cm.name }}
   literals:
-{% for key in cm.yaml.literals %}
-    - {{ key }}={{ cm.yaml.literals[key] }}
+{% for key in cm.yaml["data"] %}
+     - {{ key }}={{ cm.yaml["data"][key] }}
 {% endfor %}
 {% endfor %}
