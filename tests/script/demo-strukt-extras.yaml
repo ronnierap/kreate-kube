@@ -4,13 +4,14 @@
 # some extra
 Deployment:
   main:
+    name: demo
     kreate:
-      filename: demo-deployment.yaml # TODO: have appname in vals or somehow
       patches: {}
 
 # This entire resource is not in demo-strukt, so will not be generated
-PodDisruptionBudget: # TODO: is there a good reason to have it capitalized
+PodDisruptionBudget:
   main:
+    name: demo-pdb
     kreate:
       name: demo-pdb # TODO: have appname in vals or somehow
     minAvailable: 2
@@ -25,3 +26,15 @@ Ingress:
       nginx.ingress.kubernetes.io/whitelist-source-range: ggg
     labels:
       dummy: jan
+
+Egress:
+  redis:
+    name: demo-egress-to-redis
+  db:
+    name: demo-egress-to-db
+  xyz:
+    name: demo-egress-to-xyz
+
+ConfigMap:
+  main:
+    name: demo-vars

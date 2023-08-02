@@ -121,7 +121,6 @@ class Resource(core.YamlBase):
                  shortname: str = None,
                  kind: str = None,
                  name: str = None,
-                 filename: str = None,
                  skip: bool = False,
                  config = None):
         self.app = app
@@ -129,38 +128,23 @@ class Resource(core.YamlBase):
             self.kind = self.__class__.__name__
         else:
             self.kind = kind
+
+        self.shortname = shortname or "main"
+        self.config = config or self._find_config()
+
         typename = self.kind.lower()
         if shortname is None:
-            shortname = "main"
-            self.name = name or f"{app.name}-{typename}"
+            self.name = name or self.config.get("name", f"{app.name}-{typename}")
         else:
-            self.name = name or f"{app.name}-{typename}-{shortname}"
-        self.shortname = shortname
-        self.filename = filename or f"{self.name}.yaml"
+            self.name = name or self.config.get("name", f"{app.name}-{typename}-{shortname}")
+
+        self.filename = f"{typename}-{self.name}.yaml"
+        # TODO: is there any reason to customize the filename?
+        #self.filename = self.config.get("filename", f"{typename}-{self.name}.yaml")
         self.patches = []
         self.skip = skip
 
-        self.config = {}
-        if config:
-            self.config = config
-        else:
-            # In theory we could use any kind_alias for finding the config with the code below
-            #    for typename in app.get_aliases(self.kind):
-            #        if typename in app.config and self.shortname in app.config[typename]:
-            #            logger.debug(f"using named config {typename}.{shortname}")
-            #            self.config = app.config[typename][shortname]
-            #            break
-            # This works, but has several drawbacks:
-            # - Service.main could shadow svc.main, it needs to merge all found maps
-            # - kreate_strukture, needs to iterate over all possible aliases
-            # it seems doable, but can be confusing and for very little convenience
-            typename = self.kind
-            if typename in app.config and self.shortname in app.config[typename]:
-                logger.debug(f"using named config {typename}.{shortname}")
-                self.config = app.config[typename][shortname]
-        if not self.config:
-            logger.warn(f"could not find config for {self.kind}.{shortname} in")
-            self.config = {}
+
         template = f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
         if self.config.get("ignore", False):
@@ -172,6 +156,25 @@ class Resource(core.YamlBase):
         else:
             self.load_yaml()
         self.app.add(self)
+
+    def _find_config(self):
+        # In theory we could use any kind_alias for finding the config with the code below
+        #    for typename in app.get_aliases(self.kind):
+        #        if typename in app.config and self.shortname in app.config[typename]:
+        #            logger.debug(f"using named config {typename}.{shortname}")
+        #            self.config = app.config[typename][shortname]
+        #            break
+        # This works, but has several drawbacks:
+        # - Service.main could shadow svc.main, it needs to merge all found maps
+        # - kreate_strukture, needs to iterate over all possible aliases
+        # it seems doable, but can be confusing and for very little convenience
+        typename = self.kind
+        if typename in self.app.config and self.shortname in self.app.config[typename]:
+            logger.debug(f"using named config {typename}.{self.shortname}")
+            return self.app.config[typename][self.shortname]
+        logger.warn(f"could not find config for {typename}.{self.shortname} in")
+        return {} # TODO: should this be wrapped?
+
 
     def _get_jinja_vars(self):
         return {
@@ -198,18 +201,14 @@ class Resource(core.YamlBase):
 
 class Kustomization(Resource):
     def __init__(self, app: App):
-        Resource.__init__(self, app, filename="kustomization.yaml", skip=True)
+        Resource.__init__(self, app, skip=True)
+        self.filename="kustomization.yaml"
 
 
 class Deployment(Resource):
     def __init__(self, app: App, shortname: str = None):
-        if shortname is None:
-            name = app.name
-            filename = f"{app.name}-deployment.yaml"
-        else:
-            name = None
-            filename = None
-        Resource.__init__(self, app, shortname, name=name, filename=filename)
+        name = None if shortname else app.name
+        Resource.__init__(self, app, shortname, name=name)
 
     def add_template_annotation(self, name: str, val: str) -> None:
         if not "annotations" in self.yaml.spec.template.metadata:
@@ -223,17 +222,14 @@ class Deployment(Resource):
 
 
 class PodDisruptionBudget(Resource):
-    def __init__(self, app: App, shortname: str = None):
-        Resource.__init__(self, app, shortname, name=f"{app.name}-pdb")
+    pass
 
 class Service(Resource):
-    def __init__(self, app: App, shortname : str = None):
-        Resource.__init__(self, app, shortname=shortname)
-
     def headless(self):
         self.yaml.spec.clusterIP="None"
 
 class Egress(Resource):
+    # TODO: do we want a special class just for the egress-to-.... name?
     def __init__(self, app: App, shortname: str):
         Resource.__init__(self, app, shortname=shortname, name=f"{app.name}-egress-to-{shortname}")
 

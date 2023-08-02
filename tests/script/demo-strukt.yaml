@@ -31,6 +31,7 @@ Egress:
     - cidr: {{ val.redis_egress_cidr }}
       port: {{ val.redis_egress_port | default(6379) }}
   db:
+    name: demo-egress-to-db
     to:
     - cidr: {{ val.db_egress_cidr }}
       port: {{ val.db_egress_port | default(1521) }}
