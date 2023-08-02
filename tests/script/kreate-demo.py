@@ -30,7 +30,7 @@ def kreate_demo_app(env: str):
     kreate.HttpProbesPatch(depl)
     kreate.AntiAffinityPatch(depl)
     kreate.Service(app)
-    app.service._.headless() # Use _ as the (unnamed) service
+    app.service.main.headless() # Use _ as the (unnamed) service
     kreate.Service(app, "https")
 
 

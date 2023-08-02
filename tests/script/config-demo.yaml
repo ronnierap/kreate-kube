@@ -1,8 +1,9 @@
 deployment:
-  version: {{ val.version }}
-  project: kreate-demo
-  replicas: {{ val.replicas | default(1) }}
-  image_repo: {{ val.image_repo }}
+  main:
+    version: {{ val.version }}
+    project: kreate-demo
+    replicas: {{ val.replicas | default(1) }}
+    image_repo: {{ val.image_repo }}
 
 containers:
   app:
@@ -15,12 +16,14 @@ containers:
       failureThreshold: 120
 
 serviceaccount:
-  role: {{ val.serviceaccount_role }}
+  main:
+    role: {{ val.serviceaccount_role }}
 
 servicemonitor:
-  endpoints:
-    - interval: 20s
-      path: /actuator/prometheus
+  main:
+    endpoints:
+      - interval: 20s
+        path: /actuator/prometheus
 
 egress:
   redis:
@@ -45,10 +48,9 @@ ingress:
     port: {{ val.service_port }}
 
 service:
-  # default service
-  ports:
-    - port: {{ val.service_port }}
-  # extra named service https
+  main: # default service
+    ports:
+      - port: {{ val.service_port }}
   https:
     ports:
       - port: 443

@@ -88,12 +88,13 @@ class Resource(core.YamlBase):
             self.kind = self.__class__.__name__
         else:
             self.kind = kind
-        self.shortname = shortname
         typename = self.kind.lower()
         if shortname is None:
+            shortname = "main"
             self.name = name or f"{app.name}-{typename}"
         else:
             self.name = name or f"{app.name}-{typename}-{shortname}"
+        self.shortname = shortname
         self.filename = filename or f"{self.name}.yaml"
         self.patches = []
         self.skip = skip
@@ -102,10 +103,7 @@ class Resource(core.YamlBase):
             self.config = config
         else:
             if typename in app.config:
-                if shortname is None:
-                    logger.debug(f"using default config for {typename}")
-                    self.config = app.config[typename]
-                elif shortname in app.config[typename]:
+                if self.shortname in app.config[typename]:
                     logger.debug(f"using named config {typename}.{shortname}")
                     self.config = app.config[typename][shortname]
                 else:
