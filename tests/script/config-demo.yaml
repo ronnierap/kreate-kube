@@ -52,9 +52,19 @@ ingress:
   root:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
+    annontations:
+      nginx.ingress.kubernetes.io/affinity: cookie
+      nginx.ingress.kubernetes.io/auth-realm: demo-realm
+      nginx.ingress.kubernetes.io/auth-secret: basic-auth
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/whitelist-source-range: ggg
+    labels:
+      dummy: jan
   api:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
+    path: /api
+
 
 service:
   main: # default service
