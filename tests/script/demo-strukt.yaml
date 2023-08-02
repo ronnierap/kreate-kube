@@ -60,6 +60,11 @@ Service:
       - port: 443
         name: https
 
+HorizontalPodAutoscaler:
+  main:
+    minReplicas: {{ val.minReplicas | default(1) }}
+    maxReplicas: {{ val.maxReplicas | default(3) }}
+
 ConfigMap:
   main:
     vars:

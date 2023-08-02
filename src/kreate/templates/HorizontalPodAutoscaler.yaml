@@ -1,0 +1,25 @@
+
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ my.name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ app.name }}
+  minReplicas: {{ cfg.minReplicas }}
+  maxReplicas: {{ cfg.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ cfg.cpu.averageUtilization | default(70) }}
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: {{ cfg.memory.averageUtilization | default(70) }}

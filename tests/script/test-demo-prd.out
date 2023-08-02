@@ -149,6 +149,32 @@ spec:
     matchLabels:
       app: demo
 ---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: demo-horizontalpodautoscaler
+  namespace: demo-prd
+spec:
+  maxReplicas: 8
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 70
+        type: Utilization
+    type: Resource
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 70
+        type: Utilization
+    type: Resource
+  minReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: demo
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:

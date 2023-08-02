@@ -40,6 +40,7 @@ def kreate_demo_app(env: str):
 
     app.kreate("ServiceAccount")
     app.kreate("ServiceMonitor")
+    app.kreate("HorizontalPodAutoscaler")
 
     cm = kreate.ConfigMap(app, "main", name="demo-vars", kustomize=False)
     cm.add_var("ENV", app.values["env"])

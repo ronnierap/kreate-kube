@@ -106,11 +106,9 @@ class App():
             PodDisruptionBudget(self, shortname)
         for shortname in self._shortnames("ConfigMap"):
             ConfigMap(self, shortname)
-
-        for shortname in self._shortnames("ServiceAccount"):
-            self.kreate("ServiceAccount", shortname)
-        for shortname in self._shortnames("ServiceMonitor"):
-            self.kreate("ServiceMonitor", shortname)
+        for kind in ("ServiceAccount", "ServiceMonitor", "HorizontalPodAutoscaler"):
+            for shortname in self._shortnames(kind):
+                self.kreate(kind, shortname)
 
 
 

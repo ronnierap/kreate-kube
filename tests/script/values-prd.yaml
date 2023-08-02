@@ -19,6 +19,8 @@ xyz_egress_cidr: 4.4.4.5/32
 
 #cpu_limit: "1"
 #cpu_request: "200m"
+minReplicas: 3
+maxReplicas: 8
 
 serviceaccount_role: some-role-prd
 
