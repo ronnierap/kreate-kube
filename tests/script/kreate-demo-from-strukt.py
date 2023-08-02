@@ -20,6 +20,9 @@ def kreate_demo_app(env: str):
     # - parse labels and annontations from config for all resources
     # - apply patches for resources
 
+    app.depl.main.add_template_label("egress-to-db", "enabled")
+    app.service.main.headless() # Use _ as the (unnamed) service
+
     kreate.HttpProbesPatch(app.depl.main)
     kreate.AntiAffinityPatch(app.depl.main)
 
