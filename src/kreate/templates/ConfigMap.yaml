@@ -6,4 +6,7 @@ metadata:
     config-map: {{ my.name }}
   name: {{ my.name }}
   namespace: {{ app.namespace }}
-data: {}
+data:
+{% for key in cfg.get("vars", []) %}
+    {{key}}: {{ cfg.vars[key] }}
+{% endfor %}

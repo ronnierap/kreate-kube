@@ -86,8 +86,10 @@ class App():
         for shortname in self._shortnames("Service"):
             Service(self, none_if_main(shortname))
         for shortname in self._shortnames("PodDisruptionBudget"):
-            print(shortname)
             PodDisruptionBudget(self, shortname)
+        for shortname in self._shortnames("ConfigMap"):
+            ConfigMap(self, shortname)
+
         for shortname in self._shortnames("ServiceAccount"):
             self.kreate("ServiceAccount", none_if_main(shortname))
         for shortname in self._shortnames("ServiceMonitor"):
@@ -213,7 +215,13 @@ class Egress(Resource):
         Resource.__init__(self, app, shortname=shortname, name=f"{app.name}-egress-to-{shortname}")
 
 class ConfigMap(Resource):
-    def __init__(self, app: App, shortname=None, name: str = None, kustomize=False):
+    def __init__(
+            self,
+            app: App,
+            shortname: str = None,
+            name: str = None,
+            kustomize: bool = False
+        ):
         self.kustomize = kustomize
         Resource.__init__(self, app, shortname=shortname, name=name, skip=kustomize)
         if kustomize:
@@ -227,7 +235,7 @@ class ConfigMap(Resource):
 
     def add_var(self, name, value=None):
         if value is None:
-            value = self.app.config.vars[name]
+            value = self.app.values[name]
         # We can not use self.yaml.data, since data is a field in UserDict
         self.yaml[self.fieldname][name] = value
 

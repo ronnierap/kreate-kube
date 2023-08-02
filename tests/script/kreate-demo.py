@@ -41,8 +41,8 @@ def kreate_demo_app(env: str):
     app.kreate("ServiceAccount")
     app.kreate("ServiceMonitor")
 
-    cm = kreate.ConfigMap(app, "vars", name="demo-vars", kustomize=False)
-    cm.add_var("ENV", value=app.env)
+    cm = kreate.ConfigMap(app, "main", name="demo-vars", kustomize=False)
+    cm.add_var("ENV", app.values["env"])
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")
     cm.add_var("ORACLE_SCHEMA")

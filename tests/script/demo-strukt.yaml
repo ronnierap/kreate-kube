@@ -58,3 +58,11 @@ service:
     ports:
       - port: 443
         name: https
+
+ConfigMap:
+  main:
+    vars:
+      ENV: {{ val.env }}
+      ORACLE_URL: {{ val.ORACLE_URL }}
+      ORACLE_USR: {{ val.ORACLE_USR }}
+      ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
