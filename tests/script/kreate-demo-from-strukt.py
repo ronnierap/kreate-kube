@@ -8,7 +8,7 @@ def kreate_demo_app(env: str):
     cfg._values.add_yaml(f"tests/script/values-{env}.yaml")
     cfg.add_files(
         f"tests/script/config-demo-{env}.yaml",
-        "tests/script/config-demo.yaml",
+        "tests/script/demo-strukt.yaml",
         "src/kreate/templates/default-values.yaml",
         )
 
