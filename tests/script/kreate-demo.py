@@ -19,7 +19,7 @@ def kreate_demo_app(env: str):
     app.ingress.root.whitelist("ggg")
     app.ingress.root.basic_auth()
     app.ingress.root.add_label("dummy", "jan")
-    kreate.Ingress(app, "api", path="/api")
+    kreate.Ingress(app, "api")
 
     kreate.Egress(app, "db")
     kreate.Egress(app, "redis")

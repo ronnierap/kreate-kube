@@ -1,18 +1,9 @@
 deployment:
   main:
-    kreate:
-      filename: demo-deployment.yaml # TODO: have appname in vals or somehow
-      patches: {}
     version: {{ val.version }}
     project: kreate-demo
     replicas: {{ val.replicas | default(1) }}
     image_repo: {{ val.image_repo }}
-
-PodDisruptionBudget: # TODO: is there a good reason to have it capitalized
-  main:
-    kreate:
-      name: demo-pdb # TODO: have appname in vals or somehow
-    minAvailable: 2
 
 containers:
   app:
@@ -52,14 +43,7 @@ ingress:
   root:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
-    annontations:
-      nginx.ingress.kubernetes.io/affinity: cookie
-      nginx.ingress.kubernetes.io/auth-realm: demo-realm
-      nginx.ingress.kubernetes.io/auth-secret: basic-auth
-      nginx.ingress.kubernetes.io/auth-type: basic
-      nginx.ingress.kubernetes.io/whitelist-source-range: ggg
-    labels:
-      dummy: jan
+    path: /
   api:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
