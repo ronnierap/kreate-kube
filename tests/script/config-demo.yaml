@@ -1,9 +1,17 @@
 deployment:
   main:
+    kreate:
+      filename: demo-deployment.yaml # TODO: have appname in vals or somehow
+      patches: {}
     version: {{ val.version }}
     project: kreate-demo
     replicas: {{ val.replicas | default(1) }}
     image_repo: {{ val.image_repo }}
+
+PodDisruptionBudget:
+  main:
+    kreate:
+      name: demo-pdb # TODO: have appname in vals or somehow
 
 containers:
   app:

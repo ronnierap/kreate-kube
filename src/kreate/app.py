@@ -67,19 +67,30 @@ class App():
             kust = Kustomization(self)
             kust.kreate()
 
+    def _shortnames(self, kind:str ) -> list:
+        if kind in self.config:
+            return [none_if_main(k) for k in self.config[kind].keys()]
+        elif kind.lower() in self.config:
+            return [none_if_main(k) for k in self.config[kind.lower()].keys()]
+        else:
+            return []
+
+
     def kreate_strukture(self):
-        for shortname in self.config.egress.keys():
+        for shortname in self._shortnames("Egress"):
             Egress(self, none_if_main(shortname))
-        for shortname in self.config.ingress.keys():
+        for shortname in self._shortnames("Ingress"):
             Ingress(self, none_if_main(shortname))
-        for shortname in self.config.deployment.keys():
-            print(shortname)
+        for shortname in self._shortnames("Deployment"):
             Deployment(self, none_if_main(shortname))
-        for shortname in self.config.service.keys():
+        for shortname in self._shortnames("Service"):
             Service(self, none_if_main(shortname))
-        for shortname in self.config.serviceaccount.keys():
+        for shortname in self._shortnames("PodDisruptionBudget"):
+            print(shortname)
+            PodDisruptionBudget(self, shortname)
+        for shortname in self._shortnames("ServiceAccount"):
             self.kreate("ServiceAccount", none_if_main(shortname))
-        for shortname in self.config.servicemonitor.keys():
+        for shortname in self._shortnames("ServiceMonitor"):
             self.kreate("ServiceMonitor", none_if_main(shortname))
 
 
@@ -112,17 +123,19 @@ class Resource(core.YamlBase):
 
         if config:
             self.config = config
-        else:
-            if typename in app.config:
-                if self.shortname in app.config[typename]:
-                    logger.debug(f"using named config {typename}.{shortname}")
-                    self.config = app.config[typename][shortname]
-                else:
-                    logger.debug(f"could not find config for {shortname} in {typename}.")
-                    self.config = {}
+        elif self.kind in app.config and self.shortname in app.config[self.kind]:
+            logger.debug(f"using named config {self.kind}.{shortname}")
+            self.config = app.config[self.kind][shortname]
+        elif typename in app.config:
+            if self.shortname in app.config[typename]:
+                logger.debug(f"using named config {typename}.{shortname}")
+                self.config = app.config[typename][shortname]
             else:
-                logger.debug(f"could not find any config for {typename}")
+                logger.debug(f"could not find config for {shortname} in {typename}.")
                 self.config = {}
+        else:
+            logger.debug(f"could not find any config for {typename}")
+            self.config = {}
         template = f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
         if self.config.get("ignore", False):
@@ -185,11 +198,11 @@ class Deployment(Resource):
 
 
 class PodDisruptionBudget(Resource):
-    def __init__(self, app: App):
-        Resource.__init__(self, app, name=f"{app.name}-pdb")
+    def __init__(self, app: App, shortname: str = None):
+        Resource.__init__(self, app, shortname, name=f"{app.name}-pdb")
 
 class Service(Resource):
-    def __init__(self, app: App, shortname=None):
+    def __init__(self, app: App, shortname : str = None):
         Resource.__init__(self, app, shortname=shortname)
 
     def headless(self):
