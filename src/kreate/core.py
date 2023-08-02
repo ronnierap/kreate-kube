@@ -74,7 +74,7 @@ class DeepChain(Mapping):
     def get(self, attr, default):
         if attr in self:
             return self[attr]
-        return super().get(attr, default)
+        return default
 
     def keys(self):
         result = set()
