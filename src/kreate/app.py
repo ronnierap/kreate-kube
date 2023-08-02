@@ -155,6 +155,10 @@ class Resource(core.YamlBase):
         else:
             self.load_yaml()
         self.app.add(self)
+        self.add_metadata()
+        kreate_patches(self)
+
+    def add_metadata(self):
         for key in self.config.get("annotations", {}):
             if not "annotations" in self.yaml.metadata:
                 self.yaml.metadata.annotations={}
@@ -163,7 +167,6 @@ class Resource(core.YamlBase):
             if not "labels" in self.yaml.metadata:
                 self.yaml.metadata.labels={}
             self.yaml.metadata.labels[key]=self.config.labels[key]
-
 
     def _find_config(self):
         # In theory we could use any kind_alias for finding the config with the code below
@@ -299,13 +302,11 @@ class Ingress(Resource):
 
 #########################################################################################
 class Patch(core.YamlBase):
-    def __init__(self, target: Resource, template, config: Mapping):
+    def __init__(self, target: Resource, template):
         self.target = target
         self.target.patches.append(self)
-        self.config = config
         self.filename = template
         core.YamlBase.__init__(self, template=template)
-        self.load_yaml()
 
     def kreate(self) -> None:
         self.save_yaml(f"{self.target.app.target_dir}/{self.filename}")
@@ -322,10 +323,23 @@ class Patch(core.YamlBase):
 
 class HttpProbesPatch(Patch):
     def __init__(self, target: Resource, container_name : str ="app"):
-        config = target.app.config.containers[container_name]
-        Patch.__init__(self, target, "patch-http-probes.yaml", config=config)
+        self.config = target.app.config.containers[container_name]
+        if self.config is None:
+            (f"Unknown contrainer {container_name} to patch")
+            raise ValueError(f"Unknown container name {container_name} to patch with HttpProbes")
+        Patch.__init__(self, target, "patch-http-probes.yaml")
+        self.load_yaml()
 
 class AntiAffinityPatch(Patch):
-    def __init__(self, target: Resource, container_name : str ="app"):
-        config = target.app.config.containers[container_name]
-        Patch.__init__(self, target, "patch-anti-affinity.yaml", config=config)
+    def __init__(self, target: Resource, selector_key : str ="app"):
+        self.config = { "selector_key": selector_key }
+        Patch.__init__(self, target, "patch-anti-affinity.yaml")
+        self.load_yaml()
+
+def kreate_patches(target : Resource) -> None:
+    for patch in target.config.get("patches", {}):
+        conf = target.config.patches[patch];
+        if patch == "HttpProbesPatch":
+            HttpProbesPatch(target, container_name=conf.get("container","app")) # TODO: do not mirror default value
+        elif patch == "AntiAffinityPatch":
+            AntiAffinityPatch(target, selector_key=conf.get("selector_key","app")) # TODO: do not mirror default value

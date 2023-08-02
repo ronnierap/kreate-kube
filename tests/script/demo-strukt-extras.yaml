@@ -5,8 +5,10 @@
 Deployment:
   main:
     name: demo
-    kreate:
-      patches: {}
+    patches:
+      HttpProbesPatch:
+        container: app
+      AntiAffinityPatch: {}
     #labels: TODO: should be in spec/template
     #  egress-to-db: enabled
 

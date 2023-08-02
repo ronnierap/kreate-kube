@@ -17,14 +17,12 @@ def kreate_demo_app(env: str):
     app.kreate_strukture()
 
     # TODO: the tweaks below should be possible to read from config
-    # - parse labels and annontations from config for all resources
-    # - apply patches for resources
 
+    # TODO: parse labels and annontations from config spec.template
     app.depl.main.add_template_label("egress-to-db", "enabled")
-    app.service.main.headless() # Use _ as the (unnamed) service
 
-    kreate.HttpProbesPatch(app.depl.main)
-    kreate.AntiAffinityPatch(app.depl.main)
+    # TODO: invoke special functions, or add yaml at other locations
+    app.service.main.headless()
 
     return app
 
