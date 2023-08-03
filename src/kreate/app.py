@@ -141,6 +141,7 @@ class AppYaml(core.YamlBase):
             logger.info(f"ignoring {self.name}")
         else:
             self.load_yaml()
+        self.app.add(self)
 
     def calc_name(self):
         if self.shortname == "main":
@@ -190,8 +191,6 @@ class Resource(AppYaml):
                  template: str = None,
                 ):
         AppYaml.__init__(self, app, kind=kind, shortname=shortname, template=template)
-        self.patches = []
-        self.app.add(self)
         self.add_metadata()
         self.add_patches()
 
@@ -332,7 +331,6 @@ class Patch(AppYaml):
         self.target = target
         template = self.__class__.__name__+".yaml"
         AppYaml.__init__(self, target.app, template=template, shortname=shortname)
-        self.target.app.add(self)
 
     def need_kustomize(self):
         return True
