@@ -40,9 +40,9 @@ def kreate_demo_app(env: str):
     pdb.yaml.spec.minAvailable = 2
     pdb.add_label("testje","test")
 
-    app.kreate("ServiceAccount")
-    app.kreate("ServiceMonitor")
-    app.kreate("HorizontalPodAutoscaler")
+    app.kreate_resource("ServiceAccount")
+    app.kreate_resource("ServiceMonitor")
+    app.kreate_resource("HorizontalPodAutoscaler")
 
     cm = kreate.ConfigMap(app, "vars") # TODO, kustomize=True)
     cm.add_var("ENV", app.values["env"])

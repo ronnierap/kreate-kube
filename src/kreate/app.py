@@ -56,18 +56,15 @@ class App():
             for alias in self.get_aliases(res.kind):
                 self._kinds[alias] = map
 
-        if res.shortname is None:
-            map["_"] = res
-        else:
-            map[res.shortname] = res
+        map[res.shortname] = res
 
     def __getattr__(self, attr):
         if attr in self.__dict__ or attr == "_dict":
             return super().__getattribute__(attr)
         return self._kinds.get(attr, None)
 
-    def kreate(self, kind: str, shortname: str = None, fullname: str = None):
-        res = Resource(self, shortname=shortname, kind=kind)
+    def kreate_resource(self, kind: str, shortname: str = None, **kwargs):
+        return Resource(self, shortname=shortname, kind=kind, **kwargs)
 
     def kreate_files(self):
         if os.path.exists(self.target_dir) and os.path.isdir(self.target_dir):
@@ -107,7 +104,7 @@ class App():
             ConfigMap(self, shortname)
         for kind in ("ServiceAccount", "ServiceMonitor", "HorizontalPodAutoscaler"):
             for shortname in self._shortnames(kind):
-                self.kreate(kind, shortname)
+                self.kreate_resource(kind, shortname)
         for res in self.yaml_objects:
             if isinstance(res, Resource): # should always be?
                 res.add_patches()
@@ -187,7 +184,7 @@ class YamlObject(core.YamlBase):
 class Resource(YamlObject):
     def __init__(self,
                  app: App,
-                 shortname: str = "main",
+                 shortname: str = None,
                  kind: str = None,
                  template: str = None,
                  **kwargs
@@ -231,7 +228,7 @@ class Resource(YamlObject):
 
 class Deployment(Resource):
     def calc_name(self):
-        if self.shortname is None or self.shortname == "main":
+        if  self.shortname == "main":
             return self.app.name
         return f"{self.app.name}-{self.shortname}"
 
