@@ -55,6 +55,12 @@ def pp(map, indent):
         if isinstance(val, collections.abc.Mapping):
             print(f"{indent}{key}:")
             pp(val, indent + "    ")
+        elif isinstance(val, str):
+            print(f"{indent}{key}: {val}")
+        elif isinstance(val, collections.abc.Sequence):
+            print(f"{indent}{key}:")
+            for v in val:
+                print(f"{indent}- {v}")
         else:
             print(f"{indent}{key}: {val}")
 
