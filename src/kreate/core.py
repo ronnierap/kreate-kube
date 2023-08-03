@@ -128,7 +128,7 @@ class YamlBase:
         with open(outfile, 'wb') as f:
             parser.dump(self.yaml.data, f)
 
-    def _get_jinja_vars(self):
+    def _template_vars(self):
         return {}
 
     def _render(self, outfile=None):
@@ -143,7 +143,7 @@ class YamlBase:
             trim_blocks=True,
             lstrip_blocks=True
         )
-        vars = self._get_jinja_vars()
+        vars = self._template_vars()
         return tmpl.render(vars)
 
 

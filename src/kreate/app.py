@@ -1,7 +1,6 @@
 import os
 import sys
 import shutil
-from collections.abc import Mapping
 import logging
 
 from . import core
@@ -152,7 +151,7 @@ class AppYaml(core.YamlBase):
             dir = self.dirname
             self.save_yaml(f"{dir}/{filename}")
 
-    def _get_jinja_vars(self):
+    def _template_vars(self):
         return {
             "cfg" : self.config,
             "app" : self.app,
@@ -348,15 +347,8 @@ class Patch(AppYaml):
         self.target.app.add(self)
         self.load_yaml()
 
-    def _get_jinja_vars(self):
-        return {
-            "target": self.target,
-            "cfg" : self.config,
-            "app" : self.target.app,
-            "my" : self,
-            "val": self.target.app.values
-        }
-
+    def _template_vars(self):
+        return { **super()._template_vars(),  "target": self.target }
 
 class HttpProbesPatch(Patch):
     pass
