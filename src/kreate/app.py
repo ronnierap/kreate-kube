@@ -330,8 +330,7 @@ class Ingress(Resource):
 class Patch(YamlObject):
     def __init__(self, target: Resource, shortname: str = None):
         self.target = target
-        template = self.__class__.__name__+".yaml"
-        YamlObject.__init__(self, target.app, template=template, shortname=shortname)
+        YamlObject.__init__(self, target.app, shortname=shortname)
 
     def need_kustomize(self):
         return True
