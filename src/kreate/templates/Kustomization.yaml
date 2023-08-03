@@ -5,12 +5,12 @@ namespace: {{ app.namespace }}
 
 resources:
 {% for res in my.get_resources() %}
-- {{ res.calc_filename() }}
+- {{ res.filename }}
 {% endfor %}
 
 patches:
 {% for pat in my.get_patches() %}
-- {{ pat.calc_filename() }}
+- {{ pat.filename }}
 {% endfor %}
 
 configMapGenerator:

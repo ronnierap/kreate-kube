@@ -147,15 +147,17 @@ class AppYaml(core.YamlBase):
         return {} # TODO: should this be wrapped?
 
     def kreate_file(self) -> None:
-        filename = self.calc_filename()
+        filename = self.filename
         if filename:
-            dir = self.calc_dirname()
+            dir = self.dirname
             self.save_yaml(f"{dir}/{filename}")
 
-    def calc_dirname(self):
+    @property
+    def dirname(self):
         return self.app.target_dir
 
-    def calc_filename(self):
+    @property
+    def filename(self):
         return f"{self.kind.lower()}-{self.shortname}.yaml"
 
 
@@ -195,7 +197,8 @@ class Resource(AppYaml):
             return f"{self.app.name}-{self.kind}"
         return f"{self.app.name}-{self.kind}-{self.shortname}"
 
-    def calc_filename(self):
+    @property
+    def filename(self):
         # prefix the file, because the name of a resource is not guaranteed
         # to be unique
         return f"{self.kind}-{self.name}.yaml".lower()
@@ -253,18 +256,19 @@ class Service(Resource):
         self.yaml.spec.clusterIP="None"
 
 class Egress(Resource):
-    def calc_fullname(self):
+    def calc_name(self):
         return f"{self.app.name}-egress-to-{self.shortname}"
 
 
 class Kustomization(Resource):
     def get_resources(self):
-        return [res for res in self.app.resources if isinstance(res, Resource) and res.calc_filename()  ]
+        return [res for res in self.app.resources if isinstance(res, Resource) and res.filename  ]
 
     def get_patches(self):
         return [res for res in self.app.resources if isinstance(res, Patch)]
 
-    def calc_filename(self):
+    @property
+    def filename(self):
         return "kustomization.yaml"
 
 class ConfigMap(Resource):
@@ -287,10 +291,11 @@ class ConfigMap(Resource):
         self.fieldname = "data"
         self.app.config[self.kind][self.shortname]
 
-    def calc_filename(self):
+    @property
+    def filename(self):
         if self.kustomize:
             return None # file is created by kustomize
-        super().calc_filename()
+        super().filename
 
     def add_var(self, name, value=None):
         if value is None:
