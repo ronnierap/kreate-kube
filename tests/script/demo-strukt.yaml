@@ -5,6 +5,13 @@ Deployment:
     replicas: {{ val.replicas | default(1) }}
     image_repo: {{ val.image_repo }}
 
+HttpProbesPatch:
+  main:
+    startupProbe:
+      failureThreshold: 120
+
+
+
 containers:
   main:
     resources:
@@ -13,10 +20,6 @@ containers:
       requests:
         cpu: {{ val.cpu_request | default("400m") }}
 
-HttpProbesPatch:
-  main:
-    startupProbe:
-      failureThreshold: 120
 
 ServiceAccount:
   main:

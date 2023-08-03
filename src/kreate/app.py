@@ -338,6 +338,18 @@ class Patch(YamlObject):
     def _template_vars(self):
         return { **super()._template_vars(),  "target": self.target }
 
+    def _find_config(self):
+        root_config = super()._find_config()
+        typename = self.kind
+        target_config = self.target.config.get("patches",{})
+        if typename in target_config and self.shortname in target_config[typename]:
+            logger.debug(f"using embedded config {typename}.{self.shortname} from {self.target.kind}.{self.target.shortname}")
+            # The embedded_config is first, since the root_config will contain all default values
+            embedded_config = target_config[typename][self.shortname]
+            return core.DeepChain(embedded_config, root_config)
+        return root_config
+
+
 class HttpProbesPatch(Patch):
     pass
 class AntiAffinityPatch(Patch):
