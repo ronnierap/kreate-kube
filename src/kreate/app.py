@@ -25,6 +25,7 @@ class App():
         self.yaml_objects = []
         self._kinds = {}
         self.aliases = {}
+        self.add_std_aliases()
 
     def add_std_aliases(self) -> None:
         self.add_alias("Service", "svc")
@@ -71,8 +72,8 @@ class App():
             shutil.rmtree(self.target_dir)
         os.makedirs(self.target_dir, exist_ok=True)
 
-        for rsrc in self.yaml_objects:
-            rsrc.kreate_file()
+        for obj  in self.yaml_objects:
+            obj.kreate_file()
         if self.need_kustomize():
             kust = Kustomization(self)
             kust.kreate_file()
@@ -282,10 +283,11 @@ class ConfigMap(Resource):
         return f"{self.app.name}-{self.shortname}"
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         if self.need_kustomize():
-            return None # file is created by kustomize
-        super().filename
+            logger.debug(f"not kreating file for {self.name}, will be created by kustomize")
+            return None
+        return super().filename
 
     def add_var(self, name, value=None):
         if value is None:
