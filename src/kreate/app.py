@@ -7,11 +7,6 @@ from . import core
 
 logger = logging.getLogger(__name__)
 
-def none_if_main(shortname: str) -> str:
-    if shortname == "main":
-        return None
-    return shortname
-
 class App():
     def __init__(
             self,
@@ -93,11 +88,8 @@ class App():
 
     def _shortnames(self, kind:str ) -> list:
         if kind in self.config:
-            return [none_if_main(k) for k in self.config[kind].keys()]
-        elif kind.lower() in self.config:
-            return [none_if_main(k) for k in self.config[kind.lower()].keys()]
-        else:
-            return []
+            return self.config[kind].keys()
+        return []
 
 
     def kreate_from_config(self):
