@@ -7,6 +7,6 @@ metadata:
   name: {{ my.name }}
   namespace: {{ app.namespace }}
 data:
-{% for key in cfg.get("vars", []) %}
+  {% for key in cfg.get("vars", []) %}
     {{key}}: {{ cfg.vars[key] }}
-{% endfor %}
+  {% endfor %}

@@ -31,13 +31,13 @@ spec:
         imagePullPolicy: {{ cont.imagePullPolicy }}
         envFrom:
         - secretRef:
-{% for secr in cfg.get("secret-vars",[]) %}
+        {% for secr in cfg.get("secret-vars",[]) %}
             name: {{ secr }}
-{% endfor %}
+        {% endfor %}
         - configMapRef:
-{% for cm in cfg.get("vars",[]) %}
+        {% for cm in cfg.get("vars",[]) %}
             name: {{ cm }}
-{% endfor %}
+        {% endfor %}
         ports:
         - containerPort: {{ cont.ports[0].containerPort }}
           protocol: {{ cont.ports[0].protocol }}
