@@ -36,7 +36,7 @@ def kreate_demo_app(env: str):
     kreate.Service(app, "https")
 
 
-    pdb = kreate.PodDisruptionBudget(app)
+    pdb = kreate.PodDisruptionBudget(app, name="demo-pdb")
     pdb.yaml.spec.minAvailable = 2
     pdb.add_label("testje","test")
 

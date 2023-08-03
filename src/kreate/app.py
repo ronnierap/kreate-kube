@@ -130,12 +130,13 @@ class YamlObject(core.YamlBase):
                  shortname: str = None,
                  kind: str = None,
                  template: str = None,
+                 **kwargs
                  ):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         # TODO: merge config with keyword args
-        self.config = self._find_config()
+        self.config = self._find_config(kwargs)
         template = template or f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
         self.skip = self.config.get("ignore", False)
@@ -153,13 +154,17 @@ class YamlObject(core.YamlBase):
         return f"{self.app.name}-{self.kind}-{self.shortname}"
 
 
-    def _find_config(self):
+    def _find_config(self, extra):
         typename = self.kind
         if typename in self.app.config and self.shortname in self.app.config[typename]:
             logger.debug(f"using named config {typename}.{self.shortname}")
-            return self.app.config[typename][self.shortname]
-        logger.warn(f"could not find config for {typename}.{self.shortname} in")
-        return {} # TODO: should this be wrapped?
+            config = self.app.config[typename][self.shortname]
+            if extra and config:
+                return core.DeepChain(extra, config)
+            else:
+                return extra or config
+        logger.info(f"could not find config for {typename}.{self.shortname} in")
+        return extra # TODO: should this be wrapped?
 
     def kreate_file(self) -> None:
         filename = self.filename
@@ -190,11 +195,12 @@ class YamlObject(core.YamlBase):
 class Resource(YamlObject):
     def __init__(self,
                  app: App,
-                 shortname: str = None,
+                 shortname: str = "main",
                  kind: str = None,
                  template: str = None,
+                 **kwargs
                 ):
-        YamlObject.__init__(self, app, kind=kind, shortname=shortname, template=template)
+        YamlObject.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)
         self.add_metadata()
 
     def add_patches(self) -> None:
@@ -328,9 +334,9 @@ class Ingress(Resource):
 
 #########################################################################################
 class Patch(YamlObject):
-    def __init__(self, target: Resource, shortname: str = None):
+    def __init__(self, target: Resource, shortname: str = None, **kwargs):
         self.target = target
-        YamlObject.__init__(self, target.app, shortname=shortname)
+        YamlObject.__init__(self, target.app, shortname=shortname, **kwargs)
 
     def need_kustomize(self):
         return True
@@ -338,8 +344,8 @@ class Patch(YamlObject):
     def _template_vars(self):
         return { **super()._template_vars(),  "target": self.target }
 
-    def _find_config(self):
-        root_config = super()._find_config()
+    def _find_config(self, extra):
+        root_config = super()._find_config(extra)
         typename = self.kind
         target_config = self.target.config.get("patches",{})
         if typename in target_config and self.shortname in target_config[typename]:
