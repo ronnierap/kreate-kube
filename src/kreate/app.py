@@ -116,6 +116,9 @@ class App():
         for kind in ("ServiceAccount", "ServiceMonitor", "HorizontalPodAutoscaler"):
             for shortname in self._shortnames(kind):
                 self.kreate(kind, shortname)
+        for res in self.yaml_objects:
+            if isinstance(res, Resource): # should always be?
+                res.add_patches()
 
 
 
@@ -193,12 +196,9 @@ class Resource(YamlObject):
                 ):
         YamlObject.__init__(self, app, kind=kind, shortname=shortname, template=template)
         self.add_metadata()
-        self.add_patches()
-
 
     def add_patches(self) -> None:
         for patch in self.config.get("patches", {}):
-            conf = self.config.patches[patch];
             if patch == "HttpProbesPatch":
                 HttpProbesPatch(self)
             elif patch == "AntiAffinityPatch":
