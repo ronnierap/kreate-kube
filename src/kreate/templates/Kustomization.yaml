@@ -4,12 +4,12 @@ kind: Kustomization
 namespace: {{ app.namespace }}
 
 resources:
-{% for res in my.get_resources() %}
+{% for res in my.resources %}
 - {{ res.filename }}
 {% endfor %}
 
 patches:
-{% for pat in my.get_patches() %}
+{% for pat in my.patches %}
 - {{ pat.filename }}
 {% endfor %}
 
