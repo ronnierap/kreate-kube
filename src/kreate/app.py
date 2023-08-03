@@ -328,13 +328,12 @@ class Ingress(Resource):
 
 #########################################################################################
 class Patch(AppYaml):
-    def __init__(self, target: Resource, template, shortname: str = None):
+    def __init__(self, target: Resource, shortname: str = None):
         self.target = target
+        template = self.__class__.__name__+".yaml"
         AppYaml.__init__(self, target.app, template=template, shortname=shortname)
         self.target.app.add(self)
-
-    #def kreate(self) -> None:
-    #    self.save_yaml(f"{self.target.app.target_dir}/{self.filename}")
+        self.load_yaml()
 
     def _get_jinja_vars(self):
         return {
@@ -347,17 +346,6 @@ class Patch(AppYaml):
 
 
 class HttpProbesPatch(Patch):
-    def __init__(self, target: Resource, shortname : str = None):
-        #contname = target.yaml.spec.template.spec.containers[0].name
-        Patch.__init__(self, target, "patch-http-probes.yaml", shortname=shortname)
-        #config = target.app.config.containers[container_name]
-        #if config is None:
-        #    (f"Unknown contrainer {container_name} to patch")
-        #    raise ValueError(f"Unknown container name {container_name} to patch with HttpProbes")
-        self.load_yaml()
-
+    pass
 class AntiAffinityPatch(Patch):
-    def __init__(self, target: Resource, selector_key : str ="app"):
-        self.config = { "selector_key": selector_key }
-        Patch.__init__(self, target, "patch-anti-affinity.yaml")
-        self.load_yaml()
+    pass
