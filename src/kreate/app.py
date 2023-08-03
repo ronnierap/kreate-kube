@@ -186,9 +186,9 @@ class Resource(AppYaml):
         for patch in self.config.get("patches", {}):
             conf = self.config.patches[patch];
             if patch == "HttpProbesPatch":
-                HttpProbesPatch(self, container_name=conf.get("container","app")) # TODO: do not mirror default value
+                HttpProbesPatch(self)
             elif patch == "AntiAffinityPatch":
-                AntiAffinityPatch(self, selector_key=conf.get("selector_key","app")) # TODO: do not mirror default value
+                AntiAffinityPatch(self)
 
     def calc_name(self):
         if self.shortname == "main":

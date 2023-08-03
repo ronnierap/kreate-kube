@@ -13,6 +13,8 @@ def kreate_demo_app(env: str):
         )
 
     app = kreate.App('demo', env, kustomize=True, config=cfg)
+    app.add_std_aliases() # TODO: should this always be done?
+
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()
@@ -26,8 +28,8 @@ def kreate_demo_app(env: str):
     kreate.Egress(app, "xyz")
 
     depl=kreate.Deployment(app)
-    depl.add_template_label("egress-to-db", "enabled")
-    kreate.HttpProbesPatch(depl)
+    app.depl.main.add_template_label("egress-to-db", "enabled")
+    kreate.HttpProbesPatch(app.depl.main)
     kreate.AntiAffinityPatch(depl)
     kreate.Service(app)
     app.service.main.headless()
