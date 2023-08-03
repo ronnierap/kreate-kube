@@ -44,7 +44,7 @@ def kreate_demo_app(env: str):
     app.kreate("ServiceMonitor")
     app.kreate("HorizontalPodAutoscaler")
 
-    cm = kreate.ConfigMap(app, "main", name="demo-vars", kustomize=True)
+    cm = kreate.ConfigMap(app, "vars", kustomize=True)
     cm.add_var("ENV", app.values["env"])
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")

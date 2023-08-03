@@ -172,10 +172,9 @@ class Resource(AppYaml):
     def __init__(self, app: App,
                  shortname: str = None,
                  kind: str = None,
-                 name: str = None,
                  skip: bool = False,
                  template: str = None,
-                 config = None):
+                ):
         AppYaml.__init__(self, app, kind=kind, shortname=shortname, template=template)
         self.name = self.config.get("name", None) or self.calc_name().lower()
         self.patches = []
@@ -286,10 +285,9 @@ class ConfigMap(Resource):
             self,
             app: App,
             shortname: str,
-            name: str = None,
             kustomize: bool = True
         ):
-        Resource.__init__(self, app, shortname=shortname, name=name)
+        Resource.__init__(self, app, shortname=shortname)
         self.kustomize = self.config.get("kustomize", kustomize)
         if self.kustomize:
             app.kustomize = True
@@ -297,6 +295,9 @@ class ConfigMap(Resource):
             self.fieldname = "literals" # This does not seem to work as expected
         self.fieldname = "data"
         self.app.config[self.kind][self.shortname]
+
+    def calc_name(self):
+        return f"{self.app.name}-{self.shortname}"
 
     @property
     def filename(self):

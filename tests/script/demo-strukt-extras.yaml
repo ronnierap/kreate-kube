@@ -40,7 +40,3 @@ Egress:
     name: demo-egress-to-db
   xyz:
     name: demo-egress-to-xyz
-
-ConfigMap:
-  main:
-    name: demo-vars

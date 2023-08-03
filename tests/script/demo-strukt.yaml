@@ -69,7 +69,7 @@ HorizontalPodAutoscaler:
     maxReplicas: {{ val.maxReplicas | default(3) }}
 
 ConfigMap:
-  main:
+  vars:
     vars:
       ENV: {{ val.env }}
       ORACLE_URL: {{ val.ORACLE_URL }}
