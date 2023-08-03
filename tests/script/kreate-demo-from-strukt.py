@@ -20,7 +20,6 @@ def kreate_demo_app(env: str):
     # TODO: the tweaks below should be possible to read from config
 
     # TODO: parse labels and annontations from config spec.template
-    print(app.aliases)
     app.depl.main.add_template_label("egress-to-db", "enabled")
 
     # TODO: invoke special functions, or add yaml at other locations
