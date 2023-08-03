@@ -182,7 +182,11 @@ class YamlObject(core.YamlBase):
                 for key in opt.keys():
                     val = opt.get(key)
                     if isinstance(val, Mapping):
+                        logger.debug(f"invoking {self.name} option {key} with kwargs parameters {val}")
                         getattr(self, key)(**dict(val))
+                    if isinstance(val, list):
+                        logger.debug(f"invoking {self.name} option {key} with list parameters {val}")
+                        getattr(self, key)(*val)
                     elif isinstance(val, str):
                         logger.debug(f"invoking {self.name} option {key} with string parameter {val}")
                         getattr(self, key)(val)
@@ -243,12 +247,12 @@ class Resource(YamlObject):
             self.yaml.metadata.labels[key]=self.config.labels[key]
 
 
-    def annotate(self, name: str, val: str) -> None:
+    def annotation(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.metadata:
             self.yaml.metadata["annotations"]={}
         self.yaml.metadata.annotations[name]=val
 
-    def add_label(self, name: str, val: str) -> None:
+    def label(self, name: str, val: str) -> None:
         if "labels" not in self.yaml.metadata:
             self.yaml.metadata["labels"]={}
         self.yaml.metadata.labels[name]=val
@@ -259,12 +263,12 @@ class Deployment(Resource):
             return self.app.name
         return f"{self.app.name}-{self.shortname}"
 
-    def add_template_annotation(self, name: str, val: str) -> None:
+    def pod_annotation(self, name: str, val: str) -> None:
         if not "annotations" in self.yaml.spec.template.metadata:
             self.yaml.spec.template.metadata["annotations"] = {}
         self.yaml.spec.template.metadata.annotations[name] = val
 
-    def add_template_label(self, name: str, val: str) -> None:
+    def pod_label(self, name: str, val: str) -> None:
         if not "labels" in self.yaml.spec.template.metadata:
             self.yaml.spec.template.metadata["labels"] = {}
         self.yaml.spec.template.metadata.labels[name] = val
@@ -324,7 +328,7 @@ class ConfigMap(Resource):
 
 class Ingress(Resource):
     def nginx_annon(self, name: str, val: str) -> None:
-        self.annotate("nginx.ingress.kubernetes.io/" + name, val)
+        self.annotation("nginx.ingress.kubernetes.io/" + name, val)
 
     def sticky(self) -> None:
         self.nginx_annon("affinity", "cookie")

@@ -18,7 +18,7 @@ def kreate_demo_app(env: str):
     app.ingress.root.sticky()
     app.ingress.root.whitelist("10.20.30.40")
     app.ingress.root.basic_auth()
-    app.ingress.root.add_label("dummy", "jan")
+    app.ingress.root.label("dummy", "jan")
     kreate.Ingress(app, "api")
 
     kreate.Egress(app, "db")
@@ -26,7 +26,7 @@ def kreate_demo_app(env: str):
     kreate.Egress(app, "xyz")
 
     depl=kreate.Deployment(app)
-    app.depl.main.add_template_label("egress-to-db", "enabled")
+    depl.pod_label("egress-to-db", "enabled")
     kreate.HttpProbesPatch(app.depl.main)
     kreate.AntiAffinityPatch(depl)
     kreate.Service(app)
@@ -36,7 +36,7 @@ def kreate_demo_app(env: str):
 
     pdb = kreate.PodDisruptionBudget(app, name="demo-pdb")
     pdb.yaml.spec.minAvailable = 2
-    pdb.add_label("testje","test")
+    pdb.label("testje","test")
 
     app.kreate_resource("ServiceAccount")
     app.kreate_resource("ServiceMonitor")

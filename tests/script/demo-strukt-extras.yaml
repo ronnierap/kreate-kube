@@ -4,6 +4,8 @@
 # some extra
 Deployment:
   main:
+    options:
+      - pod_label: ["egress-to-db", "enabled"]
 #    name: demo
     patches:
 #      HttpProbesPatch:
