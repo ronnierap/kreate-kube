@@ -4,15 +4,13 @@ kind: Kustomization
 namespace: {{ app.namespace }}
 
 resources:
-{% for res in app.resources %}
-- {{ res.filename }}
+{% for res in my.get_resources() %}
+- {{ res.calc_filename() }}
 {% endfor %}
 
 patches:
-{% for res in app.resources %}
-{% for pat in res.patches %}
-- {{ pat.filename }}
-{% endfor %}
+{% for pat in my.get_patches() %}
+- {{ pat.calc_filename() }}
 {% endfor %}
 
 configMapGenerator:

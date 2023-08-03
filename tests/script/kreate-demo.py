@@ -14,7 +14,7 @@ def kreate_demo_app(env: str):
 
     app = kreate.App('demo', env, kustomize=True, config=cfg)
 
-    kreate.Ingress(app)
+    kreate.Ingress(app, "root")
     app.ingress.root.sticky()
     app.ingress.root.whitelist("ggg")
     app.ingress.root.basic_auth()
@@ -27,7 +27,7 @@ def kreate_demo_app(env: str):
 
     depl=kreate.Deployment(app)
     depl.add_template_label("egress-to-db", "enabled")
-    kreate.HttpProbesPatch(depl, container_name="app")
+    kreate.HttpProbesPatch(depl)
     kreate.AntiAffinityPatch(depl)
     kreate.Service(app)
     app.service.main.headless()

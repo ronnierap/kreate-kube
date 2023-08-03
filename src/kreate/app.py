@@ -34,16 +34,21 @@ class App():
         self.kust_resources = []
         self._kinds = {}
         self.aliases = {}
-        self.add_alias( "Service", "svc")
-        self.add_alias( "Deployment", "depl")
-        self.add_alias( "PodDisruptionBudget", "pdb")
-        self.add_alias( "ConfigMap", "cm")
+
+    def add_std_aliases(self):
+        self.add_alias("Service", "svc")
+        self.add_alias("Deployment", "depl")
+        self.add_alias("PodDisruptionBudget", "pdb")
+        self.add_alias("ConfigMap", "cm")
+        self.add_alias("HorizontalPodAutoscaler", "hpa")
+
 
     def add_alias(self, kind: str, *aliases: str ):
         if kind in self.aliases:
             self.aliases[kind].append(aliases)
         else:
             self.aliases[kind] = list(aliases)
+
     def get_aliases(self, kind: str):
         result = [kind, kind.lower()]
         if kind in self.aliases:
@@ -79,10 +84,10 @@ class App():
         os.makedirs(self.target_dir, exist_ok=True)
 
         for rsrc in self.resources:
-            rsrc.kreate()
+            rsrc.kreate_file()
         if self.kustomize:
             kust = Kustomization(self)
-            kust.kreate()
+            kust.kreate_file()
 
     def _shortnames(self, kind:str ) -> list:
         if kind in self.config:
@@ -123,7 +128,9 @@ class AppYaml(core.YamlBase):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
+        # TODO: merge config with keyword args
         self.config = self._find_config()
+        self.skip = False
 
         template = template or f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
@@ -139,8 +146,17 @@ class AppYaml(core.YamlBase):
         logger.warn(f"could not find config for {typename}.{self.shortname} in")
         return {} # TODO: should this be wrapped?
 
-    def kreate(self) -> None:
-        self.save_yaml(f"{self.app.target_dir}/{self.filename}")
+    def kreate_file(self) -> None:
+        filename = self.calc_filename()
+        if filename:
+            dir = self.calc_dirname()
+            self.save_yaml(f"{dir}/{filename}")
+
+    def calc_dirname(self):
+        return self.app.target_dir
+
+    def calc_filename(self):
+        return f"{self.kind.lower()}-{self.shortname}.yaml"
 
 
 class Resource(AppYaml):
@@ -152,29 +168,37 @@ class Resource(AppYaml):
                  template: str = None,
                  config = None):
         AppYaml.__init__(self, app, kind=kind, shortname=shortname, template=template)
-        typename = self.kind.lower()
-        if shortname is None:
-            self.name = name or self.config.get("name", f"{app.name}-{typename}")
-        else:
-            self.name = name or self.config.get("name", f"{app.name}-{typename}-{shortname}")
-
-        self.filename = f"{typename}-{self.name}.yaml"
-        # TODO: is there any reason to customize the filename?
-        #self.filename = self.config.get("filename", f"{typename}-{self.name}.yaml")
+        self.name = self.config.get("name", None) or self.calc_name().lower()
         self.patches = []
-        self.skip = skip
-
-        if self.config.get("ignore", False):
-            # config indicates to be ignored
+        self.skip = self.config.get("ignore", skip)
+        if self.skip:
             # - do not load the template (config might be missing)
-            # - do not register
-            logger.info(f"ignoring {typename}.{self.name}")
+            # - do not register???
+            logger.info(f"ignoring {self.name}")
             self.skip = True
         else:
             self.load_yaml()
         self.app.add(self)
         self.add_metadata()
-        kreate_patches(self)
+        self.add_patches()
+
+    def add_patches(self) -> None:
+        for patch in self.config.get("patches", {}):
+            conf = self.config.patches[patch];
+            if patch == "HttpProbesPatch":
+                HttpProbesPatch(self, container_name=conf.get("container","app")) # TODO: do not mirror default value
+            elif patch == "AntiAffinityPatch":
+                AntiAffinityPatch(self, selector_key=conf.get("selector_key","app")) # TODO: do not mirror default value
+
+    def calc_name(self):
+        if self.shortname == "main":
+            return f"{self.app.name}-{self.kind}"
+        return f"{self.app.name}-{self.kind}-{self.shortname}"
+
+    def calc_filename(self):
+        # prefix the file, because the name of a resource is not guaranteed
+        # to be unique
+        return f"{self.kind}-{self.name}.yaml".lower()
 
     def add_metadata(self):
         for key in self.config.get("annotations", {}):
@@ -194,11 +218,6 @@ class Resource(AppYaml):
             "val": self.app.values
         }
 
-    def kreate(self) -> None:
-        self.save_yaml(f"{self.app.target_dir}/{self.filename}")
-        for p in self.patches:
-            p.kreate()
-
     def annotate(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.metadata:
             self.yaml.metadata["annotations"]={}
@@ -210,9 +229,10 @@ class Resource(AppYaml):
         self.yaml.metadata.labels[name]=val
 
 class Deployment(Resource):
-    def __init__(self, app: App, shortname: str = None):
-        name = None if shortname else app.name
-        Resource.__init__(self, app, shortname, name=name)
+    def calc_name(self):
+        if self.shortname is None or self.shortname == "main":
+            return self.app.name
+        return f"{self.app.name}-{self.shortname}"
 
     def add_template_annotation(self, name: str, val: str) -> None:
         if not "annotations" in self.yaml.spec.template.metadata:
@@ -233,21 +253,25 @@ class Service(Resource):
         self.yaml.spec.clusterIP="None"
 
 class Egress(Resource):
-    # TODO: do we want a special class just for the egress-to-.... name?
-    def __init__(self, app: App, shortname: str):
-        Resource.__init__(self, app, shortname=shortname, name=f"{app.name}-egress-to-{shortname}")
+    def calc_fullname(self):
+        return f"{self.app.name}-egress-to-{self.shortname}"
 
 
 class Kustomization(Resource):
-    def __init__(self, app: App):
-        Resource.__init__(self, app, skip=True)
-        self.filename="kustomization.yaml"
+    def get_resources(self):
+        return [res for res in self.app.resources if isinstance(res, Resource) and res.calc_filename()  ]
+
+    def get_patches(self):
+        return [res for res in self.app.resources if isinstance(res, Patch)]
+
+    def calc_filename(self):
+        return "kustomization.yaml"
 
 class ConfigMap(Resource):
     def __init__(
             self,
             app: App,
-            shortname: str = None,
+            shortname: str,
             name: str = None,
             kustomize: bool = True
         ):
@@ -255,13 +279,18 @@ class ConfigMap(Resource):
         # is initialized
         config = app.config["ConfigMap"][shortname or "main"]
         self.kustomize = config.get("kustomize", kustomize)
-        Resource.__init__(self, app, shortname=shortname, name=name, skip=self.kustomize)
+        Resource.__init__(self, app, shortname=shortname, name=name)
         if self.kustomize:
             app.kustomize = True
             app.kust_resources.append(self)
             self.fieldname = "literals" # This does not seem to work as expected
         self.fieldname = "data"
         self.app.config[self.kind][self.shortname]
+
+    def calc_filename(self):
+        if self.kustomize:
+            return None # file is created by kustomize
+        super().calc_filename()
 
     def add_var(self, name, value=None):
         if value is None:
@@ -271,9 +300,6 @@ class ConfigMap(Resource):
 
 
 class Ingress(Resource):
-    def __init__(self, app: App, shortname: str ="root"):
-        Resource.__init__(self, app, shortname=shortname)
-
     def nginx_annon(self, name: str, val: str) -> None:
         self.annotate("nginx.ingress.kubernetes.io/" + name, val)
 
@@ -304,9 +330,8 @@ class Ingress(Resource):
 class Patch(AppYaml):
     def __init__(self, target: Resource, template, shortname: str = None):
         self.target = target
-        self.target.patches.append(self)
-        self.filename = template
         AppYaml.__init__(self, target.app, template=template, shortname=shortname)
+        self.target.app.add(self)
 
     #def kreate(self) -> None:
     #    self.save_yaml(f"{self.target.app.target_dir}/{self.filename}")
@@ -322,8 +347,9 @@ class Patch(AppYaml):
 
 
 class HttpProbesPatch(Patch):
-    def __init__(self, target: Resource, container_name : str = None):
-        Patch.__init__(self, target, "patch-http-probes.yaml")
+    def __init__(self, target: Resource, shortname : str = None):
+        #contname = target.yaml.spec.template.spec.containers[0].name
+        Patch.__init__(self, target, "patch-http-probes.yaml", shortname=shortname)
         #config = target.app.config.containers[container_name]
         #if config is None:
         #    (f"Unknown contrainer {container_name} to patch")
@@ -335,11 +361,3 @@ class AntiAffinityPatch(Patch):
         self.config = { "selector_key": selector_key }
         Patch.__init__(self, target, "patch-anti-affinity.yaml")
         self.load_yaml()
-
-def kreate_patches(target : Resource) -> None:
-    for patch in target.config.get("patches", {}):
-        conf = target.config.patches[patch];
-        if patch == "HttpProbesPatch":
-            HttpProbesPatch(target, container_name=conf.get("container","app")) # TODO: do not mirror default value
-        elif patch == "AntiAffinityPatch":
-            AntiAffinityPatch(target, selector_key=conf.get("selector_key","app")) # TODO: do not mirror default value
