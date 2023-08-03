@@ -4,6 +4,10 @@ Deployment:
     project: kreate-demo
     replicas: {{ val.replicas | default(1) }}
     image_repo: {{ val.image_repo }}
+    vars:
+    - demo-vars
+    secret-vars:
+    - demo-secrets
 
 HttpProbesPatch:
   main:
