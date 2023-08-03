@@ -14,7 +14,7 @@ patches:
 {% endfor %}
 
 configMapGenerator:
-{% for cm in app.kust_resources %}
+{% for cm in my.config_maps %}
 - name: {{ cm.name }}
   options:
     labels:

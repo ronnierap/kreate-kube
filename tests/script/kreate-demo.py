@@ -12,7 +12,7 @@ def kreate_demo_app(env: str):
         "src/kreate/templates/default-values.yaml",
         )
 
-    app = kreate.App('demo', env, kustomize=True, config=cfg)
+    app = kreate.App('demo', env, config=cfg) # TODO: kustomize=True,
     app.add_std_aliases() # TODO: should this always be done?
 
 
@@ -44,7 +44,7 @@ def kreate_demo_app(env: str):
     app.kreate("ServiceMonitor")
     app.kreate("HorizontalPodAutoscaler")
 
-    cm = kreate.ConfigMap(app, "vars", kustomize=True)
+    cm = kreate.ConfigMap(app, "vars") # TODO, kustomize=True)
     cm.add_var("ENV", app.values["env"])
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")

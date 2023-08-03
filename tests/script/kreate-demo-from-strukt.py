@@ -13,9 +13,9 @@ def kreate_demo_app(env: str):
         "src/kreate/templates/default-values.yaml",
         )
 
-    app = kreate.App('demo', env, kustomize=True, config=cfg)
+    app = kreate.App('demo', env, config=cfg)
     app.add_std_aliases() # TODO: should this always be done?
-    app.kreate_strukture()
+    app.kreate_from_config()
 
     # TODO: the tweaks below should be possible to read from config
 
