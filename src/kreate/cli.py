@@ -2,6 +2,8 @@ import argparse
 import os
 import logging
 
+import collections.abc
+
 logger = logging.getLogger(__name__)
 
 def do_files(kreate_app, env):
@@ -43,6 +45,19 @@ def do_testupdate(kreate_app, env):
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
+def do_config(kreate_app, env):
+    app = kreate_app(env)
+    pp(app.config, "")
+
+def pp(map, indent):
+    for key in map.keys():
+        val = map.get(key, None)
+        if isinstance(val, collections.abc.Mapping):
+            print(f"{indent}{key}:")
+            pp(val, indent + "    ")
+        else:
+            print(f"{indent}{key}: {val}")
+
 
 def run_cli(kreate_app):
     parser = argparse.ArgumentParser()
@@ -59,12 +74,15 @@ def run_cli(kreate_app):
     diff_cmd = subparsers.add_parser("diff", help="diff with current existing resources", aliases=["d"])
     test_cmd = subparsers.add_parser("test", help="test output against test.out file", aliases=["t"])
     testupdate_cmd = subparsers.add_parser("testupdate", help="update test.out file", aliases=["tu"])
+    config_cmd = subparsers.add_parser("config", help="update test.out file", aliases=["c"])
+
     files_cmd.set_defaults(func=do_files)
     out_cmd.set_defaults(func=do_out)
     diff_cmd.set_defaults(func=do_diff)
     apply_cmd.set_defaults(func=do_apply)
     test_cmd.set_defaults(func=do_test)
     testupdate_cmd.set_defaults(func=do_testupdate)
+    config_cmd.set_defaults(func=do_config)
     # from https://stackoverflow.com/questions/6365601/default-sub-command-or-handling-no-sub-command-with-argparse
     parser.set_defaults(func=do_files) # TODO: better way to set default command?
 
