@@ -69,6 +69,7 @@ def run_cli(kreate_app):
     parser = argparse.ArgumentParser()
     parser.add_argument("-e","--env", action="store", default="dev")
     parser.add_argument("-v","--verbose", action="store_true")
+    parser.add_argument("-w","--warn", action="store_true")
     parser.add_argument("-q","--quiet", action="store_true")
 
 
@@ -96,6 +97,8 @@ def run_cli(kreate_app):
     env = args.env
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
+    elif args.warn:
+        logging.basicConfig(level=logging.WARN)
     elif args.quiet:
         logging.basicConfig(level=logging.ERROR)
     else:
