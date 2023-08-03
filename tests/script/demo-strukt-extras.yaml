@@ -24,11 +24,11 @@ PodDisruptionBudget:
 
 Ingress:
   root:
+    options:
+      - sticky
+      - basic_auth
+      - read_timeout: { }
     annotations:
-      nginx.ingress.kubernetes.io/affinity: cookie
-      nginx.ingress.kubernetes.io/auth-realm: demo-realm
-      nginx.ingress.kubernetes.io/auth-secret: basic-auth
-      nginx.ingress.kubernetes.io/auth-type: basic
       nginx.ingress.kubernetes.io/whitelist-source-range: ggg
     labels:
       dummy: jan

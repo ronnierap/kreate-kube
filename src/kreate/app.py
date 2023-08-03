@@ -137,6 +137,7 @@ class YamlObject(core.YamlBase):
         else:
             self.load_yaml()
         self.app.add(self)
+        self.invoke_options()
 
     def calc_name(self):
         if self.shortname == "main":
@@ -169,6 +170,16 @@ class YamlObject(core.YamlBase):
             "my" : self,
             "val": self.app.values
         }
+
+    def invoke_options(self):
+        options = self.config.get("options", [])
+        for opt in options:
+            if type(opt) == str:
+                logger.debug(f"invoking {self.name} option {opt}")
+                getattr(self, opt)()
+            else:
+                logger.warn(f"option {opt} for {self.name} not supported")
+
 
     @property
     def dirname(self):
