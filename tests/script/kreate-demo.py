@@ -16,7 +16,7 @@ def kreate_demo_app(env: str):
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()
-    app.ingress.root.whitelist("ggg")
+    app.ingress.root.whitelist("10.20.30.40")
     app.ingress.root.basic_auth()
     app.ingress.root.add_label("dummy", "jan")
     kreate.Ingress(app, "api")

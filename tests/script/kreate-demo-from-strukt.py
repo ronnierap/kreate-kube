@@ -16,13 +16,8 @@ def kreate_demo_app(env: str):
     app = kreate.App('demo', env, config=cfg)
     app.kreate_from_config()
 
-    # TODO: the tweaks below should be possible to read from config
-
     # TODO: parse labels and annontations from config spec.template
     app.depl.main.add_template_label("egress-to-db", "enabled")
-
-    # TODO: invoke special functions, or add yaml at other locations
-    app.service.main.headless()
 
     return app
 

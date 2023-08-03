@@ -22,14 +22,19 @@ PodDisruptionBudget:
       name: demo-pdb # TODO: have appname in vals or somehow
     minAvailable: 2
 
+Service:
+  main:
+    options:
+    - headless
+
+
 Ingress:
   root:
     options:
       - sticky
       - basic_auth
-      - read_timeout: { }
-    annotations:
-      nginx.ingress.kubernetes.io/whitelist-source-range: ggg
+      - read_timeout: 100
+      - whitelist: ggg
     labels:
       dummy: jan
 

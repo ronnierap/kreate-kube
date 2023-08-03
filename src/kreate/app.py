@@ -2,6 +2,7 @@ import os
 import sys
 import shutil
 import logging
+from collections.abc import Mapping
 
 from . import core
 
@@ -177,6 +178,20 @@ class YamlObject(core.YamlBase):
             if type(opt) == str:
                 logger.debug(f"invoking {self.name} option {opt}")
                 getattr(self, opt)()
+            elif isinstance(opt, Mapping):
+                for key in opt.keys():
+                    val = opt.get(key)
+                    if isinstance(val, Mapping):
+                        getattr(self, key)(**dict(val))
+                    elif isinstance(val, str):
+                        logger.debug(f"invoking {self.name} option {key} with string parameter {val}")
+                        getattr(self, key)(val)
+                    elif isinstance(val, int):
+                        logger.debug(f"invoking {self.name} option {key} with int parameter {val}")
+                        getattr(self, key)(int(val))
+                    else:
+                        logger.warn(f"option map {opt} for {self.name} not supported")
+
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")
 
