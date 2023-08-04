@@ -19,7 +19,7 @@ class App():
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.vars = dict()
         self.config = config.config()
-        self.values = config.values()
+        self.values = config.values
         self.env = env
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace

@@ -7,6 +7,6 @@ config_files:
   - config-demo-dev.yaml
   - demo-strukt-extras.yaml
   - demo-strukt.yaml
-  - ../../src/kreate/templates/default-values.yaml
+  #- ../../src/kreate/templates/default-values.yaml
   # TODO: use other mechanism to load from package, e.g.
   # - @kreate.templates:default-values.yaml

@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 import logging
 
 from ruamel.yaml import YAML
-from . import templates
+from . import templates, jinyaml
 
 logger = logging.getLogger(__name__)
 
@@ -206,16 +206,23 @@ def load_jinyaml(filename: str, vars: Mapping):
 class AppConfig():
     def __init__(self, env, filename="appdef.yaml", *args):
         dir = os.path.dirname(filename)
-        self._values = Values()
+        self.values = {}
         self._maps = []
         if filename:
             vars = { "env": env }
             self.appdef = load_jinyaml(filename, vars)
-            self._values.add_map(self.appdef)
+            self.values.update(self.appdef)
+
             for file in self.appdef.get("value_files",[]):
-                self._values.add_yaml(f"{dir}/{file}")
+                yaml = jinyaml.load_yaml(f"{dir}/{file}")
+                self.values.update(yaml)
+            # TODO: load from package mechanism
+
             for file in self.appdef.get("config_files"):
+                #self.add_file(jinyaml.load_jinyaml(f"{dir}/{file}",vars))
                 self.add_file(f"{dir}/{file}")
+            yaml = jinyaml.load_jinyaml(f"default-values.yaml", vars, package=templates )
+            self._maps.append(yaml)
 
 
     def add_file(self, filename):
@@ -228,7 +235,7 @@ class AppConfig():
                     trim_blocks=True,
                     lstrip_blocks=True
                 )
-                vars = { "val": self.values() }
+                vars = { "val": self.values }
                 m = parser.load(tmpl.render(vars))
                 self._maps.append(m)
         else:
@@ -238,9 +245,6 @@ class AppConfig():
         maps = []
         for fname in filenames:
             self.add_file(fname)
-
-    def values(self):
-        return self._values._map
 
     def config(self):
         return DeepChain(*self._maps)
