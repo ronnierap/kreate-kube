@@ -5,7 +5,7 @@ metadata:
   name: {{ my.name }}
 spec:
   # This can be set from python code
-  minAvailable: {{ cfg.get("minAvailable", 1) }} # TODO: use `cfg.attr or 1`  instead of get
+  minAvailable: {{ cfg.minAvailable | default(1) }} # TODO: use defaults from config
   selector:
     matchLabels:
       app: {{ app.name }}

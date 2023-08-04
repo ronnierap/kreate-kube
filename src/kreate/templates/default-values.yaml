@@ -30,6 +30,12 @@ HttpProbesPatch:
         path: actuator/info
         port: 8080
 
+# TODO: toplevel resources should not be used
+default:
+  PodDisruptionBudget:
+    #  no main:
+    minAvailable: 1
+
 AntiAffinityPatch:
   main:
     selector_key: app
