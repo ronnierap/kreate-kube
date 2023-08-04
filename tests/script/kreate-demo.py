@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
 import kreate
-import appdef
 
 def kreate_config(env: str) -> kreate.AppConfig:
-    cfg = kreate.AppConfig()
-    cfg._values.add_obj(appdef)
-    cfg._values.add_yaml(f"tests/script/values-{env}.yaml")
-    cfg.add_files(
-        f"tests/script/config-demo-{env}.yaml",
-        "tests/script/demo-strukt.yaml",
-        "src/kreate/templates/default-values.yaml",
-        )
-    return cfg
+    return kreate.AppConfig(env, "tests/script/appdef.yaml")
 
 
 def kreate_app(env: str) -> kreate.App:

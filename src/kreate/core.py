@@ -1,4 +1,5 @@
 import os
+import sys
 import jinja2
 import pkgutil
 from collections import UserDict, UserList
@@ -188,11 +189,34 @@ class Values():
     def add_jinyaml(self, filename: str, package=None):
         self._map.update(load_yaml(filename, package))
 
+def load_jinyaml(filename: str, vars: Mapping):
+    #if not os.path.exists(filename):
+    #    raise FileNotFoundError(filename)
+    logger.info(f"loading config {filename}")
+    with open(filename) as f:
+        tmpl = jinja2.Template(
+            f.read(),
+            undefined=jinja2.StrictUndefined,
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
+        return parser.load(tmpl.render(vars))
+
 
 class AppConfig():
-    def __init__(self, *args):
+    def __init__(self, env, filename="appdef.yaml", *args):
+        dir = os.path.dirname(filename)
         self._values = Values()
         self._maps = []
+        if filename:
+            vars = { "env": env }
+            self.appdef = load_jinyaml(filename, vars)
+            self._values.add_map(self.appdef)
+            for file in self.appdef.get("value_files",[]):
+                self._values.add_yaml(f"{dir}/{file}")
+            for file in self.appdef.get("config_files"):
+                self.add_file(f"{dir}/{file}")
+
 
     def add_file(self, filename):
         if os.path.exists(filename):
