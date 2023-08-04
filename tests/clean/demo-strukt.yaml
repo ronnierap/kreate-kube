@@ -53,15 +53,6 @@ Ingress:
     port: {{ val.service_port }}
     path: /api
 
-# TODO: these are still needed to override default mechanism
-containers:
-  main:
-    resources:
-      limits:
-        cpu: {{ val.cpu_limit | default(2) }}
-      requests:
-        cpu: {{ val.cpu_request | default("400m") }}
-
 Egress:
   redis:
     to:
