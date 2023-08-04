@@ -2,7 +2,7 @@
 import kreate
 import appdef
 
-def kreate_demo_app(env: str):
+def kreate_config(env: str) -> kreate.core.Config:
     cfg = kreate.core.Config()
     cfg._values.add_obj(appdef)
     cfg._values.add_yaml(f"tests/script/values-{env}.yaml")
@@ -12,9 +12,12 @@ def kreate_demo_app(env: str):
         "tests/script/demo-strukt.yaml",
         "src/kreate/templates/default-values.yaml",
         )
+    return cfg
 
-    app = kreate.App('demo', env, config=cfg)
+
+def kreate_app(env: str) -> kreate.App:
+    app = kreate.App('demo', env, config=kreate_config(env))
     app.kreate_from_config()
     return app
 
-kreate.run_cli(kreate_demo_app)
+kreate.run_cli(kreate_app)
