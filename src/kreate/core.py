@@ -1,12 +1,8 @@
 import os
-import sys
-import jinja2
-import pkgutil
 from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 import logging
 
-from ruamel.yaml import YAML
 from . import templates, jinyaml
 
 logger = logging.getLogger(__name__)
@@ -124,84 +120,22 @@ class DeepChain(Mapping):
                 print(f"{indent}{key}: {val}")
 
 
-parser = YAML()
-
-def load_yaml(filename: str, package=None, warn: bool = True) -> Mapping:
-    if package:
-        data = pkgutil.get_data(package, filename).decode('utf-8')
-        return parser.load(data)
-    if os.path.exists(filename):
-        with open(filename) as f:
-            return parser.load(f)
-    else:
-        if warn:
-            logger.warn(f"skipping yaml file {filename}")
-            return {}
-        else:
-            raise(ValueError(f"could not find yaml file {filename}"))
-
 class YamlBase:
     def __init__(self, template: str):
         self.template = template
 
     def load_yaml(self):
-        parsed = parser.load(self._render())
-        self.yaml = wrap(parsed)
+        #parsed = parser.load(self._render())
+        vars = self._template_vars()
+        self.yaml = wrap(jinyaml.load_jinyaml(self.template, vars, templates))
 
     def save_yaml(self, outfile) -> None:
         logger.info(f"kreating {outfile}")
         with open(outfile, 'wb') as f:
-            parser.dump(self.yaml.data, f)
+            jinyaml.dump(self.yaml.data, f)
 
     def _template_vars(self):
         return {}
-
-    def _render(self, outfile=None):
-        # TODO: make template package flexible (or directory)
-        template_data = pkgutil.get_data(
-            templates.__package__,
-            self.template
-        ).decode('utf-8')
-        tmpl = jinja2.Template(
-            template_data,
-            undefined=jinja2.StrictUndefined,
-            trim_blocks=True,
-            lstrip_blocks=True
-        )
-        vars = self._template_vars()
-        return tmpl.render(vars)
-
-
-class Values():
-    def __init__(self):
-        self._map = {}
-
-    def add_map(self, map: Mapping):
-        self._map.update(map)
-
-    def add_yaml(self, filename: str, package=None):
-        self._map.update(load_yaml(filename, package))
-
-    def add_obj(self, obj):
-        d = { key: obj.__dict__[key] for key in obj.__dict__.keys() if not key.startswith("_")}
-        self._map.update(d)
-
-    def add_jinyaml(self, filename: str, package=None):
-        self._map.update(load_yaml(filename, package))
-
-def load_jinyaml(filename: str, vars: Mapping):
-    #if not os.path.exists(filename):
-    #    raise FileNotFoundError(filename)
-    logger.info(f"loading config {filename}")
-    with open(filename) as f:
-        tmpl = jinja2.Template(
-            f.read(),
-            undefined=jinja2.StrictUndefined,
-            trim_blocks=True,
-            lstrip_blocks=True
-        )
-        return parser.load(tmpl.render(vars))
-
 
 class AppConfig():
     def __init__(self, env, filename="appdef.yaml", *args):
@@ -210,7 +144,7 @@ class AppConfig():
         self._maps = []
         if filename:
             vars = { "env": env }
-            self.appdef = load_jinyaml(filename, vars)
+            self.appdef = jinyaml.load_jinyaml(filename, vars)
             self.values.update(self.appdef)
 
             for file in self.appdef.get("value_files",[]):
@@ -224,22 +158,10 @@ class AppConfig():
             yaml = jinyaml.load_jinyaml(f"default-values.yaml", vars, package=templates )
             self._maps.append(yaml)
 
-
     def add_file(self, filename):
-        if os.path.exists(filename):
-            logger.info(f"loading config {filename}")
-            with open(filename) as f:
-                tmpl = jinja2.Template(
-                    f.read(),
-                    undefined=jinja2.StrictUndefined,
-                    trim_blocks=True,
-                    lstrip_blocks=True
-                )
-                vars = { "val": self.values }
-                m = parser.load(tmpl.render(vars))
-                self._maps.append(m)
-        else:
-            logger.warn(f"skipping jinyaml file {filename}")
+        vars = { "val": self.values }
+        yaml = jinyaml.load_jinyaml(filename, vars)
+        self._maps.append(yaml)
 
     def add_files(self, *filenames):
         maps = []
