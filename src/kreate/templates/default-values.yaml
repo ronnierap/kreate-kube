@@ -3,34 +3,30 @@
 default:
   HttpProbesPatch:
     name: app
-    startupProbe:
-      initialDelaySeconds: 10
-      periodSeconds: 2
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 30
-      httpGet:
-        scheme: HTTP
-        path: actuator/info
-        port: 8080
-    readinessProbe:
-      periodSeconds: 2
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 1
-      httpGet:
-        scheme: HTTP
-        path: actuator/info
-        port: 8080
-    livenessProbe:
-      periodSeconds: 2
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 3
-      httpGet:
-        scheme: HTTP
-        path: actuator/info
-        port: 8080
+    startup_initialDelaySeconds: 10
+    startup_periodSeconds: 2
+    startup_timeoutSeconds: 1
+    startup_successThreshold: 1
+    startup_failureThreshold: 30
+    startup_scheme: HTTP
+    startup_path: actuator/info
+    startup_port: 8080
+
+    readiness_periodSeconds: 2
+    readiness_timeoutSeconds: 1
+    readiness_successThreshold: 1
+    readiness_failureThreshold: 1
+    readiness_scheme: HTTP
+    readiness_path: actuator/info
+    readiness_port: 8080
+
+    liveness_periodSeconds: 2
+    liveness_timeoutSeconds: 1
+    liveness_successThreshold: 1
+    liveness_failureThreshold: 3
+    liveness_scheme: HTTP
+    liveness_path: actuator/info
+    liveness_port: 8080
 
   PodDisruptionBudget:
     minAvailable: 1
@@ -41,13 +37,15 @@ default:
   Deployment:
     name: app
     imagePullPolicy: Always
-    port:
-      containerPort: 8080
-      protocol: TCP
-    resources:
-      limits:
-        cpu: 1
-        memory: 512M
-      requests:
-        cpu: 200m
-        memory: 512M
+    containerPort: 8080
+    protocol: TCP
+    cpu_limit: 1
+    memory_limit: 512M
+    cpu_request: 200m
+    memory_request: 512M
+
+  HorizontalPodAutoscaler:
+    minReplicas: 1
+    maxReplicas: 3
+    cpu_averageUtilization: 70
+    memory_averageUtilization: 70

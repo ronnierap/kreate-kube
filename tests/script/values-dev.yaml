@@ -15,8 +15,8 @@ db_egress_cidr: 1.2.3.4/32
 redis_egress_cidr: dummy
 xyz_egress_cidr: dummy
 
-cpu_limit: "500m"
-cpu_request: "100m"
+cpu_limit: "500m" # TODO: use this instead of default?
+cpu_request: "100m" # TODO: use this instead of default?
 
 serviceaccount_role: some-role-dev
 

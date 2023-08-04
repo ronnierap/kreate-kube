@@ -1,10 +1,9 @@
 default:
   Deployment:
-    resources:
-      limits:
-        cpu: 500m
-      requests:
-        cpu: 100m
+      cpu_limit: 500m # TODO: use the value from value instead of overriding default here
+      cpu_request: 100m
+  HttpProbesPatch:
+    startup_failureThreshold: 120
 
 Deployment:
   main:

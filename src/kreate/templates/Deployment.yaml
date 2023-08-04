@@ -38,12 +38,12 @@ spec:
             name: {{ cm }}
         {% endfor %}
         ports:
-        - containerPort: {{ default.port.containerPort }}
-          protocol: {{ default.port.protocol }}
+        - containerPort: {{ default.containerPort }}
+          protocol: {{ default.protocol }}
         resources:
           limits:
-            cpu: {{ default.resources.limits.cpu }}
-            memory: {{ default.resources.limits.memory }}
+            cpu: {{ default.cpu_limit }}
+            memory: {{ default.memory_limit }}
           requests:
-            cpu: {{ default.resources.requests.cpu }}
-            memory: {{ default.resources.requests.memory }}
+            cpu: {{ default.cpu_request }}
+            memory: {{ default.memory_request }}
