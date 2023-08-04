@@ -97,6 +97,32 @@ class DeepChain(Mapping):
         return f"DeepChain({self._maps})"
 
 
+    def pprint(self, map=None, indent="", field=None):
+        indent_step = "  "
+        if map is None:
+            map = self
+        if field:
+            print(f"{field}:")
+            indent = indent + indent_step
+            map = map.get(field,{})
+        for key in sorted(map.keys()):
+            val = map.get(key, None)
+            if isinstance(val, Mapping):
+                if len(val) == 0:
+                    print(f"{indent}{key}: "+"{}")
+                else:
+                    print(f"{indent}{key}:")
+                    self.pprint(map=val, indent=indent + indent_step)
+            elif isinstance(val, str):
+                print(f"{indent}{key}: {val}")
+            elif isinstance(val, Sequence):
+                print(f"{indent}{key}:")
+                for v in val:
+                    print(f"{indent}- {v}")
+            else:
+                print(f"{indent}{key}: {val}")
+
+
 parser = YAML()
 
 def load_yaml(filename: str, package=None, warn: bool = True) -> Mapping:

@@ -49,22 +49,7 @@ def do_config(kreate_app, env):
     module = inspect.getmodule(kreate_app)
     func = getattr(module, "kreate_config")
     cfg = func(env)
-    pp(cfg.config(), "")
-
-def pp(map, indent):
-    for key in map.keys():
-        val = map.get(key, None)
-        if isinstance(val, collections.abc.Mapping):
-            print(f"{indent}{key}:")
-            pp(val, indent + "    ")
-        elif isinstance(val, str):
-            print(f"{indent}{key}: {val}")
-        elif isinstance(val, collections.abc.Sequence):
-            print(f"{indent}{key}:")
-            for v in val:
-                print(f"{indent}- {v}")
-        else:
-            print(f"{indent}{key}: {val}")
+    cfg.config().pprint() # TODO: support field="Deployment"
 
 
 def run_cli(kreate_app):
