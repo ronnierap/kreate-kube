@@ -2,8 +2,8 @@
 import kreate
 import appdef
 
-def kreate_config(env: str) -> kreate.core.Config:
-    cfg = kreate.core.Config()
+def kreate_config(env: str) -> kreate.AppConfig:
+    cfg = kreate.AppConfig()
     cfg._values.add_obj(appdef)
     cfg._values.add_yaml(f"tests/script/values-{env}.yaml")
     cfg.add_files(

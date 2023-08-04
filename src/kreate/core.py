@@ -189,7 +189,7 @@ class Values():
         self._map.update(load_yaml(filename, package))
 
 
-class Config():
+class AppConfig():
     def __init__(self, *args):
         self._values = Values()
         self._maps = []

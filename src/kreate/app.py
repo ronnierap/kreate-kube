@@ -13,7 +13,7 @@ class App():
             self,
             name: str,
             env: str,
-            config: core.Config = None,
+            config: core.AppConfig,
         ):
         self.name = name
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
