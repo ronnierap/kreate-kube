@@ -139,20 +139,21 @@ class YamlBase:
 class AppDef():
     def __init__(self, env, filename="appdef.yaml", *args):
         self.dir = os.path.dirname(filename)
+        self.filename = filename
+        self.env = env
+        vars = { "env": env }
+        yaml = jinyaml.load_jinyaml(filename, vars)
+
         self.values = {}
+        self.values.update(yaml)
+        for file in yaml.get("value_files",[]):
+            val_yaml = jinyaml.load_yaml(f"{self.dir}/{file}")
+            self.values.update(val_yaml)
+
         self.maps = []
-        if filename:
-            vars = { "env": env }
-            self.appdef = jinyaml.load_jinyaml(filename, vars)
-            self.values.update(self.appdef)
-
-            for file in self.appdef.get("value_files",[]):
-                yaml = jinyaml.load_yaml(f"{self.dir}/{file}")
-                self.values.update(yaml)
-
-            for file in self.appdef.get("config_files"):
-                self.add_config_file(f"{self.dir}/{file}")
-            self.add_config_file(f"default-values.yaml", package=templates )
+        for file in yaml.get("config_files"):
+            self.add_config_file(f"{self.dir}/{file}")
+        self.add_config_file(f"default-values.yaml", package=templates )
 
     def add_config_file(self, filename, package=None):
         vars = { "val": self.values }
