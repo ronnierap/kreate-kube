@@ -19,7 +19,6 @@ class DictWrapper(UserDict):
 
     def __getattr__(self, attr):
         if attr not in self.data:
-            # TODO: more informative error message
             raise AttributeError(f"could not find attribute {attr} in {self}")
         else:
             return wrap(self.data[attr])
@@ -66,8 +65,7 @@ class DeepChain(Mapping):
 
     def __getattr__(self, attr):
         if attr not in self:
-            # TODO: more informative error message
-            raise AttributeError(f"DeepChain object does not have attribute {attr}")
+            raise AttributeError(f"DeepChain object could not find attribute {attr} in {self}")
         else:
             return self[attr]
 

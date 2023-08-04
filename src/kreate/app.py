@@ -126,7 +126,6 @@ class YamlObject(core.YamlBase):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
-        # TODO: merge config with keyword args
         self.config = self._find_config(kwargs)
         template = template or f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
@@ -156,7 +155,7 @@ class YamlObject(core.YamlBase):
             else:
                 return extra or config
         logger.info(f"could not find config for {typename}.{self.shortname} in")
-        return extra # TODO: should this be wrapped?
+        return extra
 
     def kreate_file(self) -> None:
         filename = self.filename
