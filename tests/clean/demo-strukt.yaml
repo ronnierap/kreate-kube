@@ -9,13 +9,10 @@ Deployment:
     secret-vars:
     - demo-secrets
     options:
-      - pod_label: ["egress-to-db", "enabled"]
+      - pod_label: ["egress-to-db", "enabled"]  # TODO: make this a map
     patches:
       AntiAffinityPatch: {}
-      HttpProbesPatch:
-        main:
-          startupProbe:
-            failureThreshold: 120
+      HttpProbesPatch: {}
 
 ConfigMap:
   vars:
@@ -49,6 +46,7 @@ Ingress:
     port: {{ val.service_port }}
     path: /api
 
+# TODO: these are still needed to override default mechanism
 containers:
   main:
     resources:
@@ -57,25 +55,6 @@ containers:
       requests:
         cpu: {{ val.cpu_request | default("400m") }}
 
-
-ServiceAccount:
-  main:
-    role: {{ val.serviceaccount_role }}
-
-ServiceMonitor:
-  main:
-    endpoints:
-      - interval: 20s
-        path: /actuator/prometheus
-
-# TODO: The following gives a yaml error
-#Egress:
-#  redis:
-#    name: demo-egress-to-redis
-#  db:
-#    name: demo-egress-to-db
-#  xyz:
-#    name: demo-egress-to-xyz
 Egress:
   redis:
     to:
@@ -91,10 +70,8 @@ Egress:
     - cidr: {{ val.xyz_egress_cidr }}
       port: {{ val.xyz_egress_port | default(8443) }}
 
-
-
 Service:
-  main: # default service
+  main:
     options:
     - headless
     ports:
@@ -103,6 +80,16 @@ Service:
     ports:
       - port: 443
         name: https
+
+ServiceAccount:
+  main:
+    role: {{ val.serviceaccount_role }}
+
+ServiceMonitor:
+  main:
+    endpoints:
+      - interval: 20s
+        path: /actuator/prometheus
 
 HorizontalPodAutoscaler:
   main:
