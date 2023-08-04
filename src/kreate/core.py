@@ -125,7 +125,6 @@ class YamlBase:
         self.template = template
 
     def load_yaml(self):
-        #parsed = parser.load(self._render())
         vars = self._template_vars()
         self.yaml = wrap(jinyaml.load_jinyaml(self.template, vars, templates))
 
@@ -141,7 +140,7 @@ class AppConfig():
     def __init__(self, env, filename="appdef.yaml", *args):
         dir = os.path.dirname(filename)
         self.values = {}
-        self._maps = []
+        self.maps = []
         if filename:
             vars = { "env": env }
             self.appdef = jinyaml.load_jinyaml(filename, vars)
@@ -150,23 +149,15 @@ class AppConfig():
             for file in self.appdef.get("value_files",[]):
                 yaml = jinyaml.load_yaml(f"{dir}/{file}")
                 self.values.update(yaml)
-            # TODO: load from package mechanism
 
             for file in self.appdef.get("config_files"):
-                #self.add_file(jinyaml.load_jinyaml(f"{dir}/{file}",vars))
-                self.add_file(f"{dir}/{file}")
-            yaml = jinyaml.load_jinyaml(f"default-values.yaml", vars, package=templates )
-            self._maps.append(yaml)
+                self.add_config_file(f"{dir}/{file}")
+            self.add_config_file(f"default-values.yaml", package=templates )
 
-    def add_file(self, filename):
+    def add_config_file(self, filename, package=None):
         vars = { "val": self.values }
-        yaml = jinyaml.load_jinyaml(filename, vars)
-        self._maps.append(yaml)
-
-    def add_files(self, *filenames):
-        maps = []
-        for fname in filenames:
-            self.add_file(fname)
+        yaml = jinyaml.load_jinyaml(filename, vars, package=package)
+        self.maps.append(yaml)
 
     def config(self):
-        return DeepChain(*self._maps)
+        return DeepChain(*self.maps)
