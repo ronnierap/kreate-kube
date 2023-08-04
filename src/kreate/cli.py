@@ -6,55 +6,57 @@ import collections.abc
 
 logger = logging.getLogger(__name__)
 
-def do_files(kreate_app, env):
-    app=kreate_app(env)
+def do_files(kreate_app, args):
+    app=kreate_app(args.appdef, args.env)
     app.kreate_files()
 
-def do_out(kreate_app, env):
-    app=kreate_app(env)
+def do_out(kreate_app, args):
+    app=kreate_app(args.appdef, args.env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir}"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def do_diff(kreate_app, env):
-    app=kreate_app(env)
+def do_diff(kreate_app, args):
+    app=kreate_app(args.appdef, args.env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl diff -f - "
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def do_apply(kreate_app, env):
-    app=kreate_app(env)
+def do_apply(kreate_app, args):
+    app=kreate_app(args.appdef, args.env)
     app.kreate_files()
     cmd = f"kustomize build {app.target_dir} | kubectl apply --dry-run -f - "
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def do_test(kreate_app, env):
-    app=kreate_app(env)
+def do_test(kreate_app, args):
+    app=kreate_app(args.appdef, args.env)
     app.kreate_files()
-    cmd = f"kustomize build {app.target_dir} | diff  {app.script_dir}/test-{app.name}-{app.env}.out -"
+    print(app.script_dir)
+    cmd = f"kustomize build {app.target_dir} | diff  {app.appdef.dir}/test-{app.name}-{app.env}.out -"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def do_testupdate(kreate_app, env):
-    app=kreate_app(env)
+def do_testupdate(kreate_app, args):
+    app=kreate_app(args.appdef, args.env)
     app.kreate_files()
-    cmd = f"kustomize build {app.target_dir} > {app.script_dir}/test-{app.name}-{app.env}.out"
+    cmd = f"kustomize build {app.target_dir} > {app.appdef.dir}/test-{app.name}-{app.env}.out"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def do_config(kreate_app, env):
+def do_config(kreate_app, args):
     module = inspect.getmodule(kreate_app)
     func = getattr(module, "kreate_config")
-    cfg = func(env)
+    cfg = func(args.appdef, args.env)
     cfg.config().pprint() # TODO: support field="Deployment"
 
 
 def run_cli(kreate_app):
     parser = argparse.ArgumentParser()
     parser.add_argument("-e","--env", action="store", default="dev")
+    parser.add_argument("-a","--appdef", action="store", default="appdef.yaml")
     parser.add_argument("-v","--verbose", action="store_true")
     parser.add_argument("-w","--warn", action="store_true")
     parser.add_argument("-q","--quiet", action="store_true")
@@ -90,4 +92,4 @@ def run_cli(kreate_app):
         logging.basicConfig(level=logging.ERROR)
     else:
         logging.basicConfig(level=logging.INFO)
-    args.func(kreate_app, env)
+    args.func(kreate_app, args)

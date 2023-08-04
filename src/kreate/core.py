@@ -136,9 +136,9 @@ class YamlBase:
     def _template_vars(self):
         return {}
 
-class AppConfig():
+class AppDef():
     def __init__(self, env, filename="appdef.yaml", *args):
-        dir = os.path.dirname(filename)
+        self.dir = os.path.dirname(filename)
         self.values = {}
         self.maps = []
         if filename:
@@ -147,11 +147,11 @@ class AppConfig():
             self.values.update(self.appdef)
 
             for file in self.appdef.get("value_files",[]):
-                yaml = jinyaml.load_yaml(f"{dir}/{file}")
+                yaml = jinyaml.load_yaml(f"{self.dir}/{file}")
                 self.values.update(yaml)
 
             for file in self.appdef.get("config_files"):
-                self.add_config_file(f"{dir}/{file}")
+                self.add_config_file(f"{self.dir}/{file}")
             self.add_config_file(f"default-values.yaml", package=templates )
 
     def add_config_file(self, filename, package=None):

@@ -1,10 +1,10 @@
 import kreate
 
-def kreate_config(env: str) -> kreate.AppConfig:
-    return kreate.AppConfig(env, "tests/script/appdef-extras.yaml")
+def kreate_config(appdef:str, env: str) -> kreate.AppDef:
+    return kreate.AppDef(env, appdef )
 
-def kreate_app(env: str) -> kreate.App:
-    app_cfg = kreate_config(env)
+def kreate_app(appdef:str, env: str) -> kreate.App:
+    app_cfg = kreate_config(appdef, env)
     app = kreate.App(app_cfg, env)
     app.kreate_from_config()
     return app
