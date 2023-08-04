@@ -1,3 +1,11 @@
+default:
+  Deployment:
+    resources:
+      limits:
+        cpu: 500m
+      requests:
+        cpu: 100m
+
 Deployment:
   main:
     version: {{ val.version }}

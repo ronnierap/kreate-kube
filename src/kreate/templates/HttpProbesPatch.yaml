@@ -7,32 +7,32 @@ spec:
   template:
     spec:
       containers:
-      - name: {{ cfg.name }}
+      - name: {{ default.name }}
         startupProbe:
-          initialDelaySeconds: {{ cfg.startupProbe.initialDelaySeconds }}
-          periodSeconds: {{ cfg.startupProbe.periodSeconds }}
-          timeoutSeconds: {{ cfg.startupProbe.timeoutSeconds }}
-          successThreshold: {{ cfg.startupProbe.successThreshold }}
-          failureThreshold: {{ cfg.startupProbe.failureThreshold }}
+          initialDelaySeconds: {{ default.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ default.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ default.startupProbe.timeoutSeconds }}
+          successThreshold: {{ default.startupProbe.successThreshold }}
+          failureThreshold: {{ default.startupProbe.failureThreshold }}
           httpGet:
-            scheme: {{ cfg.startupProbe.httpGet.scheme }}
-            path: {{ cfg.startupProbe.httpGet.path }}
-            port: {{ cfg.startupProbe.httpGet.port }}
+            scheme: {{ default.startupProbe.httpGet.scheme }}
+            path: {{ default.startupProbe.httpGet.path }}
+            port: {{ default.startupProbe.httpGet.port }}
         readinessProbe:
-          periodSeconds: {{ cfg.readinessProbe.periodSeconds }}
-          timeoutSeconds: {{ cfg.readinessProbe.timeoutSeconds }}
-          failureThreshold: {{ cfg.readinessProbe.failureThreshold }}
-          successThreshold: {{ cfg.readinessProbe.successThreshold }}
+          periodSeconds: {{ default.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ default.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ default.readinessProbe.failureThreshold }}
+          successThreshold: {{ default.readinessProbe.successThreshold }}
           httpGet:
-            scheme: {{ cfg.readinessProbe.httpGet.scheme }}
-            path: {{ cfg.readinessProbe.httpGet.path }}
-            port: {{ cfg.readinessProbe.httpGet.port }}
+            scheme: {{ default.readinessProbe.httpGet.scheme }}
+            path: {{ default.readinessProbe.httpGet.path }}
+            port: {{ default.readinessProbe.httpGet.port }}
         livenessProbe:
-          periodSeconds: {{ cfg.livenessProbe.periodSeconds }}
-          timeoutSeconds: {{ cfg.livenessProbe.timeoutSeconds }}
-          failureThreshold: {{ cfg.livenessProbe.failureThreshold }}
-          successThreshold: {{ cfg.livenessProbe.successThreshold }}
+          periodSeconds: {{ default.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ default.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ default.livenessProbe.failureThreshold }}
+          successThreshold: {{ default.livenessProbe.successThreshold }}
           httpGet:
-            scheme: {{ cfg.livenessProbe.httpGet.scheme }}
-            path: {{ cfg.livenessProbe.httpGet.path }}
-            port: {{ cfg.livenessProbe.httpGet.port }}
+            scheme: {{ default.livenessProbe.httpGet.scheme }}
+            path: {{ default.livenessProbe.httpGet.path }}
+            port: {{ default.livenessProbe.httpGet.port }}

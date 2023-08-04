@@ -25,10 +25,9 @@ spec:
     spec:
       #restartPolicy: Never
       containers:
-      {% for cont in app.config.containers.values() %}
-      - name: {{ cont.name | default ("app")}}
+      - name: {{ default.name }}
         image: {{ cfg.image_repo }}/{{ app.name }}.app:{{ cfg.version }}
-        imagePullPolicy: {{ cont.imagePullPolicy }}
+        imagePullPolicy: {{ default.imagePullPolicy }}
         envFrom:
         - secretRef:
         {% for secr in cfg.get("secret-vars",[]) %}
@@ -39,13 +38,12 @@ spec:
             name: {{ cm }}
         {% endfor %}
         ports:
-        - containerPort: {{ cont.ports[0].containerPort }}
-          protocol: {{ cont.ports[0].protocol }}
+        - containerPort: {{ default.port.containerPort }}
+          protocol: {{ default.port.protocol }}
         resources:
           limits:
-            cpu: {{ cont.resources.limits.cpu }}
-            memory: {{ cont.resources.limits.memory }}
+            cpu: {{ default.resources.limits.cpu }}
+            memory: {{ default.resources.limits.memory }}
           requests:
-            cpu: {{ cont.resources.requests.cpu }}
-            memory: {{ cont.resources.requests.memory }}
-      {% endfor %}
+            cpu: {{ default.resources.requests.cpu }}
+            memory: {{ default.resources.requests.memory }}

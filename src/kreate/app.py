@@ -126,7 +126,8 @@ class YamlObject(core.YamlBase):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
-        self.config = self._find_config(kwargs)
+        self.config = self._calc_config(kwargs)
+
         template = template or f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
         self.skip = self.config.get("ignore", False)
@@ -144,18 +145,24 @@ class YamlObject(core.YamlBase):
             return f"{self.app.name}-{self.kind}"
         return f"{self.app.name}-{self.kind}-{self.shortname}"
 
+    def _calc_config(self, extra):
+        cfg = self._find_config()
+        defaults = self._find_defaults()
+        return core.DeepChain(extra, cfg, {"default": defaults})
 
-    def _find_config(self, extra):
+    def _find_defaults(self):
+        if self.kind in self.app.config.default:
+            logger.debug(f"using defaults for {self.kind}")
+            return self.app.config.default[self.kind]
+        return {}
+
+    def _find_config(self):
         typename = self.kind
         if typename in self.app.config and self.shortname in self.app.config[typename]:
             logger.debug(f"using named config {typename}.{self.shortname}")
-            config = self.app.config[typename][self.shortname]
-            if extra and config:
-                return core.DeepChain(extra, config)
-            else:
-                return extra or config
+            return  self.app.config[typename][self.shortname]
         logger.info(f"could not find config for {typename}.{self.shortname} in")
-        return extra
+        return {}
 
     def kreate_file(self) -> None:
         filename = self.filename
@@ -166,6 +173,7 @@ class YamlObject(core.YamlBase):
     def _template_vars(self):
         return {
             "cfg" : self.config,
+            "default" : self.config.default,
             "app" : self.app,
             "my" : self,
             "val": self.app.values
@@ -364,8 +372,8 @@ class Patch(YamlObject):
     def _template_vars(self):
         return { **super()._template_vars(),  "target": self.target }
 
-    def _find_config(self, extra):
-        root_config = super()._find_config(extra)
+    def _find_config(self):
+        root_config = super()._find_config()
         typename = self.kind
         target_config = self.target.config.get("patches",{})
         if typename in target_config and self.shortname in target_config[typename]:

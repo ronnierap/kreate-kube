@@ -1,5 +1,7 @@
-HttpProbesPatch:
-  main:
+# this is a default file. It does not define any toplevel Objects
+
+default:
+  HttpProbesPatch:
     name: app
     startupProbe:
       initialDelaySeconds: 10
@@ -30,22 +32,17 @@ HttpProbesPatch:
         path: actuator/info
         port: 8080
 
-# TODO: toplevel resources should not be used
-default:
   PodDisruptionBudget:
-    #  no main:
     minAvailable: 1
 
-AntiAffinityPatch:
-  main:
+  AntiAffinityPatch:
     selector_key: app
 
-containers:
-  main:
+  Deployment:
     name: app
     imagePullPolicy: Always
-    ports:
-    - containerPort: 8080
+    port:
+      containerPort: 8080
       protocol: TCP
     resources:
       limits:
