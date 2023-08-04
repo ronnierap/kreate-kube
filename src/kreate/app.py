@@ -11,11 +11,10 @@ logger = logging.getLogger(__name__)
 class App():
     def __init__(
             self,
-            name: str,
-            env: str,
             config: core.AppConfig,
+            env: str,
         ):
-        self.name = name
+        self.name = config.values["app"]
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.vars = dict()
         self.config = config.config()

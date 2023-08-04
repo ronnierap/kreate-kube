@@ -4,9 +4,9 @@ import kreate
 def kreate_config(env: str) -> kreate.AppConfig:
     return kreate.AppConfig(env, "tests/script/appdef.yaml")
 
-
 def kreate_app(env: str) -> kreate.App:
-    app = kreate.App('demo', env, config=kreate_config(env))
+    app_cfg = kreate_config(env)
+    app = kreate.App(app_cfg, env)
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()
