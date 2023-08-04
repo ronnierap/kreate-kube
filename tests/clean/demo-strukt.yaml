@@ -1,0 +1,110 @@
+Deployment:
+  main:
+    version: {{ val.version }}
+    project: kreate-demo
+    replicas: {{ val.replicas | default(1) }}
+    image_repo: {{ val.image_repo }}
+    vars:
+    - demo-vars
+    secret-vars:
+    - demo-secrets
+    options:
+      - pod_label: ["egress-to-db", "enabled"]
+    patches:
+      AntiAffinityPatch: {}
+      HttpProbesPatch:
+        main:
+          startupProbe:
+            failureThreshold: 120
+
+ConfigMap:
+  vars:
+    vars:
+      ENV: {{ val.env }}
+      ORACLE_URL: {{ val.ORACLE_URL }}
+      ORACLE_USR: {{ val.ORACLE_USR }}
+      ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
+
+PodDisruptionBudget:
+  main:
+    name: demo-pdb
+    labels:
+      testje: test
+    minAvailable: 2
+
+Ingress:
+  root:
+    options:
+      - sticky
+      - basic_auth
+      - read_timeout: 100
+      - whitelist: ggg
+    labels:
+      dummy: jan
+    host: {{ val.ingress_host_internal}}
+    port: {{ val.service_port }}
+    path: /
+  api:
+    host: {{ val.ingress_host_internal}}
+    port: {{ val.service_port }}
+    path: /api
+
+containers:
+  main:
+    resources:
+      limits:
+        cpu: {{ val.cpu_limit | default(2) }}
+      requests:
+        cpu: {{ val.cpu_request | default("400m") }}
+
+
+ServiceAccount:
+  main:
+    role: {{ val.serviceaccount_role }}
+
+ServiceMonitor:
+  main:
+    endpoints:
+      - interval: 20s
+        path: /actuator/prometheus
+
+# TODO: The following gives a yaml error
+#Egress:
+#  redis:
+#    name: demo-egress-to-redis
+#  db:
+#    name: demo-egress-to-db
+#  xyz:
+#    name: demo-egress-to-xyz
+Egress:
+  redis:
+    to:
+    - cidr: {{ val.redis_egress_cidr }}
+      port: {{ val.redis_egress_port | default(6379) }}
+  db:
+    name: demo-egress-to-db
+    to:
+    - cidr: {{ val.db_egress_cidr }}
+      port: {{ val.db_egress_port | default(1521) }}
+  xyz:
+    to:
+    - cidr: {{ val.xyz_egress_cidr }}
+      port: {{ val.xyz_egress_port | default(8443) }}
+
+
+
+Service:
+  main: # default service
+    options:
+    - headless
+    ports:
+      - port: {{ val.service_port }}
+  https:
+    ports:
+      - port: 443
+        name: https
+
+HorizontalPodAutoscaler:
+  main:
+    minReplicas: {{ val.minReplicas | default(1) }}
+    maxReplicas: {{ val.maxReplicas | default(3) }}
