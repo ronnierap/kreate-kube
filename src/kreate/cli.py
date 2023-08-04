@@ -1,7 +1,7 @@
 import argparse
 import os
 import logging
-
+import inspect
 import collections.abc
 
 logger = logging.getLogger(__name__)
@@ -46,8 +46,10 @@ def do_testupdate(kreate_app, env):
     os.system(cmd)
 
 def do_config(kreate_app, env):
-    app = kreate_app(env)
-    pp(app.config, "")
+    module = inspect.getmodule(kreate_app)
+    func = getattr(module, "kreate_config")
+    cfg = func(env)
+    pp(cfg.config(), "")
 
 def pp(map, indent):
     for key in map.keys():
@@ -103,7 +105,4 @@ def run_cli(kreate_app):
         logging.basicConfig(level=logging.ERROR)
     else:
         logging.basicConfig(level=logging.INFO)
-
-
-
     args.func(kreate_app, env)
