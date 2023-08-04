@@ -50,13 +50,14 @@ def do_config(kreate_app, args):
     module = inspect.getmodule(kreate_app)
     func = getattr(module, "kreate_config")
     cfg = func(args.appdef, args.env)
-    cfg.config().pprint() # TODO: support field="Deployment"
+    cfg.config().pprint(field=args.kind)
 
 
 def run_cli(kreate_app):
     parser = argparse.ArgumentParser()
     parser.add_argument("-e","--env", action="store", default="dev")
     parser.add_argument("-a","--appdef", action="store", default="appdef.yaml")
+    parser.add_argument("-k","--kind", action="store", default=None)
     parser.add_argument("-v","--verbose", action="store_true")
     parser.add_argument("-w","--warn", action="store_true")
     parser.add_argument("-q","--quiet", action="store_true")
