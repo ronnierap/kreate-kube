@@ -120,13 +120,13 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: 500m
+            cpu: 1
             memory: 512M
           requests:
-            cpu: 100m
+            cpu: 200m
             memory: 512M
         startupProbe:
-          failureThreshold: 120
+          failureThreshold: 30
           httpGet:
             path: actuator/info
             port: 8080
@@ -221,6 +221,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-realm: demo-realm
     nginx.ingress.kubernetes.io/auth-secret: basic-auth
     nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "100"
     nginx.ingress.kubernetes.io/whitelist-source-range: ggg
   labels:
     dummy: jan
