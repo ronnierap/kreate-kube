@@ -38,24 +38,24 @@ class AppDef():
         return core.DeepChain(*self.maps)
 
     def kreate_app(self):
-        app = App(self, self.env)
+        app = App(self)
         if self.kreate_app_func:
-            app = self.kreate_app_func(appdef=self, env=self.env)
+            app = self.kreate_app_func(appdef=self)
         else:
-            app = self.app_class(self, self.env)
+            app = self.app_class(self)
             app.kreate_from_config()
         return app
 
 
 class App():
-    def __init__(self, appdef: AppDef, env: str):
+    def __init__(self, appdef: AppDef):
         self.name = appdef.values["app"]
+        self.env = appdef.env
         self.appdef = appdef
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.vars = dict()
         self.config = appdef.config()
         self.values = appdef.values
-        self.env = env
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
         self.komponents = []

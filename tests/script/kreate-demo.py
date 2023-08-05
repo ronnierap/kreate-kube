@@ -8,8 +8,8 @@ def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
     return appdef
 
 
-def kreate_app(appdef: kreate.AppDef, env: str) -> kreate.App:
-    app = kreate.KustApp(appdef, env)
+def kreate_app(appdef: kreate.AppDef,) -> kreate.App:
+    app = kreate.KustApp(appdef)
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()

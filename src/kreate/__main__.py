@@ -1,7 +1,7 @@
 import kreate
 
-def kreate_appdef(appdef:str, env: str) -> kreate.AppDef:
-    appdef = kreate.AppDef(env, appdef )
+def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
+    appdef = kreate.AppDef(env, appdef_filename )
     appdef.app_class = kreate.KustApp
     return appdef
 
