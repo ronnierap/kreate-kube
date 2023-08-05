@@ -7,7 +7,7 @@ def kreate_config(appdef:str, env: str) -> kreate.AppDef:
 
 def kreate_app(appdef:str, env: str) -> kreate.App:
     app_cfg = kreate_config(appdef, env)
-    app = kreate.App(app_cfg, env)
+    app = kreate.KustApp(app_cfg, env)
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()

@@ -1,0 +1,13 @@
+---
+# Note this file will never be generated
+apiVersion: v1
+kind: KustConfigMap # this kind does not exist in kubernets
+metadata:
+  labels:
+    config-map: {{ my.name }}
+  name: {{ my.name }}
+  namespace: {{ app.namespace }}
+literals:
+  {% for key in cfg.get("vars", []) %}
+    {{key}}: {{ cfg.vars[key] }}
+  {% endfor %}

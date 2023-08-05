@@ -4,17 +4,17 @@ kind: Kustomization
 namespace: {{ app.namespace }}
 
 resources:
-{% for res in my.resources %}
+{% for res in my.resources() %}
 - {{ res.filename }}
 {% endfor %}
 
 patches:
-{% for pat in my.patches %}
+{% for pat in my.patches() %}
 - {{ pat.filename }}
 {% endfor %}
 
 configMapGenerator:
-{% for cm in my.config_maps %}
+{% for cm in my.config_maps() %}
 - name: {{ cm.name }}
   options:
     labels:
