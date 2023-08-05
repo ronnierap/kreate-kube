@@ -4,16 +4,40 @@ import shutil
 import logging
 from collections.abc import Mapping
 
-from . import core
+from . import core, jinyaml, templates
 
 logger = logging.getLogger(__name__)
 
+class AppDef():
+    def __init__(self, env, filename="appdef.yaml", *args):
+        self.dir = os.path.dirname(filename)
+        self.filename = filename
+        self.env = env
+        vars = { "env": env }
+        yaml = jinyaml.load_jinyaml(filename, vars)
+
+        self.values = {}
+        self.values.update(yaml)
+        for file in yaml.get("value_files",[]):
+            val_yaml = jinyaml.load_yaml(f"{self.dir}/{file}")
+            self.values.update(val_yaml)
+
+        self.maps = []
+        for file in yaml.get("config_files"):
+            self.add_config_file(f"{self.dir}/{file}")
+        self.add_config_file(f"default-values.yaml", package=templates )
+
+    def add_config_file(self, filename, package=None):
+        vars = { "val": self.values }
+        yaml = jinyaml.load_jinyaml(filename, vars, package=package)
+        self.maps.append(yaml)
+
+    def config(self):
+        return core.DeepChain(*self.maps)
+
+
 class App():
-    def __init__(
-            self,
-            appdef: core.AppDef,
-            env: str,
-        ):
+    def __init__(self, appdef: AppDef, env: str):
         self.name = appdef.values["app"]
         self.appdef = appdef
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
