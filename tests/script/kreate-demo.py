@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 import kreate
 
-def kreate_config(appdef:str, env: str) -> kreate.AppDef:
+def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
     # ignore passed in appdef
-    return kreate.AppDef(env, "tests/script/appdef.yaml")
+    appdef = kreate.AppDef(env, "tests/script/appdef.yaml")
+    appdef.kreate_app_func = kreate_app
+    return appdef
 
-def kreate_app(appdef:str, env: str) -> kreate.App:
-    app_cfg = kreate_config(appdef, env)
-    app = kreate.KustApp(app_cfg, env)
+
+def kreate_app(appdef: kreate.AppDef, env: str) -> kreate.App:
+    app = kreate.KustApp(appdef, env)
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()
@@ -45,4 +47,4 @@ def kreate_app(appdef:str, env: str) -> kreate.App:
 
     return app
 
-kreate.run_cli(kreate_app)
+kreate.run_cli(kreate_appdef)

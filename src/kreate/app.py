@@ -13,6 +13,8 @@ class AppDef():
         self.dir = os.path.dirname(filename)
         self.filename = filename
         self.env = env
+        self.app_class = App
+        self.kreate_app_func = None
         vars = { "env": env }
         yaml = jinyaml.load_jinyaml(filename, vars)
 
@@ -34,6 +36,15 @@ class AppDef():
 
     def config(self):
         return core.DeepChain(*self.maps)
+
+    def kreate_app(self):
+        app = App(self, self.env)
+        if self.kreate_app_func:
+            app = self.kreate_app_func(appdef=self, env=self.env)
+        else:
+            app = self.app_class(self, self.env)
+            app.kreate_from_config()
+        return app
 
 
 class App():
