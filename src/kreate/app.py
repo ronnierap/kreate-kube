@@ -78,7 +78,12 @@ class App():
         os.makedirs(self.target_dir, exist_ok=True)
 
         for obj  in self.yaml_objects:
-            obj.kreate_file()
+            if (obj.filename):
+                logger.info(f"kreating file {obj.filename}")
+                obj.kreate_file()
+            else:
+                logger.info(f"skipping file for {obj.kind}.{obj.shortname}")
+
 
     def _shortnames(self, kind:str ) -> list:
         if kind in self.config:

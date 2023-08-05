@@ -21,7 +21,7 @@ Deployment:
       AntiAffinityPatch: {}
       HttpProbesPatch: {}
 
-ConfigMap:
+KustConfigMap:
   vars:
     vars:
       ENV: {{ val.env }}

@@ -22,7 +22,6 @@ class KustApp(app.App):
                 self.kreate_patches(res)
 
     def kreate_patches(self, res) -> None:
-        print(res)
         for patch in res.config.get("patches", {}):
             if patch == "HttpProbesPatch":
                 HttpProbesPatch(res)
@@ -49,17 +48,15 @@ class Kustomization(YamlObject):
 # Note: this is not a resource
 class KustConfigMap(YamlObject):
     def _init(self):
-        self.map = {}
+        self.vars = {}
 
     def calc_name(self):
         return f"{self.app.name}-{self.shortname}"
 
     @property
     def filename(self) -> str:
-        if self.need_kustomize():
-            logger.debug(f"not kreating file for {self.name}, will be created by kustomize")
-            return None
-        return super().filename
+        #logger.debug(f"not kreating file for {self.name}, will be created by kustomize")
+        return None
 
     def calc_name(self):
         return f"{self.app.name}-{self.shortname}"

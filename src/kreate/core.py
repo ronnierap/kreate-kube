@@ -129,7 +129,6 @@ class YamlBase:
         self.yaml = wrap(jinyaml.load_jinyaml(self.template, vars, templates))
 
     def save_yaml(self, outfile) -> None:
-        logger.info(f"kreating {outfile}")
         with open(outfile, 'wb') as f:
             jinyaml.dump(self.yaml.data, f)
 
