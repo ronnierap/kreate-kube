@@ -23,7 +23,7 @@ class App():
         self.env = env
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
-        self.yaml_objects = []
+        self.komponents = []
         self._kinds = {}
         self.aliases = {}
         self.add_std_aliases()
@@ -54,7 +54,7 @@ class App():
 
     def add(self, res) -> None:
         if not res.skip:
-            self.yaml_objects.append(res)
+            self.komponents.append(res)
         map = self._kinds.get(res.kind, None)
         if map is None:
             map = core.DictWrapper({})
@@ -77,7 +77,7 @@ class App():
             shutil.rmtree(self.target_dir)
         os.makedirs(self.target_dir, exist_ok=True)
 
-        for obj  in self.yaml_objects:
+        for obj  in self.komponents:
             if (obj.filename):
                 logger.info(f"kreating file {obj.filename}")
                 obj.kreate_file()
@@ -111,7 +111,7 @@ class App():
 
 ##################################################################
 
-class YamlObject(core.YamlBase):
+class Komponent(core.YamlBase):
     """An object that is parsed from a yaml template and configuration"""
     def __init__(self, app: App,
                  shortname: str = None,
@@ -217,7 +217,7 @@ class YamlObject(core.YamlBase):
         return f"{self.kind.lower()}-{self.shortname}.yaml"
 
 
-class Resource(YamlObject):
+class Resource(Komponent):
     def __init__(self,
                  app: App,
                  shortname: str = None,
@@ -225,7 +225,7 @@ class Resource(YamlObject):
                  template: str = None,
                  **kwargs
                 ):
-        YamlObject.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)
+        Komponent.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)
         self.add_metadata()
 
 
