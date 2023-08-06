@@ -3,6 +3,7 @@ import os
 import logging
 import inspect
 import collections.abc
+from . import jinyaml
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ def run_cli(kreate_appdef_func):
     parser.add_argument("-e","--env", action="store", default="dev")
     parser.add_argument("-a","--appdef", action="store", default="appdef.yaml")
     parser.add_argument("-k","--kind", action="store", default=None)
-    parser.add_argument("-v","--verbose", action="store_true")
+    parser.add_argument("-v","--verbose", action='count', default=0)
     parser.add_argument("-w","--warn", action="store_true")
     parser.add_argument("-q","--quiet", action="store_true")
 
@@ -79,8 +80,11 @@ def run_cli(kreate_appdef_func):
 
     args = parser.parse_args()
     env = args.env
-    if args.verbose:
+    if args.verbose>=2:
         logging.basicConfig(level=logging.DEBUG)
+    elif args.verbose==1:
+        logging.basicConfig(level=logging.DEBUG)
+        jinyaml.logger.setLevel(logging.INFO)
     elif args.warn:
         logging.basicConfig(level=logging.WARN)
     elif args.quiet:
