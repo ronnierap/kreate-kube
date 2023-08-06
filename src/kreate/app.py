@@ -3,10 +3,23 @@ import sys
 import shutil
 import logging
 from collections.abc import Mapping
+import importlib
+
 
 from . import core, jinyaml, templates
 
 logger = logging.getLogger(__name__)
+
+def get_package_data(ur: str):
+    module = importlib.import_module('my_package.my_module')
+    my_class = getattr(module, 'MyClass')
+
+def get_class(name: str):
+    module_name = name.rsplit(".", 1)[0]
+    class_name = name.rsplit(".", 1)[1]
+    module = importlib.import_module(module_name)
+    return getattr(class_name)
+
 
 class AppDef():
     def __init__(self, env, filename="appdef.yaml", *args):
@@ -15,13 +28,12 @@ class AppDef():
         self.env = env
         self.app_class = App
         self.kreate_app_func = None
-        vars = { "env": env }
-        yaml = jinyaml.load_jinyaml(filename, vars)
+        self.values = { "env": env }
+        yaml = jinyaml.load_jinyaml(filename, self.values)
+        self.values.update(yaml.get("values",{}))
 
-        self.values = {}
-        self.values.update(yaml)
         for file in yaml.get("value_files",[]):
-            val_yaml = jinyaml.load_yaml(f"{self.dir}/{file}")
+            val_yaml = jinyaml.load_jinyaml(f"{self.dir}/{file}", self.values)
             self.values.update(val_yaml)
 
         self.maps = []

@@ -26,9 +26,11 @@ def load_jinja_data(filename: str, vars: Mapping, package=None):
     return tmpl.render(vars)
 
 def load_yaml(filename: str, package=None) -> Mapping:
+    logger.debug(f"loading yaml {filename} from {package}")
     return yaml_parser.load(load_data(filename, package=package))
 
 def load_jinyaml(filename: str, vars: Mapping, package=None) -> Mapping:
+    logger.debug(f"loading jinyaml {filename} from {package}")
     return yaml_parser.load(load_jinja_data(filename, vars, package=package))
 
 def dump(data, file):

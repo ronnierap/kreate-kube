@@ -126,7 +126,7 @@ class YamlBase:
 
     def load_yaml(self):
         vars = self._template_vars()
-        self.yaml = wrap(jinyaml.load_jinyaml(self.template, vars,  ))
+        self.yaml = wrap(jinyaml.load_jinyaml(self.template, vars, package=templates ))
 
     def save_yaml(self, outfile) -> None:
         with open(outfile, 'wb') as f:
