@@ -32,7 +32,6 @@ def do_apply(kreate_appdef_func, args):
 
 def do_test(kreate_appdef_func, args):
     app = do_files(kreate_appdef_func, args)
-    print(app.script_dir)
     cmd = f"kustomize build {app.target_dir} | diff  {app.appdef.dir}/test-{app.name}-{app.env}.out -"
     logger.info(f"running: {cmd}")
     os.system(cmd)
