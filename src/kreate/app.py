@@ -32,18 +32,18 @@ class AppDef():
         self.values.update(yaml.get("values",{}))
         self.app_class = get_class(yaml.get("app_class","kreate.KustApp"))
 
-        for file in yaml.get("value_files",[]):
-            val_yaml = jinyaml.load_jinyaml(f"{self.dir}/{file}", self.values)
+        for fname in yaml.get("value_files",[]):
+            val_yaml = jinyaml.load_jinyaml(fname, self.values, dirname=self.dir)
             self.values.update(val_yaml)
 
         self.maps = []
-        for file in yaml.get("config_files"):
-            self.add_config_file(f"{self.dir}/{file}")
-        self.add_config_file(f"default-values.yaml", package=templates )
+        for fname in yaml.get("config_files"):
+            self.add_config_file(fname, dirname=self.dir)
+        #self.add_config_file(f"@kreate.templates:default-values.yaml")#, package=templates )
 
-    def add_config_file(self, filename, package=None):
+    def add_config_file(self, filename, package=None, dirname=None):
         vars = { "val": self.values }
-        yaml = jinyaml.load_jinyaml(filename, vars, package=package)
+        yaml = jinyaml.load_jinyaml(filename, vars, package=package, dirname=dirname)
         self.maps.append(yaml)
 
     def config(self):

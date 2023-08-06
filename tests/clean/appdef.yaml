@@ -8,6 +8,4 @@ value_files:
 config_files:
   - ../script/config-demo-dev.yaml
   - demo-strukt.yaml
-  #- ../../src/kreate/templates/default-values.yaml
-  # TODO: use other mechanism to load from package, e.g.
-  # - @kreate.templates:default-values.yaml
+  - py:kreate.templates:default-values.yaml
