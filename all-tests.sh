@@ -8,5 +8,5 @@ echo ./tests/script/kreate-demo.py -q test
 ./tests/script/kreate-demo.py -q test
 
 echo '###########################################'
-echo ./tests/script/kreate-demo-from-strukt.py -q test
-./tests/script/kreate-demo-from-strukt.py -q test
+echo ./tests/script/kreate-demo-from-konfig.py -q test
+./tests/script/kreate-demo-from-konfig.py -q test

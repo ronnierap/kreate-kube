@@ -8,11 +8,12 @@ Deployment:
     - demo-vars
     secret-vars:
     - demo-secrets
+  patches:
+    HttpProbesPatch:
+      main:
+        startupProbe:
+          failureThreshold: 120
 
-HttpProbesPatch:
-  main:
-    startupProbe:
-      failureThreshold: 120
 
 ServiceAccount:
   main:
@@ -48,7 +49,6 @@ Ingress:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
     path: /api
-
 
 Service:
   main: # default service
