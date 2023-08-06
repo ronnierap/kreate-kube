@@ -2,6 +2,7 @@ values:
   app: demo
   team: myteam
   version: v1.3.4
+app_class: kreate.KustApp  # This is the default so may be omitted
 value_files:
   - ../script/values-dev.yaml
 config_files:

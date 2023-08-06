@@ -18,7 +18,7 @@ def get_class(name: str):
     module_name = name.rsplit(".", 1)[0]
     class_name = name.rsplit(".", 1)[1]
     module = importlib.import_module(module_name)
-    return getattr(class_name)
+    return getattr(module, class_name)
 
 
 class AppDef():
@@ -26,11 +26,11 @@ class AppDef():
         self.dir = os.path.dirname(filename)
         self.filename = filename
         self.env = env
-        self.app_class = App
         self.kreate_app_func = None
         self.values = { "env": env }
         yaml = jinyaml.load_jinyaml(filename, self.values)
         self.values.update(yaml.get("values",{}))
+        self.app_class = get_class(yaml.get("app_class","kreate.KustApp"))
 
         for file in yaml.get("value_files",[]):
             val_yaml = jinyaml.load_jinyaml(f"{self.dir}/{file}", self.values)

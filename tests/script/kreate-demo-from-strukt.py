@@ -4,7 +4,7 @@ import kreate
 def kreate_appdef(appdef:str, env: str) -> kreate.AppDef:
     # ignore passed in appdef
     appdef = kreate.AppDef(env, "tests/script/appdef-extras.yaml")
-    appdef.app_class = kreate.KustApp
+    #appdef.app_class = kreate.KustApp
     return appdef
 
 
