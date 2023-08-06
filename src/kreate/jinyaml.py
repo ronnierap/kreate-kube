@@ -23,10 +23,14 @@ def load_data(filename: str, package=None, dirname: str = None):
         filename = spl[1]
         package = importlib.import_module(package_name)
     if package:
+        pck_name = package.__name__
+        logger.debug(f"loading {filename} from package {package.__name__}")
         return pkgutil.get_data(package.__package__, filename).decode('utf-8')
-    dirname = dirname or "."
-    with open(f"{dirname}/{filename}") as f:
-        return f.read()
+    else:
+        dirname = dirname or "."
+        logger.debug(f"loading {filename} from {dirname}")
+        with open(f"{dirname}/{filename}") as f:
+            return f.read()
 
 def load_jinja_data(filename: str, vars: Mapping, package=None, dirname: str = None):
     filedata = load_data(filename, package=package, dirname=dirname)
@@ -39,11 +43,9 @@ def load_jinja_data(filename: str, vars: Mapping, package=None, dirname: str = N
     return tmpl.render(vars)
 
 def load_yaml(filename: str, package=None, dirname: str = None) -> Mapping:
-    logger.debug(f"loading yaml {filename} from {package or dirname or '.'}")
     return yaml_parser.load(load_data(filename, package=package, dirname=dirname))
 
 def load_jinyaml(filename: str, vars: Mapping, package=None, dirname: str = None) -> Mapping:
-    logger.debug(f"loading jinyaml {filename} from {package or dirname or '.'}")
     return yaml_parser.load(load_jinja_data(filename, vars, package=package, dirname=dirname))
 
 def dump(data, file):
