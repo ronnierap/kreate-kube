@@ -13,6 +13,13 @@ class KustApp(app.App):
         self.kust = Kustomization(self)
         self.kust.kreate_file()
 
+    def register_std_templates(self) -> None:
+        super().register_std_templates()
+        self.register_template_class(Kustomization)
+        self.register_template_class(KustConfigMap)
+        self.register_template_class(AntiAffinityPatch)
+        self.register_template_class(HttpProbesPatch)
+
     def kreate_from_config(self):
         super().kreate_from_config()
         for shortname in self._shortnames("KustConfigMap"):

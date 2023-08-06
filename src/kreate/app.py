@@ -28,16 +28,16 @@ class AppDef():
         self.env = env
         self.kreate_app_func = None
         self.values = { "env": env }
-        yaml = jinyaml.load_jinyaml(filename, self.values)
-        self.values.update(yaml.get("values",{}))
-        self.app_class = get_class(yaml.get("app_class","kreate.KustApp"))
+        self.yaml = jinyaml.load_jinyaml(filename, self.values)
+        self.values.update(self.yaml.get("values",{}))
+        self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
 
-        for fname in yaml.get("value_files",[]):
+        for fname in self.yaml.get("value_files",[]):
             val_yaml = jinyaml.load_jinyaml(fname, self.values, dirname=self.dir)
             self.values.update(val_yaml)
 
         self.maps = []
-        for fname in yaml.get("config_files"):
+        for fname in self.yaml.get("config_files"):
             self.add_config_file(fname, dirname=self.dir)
         #self.add_config_file(f"@kreate.templates:default-values.yaml")#, package=templates )
 
@@ -51,6 +51,8 @@ class AppDef():
 
     def kreate_app(self):
         app = App(self)
+        for templ in self.yaml.get("templates",[]):
+            logger.debug(f"adding custom template {templ}: {self.yaml['templates'][templ]}")
         if self.kreate_app_func:
             app = self.kreate_app_func(appdef=self)
         else:
@@ -70,22 +72,40 @@ class App():
         self.values = appdef.values
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
+        self.templates = {}
         self.komponents = []
         self._kinds = {}
         self.aliases = {}
-        self.add_std_aliases()
+        self.register_std_templates()
         self._init()
 
     def _init(self):
         pass
 
-    def add_std_aliases(self) -> None:
-        self.add_alias("Service", "svc")
-        self.add_alias("Deployment", "depl")
-        self.add_alias("PodDisruptionBudget", "pdb")
-        self.add_alias("ConfigMap", "cm")
-        self.add_alias("HorizontalPodAutoscaler", "hpa")
+    def register_template(self, name: str, template, aliases=None):
+        if name in self.templates:
+            logger.warning(f"overriding template {name}")
+        self.templates[name] = template
+        if aliases:
+            self.add_alias(name, aliases)
 
+    def register_template_class(self, cls, aliases=None):
+        self.register_template_file(cls.__name__, aliases=aliases)
+
+    def register_template_file(self, name, filename=None, aliases=None):
+        filename = filename or f"py:kreate.template:{name}"
+        self.register_template(name, filename, aliases=aliases)
+
+    def register_std_templates(self) -> None:
+        self.register_template_class(Service, aliases="svc")
+        self.register_template_class(Deployment, aliases="depl")
+        self.register_template_class(PodDisruptionBudget, aliases="pdb")
+        self.register_template_class(ConfigMap, aliases="cm")
+        self.register_template_class(Ingress)
+        self.register_template_class(Egress)
+        self.register_template_file("HorizontalPodAutoscaler", aliases="hpa")
+        self.register_template_file("ServiceAccount")
+        self.register_template_file("ServiceMonitor")
 
     def add_alias(self, kind: str, *aliases: str ) -> None:
         if kind in self.aliases:

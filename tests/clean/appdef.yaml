@@ -9,3 +9,7 @@ config_files:
   - ../script/config-demo-dev.yaml
   - demo-strukt.yaml
   - py:kreate.templates:default-values.yaml
+requires:
+  kreate: 0.1.0
+templates:
+  Secret: ./templates/Secret.yaml
