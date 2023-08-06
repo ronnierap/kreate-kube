@@ -1,9 +1,0 @@
-Egress:
-  redis:
-    ignore: True  # redis is local in acc environment
-
-# override threshold that is not a value
-HttpProbesPatch:
-  main:
-    startupProbe:
-      failureThreshold: 30

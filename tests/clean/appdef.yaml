@@ -6,8 +6,8 @@ app_class: kreate.KustApp  # This is the default so may be omitted
 value_files:
   - ../script/values-dev.yaml
 config_files:
-  - ../script/config-demo-dev.yaml
-  - demo-strukt.yaml
+  - override-demo-dev.yaml
+  - demo-konfig.yaml
   - py:kreate.templates:default-values.yaml
 requires:
   kreate: 0.1.0

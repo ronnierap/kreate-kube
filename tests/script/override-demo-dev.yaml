@@ -1,0 +1,14 @@
+
+Egress:
+  redis:
+    ignore: True  # redis is local in dev environment
+  xyz:
+    ignore: True
+
+Deployment:
+  main:
+    patches:
+      HttpProbesPatch:
+        main:
+          startupProbe:
+            failureThreshold: 77
