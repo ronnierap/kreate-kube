@@ -5,11 +5,6 @@ Egress:
   xyz:
     ignore: True
 
-HttpProbesPatch:
-  main:
-    startupProbe:
-      failureThreshold: 33
-
 Deployment:
   main:
     patches:

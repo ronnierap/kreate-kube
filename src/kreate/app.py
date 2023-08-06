@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import inspect
 import logging
 from collections.abc import Mapping
 import importlib
@@ -90,7 +91,7 @@ class App():
             self.add_alias(name, aliases)
 
     def register_template_class(self, cls, aliases=None):
-        self.register_template_file(cls.__name__, aliases=aliases)
+        self.register_template(cls.__name__, cls, aliases=aliases)
 
     def register_template_file(self, name, filename=None, aliases=None):
         filename = filename or f"py:kreate.template:{name}"
@@ -136,6 +137,14 @@ class App():
             return super().__getattribute__(attr)
         return self._kinds.get(attr, None)
 
+    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
+        templ = self.templates[kind]
+        if inspect.isclass(templ):
+            return templ(self, shortname=shortname, kind=kind, **kwargs)
+        else:
+            # TODO: not everything is a Resource
+            return Resource(self, shortname=shortname, kind=kind, **kwargs)
+
     def kreate_resource(self, kind: str, shortname: str = None, **kwargs):
         return Resource(self, shortname=shortname, kind=kind, **kwargs)
 
@@ -159,21 +168,13 @@ class App():
 
 
     def kreate_from_config(self):
-        for shortname in self._shortnames("Egress"):
-            Egress(self, shortname)
-        for shortname in self._shortnames("Ingress"):
-            Ingress(self, shortname)
-        for shortname in self._shortnames("Deployment"):
-            Deployment(self, shortname)
-        for shortname in self._shortnames("Service"):
-            Service(self, shortname)
-        for shortname in self._shortnames("PodDisruptionBudget"):
-            PodDisruptionBudget(self, shortname)
-        for shortname in self._shortnames("ConfigMap"):
-            ConfigMap(self, shortname)
-        for kind in ("ServiceAccount", "ServiceMonitor", "HorizontalPodAutoscaler"):
-            for shortname in self._shortnames(kind):
-                self.kreate_resource(kind, shortname)
+        for kind in sorted(self.config.keys()):
+            if kind in self.templates:
+                for shortname in sorted(self.config[kind].keys()):
+                    logger.info(f"kreating {kind}.{shortname}")
+                    self.kreate_komponent(kind, shortname)
+            elif kind != "default":
+                logger.warning(f"Unknown toplevel komponent {kind}")
 
 
 ##################################################################

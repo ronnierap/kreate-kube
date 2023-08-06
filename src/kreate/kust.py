@@ -1,4 +1,5 @@
 import logging
+import inspect
 
 from . import core, app
 from .app import Komponent, Resource
@@ -22,18 +23,21 @@ class KustApp(app.App):
 
     def kreate_from_config(self):
         super().kreate_from_config()
-        for shortname in self._shortnames("KustConfigMap"):
-            KustConfigMap(self, shortname)
         for res in self.komponents:
             if isinstance(res, Resource):
                 self.kreate_patches(res)
 
+    def kreate_patch(self, res: Resource, kind: str, shortname: str = None, **kwargs):
+        templ = self.templates[kind]
+        if inspect.isclass(templ):
+            return templ(res, "main", **kwargs)
+        else:
+            # TODO: patches have extra argument
+            return Patch(res, "main", **kwargs)
+
     def kreate_patches(self, res) -> None:
         for patch in res.config.get("patches", {}):
-            if patch == "HttpProbesPatch":
-                HttpProbesPatch(res)
-            elif patch == "AntiAffinityPatch":
-                AntiAffinityPatch(res)
+            self.kreate_patch(res, kind=patch, shortname="main")
 
 class Kustomization(Komponent):
     def resources(self):
