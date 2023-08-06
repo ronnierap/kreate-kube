@@ -4,6 +4,8 @@ default:
       cpu_request: 100m
   HttpProbesPatch:
     startup_failureThreshold: 120
+  PodDisruptionBudget:
+    minAvailable: 2
 
 Deployment:
   main:
@@ -34,7 +36,6 @@ PodDisruptionBudget:
     name: demo-pdb
     labels:
       testje: test
-    minAvailable: 2
 
 Ingress:
   root:
