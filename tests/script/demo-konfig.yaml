@@ -8,12 +8,20 @@ Deployment:
     - demo-vars
     secret-vars:
     - demo-secrets
-  patches:
-    HttpProbesPatch:
-      main:
-        startupProbe:
-          failureThreshold: 120
+    patches:
+      #AntiAffinityPatch: {} #TODO: this seems to work as well
+      AntiAffinityPatch:
+        main: {}
+      HttpProbesPatch:
+        main:
+          startupProbe:
+            failureThreshold: 120
 
+PodDisruptionBudget:
+  main:
+    name: demo-pdb
+    labels:
+      testje: test
 
 ServiceAccount:
   main:
@@ -45,6 +53,13 @@ Ingress:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
     path: /
+    options:
+      - sticky
+      - basic_auth
+      - read_timeout: 100
+      - whitelist: ggg
+    labels:
+      dummy: jan
   api:
     host: {{ val.ingress_host_internal}}
     port: {{ val.service_port }}
@@ -54,6 +69,8 @@ Service:
   main: # default service
     ports:
       - port: {{ val.service_port }}
+    options:
+      - headless
   https:
     ports:
       - port: 443
