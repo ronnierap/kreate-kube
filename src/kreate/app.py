@@ -253,24 +253,24 @@ class Komponent(core.YamlBase):
 
     def invoke_options(self):
         options = self.konfig.get("options", [])
-        for opt in options:
+        for opt in options or []:
             if type(opt) == str:
-                logger.debug(f"invoking {self.name} option {opt}")
+                logger.debug(f"invoking {self} option {opt}")
                 getattr(self, opt)()
             elif isinstance(opt, Mapping):
                 for key in opt.keys():
                     val = opt.get(key)
                     if isinstance(val, Mapping):
-                        logger.debug(f"invoking {self.name} option {key} with kwargs parameters {val}")
+                        logger.debug(f"invoking {self} option {key} with kwargs parameters {val}")
                         getattr(self, key)(**dict(val))
-                    if isinstance(val, list):
-                        logger.debug(f"invoking {self.name} option {key} with list parameters {val}")
+                    elif isinstance(val, list):
+                        logger.debug(f"invoking {self} option {key} with list parameters {val}")
                         getattr(self, key)(*val)
                     elif isinstance(val, str):
-                        logger.debug(f"invoking {self.name} option {key} with string parameter {val}")
+                        logger.debug(f"invoking {self} option {key} with string parameter {val}")
                         getattr(self, key)(val)
                     elif isinstance(val, int):
-                        logger.debug(f"invoking {self.name} option {key} with int parameter {val}")
+                        logger.debug(f"invoking {self} option {key} with int parameter {val}")
                         getattr(self, key)(int(val))
                     else:
                         logger.warn(f"option map {opt} for {self.name} not supported")
@@ -345,7 +345,6 @@ class Deployment(Resource):
         if not "labels" in self.yaml.spec.template.metadata:
             self.yaml.spec.template.metadata["labels"] = {}
         self.yaml.spec.template.metadata.labels[name] = val
-
 
 class PodDisruptionBudget(Resource):
     pass

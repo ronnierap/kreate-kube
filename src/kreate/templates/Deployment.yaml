@@ -14,6 +14,9 @@ spec:
       name: {{ my.name }}
       labels:
         app: {{ my.name }}
+        {% for lbl in konf.get("pod",{}).get("labels",{}).keys()  %}
+        {{ lbl }}: {{ konf.pod.labels[lbl] }}
+        {% endfor %}
       annotations:
         app.kubernetes.io/name: {{ my.name }}
         app.kubernetes.io/version: "{{ konf.version }}"
@@ -22,6 +25,9 @@ spec:
         app.kubernetes.io/managed-by: kustomize
         co.elastic.logs/enabled: "true"
         co.elastic.logs/exclude_lines: DEBUG
+        {% for anno in konf.get("pod",{}).get("annotations",{}).keys()  %}
+        {{ anno }}: {{ konf.pod.annotations[anno] }}
+        {% endfor %}
     spec:
       #restartPolicy: Never
       containers:

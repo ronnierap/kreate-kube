@@ -8,12 +8,14 @@ Deployment:
     - demo-vars
     secret-vars:
     - demo-secrets
-    options:
-    - pod_label: ["egress-to-db", "enabled"]  # TODO: make this a map
+    pod:
+      labels:
+        egress-to-db: enabled
+        egress-to-redis: enabled
+      annotations:
+        some-demo-annotation: just-for-fun
     patches:
-      #AntiAffinityPatch: {} #TODO: this seems to work as well
-      AntiAffinityPatch:
-        main: {}
+      AntiAffinityPatch: {}   # this seems to work, even without a main section
       HttpProbesPatch:
         main:
           startupProbe:

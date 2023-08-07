@@ -73,9 +73,11 @@ spec:
         app.kubernetes.io/version: v1.3.4
         co.elastic.logs/enabled: "true"
         co.elastic.logs/exclude_lines: DEBUG
+        some-demo-annotation: just-for-fun
       labels:
         app: demo
         egress-to-db: enabled
+        egress-to-redis: enabled
       name: demo
     spec:
       affinity:
