@@ -218,9 +218,9 @@ class Komponent(core.YamlBase):
         return f"{self.app.name}-{self.kind}-{self.shortname}"
 
     def _calc_konfig(self, extra):
-        cfg = self._find_konfig()
+        konf = self._find_konfig()
         defaults = self._find_defaults()
-        return core.DeepChain(extra, cfg, {"default": defaults})
+        return core.DeepChain(extra, konf, {"default": defaults})
 
     def _find_defaults(self):
         if self.kind in self.app.konfig.default:
@@ -244,7 +244,7 @@ class Komponent(core.YamlBase):
 
     def _template_vars(self):
         return {
-            "cfg" : self.konfig,
+            "konf" : self.konfig,
             "default" : self.konfig.default,
             "app" : self.app,
             "my" : self,

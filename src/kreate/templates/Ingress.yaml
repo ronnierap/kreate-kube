@@ -8,13 +8,13 @@ metadata:
     app.kubernetes.io/name: {{ app.name }}
 spec:
   rules:
-    - host: {{ cfg.host }}
+    - host: {{ konf.host }}
       http:
         paths:
           - pathType: Prefix
-            path: {{ cfg.path or "/" }}
+            path: {{ konf.path or "/" }}
             backend:
               service:
                 name: {{ my.name }}
                 port:
-                  number: {{ cfg.port }}
+                  number: {{ konf.port }}

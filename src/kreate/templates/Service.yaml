@@ -10,7 +10,7 @@ spec:
   selector:
     app: {{ app.name }}
   ports:
-{% for port in cfg.ports %}
+{% for port in konf.ports %}
   - protocol: TCP
     port: {{ port.port }}
     targetPort: {{ port.targetPort | default(port.port) }}

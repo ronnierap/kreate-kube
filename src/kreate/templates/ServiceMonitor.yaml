@@ -5,7 +5,7 @@ metadata:
   name: {{ my.name }}
 spec:
   endpoints:
-  {% for ep in cfg.endpoints %}
+  {% for ep in konf.endpoints %}
   - interval: {{ ep.interval | default('15s', true) }}
     path: {{ ep.path }}
     port: {{ ep.port | default('http', true) }}

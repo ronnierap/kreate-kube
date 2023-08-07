@@ -10,7 +10,7 @@ spec:
   policyTypes:
     - Egress
   egress:
-    {% for addr in cfg.to %}
+    {% for addr in konf.to %}
     - to:
         - ipBlock:
             cidr: {{ addr.cidr }}

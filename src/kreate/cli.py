@@ -91,5 +91,5 @@ def _do_testupdate(kreate_appdef_func, args):
     os.system(cmd)
 
 def _do_konfig(kreate_appdef_func, args):
-    cfg = kreate_appdef_func(args.appdef, args.env)
-    cfg.konfig().pprint(field=args.kind)
+    appdef = kreate_appdef_func(args.appdef, args.env)
+    appdef.konfig().pprint(field=args.kind)
