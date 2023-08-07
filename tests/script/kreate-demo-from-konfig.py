@@ -11,6 +11,7 @@ def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
 def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     app = kreate.KustApp(appdef)
     app.kreate_from_config()
+    app.depl.main.label("this-is-added","by-script")
     return app
 
 kreate.Cli(kreate_appdef).run()

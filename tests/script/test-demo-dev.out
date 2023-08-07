@@ -144,7 +144,7 @@ metadata:
   name: demo-pdb
   namespace: demo-dev
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: demo
@@ -222,7 +222,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-secret: basic-auth
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/proxy-read-timeout: "100"
-    nginx.ingress.kubernetes.io/whitelist-source-range: ggg
+    nginx.ingress.kubernetes.io/whitelist-source-range: 10.20.30.40
   labels:
     dummy: jan
   name: demo-ingress-root
