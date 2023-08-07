@@ -92,3 +92,9 @@ KustConfigMap:
       ORACLE_URL: {{ val.ORACLE_URL }}
       ORACLE_USR: {{ val.ORACLE_USR }}
       ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
+
+Secret:
+  main:
+    vars:
+      DB_USR: {{ val.DB_USR }}
+      DB_PSW: {{ val.DB_PSW }}

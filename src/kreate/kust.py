@@ -32,7 +32,6 @@ class KustApp(app.App):
         if inspect.isclass(templ):
             return templ(res, "main", **kwargs)
         else:
-            # TODO: patches have extra argument
             return Patch(res, "main", **kwargs)
 
     def kreate_patches(self, res) -> None:
@@ -74,7 +73,6 @@ class KustConfigMap(Komponent):
 
     def add_var(self, name, value=None):
         if value is None:
-            # TODO: how to get app.values
             value = self.app.values[name]
         self.vars[name] = value
 

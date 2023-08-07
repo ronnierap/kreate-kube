@@ -8,3 +8,5 @@ konfig_files:
   - py:kreate.templates:default-values.yaml
   - demo-konfig.yaml
   - override-demo-dev.yaml
+templates:
+  Secret: ./templates/Secret.yaml

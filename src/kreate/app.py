@@ -51,13 +51,16 @@ class AppDef():
         return core.DeepChain(*reversed(self.maps))
 
     def kreate_app(self):
-        app = App(self)
-        for templ in self.yaml.get("templates",[]):
-            logger.debug(f"adding custom template {templ}: {self.yaml['templates'][templ]}")
+        app: App
         if self.kreate_app_func:
             app = self.kreate_app_func(appdef=self)
         else:
             app = self.app_class(self)
+        for key in self.yaml.get("templates",[]):
+            templ = self.yaml['templates'][key]
+            logger.info(f"adding custom template {key}: {templ}")
+            app.register_template_file(key, templ)
+        if not self.kreate_app_func:
             app.kreate_from_konfig()
         return app
 
@@ -86,15 +89,18 @@ class App():
     def register_template(self, name: str, template, aliases=None):
         if name in self.templates:
             logger.warning(f"overriding template {name}")
+        logger.debug(f"registering template {name}: {template}")
         self.templates[name] = template
         if aliases:
             self.add_alias(name, aliases)
 
     def register_template_class(self, cls, aliases=None):
+        # TODO: determine package more smart
+        # f"py:kreate.templates:{cls.__name__}.yaml"
         self.register_template(cls.__name__, cls, aliases=aliases)
 
     def register_template_file(self, name, filename=None, aliases=None):
-        filename = filename or f"py:kreate.template:{name}"
+        filename = filename or f"py:kreate.templates:{name}.yaml"
         self.register_template(name, filename, aliases=aliases)
 
     def register_std_templates(self) -> None:
@@ -143,7 +149,7 @@ class App():
             return templ(self, shortname=shortname, kind=kind, **kwargs)
         else:
             # TODO: not everything is a Resource
-            return Resource(self, shortname=shortname, kind=kind, **kwargs)
+            return Resource(self, shortname=shortname, kind=kind, template=templ , **kwargs)
 
     def kreate_resource(self, kind: str, shortname: str = None, **kwargs):
         return Resource(self, shortname=shortname, kind=kind, **kwargs)
@@ -192,8 +198,8 @@ class Komponent(core.YamlBase):
         self.shortname = shortname or "main"
         self.konfig = self._calc_konfig(kwargs)
 
-        template = template or f"{self.kind}.yaml"
-        core.YamlBase.__init__(self, template)
+        template = template or f"py:kreate.templates:{self.kind}.yaml"
+        core.YamlBase.__init__(self, template, dir=self.app.appdef.dir)
         self._init()
         self.skip = self.konfig.get("ignore", False)
         self.name = self.konfig.get("name", None) or self.calc_name().lower()
@@ -302,7 +308,6 @@ class Resource(Komponent):
     def __str__(self):
         return f"<Resource {self.kind}.{self.shortname} {self.name}>"
 
-
     @property
     def filename(self):
         # prefix the file, because the name of a resource is not guaranteed
@@ -319,7 +324,6 @@ class Resource(Komponent):
                 self.yaml.metadata.labels={}
             self.yaml.metadata.labels[key]=self.konfig.labels[key]
 
-
     def annotation(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.metadata:
             self.yaml.metadata["annotations"]={}
@@ -329,6 +333,7 @@ class Resource(Komponent):
         if "labels" not in self.yaml.metadata:
             self.yaml.metadata["labels"]={}
         self.yaml.metadata.labels[name]=val
+
 
 class Deployment(Resource):
     def calc_name(self):
