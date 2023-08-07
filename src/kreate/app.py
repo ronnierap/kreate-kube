@@ -48,7 +48,7 @@ class AppDef():
         self.maps.append(yaml)
 
     def config(self):
-        return core.DeepChain(*self.maps)
+        return core.DeepChain(*reversed(self.maps))
 
     def kreate_app(self):
         app = App(self)

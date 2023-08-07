@@ -5,6 +5,6 @@ values:
 value_files:
   - values-dev.yaml
 config_files:
-  - override-demo-dev.yaml
-  - demo-konfig.yaml
   - py:kreate.templates:default-values.yaml
+  - demo-konfig.yaml
+  - override-demo-dev.yaml

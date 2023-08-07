@@ -19,7 +19,7 @@ cpu_limit: "500m" # TODO: use this instead of default?
 cpu_request: "100m" # TODO: use this instead of default?
 
 serviceaccount_role: some-role-dev
-
+root_whitelist: 10.20.30.40
 replicas: 0
 
 env: dev

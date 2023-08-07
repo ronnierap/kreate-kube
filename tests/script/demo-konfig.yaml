@@ -8,6 +8,8 @@ Deployment:
     - demo-vars
     secret-vars:
     - demo-secrets
+    options:
+    - pod_label: ["egress-to-db", "enabled"]  # TODO: make this a map
     patches:
       #AntiAffinityPatch: {} #TODO: this seems to work as well
       AntiAffinityPatch:
@@ -57,7 +59,7 @@ Ingress:
       - sticky
       - basic_auth
       - read_timeout: 100
-      - whitelist: ggg
+      - whitelist: {{ val.root_whitelist }}
     labels:
       dummy: jan
   api:

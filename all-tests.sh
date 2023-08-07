@@ -1,7 +1,7 @@
 #!/bin/sh
 echo '###########################################'
-echo python3 -m kreate -a tests/clean/appdef.yaml -q test
-python3 -m kreate -a tests/clean/appdef.yaml -q test
+echo python3 -m kreate -a tests/script/appdef.yaml -q test
+python3 -m kreate -a tests/script/appdef.yaml -q test
 
 echo '###########################################'
 echo ./tests/script/kreate-demo.py -q test
