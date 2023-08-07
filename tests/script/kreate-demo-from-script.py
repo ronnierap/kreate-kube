@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""
+This test script shows that you can kreate komponents from a python script.
+The komponents will still be configured by the appdef.konfig.
+You can also configure them further in python.
+In general it is preferred to kreate all komponents from the konfig.
+"""
 import kreate
 
 def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
