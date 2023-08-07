@@ -8,7 +8,7 @@ def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
     return appdef
 
 
-def kreate_app(appdef: kreate.AppDef,) -> kreate.App:
+def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     app = kreate.KustApp(appdef)
     app.kreate_from_config()
     return app
