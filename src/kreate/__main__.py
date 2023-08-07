@@ -6,4 +6,4 @@ def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
 
 
 
-kreate.run_cli(kreate_appdef)
+kreate.Cli(kreate_appdef).run()
