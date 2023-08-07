@@ -209,6 +209,9 @@ class Komponent(core.YamlBase):
     def _init(self):
         pass
 
+    def __str__(self):
+        return f"<Komponent {self.kind}.{self.shortname} {self.name}>"
+
     def calc_name(self):
         if self.shortname == "main":
             return f"{self.app.name}-{self.kind}"
@@ -295,6 +298,9 @@ class Resource(Komponent):
                 ):
         Komponent.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)
         self.add_metadata()
+
+    def __str__(self):
+        return f"<Resource {self.kind}.{self.shortname} {self.name}>"
 
 
     @property

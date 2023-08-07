@@ -83,6 +83,9 @@ class Patch(Komponent):
         self.target = target
         Komponent.__init__(self, target.app, shortname=shortname, **kwargs)
 
+    def __str__(self):
+        return f"<Patch {self.target.kind}.{self.target.shortname}:{self.kind}.{self.shortname}>"
+
     def _template_vars(self):
         return { **super()._template_vars(),  "target": self.target }
 
