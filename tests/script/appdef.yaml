@@ -4,7 +4,7 @@ values:
   version: v1.3.4
 value_files:
   - values-dev.yaml
-config_files:
+konfig_files:
   - py:kreate.templates:default-values.yaml
   - demo-konfig.yaml
   - override-demo-dev.yaml

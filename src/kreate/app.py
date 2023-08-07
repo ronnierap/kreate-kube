@@ -38,16 +38,16 @@ class AppDef():
             self.values.update(val_yaml)
 
         self.maps = []
-        for fname in self.yaml.get("config_files"):
-            self.add_config_file(fname, dirname=self.dir)
-        #self.add_config_file(f"@kreate.templates:default-values.yaml")#, package=templates )
+        for fname in self.yaml.get("konfig_files"):
+            self.add_konfig_file(fname, dirname=self.dir)
+        #self.add_konfig_file(f"@kreate.templates:default-values.yaml")#, package=templates )
 
-    def add_config_file(self, filename, package=None, dirname=None):
+    def add_konfig_file(self, filename, package=None, dirname=None):
         vars = { "val": self.values }
         yaml = jinyaml.load_jinyaml(filename, vars, package=package, dirname=dirname)
         self.maps.append(yaml)
 
-    def config(self):
+    def konfig(self):
         return core.DeepChain(*reversed(self.maps))
 
     def kreate_app(self):
@@ -69,7 +69,7 @@ class App():
         self.appdef = appdef
         self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         self.vars = dict()
-        self.config = appdef.config()
+        self.konfig = appdef.konfig()
         self.values = appdef.values
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
@@ -162,15 +162,15 @@ class App():
 
 
     def _shortnames(self, kind:str ) -> list:
-        if kind in self.config:
-            return self.config[kind].keys()
+        if kind in self.konfig:
+            return self.konfig[kind].keys()
         return []
 
 
     def kreate_from_konfig(self):
-        for kind in sorted(self.config.keys()):
+        for kind in sorted(self.konfig.keys()):
             if kind in self.templates:
-                for shortname in sorted(self.config[kind].keys()):
+                for shortname in sorted(self.konfig[kind].keys()):
                     logger.info(f"kreating {kind}.{shortname}")
                     self.kreate_komponent(kind, shortname)
             elif kind != "default":
@@ -180,7 +180,7 @@ class App():
 ##################################################################
 
 class Komponent(core.YamlBase):
-    """An object that is parsed from a yaml template and configuration"""
+    """An object that is parsed from a yaml template and konfiguration"""
     def __init__(self, app: App,
                  shortname: str = None,
                  kind: str = None,
@@ -190,15 +190,15 @@ class Komponent(core.YamlBase):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
-        self.config = self._calc_config(kwargs)
+        self.konfig = self._calc_konfig(kwargs)
 
         template = template or f"{self.kind}.yaml"
         core.YamlBase.__init__(self, template)
         self._init()
-        self.skip = self.config.get("ignore", False)
-        self.name = self.config.get("name", None) or self.calc_name().lower()
+        self.skip = self.konfig.get("ignore", False)
+        self.name = self.konfig.get("name", None) or self.calc_name().lower()
         if self.skip:
-            # do not load the template (config might be missing)
+            # do not load the template (konfig might be missing)
             logger.info(f"ignoring {self.name}")
         else:
             self.load_yaml()
@@ -217,23 +217,23 @@ class Komponent(core.YamlBase):
             return f"{self.app.name}-{self.kind}"
         return f"{self.app.name}-{self.kind}-{self.shortname}"
 
-    def _calc_config(self, extra):
-        cfg = self._find_config()
+    def _calc_konfig(self, extra):
+        cfg = self._find_konfig()
         defaults = self._find_defaults()
         return core.DeepChain(extra, cfg, {"default": defaults})
 
     def _find_defaults(self):
-        if self.kind in self.app.config.default:
+        if self.kind in self.app.konfig.default:
             logger.debug(f"using defaults for {self.kind}")
-            return self.app.config.default[self.kind]
+            return self.app.konfig.default[self.kind]
         return {}
 
-    def _find_config(self):
+    def _find_konfig(self):
         typename = self.kind
-        if typename in self.app.config and self.shortname in self.app.config[typename]:
-            logger.debug(f"using named config {typename}.{self.shortname}")
-            return  self.app.config[typename][self.shortname]
-        logger.info(f"could not find config for {typename}.{self.shortname} in")
+        if typename in self.app.konfig and self.shortname in self.app.konfig[typename]:
+            logger.debug(f"using named konfig {typename}.{self.shortname}")
+            return  self.app.konfig[typename][self.shortname]
+        logger.info(f"could not find konfig for {typename}.{self.shortname} in")
         return {}
 
     def kreate_file(self) -> None:
@@ -244,15 +244,15 @@ class Komponent(core.YamlBase):
 
     def _template_vars(self):
         return {
-            "cfg" : self.config,
-            "default" : self.config.default,
+            "cfg" : self.konfig,
+            "default" : self.konfig.default,
             "app" : self.app,
             "my" : self,
             "val": self.app.values
         }
 
     def invoke_options(self):
-        options = self.config.get("options", [])
+        options = self.konfig.get("options", [])
         for opt in options:
             if type(opt) == str:
                 logger.debug(f"invoking {self.name} option {opt}")
@@ -310,14 +310,14 @@ class Resource(Komponent):
         return f"{self.kind}-{self.name}.yaml".lower()
 
     def add_metadata(self):
-        for key in self.config.get("annotations", {}):
+        for key in self.konfig.get("annotations", {}):
             if not "annotations" in self.yaml.metadata:
                 self.yaml.metadata.annotations={}
-            self.yaml.metadata.annotations[key]=self.config.annotations[key]
-        for key in self.config.get("labels", {}):
+            self.yaml.metadata.annotations[key]=self.konfig.annotations[key]
+        for key in self.konfig.get("labels", {}):
             if not "labels" in self.yaml.metadata:
                 self.yaml.metadata.labels={}
-            self.yaml.metadata.labels[key]=self.config.labels[key]
+            self.yaml.metadata.labels[key]=self.konfig.labels[key]
 
 
     def annotation(self, name: str, val: str) -> None:

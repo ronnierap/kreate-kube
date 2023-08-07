@@ -25,7 +25,7 @@ class Cli():
         self.diff_cmd = subparsers.add_parser("diff", help="diff with current existing resources", aliases=["d"])
         self.test_cmd = subparsers.add_parser("test", help="test output against test.out file", aliases=["t"])
         self.testupdate_cmd = subparsers.add_parser("testupdate", help="update test.out file", aliases=["tu"])
-        self.config_cmd = subparsers.add_parser("config", help="update test.out file", aliases=["c"])
+        self.konfig_cmd = subparsers.add_parser("konfig", help="show the konfig structure", aliases=["k"])
 
         self.files_cmd.set_defaults(func=_do_files)
         self.out_cmd.set_defaults(func=_do_out)
@@ -33,7 +33,7 @@ class Cli():
         self.apply_cmd.set_defaults(func=_do_apply)
         self.test_cmd.set_defaults(func=_do_test)
         self.testupdate_cmd.set_defaults(func=_do_testupdate)
-        self.config_cmd.set_defaults(func=_do_config)
+        self.konfig_cmd.set_defaults(func=_do_konfig)
         # from https://stackoverflow.com/questions/6365601/default-sub-command-or-handling-no-sub-command-with-argparse
         self.parser.set_defaults(func=_do_files) # TODO: better way to set default command?
 
@@ -90,6 +90,6 @@ def _do_testupdate(kreate_appdef_func, args):
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def _do_config(kreate_appdef_func, args):
+def _do_konfig(kreate_appdef_func, args):
     cfg = kreate_appdef_func(args.appdef, args.env)
-    cfg.config().pprint(field=args.kind)
+    cfg.konfig().pprint(field=args.kind)
