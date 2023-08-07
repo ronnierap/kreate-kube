@@ -58,7 +58,7 @@ class AppDef():
             app = self.kreate_app_func(appdef=self)
         else:
             app = self.app_class(self)
-            app.kreate_from_config()
+            app.kreate_from_konfig()
         return app
 
 
@@ -167,7 +167,7 @@ class App():
         return []
 
 
-    def kreate_from_config(self):
+    def kreate_from_konfig(self):
         for kind in sorted(self.config.keys()):
             if kind in self.templates:
                 for shortname in sorted(self.config[kind].keys()):
