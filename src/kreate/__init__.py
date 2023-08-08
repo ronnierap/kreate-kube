@@ -15,4 +15,4 @@ from ._kust import AntiAffinityPatch
 from ._kust import Kustomization
 from ._kust import KustConfigMap
 
-from ._cli import Cli
+from ._cli import run_cli

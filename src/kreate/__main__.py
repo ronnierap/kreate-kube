@@ -11,4 +11,4 @@ def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     return app
 
 
-kreate.Cli(kreate_appdef, kreate_app).run()
+kreate.run_cli(kreate_appdef, kreate_app)

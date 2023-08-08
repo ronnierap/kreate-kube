@@ -6,105 +6,127 @@ from ._app import App, AppDef
 
 logger = logging.getLogger(__name__)
 
-class Cli():
-    def __init__(self, kreate_appdef_func, kreate_app_func=None):
-        self.kreate_appdef_func = kreate_appdef_func
-        self.kreate_app_func = kreate_app_func
-        self.parser = argparse.ArgumentParser()
-        self.parser.add_argument("-e","--env", action="store", default="dev")
-        self.parser.add_argument("-a","--appdef", action="store", default="appdef.yaml")
-        self.parser.add_argument("-k","--kind", action="store", default=None)
-        self.parser.add_argument("-v","--verbose", action='count', default=0)
-        self.parser.add_argument("-w","--warn", action="store_true")
-        self.parser.add_argument("-q","--quiet", action="store_true")
+
+cli = argparse.ArgumentParser()
+subparsers = cli.add_subparsers(description="valid subcommands", title="subcmd", dest="subcommand")
+
+def argument(*name_or_flags, **kwargs):
+    """Convenience function to properly format arguments to pass to the
+    subcommand decorator.
+    """
+    return (list(name_or_flags), kwargs)
+
+# decorator from: https://mike.depalatis.net/blog/simplifying-argparse.html
+def subcommand(args=[], aliases=[], parent=subparsers):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__, aliases=aliases, description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+    return decorator
+
+def run_cli(kreate_appdef_func, kreate_app_func=None):
+    add_main_options()
+    args = cli.parse_args()
+    args.kreate_appdef_func = kreate_appdef_func
+    args.kreate_app_func = kreate_app_func
+    process_main_options(args)
+    if args.subcommand is None:
+        cli.print_help()
+    else:
+        args.func(args)
+
+def add_main_options():
+    # from https://stackoverflow.com/questions/6365601/default-sub-command-or-handling-no-sub-command-with-argparse
+    cli.set_defaults(func=files) # TODO: better way to set default command?
+    cli.add_argument("-a","--appdef", action="store", default="appdef.yaml")
+    cli.add_argument("-e","--env", action="store", default="dev")
+    cli.add_argument("-k","--kind", action="store", default=None)
+    cli.add_argument("-v","--verbose", action='count', default=0)
+    cli.add_argument("-w","--warn", action="store_true")
+    cli.add_argument("-q","--quiet", action="store_true")
+
+def process_main_options(args):
+    if args.verbose>=2:
+        logging.basicConfig(level=logging.DEBUG)
+    elif args.verbose==1:
+        logging.basicConfig(level=logging.DEBUG)
+        _jinyaml.logger.setLevel(logging.INFO)
+    elif args.warn:
+        logging.basicConfig(level=logging.WARN)
+    elif args.quiet:
+        logging.basicConfig(level=logging.ERROR)
+    else:
+        logging.basicConfig(level=logging.INFO)
 
 
-        subparsers = self.parser.add_subparsers(help="subcommand", description="valid subcommands", title="subcmd")
-        #parser.add_subparsers(title="command", help="subcommand")
-        self.files_cmd = subparsers.add_parser("files", help="kreate all the files (default command)", aliases=["f"])
-        self.out_cmd = subparsers.add_parser("out", help="output all the resources", aliases=["o", "b",  "build"])
-        self.apply_cmd = subparsers.add_parser("apply", help="apply the output to kubernetes", aliases=["a"])
-        self.diff_cmd = subparsers.add_parser("diff", help="diff with current existing resources", aliases=["d"])
-        self.test_cmd = subparsers.add_parser("test", help="test output against test.out file", aliases=["t"])
-        self.testupdate_cmd = subparsers.add_parser("testupdate", help="update test.out file", aliases=["tu"])
-        self.konfig_cmd = subparsers.add_parser("konfig", help="show the konfig structure", aliases=["k"])
-        self.dekrypt_cmd = subparsers.add_parser("dekrypt", help="dekrypt secrets in yaml", aliases=["dek"])
-        self.enkrypt_cmd = subparsers.add_parser("enkrypt", help="enkrypt secrets in yaml", aliases=["enk"])
-
-        self.files_cmd.set_defaults(func=_do_files)
-        self.out_cmd.set_defaults(func=_do_out)
-        self.diff_cmd.set_defaults(func=_do_diff)
-        self.apply_cmd.set_defaults(func=_do_apply)
-        self.test_cmd.set_defaults(func=_do_test)
-        self.testupdate_cmd.set_defaults(func=_do_testupdate)
-        self.konfig_cmd.set_defaults(func=_do_konfig)
-        self.dekrypt_cmd.set_defaults(func=_do_dekrypt)
-        self.enkrypt_cmd.set_defaults(func=_do_enkrypt)
-        # from https://stackoverflow.com/questions/6365601/default-sub-command-or-handling-no-sub-command-with-argparse
-        self.parser.set_defaults(func=_do_files) # TODO: better way to set default command?
-
-    def run(self):
-        args = self.parser.parse_args()
-        env = args.env
-        if args.verbose>=2:
-            logging.basicConfig(level=logging.DEBUG)
-        elif args.verbose==1:
-            logging.basicConfig(level=logging.DEBUG)
-            _jinyaml.logger.setLevel(logging.INFO)
-        elif args.warn:
-            logging.basicConfig(level=logging.WARN)
-        elif args.quiet:
-            logging.basicConfig(level=logging.ERROR)
-        else:
-            logging.basicConfig(level=logging.INFO)
-        args.func(self, args)
-
-
-def _do_files(cli:Cli, args) -> App:
-    appdef : AppDef = cli.kreate_appdef_func(args.appdef, args.env)
-    app : App = cli.kreate_app_func(appdef) # appdef knows the type of App to kreate
+def kreate_files(args) -> App:
+    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
+    app : App = args.kreate_app_func(appdef) # appdef knows the type of App to kreate
     app.kreate_files()
     return app
 
-def _do_out(kreate_appdef_func, args):
-    app = _do_files(kreate_appdef_func, args)
+@subcommand([], aliases=["f"])
+def files(args) -> App:
+    """kreate all the files (default command)"""
+    app = kreate_files(args)
+
+@subcommand([], aliases=["b"])
+def buikd(args):
+    """output all the resources"""
+    app = kreate_files(args)
     cmd = f"kustomize build {app.target_dir}"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def _do_diff(kreate_appdef_func, args):
-    app = _do_files(kreate_appdef_func, args)
+@subcommand([], aliases=["d"])
+def diff(args):
+    """diff with current existing resources"""
+    app = kreate_files(args)
     cmd = f"kustomize build {app.target_dir} | kubectl diff -f - "
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def _do_apply(kreate_appdef_func, args):
-    app = _do_files(kreate_appdef_func, args)
+@subcommand([], aliases=["a"])
+def apply(args):
+    """apply the output to kubernetes"""
+    app = kreate_files(args)
     cmd = f"kustomize build {app.target_dir} | kubectl apply --dry-run -f - "
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def _do_test(kreate_appdef_func, args):
-    app = _do_files(kreate_appdef_func, args)
+@subcommand([], aliases=["t"])
+def test(args):
+    "test", """test output against test.out file"""
+    app = kreate_files(args)
     cmd = f"kustomize build {app.target_dir} | diff  {app.appdef.dir}/test-{app.name}-{app.env}.out -"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def _do_testupdate(kreate_appdef_func, args):
-    app = _do_files(kreate_appdef_func, args)
+@subcommand([], aliases=["tu"])
+def testupdate(args):
+    "testupdate", """update test.out file"""
+    app = kreate_files(args)
     cmd = f"kustomize build {app.target_dir} > {app.appdef.dir}/test-{app.name}-{app.env}.out"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-def _do_konfig(kreate_appdef_func, args):
-    appdef : AppDef = kreate_appdef_func(args.appdef, args.env)
+@subcommand([], aliases=["k"])
+def konfig(args):
+    "konfig", """show the konfig structure"""
+    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
     appdef.load_extra()
     appdef.konfig().pprint(field=args.kind)
 
-def _do_dekrypt(cli, args):
-    appdef : AppDef = cli.kreate_appdef_func(args.appdef, args.env)
+
+@subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["dek"])
+def dekrypt(args):
+    """decrypt values in a yaml file"""
+    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
     _krypt.dekrypt_yaml(f"values-{appdef.name}-{appdef.env}.yaml", appdef.dir)
 
-def _do_enkrypt(cli, args):
-    appdef : AppDef = cli.kreate_appdef_func(args.appdef, args.env)
+@subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["enk"])
+def enkrypt(args):
+    "encrypt values in a yaml file"
+    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
     _krypt.enkrypt_yaml(f"values-{appdef.name}-{appdef.env}.yaml", appdef.dir)
