@@ -10,8 +10,7 @@ import kreate
 def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
     # ignore passed in appdef
     appdef = kreate.AppDef(env, "tests/script/appdef.yaml")
-    appdef.kreate_app_func = kreate_app
-    appdef.load_extra()
+    appdef.load_konfig_files()
     return appdef
 
 

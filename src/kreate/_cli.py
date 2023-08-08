@@ -115,7 +115,7 @@ def testupdate(args):
 def konfig(args):
     "konfig", """show the konfig structure"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
-    appdef.load_extra()
+    appdef.load_konfig_files()
     appdef.konfig().pprint(field=args.kind)
 
 

@@ -37,11 +37,10 @@ class AppDef():
         self.name = self.values["app"]
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
 
-    def load_extra(self):
+    def load_konfig_files(self):
         for fname in self.yaml.get("value_files",[]):
             val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
-
         self.konfig_dicts = []
         for fname in self.yaml.get("konfig_files"):
             self.add_konfig_file(fname, dir=self.dir)
