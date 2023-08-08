@@ -8,7 +8,7 @@ values:
 krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
 
 value_files:
-  - values-{{env}}.yaml
+  - values-{{appname}}-{{env}}.yaml
 konfig_files:
   - py:kreate.kube_templates:default-values.yaml
   - {{appname}}-konfig.yaml
