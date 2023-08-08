@@ -2,7 +2,6 @@ import jinja2
 import pkgutil
 import logging
 import importlib
-import inspect
 from collections.abc import Mapping
 from ruamel.yaml import YAML
 from collections import namedtuple

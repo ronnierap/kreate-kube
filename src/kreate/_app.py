@@ -2,7 +2,6 @@ import os
 import shutil
 import inspect
 import logging
-from collections.abc import Mapping
 import importlib
 
 from ._core import  DeepChain, DictWrapper

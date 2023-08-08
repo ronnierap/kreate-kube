@@ -1,9 +1,4 @@
-import os
-import sys
-import shutil
-import inspect
 import logging
-from collections.abc import Mapping
 from ._app import App
 from ._komp import Komponent
 from ._jinyaml import FileLocation
@@ -13,9 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class KubeApp(App):
-    def _init(self):
-        pass
-
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Service, aliases="svc", package=kube_templates)
@@ -32,24 +24,9 @@ class KubeApp(App):
     def register_template_file(self, kind:str, cls=None, filename=None, aliases=None, package=None):
         # Override parent, to provide default class Resource
         cls = cls or Resource
-        self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
+        super().register_template_file(kind, cls, filename=filename, aliases=aliases, package=package)
 
 
-#    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
-#        cls = self.kind_classes[kind]
-#        if inspect.isclass(cls):
-#            return cls(self, shortname=shortname, kind=kind, **kwargs)
-#        else:
-#            raise ValueError(f"Unknown template type {type(cls)}, {cls}")
-#
-#    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
-#        templ = self.templates[kind]
-#        if inspect.isclass(templ):
-#            return templ(self, shortname=shortname, kind=kind, **kwargs)
-#        else:
-#            # TODO: not everything is a Resource
-#            return Resource(self, shortname=shortname, kind=kind, template=templ , **kwargs)
-#
 ##################################################################
 
 class Resource(Komponent):

@@ -1,14 +1,12 @@
 import logging
-import inspect
 
-from kreate._app import App
-from kreate._jinyaml import FileLocation
-
-from . import _core
-from . import kust_templates
+from ._app import App
+from ._jinyaml import FileLocation
+from ._core import DeepChain
 from ._komp import Komponent
 from ._kube import KubeApp, Resource
 from ._jinyaml import FileLocation
+from . import kust_templates
 
 
 logger = logging.getLogger(__name__)
@@ -106,7 +104,7 @@ class Patch(Komponent):
             logger.debug(f"using embedded konfig {typename}.{self.shortname} from {self.target.kind}.{self.target.shortname}")
             # The embedded_konfig is first, since the root_konfig will contain all default values
             embedded_konfig = target_konfig[typename][self.shortname]
-            return _core.DeepChain(embedded_konfig, root_konfig)
+            return DeepChain(embedded_konfig, root_konfig)
         return root_konfig
 
 

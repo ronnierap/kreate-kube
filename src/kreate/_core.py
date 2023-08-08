@@ -1,4 +1,3 @@
-import os
 from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 import logging
