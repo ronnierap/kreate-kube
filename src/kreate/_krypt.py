@@ -7,9 +7,12 @@ logger = logging.getLogger(__name__)
 
 
 _krypt_key = None
+_dekrypt_testdummy = False
 
 def dekrypt_str(value):
     f = Fernet(_krypt_key)
+    if _dekrypt_testdummy:
+        return f"testdummy-{value[len(value)//2-4:len(value)//2+4]}"
     return f.decrypt(value.encode("ascii")).decode("ascii")
 
 def enkrypt_str(value):
