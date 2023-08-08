@@ -1,6 +1,25 @@
 # this is a default file. It does not define any toplevel Objects
 
 default:
+  AntiAffinityPatch:
+    selector_key: app
+
+  Deployment:
+    name: app
+    imagePullPolicy: Always
+    containerPort: 8080
+    protocol: TCP
+    cpu_limit: 1
+    memory_limit: 512M
+    cpu_request: 200m
+    memory_request: 512M
+
+  HorizontalPodAutoscaler:
+    minReplicas: 1
+    maxReplicas: 3
+    cpu_averageUtilization: 70
+    memory_averageUtilization: 70
+
   HttpProbesPatch:
     name: app
     startup_initialDelaySeconds: 10
@@ -30,22 +49,3 @@ default:
 
   PodDisruptionBudget:
     minAvailable: 1
-
-  AntiAffinityPatch:
-    selector_key: app
-
-  Deployment:
-    name: app
-    imagePullPolicy: Always
-    containerPort: 8080
-    protocol: TCP
-    cpu_limit: 1
-    memory_limit: 512M
-    cpu_request: 200m
-    memory_request: 512M
-
-  HorizontalPodAutoscaler:
-    minReplicas: 1
-    maxReplicas: 3
-    cpu_averageUtilization: 70
-    memory_averageUtilization: 70

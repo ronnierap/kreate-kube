@@ -22,28 +22,6 @@ Deployment:
           startupProbe:
             failureThreshold: 120
 
-MyUdpService:
-  main:
-    name: demo-udp-service
-    ports:
-      - port: 8080
-
-PodDisruptionBudget:
-  main:
-    name: demo-pdb
-    labels:
-      testje: test
-
-ServiceAccount:
-  main:
-    role: {{ val.serviceaccount_role }}
-
-ServiceMonitor:
-  main:
-    endpoints:
-      - interval: 20s
-        path: /actuator/prometheus
-
 Egress:
   redis:
     to:
@@ -58,6 +36,11 @@ Egress:
     to:
     - cidr: {{ val.xyz_egress_cidr }}
       port: {{ val.xyz_egress_port | default(8443) }}
+
+HorizontalPodAutoscaler:
+  main:
+    minReplicas: {{ val.minReplicas | default(1) }}
+    maxReplicas: {{ val.maxReplicas | default(3) }}
 
 Ingress:
   root:
@@ -76,6 +59,32 @@ Ingress:
     port: {{ val.service_port }}
     path: /api
 
+KustConfigMap:
+  vars:
+    vars:
+      ENV: {{ val.env }}
+      ORACLE_URL: {{ val.ORACLE_URL }}
+      ORACLE_USR: {{ val.ORACLE_USR }}
+      ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
+
+MyUdpService:
+  main:
+    name: demo-udp-service
+    ports:
+      - port: 8080
+
+PodDisruptionBudget:
+  main:
+    name: demo-pdb
+    labels:
+      testje: test
+
+Secret:
+  main:
+    vars:
+      DB_USR: {{ val.DB_USR }}
+      DB_PSW: {{ val.DB_PSW }}
+
 Service:
   main: # default service
     ports:
@@ -87,21 +96,12 @@ Service:
       - port: 443
         name: https
 
-HorizontalPodAutoscaler:
+ServiceAccount:
   main:
-    minReplicas: {{ val.minReplicas | default(1) }}
-    maxReplicas: {{ val.maxReplicas | default(3) }}
+    role: {{ val.serviceaccount_role }}
 
-KustConfigMap:
-  vars:
-    vars:
-      ENV: {{ val.env }}
-      ORACLE_URL: {{ val.ORACLE_URL }}
-      ORACLE_USR: {{ val.ORACLE_USR }}
-      ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
-
-Secret:
+ServiceMonitor:
   main:
-    vars:
-      DB_USR: {{ val.DB_USR }}
-      DB_PSW: {{ val.DB_PSW }}
+    endpoints:
+      - interval: 20s
+        path: /actuator/prometheus
