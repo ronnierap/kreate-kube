@@ -4,7 +4,8 @@ import shutil
 import inspect
 import logging
 from collections.abc import Mapping
-from ._app import App, Komponent
+from ._app import App
+from ._komp import Komponent
 
 logger = logging.getLogger(__name__)
 

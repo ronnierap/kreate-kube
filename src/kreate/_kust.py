@@ -2,7 +2,7 @@ import logging
 import inspect
 
 from . import _core
-from ._app import Komponent
+from ._komp import Komponent
 from ._kube import KubeApp, Resource
 
 logger = logging.getLogger(__name__)
