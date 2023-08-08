@@ -37,7 +37,7 @@ class AppDef():
         self.filename = filename
         self.env = env
         self.kreate_app_func = None
-        self.values = { "env": env }
+        self.values = { "env": env, "dekrypt": dekrypt, "getenv": os.getenv }
         self.yaml = jinyaml.load_jinyaml(filename, self.values)
         self.values.update(self.yaml.get("values",{}))
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
