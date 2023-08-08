@@ -4,8 +4,8 @@ import inspect
 import logging
 import importlib
 
+from . import _krypt
 from ._core import  DeepChain, DictWrapper
-from ._krypt import dekrypt
 from ._jinyaml import load_jinyaml, FileLocation
 
 logger = logging.getLogger(__name__)
@@ -26,8 +26,10 @@ class AppDef():
         self.dir = os.path.dirname(filename)
         self.filename = filename
         self.env = env
-        self.values = { "env": env, "dekrypt": dekrypt, "getenv": os.getenv }
+        self.values = { "env": env, "dekrypt": _krypt.dekrypt, "getenv": os.getenv }
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
+        _krypt._krypt_key = self.yaml["krypt_key"]
+
         self.values.update(self.yaml.get("values",{}))
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
 

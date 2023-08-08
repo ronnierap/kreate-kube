@@ -1,12 +1,17 @@
+{% set appname = "demo" %} # reuse the appname in rest of this file
 values:
-  app: demo
+  app: {{ appname }}
   team: myteam
   version: v1.3.4
+
+# key the enkryption key for the DEV environment
+krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
+
 value_files:
-  - values-dev.yaml
+  - values-{{env}}.yaml
 konfig_files:
   - py:kreate.kube_templates:default-values.yaml
-  - demo-konfig.yaml
-  - override-demo-dev.yaml
+  - {{appname}}-konfig.yaml
+  - override-{{appname}}-{{env}}.yaml
 templates:
   MyUdpService: ./templates/MyUdpService.yaml
