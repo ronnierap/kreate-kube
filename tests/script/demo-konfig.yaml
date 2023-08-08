@@ -1,3 +1,10 @@
+default:
+  Deployment:
+    # use these as defaults for all environments,
+    # unless specified otherwise in values-dev.yaml
+    cpu_limit:   {{ val.cpu_limit   | default("500m") }}
+    cpu_request: {{ val.cpu_request | default("100m") }}
+
 Deployment:
   main:
     version: {{ val.version }}
