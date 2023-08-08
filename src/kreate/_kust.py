@@ -1,14 +1,14 @@
 import logging
 import inspect
 
-from . import core, app
-from .app import Komponent, Resource
+from . import _core
+from ._app import Komponent
+from ._kube import KubeApp, Resource
 
 logger = logging.getLogger(__name__)
 
 
-class KustApp(app.App):
-
+class KustApp(KubeApp):
     def kreate_files(self):
         super().kreate_files()
         self.kust = Kustomization(self)
@@ -95,7 +95,7 @@ class Patch(Komponent):
             logger.debug(f"using embedded konfig {typename}.{self.shortname} from {self.target.kind}.{self.target.shortname}")
             # The embedded_konfig is first, since the root_konfig will contain all default values
             embedded_konfig = target_konfig[typename][self.shortname]
-            return core.DeepChain(embedded_konfig, root_konfig)
+            return _core.DeepChain(embedded_konfig, root_konfig)
         return root_konfig
 
 

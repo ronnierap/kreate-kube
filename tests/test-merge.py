@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-import kreate.core
-from kreate.core import wrap, DeepChain
+from kreate._core import wrap, DeepChain, merge
 import copy
 
 a={
@@ -43,11 +42,11 @@ print("\n\n\n")
 
 print (a)
 print (b)
-kreate.core.merge(a,b)
+merge(a,b)
 print (a)
 print("\n\n\n")
 
 print (wa)
 print (wb)
-kreate.core.merge(wa,wb)
+merge(wa,wb)
 print (wb)

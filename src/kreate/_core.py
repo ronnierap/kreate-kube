@@ -3,7 +3,7 @@ from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 import logging
 
-from . import templates, jinyaml
+from . import _jinyaml, templates
 
 logger = logging.getLogger(__name__)
 
@@ -127,11 +127,11 @@ class YamlBase:
 
     def load_yaml(self):
         vars = self._template_vars()
-        self.yaml = wrap(jinyaml.load_jinyaml(self.template, vars, dirname=self.dir ))
+        self.yaml = wrap(_jinyaml.load_jinyaml(self.template, vars, dirname=self.dir ))
 
     def save_yaml(self, outfile) -> None:
         with open(outfile, 'wb') as f:
-            jinyaml.dump(self.yaml.data, f)
+            _jinyaml.dump(self.yaml.data, f)
 
     def _template_vars(self):
         return {}

@@ -1,5 +1,4 @@
 import os
-import sys
 import shutil
 import inspect
 import logging
@@ -8,7 +7,8 @@ import importlib
 import jinja2.filters
 from cryptography.fernet import Fernet
 
-from . import core, jinyaml, templates
+from ._jinyaml import load_jinyaml
+from ._core import YamlBase, DeepChain, DictWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -37,12 +37,12 @@ class AppDef():
         self.filename = filename
         self.env = env
         self.values = { "env": env, "dekrypt": dekrypt, "getenv": os.getenv }
-        self.yaml = jinyaml.load_jinyaml(filename, self.values)
+        self.yaml = load_jinyaml(filename, self.values)
         self.values.update(self.yaml.get("values",{}))
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
 
         for fname in self.yaml.get("value_files",[]):
-            val_yaml = jinyaml.load_jinyaml(fname, self.values, dirname=self.dir)
+            val_yaml = load_jinyaml(fname, self.values, dirname=self.dir)
             self.values.update(val_yaml)
 
         self.konfig_dicts = []
@@ -52,11 +52,11 @@ class AppDef():
 
     def add_konfig_file(self, filename, package=None, dirname=None):
         vars = { "val": self.values }
-        yaml = jinyaml.load_jinyaml(filename, vars, package=package, dirname=dirname)
+        yaml = load_jinyaml(filename, vars, package=package, dirname=dirname)
         self.konfig_dicts.append(yaml)
 
     def konfig(self):
-        return core.DeepChain(*reversed(self.konfig_dicts))
+        return DeepChain(*reversed(self.konfig_dicts))
 
     def kreate_app(self):
         app: App = self.app_class(self)
@@ -104,15 +104,7 @@ class App():
         self.register_template(name, filename, aliases=aliases)
 
     def register_std_templates(self) -> None:
-        self.register_template_class(Service, aliases="svc")
-        self.register_template_class(Deployment, aliases="depl")
-        self.register_template_class(PodDisruptionBudget, aliases="pdb")
-        self.register_template_class(ConfigMap, aliases="cm")
-        self.register_template_class(Ingress)
-        self.register_template_class(Egress)
-        self.register_template_file("HorizontalPodAutoscaler", aliases="hpa")
-        self.register_template_file("ServiceAccount")
-        self.register_template_file("ServiceMonitor")
+        pass
 
     def add_alias(self, kind: str, *aliases: str ) -> None:
         if kind in self.aliases:
@@ -131,7 +123,7 @@ class App():
             self.komponents.append(res)
         map = self._kinds.get(res.kind, None)
         if map is None:
-            map = core.DictWrapper({})
+            map = DictWrapper({})
             self.get_aliases(res.kind)
             for alias in self.get_aliases(res.kind):
                 self._kinds[alias] = map
@@ -148,11 +140,7 @@ class App():
         if inspect.isclass(templ):
             return templ(self, shortname=shortname, kind=kind, **kwargs)
         else:
-            # TODO: not everything is a Resource
-            return Resource(self, shortname=shortname, kind=kind, template=templ , **kwargs)
-
-    def kreate_resource(self, kind: str, shortname: str = None, **kwargs):
-        return Resource(self, shortname=shortname, kind=kind, **kwargs)
+            raise ValueError(f"Unknown template type {type(templ)}, {templ}")
 
     def kreate_files(self):
         if os.path.exists(self.target_dir) and os.path.isdir(self.target_dir):
@@ -184,7 +172,7 @@ class App():
 
 ##################################################################
 
-class Komponent(core.YamlBase):
+class Komponent(YamlBase):
     """An object that is parsed from a yaml template and konfiguration"""
     def __init__(self, app: App,
                  shortname: str = None,
@@ -198,7 +186,7 @@ class Komponent(core.YamlBase):
         self.konfig = self._calc_konfig(kwargs)
 
         template = template or f"py:kreate.templates:{self.kind}.yaml"
-        core.YamlBase.__init__(self, template, dir=self.app.appdef.dir)
+        YamlBase.__init__(self, template, dir=self.app.appdef.dir)
         self._init()
         self.skip = self.konfig.get("ignore", False)
         self.name = self.konfig.get("name", None) or self.calc_name().lower()
@@ -225,7 +213,7 @@ class Komponent(core.YamlBase):
     def _calc_konfig(self, extra):
         konf = self._find_konfig()
         defaults = self._find_defaults()
-        return core.DeepChain(extra, konf, {"default": defaults})
+        return DeepChain(extra, konf, {"default": defaults})
 
     def _find_defaults(self):
         if self.kind in self.app.konfig.default:
@@ -291,116 +279,3 @@ class Komponent(core.YamlBase):
     @property
     def filename(self):
         return f"{self.kind.lower()}-{self.shortname}.yaml"
-
-
-class Resource(Komponent):
-    def __init__(self,
-                 app: App,
-                 shortname: str = None,
-                 kind: str = None,
-                 template: str = None,
-                 **kwargs
-                ):
-        Komponent.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)
-        self.add_metadata()
-
-    def __str__(self):
-        return f"<Resource {self.kind}.{self.shortname} {self.name}>"
-
-    @property
-    def filename(self):
-        # prefix the file, because the name of a resource is not guaranteed
-        # to be unique
-        return f"{self.kind}-{self.name}.yaml".lower()
-
-    def add_metadata(self):
-        for key in self.konfig.get("annotations", {}):
-            if not "annotations" in self.yaml.metadata:
-                self.yaml.metadata.annotations={}
-            self.yaml.metadata.annotations[key]=self.konfig.annotations[key]
-        for key in self.konfig.get("labels", {}):
-            if not "labels" in self.yaml.metadata:
-                self.yaml.metadata.labels={}
-            self.yaml.metadata.labels[key]=self.konfig.labels[key]
-
-    def annotation(self, name: str, val: str) -> None:
-        if "annotations" not in self.yaml.metadata:
-            self.yaml.metadata["annotations"]={}
-        self.yaml.metadata.annotations[name]=val
-
-    def label(self, name: str, val: str) -> None:
-        if "labels" not in self.yaml.metadata:
-            self.yaml.metadata["labels"]={}
-        self.yaml.metadata.labels[name]=val
-
-
-class Deployment(Resource):
-    def calc_name(self):
-        if  self.shortname == "main":
-            return self.app.name
-        return f"{self.app.name}-{self.shortname}"
-
-    def pod_annotation(self, name: str, val: str) -> None:
-        if not "annotations" in self.yaml.spec.template.metadata:
-            self.yaml.spec.template.metadata["annotations"] = {}
-        self.yaml.spec.template.metadata.annotations[name] = val
-
-    def pod_label(self, name: str, val: str) -> None:
-        if not "labels" in self.yaml.spec.template.metadata:
-            self.yaml.spec.template.metadata["labels"] = {}
-        self.yaml.spec.template.metadata.labels[name] = val
-
-class PodDisruptionBudget(Resource):
-    pass
-
-class Service(Resource):
-    def headless(self):
-        self.yaml.spec.clusterIP="None"
-
-class Egress(Resource):
-    def calc_name(self):
-        return f"{self.app.name}-egress-to-{self.shortname}"
-
-
-
-class ConfigMap(Resource):
-    def calc_name(self):
-        return f"{self.app.name}-{self.shortname}"
-
-    @property
-    def filename(self) -> str:
-        return super().filename
-
-    def add_var(self, name, value=None):
-        if value is None:
-            value = self.app.values[name]
-        # We can not use self.yaml.data, since data is a field in UserDict
-        self.yaml["data"][name] = value
-
-
-class Ingress(Resource):
-    def nginx_annon(self, name: str, val: str) -> None:
-        self.annotation("nginx.ingress.kubernetes.io/" + name, val)
-
-    def sticky(self) -> None:
-        self.nginx_annon("affinity", "cookie")
-
-    def rewrite_url(self, url: str) -> None:
-        self.nginx_annon("rewrite-target", url)
-
-    def read_timeout(self, sec: int) -> None:
-        self.nginx_annon("proxy-read-timeout", str(sec))
-
-    def max_body_size(self, size: int) -> None:
-        self.nginx_annon("proxy-body-size", str(size))
-
-    def whitelist(self, whitelist: str) -> None:
-        self.nginx_annon("whitelist-source-range", whitelist)
-
-    def session_cookie_samesite(self) -> None:
-        self.nginx_annon("session-cookie-samesite", "None")
-
-    def basic_auth(self, secret: str = "basic-auth") -> None:
-        self.nginx_annon("auth-type", "basic")
-        self.nginx_annon("auth-secret", secret)
-        self.nginx_annon("auth-realm", self.app.name + "-realm")

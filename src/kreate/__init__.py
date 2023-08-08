@@ -1,16 +1,17 @@
-from .app import App
-from .app import Deployment
-from .app import PodDisruptionBudget
-from .app import ConfigMap
-from .app import Ingress
-from .app import Service
-from .app import Egress
-from .app import AppDef
+from ._app import AppDef
+from ._app import App
 
-from .kust import KustApp
-from .kust import HttpProbesPatch
-from .kust import AntiAffinityPatch
-from .kust import Kustomization
-from .kust import KustConfigMap
+from ._kube import Deployment
+from ._kube import PodDisruptionBudget
+from ._kube import ConfigMap
+from ._kube import Ingress
+from ._kube import Service
+from ._kube import Egress
 
-from .cli import Cli
+from ._kust import KustApp
+from ._kust import HttpProbesPatch
+from ._kust import AntiAffinityPatch
+from ._kust import Kustomization
+from ._kust import KustConfigMap
+
+from ._cli import Cli

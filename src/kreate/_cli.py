@@ -1,8 +1,8 @@
 import argparse
 import os
 import logging
-from . import jinyaml
-from .app import App, AppDef
+from . import _jinyaml
+from ._app import App, AppDef
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class Cli():
             logging.basicConfig(level=logging.DEBUG)
         elif args.verbose==1:
             logging.basicConfig(level=logging.DEBUG)
-            jinyaml.logger.setLevel(logging.INFO)
+            _jinyaml.logger.setLevel(logging.INFO)
         elif args.warn:
             logging.basicConfig(level=logging.WARN)
         elif args.quiet:
