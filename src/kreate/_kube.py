@@ -34,12 +34,7 @@ class KubeApp(App):
             # TODO: not everything is a Resource
             return Resource(self, shortname=shortname, kind=kind, template=templ , **kwargs)
 
-    def kreate_resource(self, kind: str, shortname: str = None, **kwargs):
-        return Resource(self, shortname=shortname, kind=kind, **kwargs)
-
-
 ##################################################################
-
 
 class Resource(Komponent):
     def __init__(self,

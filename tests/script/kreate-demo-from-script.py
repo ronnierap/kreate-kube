@@ -16,6 +16,8 @@ def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
 
 def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     app = kreate.KustApp(appdef) # or appdef.kreate_app()?
+    app.register_template_file("Secret", "templates/Secret.yaml")
+    app.kreate_komponent("Secret", "main")
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()
@@ -41,9 +43,9 @@ def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     pdb.yaml.spec.minAvailable = 2
     pdb.label("testje","test")
 
-    app.kreate_resource("ServiceAccount")
-    app.kreate_resource("ServiceMonitor")
-    app.kreate_resource("HorizontalPodAutoscaler")
+    app.kreate_komponent("ServiceAccount")
+    app.kreate_komponent("ServiceMonitor")
+    app.kreate_komponent("HorizontalPodAutoscaler")
 
     cm = kreate.KustConfigMap(app, "vars") # kustomize=False
     cm.add_var("ENV", app.values["env"])
