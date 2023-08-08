@@ -28,6 +28,7 @@ def argument(*name_or_flags, **kwargs):
     return (list(name_or_flags), kwargs)
 
 # decorator from: https://mike.depalatis.net/blog/simplifying-argparse.html
+# adjusted to add aliases and list register subcommands for the epilog
 def subcommand(args=[], aliases=[], parent=subparsers):
     def decorator(func):
         global epilog
