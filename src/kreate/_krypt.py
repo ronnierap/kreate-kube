@@ -21,6 +21,8 @@ def enkrypt_str(value):
 def change_yaml_comments( filename: str, func, from_: str, to_ :str, dir: str = None):
     dir = dir or "."
     yaml_parser = YAML()
+    yaml_parser.width=4096 # prevent line wrapping
+    yaml_parser.preserve_quotes = True
     with open(f"{dir}/{filename}") as f:
         data = f.read()
     yaml = yaml_parser.load(data)
@@ -31,7 +33,7 @@ def change_yaml_comments( filename: str, func, from_: str, to_ :str, dir: str = 
             comment=ca.items[key][2]
             if from_ in comment.value:
                 comment.column = 0
-                comment.value = "   "+comment.value.replace(from_, to_,1)
+                comment.value = " "+comment.value.replace(from_, to_,1)
                 yaml["secrets"][key] = func(item)
                 logger.info(f"{to_} {key}")
 
