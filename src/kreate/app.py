@@ -5,11 +5,20 @@ import inspect
 import logging
 from collections.abc import Mapping
 import importlib
-
+import jinja2.filters
+from cryptography.fernet import Fernet
 
 from . import core, jinyaml, templates
 
 logger = logging.getLogger(__name__)
+
+def dekrypt(value):
+    # TODO: configure which key to use
+    key=b'C6XOvZALFPjTzWKOPV3EJFIpmmwMhXEEqtMAG26W7_c='
+    f = Fernet(key)
+    return f.decrypt(value.encode("ascii")).decode("ascii")
+
+jinja2.filters.FILTERS["dekrypt"] = dekrypt
 
 def get_package_data(ur: str):
     module = importlib.import_module('my_package.my_module')
