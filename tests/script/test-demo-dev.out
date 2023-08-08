@@ -21,7 +21,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  DB_PSW: n0t-v3ry-s3cr3t
+  DB_PSW: testdummy-Jh2wU5Bp
   DB_USR: dbusrdev
 kind: Secret
 metadata:
@@ -165,6 +165,7 @@ spec:
           periodSeconds: 2
           successThreshold: 1
           timeoutSeconds: 1
+      restartPolicy: Always
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget

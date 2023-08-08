@@ -90,7 +90,7 @@ Secret:
   main:
     vars:
       DB_USR: {{ val.DB_USR }}
-      DB_PSW: {{ val.DB_PSW }}
+      DB_PSW: {{ val.DB_PSW | dekrypt}}
 
 Service:
   main: # default service
