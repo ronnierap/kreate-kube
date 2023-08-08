@@ -14,7 +14,9 @@ def dekrypt_str(value):
 
 def enkrypt_str(value):
     f = Fernet(_krypt_key)
-    return f.encrypt(value.encode("ascii")).decode("ascii")
+    part = b'\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa'
+    # use the parts to prevent changes if secret was not changed
+    return f._encrypt_from_parts(value.encode("ascii"), 0, part).decode("ascii")
 
 
 

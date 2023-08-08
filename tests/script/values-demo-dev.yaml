@@ -29,7 +29,7 @@ DB_USR: dbusrdev
 secrets:
   DB_USR: mark #a-very-close-comment
   # some comments before
-  DB_PSW: gAAAAABk0YdLDbBXZ3pTdCxRGrFd43y7ExkZO5r5aAOI5gkE0rJMPGBe85h_xKhhyGA4fUFRMte2Ywa7VWe3c4MUF1heXJU47Q==  # enkrypted
+  DB_PSW: gAAAAAAAAAAAvcAsFofXR7XlzNv5B6-g-kgmd7Bb2rZauSJh2wU5BpD2krelTT5drm1J-MkvVeN_qOU7TPdx6XITx6nAzYPgyw==  # enkrypted
   # and some comments after
 # even some comments at weird indent
 
@@ -37,4 +37,4 @@ secrets:
   REDIS_USR: redis # just another comment
   # some more
     # weird indentation
-  REDIS_PSW: gAAAAABk0YdLDbBXZ3pTdCxRGrFd43y7ExkZO5r5aAOI5gkE0rJMPGBe85h_xKhhyGA4fUFRMte2Ywa7VWe3c4MUF1heXJU47Q==  # enkrypted
+  REDIS_PSW: gAAAAAAAAAAAvcAsFofXR7XlzNv5B6-g-kgmd7Bb2rZauSJh2wU5BpD2krelTT5drm1J-MkvVeN_qOU7TPdx6XITx6nAzYPgyw==  # enkrypted
