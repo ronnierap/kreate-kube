@@ -30,13 +30,15 @@ class KustApp(KubeApp):
     def kreate_patch(self, res: Resource, kind: str, shortname: str = None, **kwargs):
         templ = self.templates[kind]
         if inspect.isclass(templ):
-            return templ(res, "main", **kwargs)
+            return templ(res, shortname, **kwargs)
         else:
-            return Patch(res, "main", **kwargs)
+            return Patch(res, shortname, **kwargs)
 
-    def kreate_patches(self, res) -> None:
-        for patch in res.konfig.get("patches", {}):
-            self.kreate_patch(res, kind=patch, shortname="main")
+    def kreate_patches(self, res: Resource) -> None:
+        if "patches" in res.konfig:
+            for kind in res.konfig.patches:
+                for shortname in res.konfig.patches[kind]:
+                    self.kreate_patch(res, kind=kind, shortname=shortname)
 
 class Kustomization(Komponent):
     def resources(self):

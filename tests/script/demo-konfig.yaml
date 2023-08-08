@@ -15,7 +15,8 @@ Deployment:
       annotations:
         some-demo-annotation: just-for-fun
     patches:
-      AntiAffinityPatch: {}   # this seems to work, even without a main section
+      AntiAffinityPatch:
+        main: {}
       HttpProbesPatch:
         main:
           startupProbe:
