@@ -25,6 +25,7 @@ class KubeApp(App):
         self.register_template_file("HorizontalPodAutoscaler", aliases="hpa")
         self.register_template_file("ServiceAccount")
         self.register_template_file("ServiceMonitor")
+        self.register_template_file("Secret")
 
     def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
         templ = self.templates[kind]

@@ -64,6 +64,22 @@ spec:
   selector:
     app: demo
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: demo
+  name: demo-udp-service
+  namespace: demo-dev
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: UDP
+    targetPort: 8080
+  selector:
+    app: demo
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -22,6 +22,12 @@ Deployment:
           startupProbe:
             failureThreshold: 120
 
+MyUdpService:
+  main:
+    name: demo-udp-service
+    ports:
+      - port: 8080
+
 PodDisruptionBudget:
   main:
     name: demo-pdb

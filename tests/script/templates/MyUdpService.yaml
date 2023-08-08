@@ -1,0 +1,20 @@
+---
+# This template is a clone of Service, but with protocol=UDP
+# This is to demonstrate that you can easily add your own template, if needed
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ my.name }}
+  namespace: {{ app.namespace }}
+  labels:
+    app: {{ app.name }}
+spec:
+  selector:
+    app: {{ app.name }}
+  ports:
+{% for port in konf.ports %}
+  - protocol: UDP
+    port: {{ port.port }}
+    targetPort: {{ port.targetPort | default(port.port) }}
+    name: {{ port.name | default("http") }}
+{% endfor %}

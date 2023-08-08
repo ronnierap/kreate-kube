@@ -9,4 +9,4 @@ konfig_files:
   - demo-konfig.yaml
   - override-demo-dev.yaml
 templates:
-  Secret: ./templates/Secret.yaml
+  MyUdpService: ./templates/MyUdpService.yaml
