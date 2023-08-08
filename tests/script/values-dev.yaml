@@ -22,7 +22,6 @@ serviceaccount_role: some-role-dev
 root_whitelist: 10.20.30.40
 replicas: 0
 
-env: dev
 ORACLE_URL: localhost:1521
 ORACLE_SCHEMA: demo_schema_dev
 ORACLE_USR: demo_usr_DEV

@@ -72,8 +72,6 @@ class App():
         self.name = appdef.values["app"]
         self.env = appdef.env
         self.appdef = appdef
-        self.script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-        self.vars = dict()
         self.konfig = appdef.konfig()
         self.values = appdef.values
         self.namespace = self.name + "-" + self.env
