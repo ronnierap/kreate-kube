@@ -1,6 +1,8 @@
-import sys
 from cryptography.fernet import Fernet
 from ruamel.yaml import YAML
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -31,9 +33,10 @@ def change_yaml_comments( filename: str, func, from_: str, to_ :str, dir: str = 
                 comment.column = 0
                 comment.value = "   "+comment.value.replace(from_, to_,1)
                 yaml["secrets"][key] = func(item)
+                logger.info(f"{to_} {key}")
 
-    #    with open(f"{dir}/{filename}", 'wb') as f:
-    yaml_parser.dump(yaml, sys.stdout)
+    with open(f"{dir}/{filename}", 'wb') as f:
+        yaml_parser.dump(yaml, f)
 
 def dekrypt_yaml( filename: str, dir: str = None):
     change_yaml_comments(filename, dekrypt_str, "enkrypted", "dekrypted", dir=dir)
