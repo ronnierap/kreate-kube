@@ -16,7 +16,7 @@ def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
 
 def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     app = kreate.KustApp(appdef) # or appdef.kreate_app()?
-    app.register_template_file("MyUdpService", "templates/MyUdpService.yaml")
+    app.register_template_file("MyUdpService", kreate.Resource, "templates/MyUdpService.yaml")
     app.kreate_komponent("MyUdpService", "main")
 
     kreate.Ingress(app, "root")
@@ -48,7 +48,7 @@ def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     app.kreate_komponent("ServiceMonitor")
     app.kreate_komponent("HorizontalPodAutoscaler")
 
-    cm = kreate.KustConfigMap(app, "vars") # kustomize=False
+    cm = kreate.KustConfigMap(app, shortname="vars") # kustomize=False
     cm.add_var("ENV", app.values["env"])
     cm.add_var("ORACLE_URL")
     cm.add_var("ORACLE_USR")

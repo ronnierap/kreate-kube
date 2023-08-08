@@ -7,7 +7,7 @@ import importlib
 
 from ._core import  DeepChain, DictWrapper
 from ._krypt import dekrypt
-from ._jinyaml import load_jinyaml
+from ._jinyaml import load_jinyaml, FileLocation
 
 logger = logging.getLogger(__name__)
 
@@ -28,22 +28,22 @@ class AppDef():
         self.filename = filename
         self.env = env
         self.values = { "env": env, "dekrypt": dekrypt, "getenv": os.getenv }
-        self.yaml = load_jinyaml(filename, self.values)
+        self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
         self.values.update(self.yaml.get("values",{}))
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
 
         for fname in self.yaml.get("value_files",[]):
-            val_yaml = load_jinyaml(fname, self.values, dirname=self.dir)
+            val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
 
         self.konfig_dicts = []
         for fname in self.yaml.get("konfig_files"):
-            self.add_konfig_file(fname, dirname=self.dir)
+            self.add_konfig_file(fname, dir=self.dir)
         #self.add_konfig_file(f"@kreate.templates:default-values.yaml")#, package=templates )
 
-    def add_konfig_file(self, filename, package=None, dirname=None):
+    def add_konfig_file(self, filename, package=None, dir=None):
         vars = { "val": self.values }
-        yaml = load_jinyaml(filename, vars, package=package, dirname=dirname)
+        yaml = load_jinyaml(FileLocation(filename, package=package, dir=dir), vars)
         self.konfig_dicts.append(yaml)
 
     def konfig(self):
@@ -54,7 +54,7 @@ class AppDef():
         for key in self.yaml.get("templates",[]):
             templ = self.yaml['templates'][key]
             logger.info(f"adding custom template {key}: {templ}")
-            app.register_template_file(key, templ)
+            app.register_template_file(key, filename=templ)
         return app
 
 
@@ -81,21 +81,20 @@ class App():
     def register_template(self, kind: str, cls, filename, aliases=None, package=None):
         if kind in self.kind_templates:
             logger.warning(f"overriding template {kind}")
+        filename = filename or f"{kind}.yaml"
+        loc = FileLocation(filename=filename, package=package, dir=self.appdef.dir)
+        logger.debug(f"registering template {kind}: {loc}")
+        self.kind_templates[kind] = loc
         self.kind_classes[kind] = cls
-        if package:
-            filename = f"py:kreate.kube_templates:{filename}"
-        logger.debug(f"registering template {name}: {filename}")
-        self.templates[name] = filename
         if aliases:
-            self.add_alias(name, aliases)
+            self.add_alias(kind, aliases)
 
-    def register_template_class(self, cls, aliases=None, package=None):
-        # TODO: determine package more smart
-        # f"py:kreate.templates:{cls.__name__}.yaml"
-        self.register_template(cls.__name__, cls, aliases=aliases, package=package)
+    def register_template_class(self: str, cls, filename=None, aliases=None, package=None):
+        kind = cls.__name__
+        self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
 
-    def register_template_file(self, name, filename=None, aliases=None, package=None):
-        self.register_template(name, filename, aliases=aliases, package=package)
+    def register_template_file(self, kind:str, cls, filename=None, aliases=None, package=None):
+        self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
 
     def register_std_templates(self) -> None:
         pass
@@ -130,11 +129,12 @@ class App():
         return self._kinds.get(attr, None)
 
     def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
-        templ = self.templates[kind]
-        if inspect.isclass(templ):
-            return templ(self, shortname=shortname, kind=kind, **kwargs)
+        cls = self.kind_classes[kind]
+        templ = self.kind_templates[kind]
+        if inspect.isclass(cls):
+            return cls(app=self, kind=kind, shortname=shortname, template=templ, **kwargs)
         else:
-            raise ValueError(f"Unknown template type {type(templ)}, {templ}")
+            raise ValueError(f"Unknown template type {type(cls)}, {cls}")
 
     def kreate_files(self):
         if os.path.exists(self.target_dir) and os.path.isdir(self.target_dir):
@@ -156,7 +156,7 @@ class App():
 
     def konfigure_from_konfig(self):
         for kind in sorted(self.konfig.keys()):
-            if kind in self.templates:
+            if kind in self.kind_classes:
                 for shortname in sorted(self.konfig[kind].keys()):
                     logger.info(f"konfiguring {kind}.{shortname}")
                     self.kreate_komponent(kind, shortname)

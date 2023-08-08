@@ -1,10 +1,15 @@
 import logging
 import inspect
 
+from kreate._app import App
+from kreate._jinyaml import FileLocation
+
 from . import _core
 from . import kust_templates
 from ._komp import Komponent
 from ._kube import KubeApp, Resource
+from ._jinyaml import FileLocation
+
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +17,7 @@ logger = logging.getLogger(__name__)
 class KustApp(KubeApp):
     def kreate_files(self):
         super().kreate_files()
-        self.kust = Kustomization(self)
+        self.kust = self.kreate_komponent("Kustomization")
         self.kust.kreate_file()
 
     def register_std_templates(self) -> None:
@@ -29,11 +34,11 @@ class KustApp(KubeApp):
                 self.kreate_patches(res)
 
     def kreate_patch(self, res: Resource, kind: str, shortname: str = None, **kwargs):
-        templ = self.templates[kind]
-        if inspect.isclass(templ):
-            return templ(res, shortname, **kwargs)
-        else:
-            return Patch(res, shortname, **kwargs)
+        cls = self.kind_classes[kind]
+        templ = self.kind_templates[kind]
+        if issubclass(cls, Patch):
+            return cls(res, kind, shortname, template=templ, **kwargs)
+        raise TypeError(f"class for {kind}.{shortname} is not a Patch but {cls}")
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.konfig:
@@ -60,6 +65,9 @@ class Kustomization(Komponent):
 
 # Note: this is not a resource
 class KustConfigMap(Komponent):
+    def __init__(self, app: App, kind=None, shortname=None, template=None, **kwargs):
+        super().__init__(app, shortname=shortname, kind=kind, template=template, **kwargs)
+
     def _init(self):
         self.vars = {}
 
@@ -80,9 +88,9 @@ class KustConfigMap(Komponent):
         self.vars[name] = value
 
 class Patch(Komponent):
-    def __init__(self, target: Resource, shortname: str = None, **kwargs):
+    def __init__(self, target: Resource, kind: str = None, shortname: str = None, template: FileLocation=None, **kwargs):
         self.target = target
-        Komponent.__init__(self, target.app, shortname=shortname, **kwargs)
+        Komponent.__init__(self, target.app, kind=kind, shortname=shortname, template=template, **kwargs)
 
     def __str__(self):
         return f"<Patch {self.target.kind}.{self.target.shortname}:{self.kind}.{self.shortname}>"

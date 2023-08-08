@@ -6,6 +6,7 @@ import logging
 from collections.abc import Mapping
 from ._app import App
 from ._komp import Komponent
+from ._jinyaml import FileLocation
 from . import kube_templates
 
 logger = logging.getLogger(__name__)
@@ -23,19 +24,32 @@ class KubeApp(App):
         self.register_template_class(ConfigMap, aliases="cm", package=kube_templates)
         self.register_template_class(Ingress, package=kube_templates)
         self.register_template_class(Egress, package=kube_templates)
-        self.register_template_file("HorizontalPodAutoscaler", filename="HorizontalPodAutoscaler.yaml", aliases="hpa", package=kube_templates)
-        self.register_template_file("ServiceAccount", filename="ServiceAccount.yaml", package=kube_templates)
-        self.register_template_file("ServiceMonitor", filename="ServiceMonitor.yaml", package=kube_templates)
-        self.register_template_file("Secret", filename="Secret.yaml", package=kube_templates)
+        self.register_template_file("HorizontalPodAutoscaler", aliases="hpa", package=kube_templates)
+        self.register_template_file("ServiceAccount", package=kube_templates)
+        self.register_template_file("ServiceMonitor", package=kube_templates)
+        self.register_template_file("Secret", package=kube_templates)
 
-    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
-        templ = self.templates[kind]
-        if inspect.isclass(templ):
-            return templ(self, shortname=shortname, kind=kind, **kwargs)
-        else:
-            # TODO: not everything is a Resource
-            return Resource(self, shortname=shortname, kind=kind, template=templ , **kwargs)
+    def register_template_file(self, kind:str, cls=None, filename=None, aliases=None, package=None):
+        # Override parent, to provide default class Resource
+        cls = cls or Resource
+        self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
 
+
+#    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
+#        cls = self.kind_classes[kind]
+#        if inspect.isclass(cls):
+#            return cls(self, shortname=shortname, kind=kind, **kwargs)
+#        else:
+#            raise ValueError(f"Unknown template type {type(cls)}, {cls}")
+#
+#    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
+#        templ = self.templates[kind]
+#        if inspect.isclass(templ):
+#            return templ(self, shortname=shortname, kind=kind, **kwargs)
+#        else:
+#            # TODO: not everything is a Resource
+#            return Resource(self, shortname=shortname, kind=kind, template=templ , **kwargs)
+#
 ##################################################################
 
 class Resource(Komponent):
@@ -43,7 +57,7 @@ class Resource(Komponent):
                  app: App,
                  shortname: str = None,
                  kind: str = None,
-                 template: str = None,
+                 template: FileLocation = None,
                  **kwargs
                 ):
         Komponent.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)

@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from ._core import  DeepChain
 from ._jinyaml import YamlBase
 from ._app import App
+from ._jinyaml import FileLocation
 
 logger = logging.getLogger(__name__)
 
@@ -11,18 +12,18 @@ logger = logging.getLogger(__name__)
 class Komponent(YamlBase):
     """An object that is parsed from a yaml template and konfiguration"""
     def __init__(self, app: App,
-                 shortname: str = None,
-                 kind: str = None,
-                 template: str = None,
+                 kind: str,
+                 shortname: str,
+                 template: FileLocation,
                  **kwargs
                  ):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         self.konfig = self._calc_konfig(kwargs)
+        template = template or self.app.kind_templates[self.kind]
 
-        #template = template or f"py:kreate.templates:{self.kind}.yaml"
-        YamlBase.__init__(self, template, dir=self.app.appdef.dir)
+        YamlBase.__init__(self, template)
         self._init()
         self.skip = self.konfig.get("ignore", False)
         self.name = self.konfig.get("name", None) or self.calc_name().lower()
@@ -30,6 +31,7 @@ class Komponent(YamlBase):
             # do not load the template (konfig might be missing)
             logger.info(f"ignoring {self.name}")
         else:
+            logger.debug(f"parsing {self.kind}.{self.shortname} at {self.template}")
             self.load_yaml()
         self.app.add(self)
         self.invoke_options()
