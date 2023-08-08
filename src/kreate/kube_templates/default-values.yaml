@@ -13,6 +13,8 @@ default:
     memory_limit: 512M
     cpu_request: 200m
     memory_request: 512M
+    revisionHistoryLimit: 1
+    restartPolicy: Always
 
   HorizontalPodAutoscaler:
     minReplicas: 1

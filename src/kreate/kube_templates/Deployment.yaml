@@ -5,7 +5,7 @@ metadata:
   name: {{ my.name }}
 spec:
   replicas: {{ konf.replicas }}
-  revisionHistoryLimit: 1
+  revisionHistoryLimit: {{ default.revisionHistoryLimit }}
   selector:
     matchLabels:
       app: {{ my.name }}
@@ -29,7 +29,7 @@ spec:
         {{ anno }}: {{ konf.pod.annotations[anno] }}
         {% endfor %}
     spec:
-      #restartPolicy: Never
+      restartPolicy: {{ default.restartPolicy }}
       containers:
       - name: {{ default.name }}
         image: {{ konf.image_repo }}/{{ app.name }}.app:{{ konf.version }}
