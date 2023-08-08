@@ -28,15 +28,15 @@ def change_yaml_comments( filename: str, func, from_: str, to_ :str, dir: str = 
     with open(f"{dir}/{filename}") as f:
         data = f.read()
     yaml = yaml_parser.load(data)
-    ca = yaml['secrets'].ca
-    for key in yaml.get("secrets", {}):
+    ca = yaml.ca
+    for key in yaml:
         if key in ca.items: # and len(ca.items[key])>2:
-            item = yaml["secrets"][key]
+            item = yaml[key]
             comment=ca.items[key][2]
             if from_ in comment.value:
                 comment.column = 0
                 comment.value = " "+comment.value.replace(from_, to_,1)
-                yaml["secrets"][key] = func(item)
+                yaml[key] = func(item)
                 logger.info(f"{to_} {key}")
 
     with open(f"{dir}/{filename}", 'wb') as f:

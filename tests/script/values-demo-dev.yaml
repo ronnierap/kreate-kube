@@ -25,17 +25,3 @@ replicas: 0
 ORACLE_URL: localhost:1521
 ORACLE_SCHEMA: demo_schema_dev
 ORACLE_USR: demo_usr_DEV
-DB_USR: dbusrdev
-DB_PSW: n0t-v3ry-s3cr3t
-secrets:
-  DB_USR: mark #a-very-close-comment
-  # some comments before
-  DB_PSW: n0t-v3ry-s3cr3t  # dekrypted
-  # and some comments after
-# even some comments at weird indent
-
-  # a comment after a empty line
-  REDIS_USR: redis # just another comment
-  # some more
-    # weird indentation
-  REDIS_PSW: n0t-v3ry-s3cr3t  # dekrypted

@@ -123,10 +123,12 @@ def konfig(args):
 def dekrypt(args):
     """decrypt values in a yaml file"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
-    _krypt.dekrypt_yaml(f"values-{appdef.name}-{appdef.env}.yaml", appdef.dir)
+    filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
+    _krypt.dekrypt_yaml(filename, appdef.dir)
 
 @subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["enk"])
 def enkrypt(args):
     "encrypt values in a yaml file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
-    _krypt.enkrypt_yaml(f"values-{appdef.name}-{appdef.env}.yaml", appdef.dir)
+    filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
+    _krypt.enkrypt_yaml(filename, appdef.dir)
