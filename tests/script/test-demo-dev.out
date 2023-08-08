@@ -20,6 +20,18 @@ metadata:
   namespace: demo-dev
 ---
 apiVersion: v1
+data:
+  DB_PSW: n0t-v3ry-s3cr3t
+  DB_USR: dbusrdev
+kind: Secret
+metadata:
+  labels:
+    secret: demo-secret
+  name: demo-secret
+  namespace: demo-dev
+type: Opaque
+---
+apiVersion: v1
 kind: Service
 metadata:
   labels:

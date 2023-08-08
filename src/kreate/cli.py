@@ -2,12 +2,14 @@ import argparse
 import os
 import logging
 from . import jinyaml
+from .app import App, AppDef
 
 logger = logging.getLogger(__name__)
 
 class Cli():
-    def __init__(self, kreate_appdef_func):
+    def __init__(self, kreate_appdef_func, kreate_app_func=None):
         self.kreate_appdef_func = kreate_appdef_func
+        self.kreate_app_func = kreate_app_func
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument("-e","--env", action="store", default="dev")
         self.parser.add_argument("-a","--appdef", action="store", default="appdef.yaml")
@@ -51,12 +53,12 @@ class Cli():
             logging.basicConfig(level=logging.ERROR)
         else:
             logging.basicConfig(level=logging.INFO)
-        args.func(self.kreate_appdef_func, args)
+        args.func(self, args)
 
 
-def _do_files(kreate_appdef_func, args):
-    appdef = kreate_appdef_func(args.appdef, args.env)
-    app = appdef.kreate_app()
+def _do_files(cli:Cli, args) -> App:
+    appdef : AppDef = cli.kreate_appdef_func(args.appdef, args.env)
+    app : App = cli.kreate_app_func(appdef) # appdef knows the type of App to kreate
     app.kreate_files()
     return app
 

@@ -21,8 +21,8 @@ class KustApp(app.App):
         self.register_template_class(AntiAffinityPatch)
         self.register_template_class(HttpProbesPatch)
 
-    def kreate_from_konfig(self):
-        super().kreate_from_konfig()
+    def konfigure_from_konfig(self):
+        super().konfigure_from_konfig()
         for res in self.komponents:
             if isinstance(res, Resource):
                 self.kreate_patches(res)

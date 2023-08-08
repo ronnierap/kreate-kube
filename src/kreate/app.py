@@ -36,7 +36,6 @@ class AppDef():
         self.dir = os.path.dirname(filename)
         self.filename = filename
         self.env = env
-        self.kreate_app_func = None
         self.values = { "env": env, "dekrypt": dekrypt, "getenv": os.getenv }
         self.yaml = jinyaml.load_jinyaml(filename, self.values)
         self.values.update(self.yaml.get("values",{}))
@@ -46,7 +45,7 @@ class AppDef():
             val_yaml = jinyaml.load_jinyaml(fname, self.values, dirname=self.dir)
             self.values.update(val_yaml)
 
-        self.maps = []
+        self.konfig_dicts = []
         for fname in self.yaml.get("konfig_files"):
             self.add_konfig_file(fname, dirname=self.dir)
         #self.add_konfig_file(f"@kreate.templates:default-values.yaml")#, package=templates )
@@ -54,23 +53,17 @@ class AppDef():
     def add_konfig_file(self, filename, package=None, dirname=None):
         vars = { "val": self.values }
         yaml = jinyaml.load_jinyaml(filename, vars, package=package, dirname=dirname)
-        self.maps.append(yaml)
+        self.konfig_dicts.append(yaml)
 
     def konfig(self):
-        return core.DeepChain(*reversed(self.maps))
+        return core.DeepChain(*reversed(self.konfig_dicts))
 
     def kreate_app(self):
-        app: App
-        if self.kreate_app_func:
-            app = self.kreate_app_func(appdef=self)
-        else:
-            app = self.app_class(self)
+        app: App = self.app_class(self)
         for key in self.yaml.get("templates",[]):
             templ = self.yaml['templates'][key]
             logger.info(f"adding custom template {key}: {templ}")
             app.register_template_file(key, templ)
-        if not self.kreate_app_func:
-            app.kreate_from_konfig()
         return app
 
 
@@ -181,12 +174,11 @@ class App():
             return self.konfig[kind].keys()
         return []
 
-
-    def kreate_from_konfig(self):
+    def konfigure_from_konfig(self):
         for kind in sorted(self.konfig.keys()):
             if kind in self.templates:
                 for shortname in sorted(self.konfig[kind].keys()):
-                    logger.info(f"kreating {kind}.{shortname}")
+                    logger.info(f"konfiguring {kind}.{shortname}")
                     self.kreate_komponent(kind, shortname)
             elif kind != "default":
                 logger.warning(f"Unknown toplevel komponent {kind}")

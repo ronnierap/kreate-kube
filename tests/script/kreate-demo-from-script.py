@@ -15,7 +15,7 @@ def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
 
 
 def kreate_app(appdef: kreate.AppDef) -> kreate.App:
-    app = kreate.KustApp(appdef)
+    app = kreate.KustApp(appdef) # or appdef.kreate_app()?
 
     kreate.Ingress(app, "root")
     app.ingress.root.sticky()
@@ -53,4 +53,4 @@ def kreate_app(appdef: kreate.AppDef) -> kreate.App:
 
     return app
 
-kreate.Cli(kreate_appdef).run()
+kreate.Cli(kreate_appdef, kreate_app).run()

@@ -10,15 +10,13 @@ import kreate
 def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
     # ignore passed in appdef
     appdef = kreate.AppDef(env, "tests/script/appdef.yaml")
-    appdef.kreate_app_func = kreate_app
     return appdef
 
-
 def kreate_app(appdef: kreate.AppDef) -> kreate.App:
-    app = kreate.KustApp(appdef)
-    app.kreate_from_konfig()
+    app = appdef.kreate_app()
+    app.konfigure_from_konfig()
     # find the (main) Deployment and modify it a bit
     app.depl.main.label("this-is-added","by-script")
     return app
 
-kreate.Cli(kreate_appdef).run()
+kreate.Cli(kreate_appdef, kreate_app).run()
