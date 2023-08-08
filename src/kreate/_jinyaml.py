@@ -6,6 +6,8 @@ import importlib
 from collections.abc import Mapping
 from ruamel.yaml import YAML
 
+from ._core import wrap
+
 logger = logging.getLogger(__name__)
 
 yaml_parser = YAML()
@@ -50,3 +52,21 @@ def load_jinyaml(filename: str, vars: Mapping, package=None, dirname: str = None
 
 def dump(data, file):
     yaml_parser.dump(data, file)
+
+
+
+class YamlBase:
+    def __init__(self, template: str, dir: str):
+        self.template = template
+        self.dir = dir
+
+    def load_yaml(self):
+        vars = self._template_vars()
+        self.yaml = wrap(load_jinyaml(self.template, vars, dirname=self.dir ))
+
+    def save_yaml(self, outfile) -> None:
+        with open(outfile, 'wb') as f:
+            dump(self.yaml.data, f)
+
+    def _template_vars(self):
+        return {}

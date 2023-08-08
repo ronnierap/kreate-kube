@@ -7,8 +7,8 @@ import importlib
 import jinja2.filters
 from cryptography.fernet import Fernet
 
-from ._jinyaml import load_jinyaml
-from ._core import YamlBase, DeepChain, DictWrapper
+from ._core import  DeepChain, DictWrapper
+from ._jinyaml import YamlBase, load_jinyaml
 
 logger = logging.getLogger(__name__)
 

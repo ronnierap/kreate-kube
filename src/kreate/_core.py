@@ -3,8 +3,6 @@ from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 import logging
 
-from . import _jinyaml, templates
-
 logger = logging.getLogger(__name__)
 
 class DictWrapper(UserDict):
@@ -118,20 +116,3 @@ class DeepChain(Mapping):
                     print(f"{indent}- {v}")
             else:
                 print(f"{indent}{key}: {val}")
-
-
-class YamlBase:
-    def __init__(self, template: str, dir: str):
-        self.template = template
-        self.dir = dir
-
-    def load_yaml(self):
-        vars = self._template_vars()
-        self.yaml = wrap(_jinyaml.load_jinyaml(self.template, vars, dirname=self.dir ))
-
-    def save_yaml(self, outfile) -> None:
-        with open(outfile, 'wb') as f:
-            _jinyaml.dump(self.yaml.data, f)
-
-    def _template_vars(self):
-        return {}
