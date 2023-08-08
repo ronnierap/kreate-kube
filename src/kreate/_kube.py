@@ -6,6 +6,7 @@ import logging
 from collections.abc import Mapping
 from ._app import App
 from ._komp import Komponent
+from . import kube_templates
 
 logger = logging.getLogger(__name__)
 
@@ -16,16 +17,16 @@ class KubeApp(App):
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
-        self.register_template_class(Service, aliases="svc")
-        self.register_template_class(Deployment, aliases="depl")
-        self.register_template_class(PodDisruptionBudget, aliases="pdb")
-        self.register_template_class(ConfigMap, aliases="cm")
-        self.register_template_class(Ingress)
-        self.register_template_class(Egress)
-        self.register_template_file("HorizontalPodAutoscaler", aliases="hpa")
-        self.register_template_file("ServiceAccount")
-        self.register_template_file("ServiceMonitor")
-        self.register_template_file("Secret")
+        self.register_template_class(Service, aliases="svc", package=kube_templates)
+        self.register_template_class(Deployment, aliases="depl", package=kube_templates)
+        self.register_template_class(PodDisruptionBudget, aliases="pdb", package=kube_templates)
+        self.register_template_class(ConfigMap, aliases="cm", package=kube_templates)
+        self.register_template_class(Ingress, package=kube_templates)
+        self.register_template_class(Egress, package=kube_templates)
+        self.register_template_file("HorizontalPodAutoscaler", filename="HorizontalPodAutoscaler.yaml", aliases="hpa", package=kube_templates)
+        self.register_template_file("ServiceAccount", filename="ServiceAccount.yaml", package=kube_templates)
+        self.register_template_file("ServiceMonitor", filename="ServiceMonitor.yaml", package=kube_templates)
+        self.register_template_file("Secret", filename="Secret.yaml", package=kube_templates)
 
     def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
         templ = self.templates[kind]

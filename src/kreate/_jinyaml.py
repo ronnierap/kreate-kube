@@ -2,6 +2,7 @@ import jinja2
 import pkgutil
 import logging
 import importlib
+import inspect
 
 from collections.abc import Mapping
 from ruamel.yaml import YAML
@@ -13,6 +14,8 @@ logger = logging.getLogger(__name__)
 yaml_parser = YAML()
 
 def load_data(filename: str, package=None, dirname: str = None):
+    if inspect.isclass(filename):
+        filename = filename
     prefix = "py:"
     if filename.startswith(prefix):
         fname = filename[len(prefix):]

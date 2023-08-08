@@ -2,6 +2,7 @@ import logging
 import inspect
 
 from . import _core
+from . import kust_templates
 from ._komp import Komponent
 from ._kube import KubeApp, Resource
 
@@ -16,10 +17,10 @@ class KustApp(KubeApp):
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
-        self.register_template_class(Kustomization)
-        self.register_template_class(KustConfigMap)
-        self.register_template_class(AntiAffinityPatch)
-        self.register_template_class(HttpProbesPatch)
+        self.register_template_class(Kustomization, package=kust_templates)
+        self.register_template_class(KustConfigMap, package=kust_templates)
+        self.register_template_class(AntiAffinityPatch, package=kust_templates)
+        self.register_template_class(HttpProbesPatch, package=kust_templates)
 
     def konfigure_from_konfig(self):
         super().konfigure_from_konfig()

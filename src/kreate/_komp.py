@@ -1,7 +1,7 @@
 import logging
 from collections.abc import Mapping
 
-from ._core import  DeepChain, DictWrapper
+from ._core import  DeepChain
 from ._jinyaml import YamlBase
 from ._app import App
 
@@ -21,7 +21,7 @@ class Komponent(YamlBase):
         self.shortname = shortname or "main"
         self.konfig = self._calc_konfig(kwargs)
 
-        template = template or f"py:kreate.templates:{self.kind}.yaml"
+        #template = template or f"py:kreate.templates:{self.kind}.yaml"
         YamlBase.__init__(self, template, dir=self.app.appdef.dir)
         self._init()
         self.skip = self.konfig.get("ignore", False)

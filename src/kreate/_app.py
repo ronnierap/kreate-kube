@@ -67,7 +67,8 @@ class App():
         self.values = appdef.values
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
-        self.templates = {}
+        self.kind_templates = {}
+        self.kind_classes = {}
         self.komponents = []
         self._kinds = {}
         self.aliases = {}
@@ -77,22 +78,24 @@ class App():
     def _init(self):
         pass
 
-    def register_template(self, name: str, template, aliases=None):
-        if name in self.templates:
-            logger.warning(f"overriding template {name}")
-        logger.debug(f"registering template {name}: {template}")
-        self.templates[name] = template
+    def register_template(self, kind: str, cls, filename, aliases=None, package=None):
+        if kind in self.kind_templates:
+            logger.warning(f"overriding template {kind}")
+        self.kind_classes[kind] = cls
+        if package:
+            filename = f"py:kreate.kube_templates:{filename}"
+        logger.debug(f"registering template {name}: {filename}")
+        self.templates[name] = filename
         if aliases:
             self.add_alias(name, aliases)
 
-    def register_template_class(self, cls, aliases=None):
+    def register_template_class(self, cls, aliases=None, package=None):
         # TODO: determine package more smart
         # f"py:kreate.templates:{cls.__name__}.yaml"
-        self.register_template(cls.__name__, cls, aliases=aliases)
+        self.register_template(cls.__name__, cls, aliases=aliases, package=package)
 
-    def register_template_file(self, name, filename=None, aliases=None):
-        filename = filename or f"py:kreate.templates:{name}.yaml"
-        self.register_template(name, filename, aliases=aliases)
+    def register_template_file(self, name, filename=None, aliases=None, package=None):
+        self.register_template(name, filename, aliases=aliases, package=package)
 
     def register_std_templates(self) -> None:
         pass
