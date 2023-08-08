@@ -7,8 +7,11 @@ import importlib
 from . import _krypt
 from ._core import  DeepChain, DictWrapper
 from ._jinyaml import load_jinyaml, FileLocation
+import jinja2.filters
 
 logger = logging.getLogger(__name__)
+
+jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
 
 def get_package_data(ur: str):
     module = importlib.import_module('my_package.my_module')
@@ -26,13 +29,15 @@ class AppDef():
         self.dir = os.path.dirname(filename)
         self.filename = filename
         self.env = env
-        self.values = { "env": env, "dekrypt": _krypt.dekrypt, "getenv": os.getenv }
+        self.values = { "env": env, "dekrypt": _krypt.dekrypt_str, "getenv": os.getenv }
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
         _krypt._krypt_key = self.yaml["krypt_key"]
 
         self.values.update(self.yaml.get("values",{}))
+        self.name = self.values["app"]
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
 
+    def load_extra(self):
         for fname in self.yaml.get("value_files",[]):
             val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
@@ -61,7 +66,7 @@ class AppDef():
 
 class App():
     def __init__(self, appdef: AppDef):
-        self.name = appdef.values["app"]
+        self.name = appdef.name
         self.env = appdef.env
         self.appdef = appdef
         self.konfig = appdef.konfig()

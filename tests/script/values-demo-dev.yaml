@@ -26,5 +26,15 @@ ORACLE_URL: localhost:1521
 ORACLE_SCHEMA: demo_schema_dev
 ORACLE_USR: demo_usr_DEV
 DB_USR: dbusrdev
-#DB_PSW: {{ 'gAAAAABk0YdLDbBXZ3pTdCxRGrFd43y7ExkZO5r5aAOI5gkE0rJMPGBe85h_xKhhyGA4fUFRMte2Ywa7VWe3c4MUF1heXJU47Q==' | dekrypt }}
-DB_PSW: {{ dekrypt('gAAAAABk0YdLDbBXZ3pTdCxRGrFd43y7ExkZO5r5aAOI5gkE0rJMPGBe85h_xKhhyGA4fUFRMte2Ywa7VWe3c4MUF1heXJU47Q==') }}
+secrets:
+  DB_USR: mark #a-very-close-comment
+  # some comments before
+  DB_PSW: gAAAAABk0YdLDbBXZ3pTdCxRGrFd43y7ExkZO5r5aAOI5gkE0rJMPGBe85h_xKhhyGA4fUFRMte2Ywa7VWe3c4MUF1heXJU47Q==  # enkrypted
+  # and some comments after
+# even some comments at weird indent
+
+  # a comment after a empty line
+  REDIS_USR: redis # just another comment
+  # some more
+    # weird indentation
+  REDIS_PSW: gAAAAABk0YdLDbBXZ3pTdCxRGrFd43y7ExkZO5r5aAOI5gkE0rJMPGBe85h_xKhhyGA4fUFRMte2Ywa7VWe3c4MUF1heXJU47Q==  # enkrypted

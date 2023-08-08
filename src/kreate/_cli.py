@@ -1,7 +1,7 @@
 import argparse
 import os
 import logging
-from . import _jinyaml
+from . import _jinyaml, _krypt
 from ._app import App, AppDef
 
 logger = logging.getLogger(__name__)
@@ -28,6 +28,8 @@ class Cli():
         self.test_cmd = subparsers.add_parser("test", help="test output against test.out file", aliases=["t"])
         self.testupdate_cmd = subparsers.add_parser("testupdate", help="update test.out file", aliases=["tu"])
         self.konfig_cmd = subparsers.add_parser("konfig", help="show the konfig structure", aliases=["k"])
+        self.dekrypt_cmd = subparsers.add_parser("dekrypt", help="dekrypt secrets in yaml", aliases=["dek"])
+        self.enkrypt_cmd = subparsers.add_parser("enkrypt", help="enkrypt secrets in yaml", aliases=["enk"])
 
         self.files_cmd.set_defaults(func=_do_files)
         self.out_cmd.set_defaults(func=_do_out)
@@ -36,6 +38,8 @@ class Cli():
         self.test_cmd.set_defaults(func=_do_test)
         self.testupdate_cmd.set_defaults(func=_do_testupdate)
         self.konfig_cmd.set_defaults(func=_do_konfig)
+        self.dekrypt_cmd.set_defaults(func=_do_dekrypt)
+        self.enkrypt_cmd.set_defaults(func=_do_enkrypt)
         # from https://stackoverflow.com/questions/6365601/default-sub-command-or-handling-no-sub-command-with-argparse
         self.parser.set_defaults(func=_do_files) # TODO: better way to set default command?
 
@@ -93,5 +97,14 @@ def _do_testupdate(kreate_appdef_func, args):
     os.system(cmd)
 
 def _do_konfig(kreate_appdef_func, args):
-    appdef = kreate_appdef_func(args.appdef, args.env)
+    appdef : AppDef = kreate_appdef_func(args.appdef, args.env)
+    appdef.load_extra()
     appdef.konfig().pprint(field=args.kind)
+
+def _do_dekrypt(cli, args):
+    appdef : AppDef = cli.kreate_appdef_func(args.appdef, args.env)
+    _krypt.dekrypt_yaml(f"values-{appdef.name}-{appdef.env}.yaml", appdef.dir)
+
+def _do_enkrypt(cli, args):
+    appdef : AppDef = cli.kreate_appdef_func(args.appdef, args.env)
+    _krypt.enkrypt_yaml(f"values-{appdef.name}-{appdef.env}.yaml", appdef.dir)
