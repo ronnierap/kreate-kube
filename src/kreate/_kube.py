@@ -69,6 +69,10 @@ class Resource(Komponent):
             self.yaml.metadata["labels"]={}
         self.yaml.metadata.labels[name]=val
 
+    def load_file(self, filename: str) -> str:
+        with open(f"{self.app.appdef.dir}/{filename}") as f:
+            return f.read()
+
 
 class Deployment(Resource):
     def calc_name(self):
