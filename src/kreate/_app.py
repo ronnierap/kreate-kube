@@ -3,6 +3,7 @@ import shutil
 import inspect
 import logging
 import importlib
+import base64
 
 from . import _krypt
 from ._core import  DeepChain, DictWrapper
@@ -11,7 +12,19 @@ import jinja2.filters
 
 logger = logging.getLogger(__name__)
 
+
+def b64encode(value: str) -> str:
+    if value:
+        res = base64.b64encode(value.encode("ascii"))
+        return res.decode("ascii")
+    print("empty")
+    return ""
+
+
 jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
+jinja2.filters.FILTERS["b64encode"] = b64encode
+
+
 
 def get_package_data(ur: str):
     module = importlib.import_module('my_package.my_module')
