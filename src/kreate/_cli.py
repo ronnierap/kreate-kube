@@ -112,7 +112,7 @@ def buikd(args):
 def diff(args):
     """diff with current existing resources"""
     app = kreate_files(args)
-    cmd = f"kustomize build {app.target_dir} | kubectl diff -f - "
+    cmd = f"kustomize build {app.target_dir} | kubectl --context={app.env} -n {app.namespace} diff -f - "
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
