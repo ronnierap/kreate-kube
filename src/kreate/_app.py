@@ -45,13 +45,12 @@ class AppDef():
         self.dir = os.path.dirname(filename)
         self.filename = filename
         self.values = { "dekrypt": _krypt.dekrypt_str, "getenv": os.getenv }
-        print(self.filename)
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
         self.values.update(self.yaml.get("values",{}))
         self.name = self.values["app"]
         self.env = self.values["env"]
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
-        _krypt._krypt_key = self.yaml.get("krypt_key","no-krypt-key-defined")
+        _krypt._krypt_key = b64encode(self.yaml.get("krypt_key","no-krypt-key-defined"))
 
     def load_konfig_files(self):
         for fname in self.yaml.get("value_files",[]):

@@ -149,12 +149,27 @@ def konfig(args):
     appdef.konfig().pprint(field=args.kind)
 
 
-@subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["dek"])
+@subcommand([argument("-f", "--filename", help="decrypt yaml file")], aliases=["dek"])
 def dekrypt(args):
     """decrypt values in a yaml file"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.dekrypt_yaml(filename, appdef.dir)
+
+@subcommand([argument("-v", "--value", help="string")], aliases=["ds"])
+def dekrypt(args):
+    """decrypt str value"""
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    value = args.value
+    print(_krypt.dekrypt_str(value))
+
+@subcommand([argument("-v", "--value", help="string")], aliases=["es"])
+def enkrypt(args):
+    """enkrypt str value"""
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    value = args.value
+    print(_krypt.enkrypt_str(value))
+
 
 @subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["enk"])
 def enkrypt(args):
