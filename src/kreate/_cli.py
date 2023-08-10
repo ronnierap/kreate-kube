@@ -114,7 +114,7 @@ def test(args):
     """test output against test.out file"""
     _krypt._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
     app = kreate_files(args)
-    cmd = f"kustomize build {app.target_dir} | diff  {app.appdef.dir}/test-{app.name}-{app.env}.out -"
+    cmd = f"kustomize build {app.target_dir} | diff  {app.appdef.dir}/expected-output-{app.name}-{app.env}.out -"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
@@ -123,7 +123,7 @@ def testupdate(args):
     """update test.out file"""
     _krypt._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
     app = kreate_files(args)
-    cmd = f"kustomize build {app.target_dir} > {app.appdef.dir}/test-{app.name}-{app.env}.out"
+    cmd = f"kustomize build {app.target_dir} > {app.appdef.dir}/expected-output-{app.name}-{app.env}.out"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
