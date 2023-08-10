@@ -10,3 +10,6 @@ data:
   {% for key in konf.get("vars", []) %}
     {{key}}: {{ konf.vars[key] }}
   {% endfor %}
+  {% for key in konf.get("files", []) %}
+    {{key}}: {{ my.load_file(konf.files[key])  | b64encode }}
+  {% endfor %}
