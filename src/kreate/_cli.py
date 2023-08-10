@@ -3,6 +3,7 @@ import os
 import logging
 from . import _jinyaml, _krypt
 from ._app import App, AppDef
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -47,10 +48,18 @@ def run_cli(kreate_appdef_func, kreate_app_func=None):
     args.kreate_appdef_func = kreate_appdef_func
     args.kreate_app_func = kreate_app_func
     process_main_options(args)
-    if args.subcommand is None:
-        kreate_files(args)
-    else:
-        args.func(args)
+    try:
+        if args.subcommand is None:
+            kreate_files(args)
+        else:
+            args.func(args)
+    except Exception as e:
+        if args.verbose:
+            print(e)
+            traceback.print_exc()
+        else:
+            print(e)
+
 
 def add_main_options():
     cli.add_argument("-a","--appdef", action="store", default="appdef.yaml")
