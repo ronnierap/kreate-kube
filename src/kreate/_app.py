@@ -160,7 +160,7 @@ class App():
             shutil.rmtree(self.target_dir)
         os.makedirs(self.target_dir, exist_ok=True)
 
-        for obj  in self.komponents:
+        for obj in self.komponents:
             if (obj.filename):
                 logger.info(f"kreating file {obj.filename}")
                 obj.kreate_file()
