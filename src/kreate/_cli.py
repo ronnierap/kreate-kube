@@ -167,12 +167,26 @@ def dekstr(args):
         value = sys.stdin.readline().strip()
     print(_krypt.dekrypt_str(value))
 
+@subcommand([argument("file", help=" filename to dekrypt")], aliases=["df"])
+def dekfile(args):
+    "dekrypt an entire file"
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    filename = args.file
+    _krypt.dekrypt_file(filename)
+
 @subcommand([argument("-f", "--file", help="yaml filename to enkrypt")], aliases=["ey"])
 def enkyaml(args):
     "enkrypt values in a yaml file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.enkrypt_yaml(filename, ".")
+
+@subcommand([argument("file", help=" filename to enkrypt")], aliases=["ef"])
+def enkfile(args):
+    "enkrypt an entire file"
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    filename = args.file
+    _krypt.enkrypt_file(filename)
 
 @subcommand([argument("-s", "--str", help="string value to enkrypt")], aliases=["es"])
 def enkstr(args):
