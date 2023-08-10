@@ -149,34 +149,33 @@ def konfig(args):
     appdef.konfig().pprint(field=args.kind)
 
 
-@subcommand([argument("-f", "--filename", help="decrypt yaml file")], aliases=["dek"])
-def dekrypt(args):
-    """decrypt values in a yaml file"""
+@subcommand([argument("-f", "--file", help="yaml file to enkrypt")], aliases=["dy"])
+def dekyaml(args):
+    """dekrypt values in a yaml file"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
-    filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
-    _krypt.dekrypt_yaml(filename, appdef.dir)
+    filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
+    _krypt.dekrypt_yaml(filename, ".")
 
-@subcommand([argument("-v", "--value", help="string")], aliases=["ds"])
-def dekrypt(args):
-    """decrypt str value"""
+@subcommand([argument("-s", "--str", help="string value to dekrypt")], aliases=["ds"])
+def dekstr(args):
+    """dekrypt string value"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
-    value = args.value
+    value = args.str
     print(_krypt.dekrypt_str(value))
 
-@subcommand([argument("-v", "--value", help="string")], aliases=["es"])
-def enkrypt(args):
-    """enkrypt str value"""
+@subcommand([argument("-f", "--file", help="yaml filename to enkrypt")], aliases=["ey"])
+def enkyaml(args):
+    "enkrypt values in a yaml file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
-    value = args.value
+    filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
+    _krypt.enkrypt_yaml(filename, ".")
+
+@subcommand([argument("-s", "--str", help="string value to enkrypt")], aliases=["es"])
+def enkstr(args):
+    """enkrypt string value"""
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    value = args.str
     print(_krypt.enkrypt_str(value))
-
-
-@subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["enk"])
-def enkrypt(args):
-    "encrypt values in a yaml file"
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
-    filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
-    _krypt.enkrypt_yaml(filename, appdef.dir)
 
 
 def jinja2_template_error_lineno():
