@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 class Komponent(YamlBase):
     """An object that is parsed from a yaml template and konfiguration"""
     def __init__(self, app: App,
-                 kind: str,
-                 shortname: str,
-                 template: FileLocation,
+                 kind: str = None,
+                 shortname: str = None,
+                 template: FileLocation = None,
                  **kwargs
                  ):
         self.app = app
