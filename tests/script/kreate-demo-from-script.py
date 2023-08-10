@@ -48,11 +48,7 @@ def kreate_app(appdef: kreate.AppDef) -> kreate.App:
     app.kreate_komponent("ServiceMonitor")
     app.kreate_komponent("HorizontalPodAutoscaler")
 
-    cm = kreate.KustConfigMap(app, shortname="vars") # kustomize=False
-    cm.add_var("ENV", app.values["env"])
-    cm.add_var("ORACLE_URL")
-    cm.add_var("ORACLE_USR")
-    cm.add_var("ORACLE_SCHEMA")
+    cm = kreate.Kustomization(app)
 
     return app
 

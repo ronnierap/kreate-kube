@@ -13,6 +13,5 @@ from ._kust import KustApp
 from ._kust import HttpProbesPatch
 from ._kust import AntiAffinityPatch
 from ._kust import Kustomization
-from ._kust import KustConfigMap
 
 from ._cli import run_cli
