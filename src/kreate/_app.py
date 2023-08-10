@@ -40,6 +40,8 @@ def get_class(name: str):
 
 class AppDef():
     def __init__(self, filename="appdef.yaml", *args):
+        if os.path.isdir(filename):
+            filename += "/appdef.yaml"
         self.dir = os.path.dirname(filename)
         self.filename = filename
         self.values = { "dekrypt": _krypt.dekrypt_str, "getenv": os.getenv }
