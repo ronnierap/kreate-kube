@@ -122,7 +122,12 @@ development, acceptance and production environments.
 However the bash scripting language was not the best choice, so Python was chosen
 for several reasons:
 - Large bash scripts are difficult to maintain
-  - google coding guidelines demand that bash scripts over 100 lines long are to be rewritten in Python
+  - google coding guidelines demand that bash scripts over 100 lines long are to be rewritten in Python.
+    See https://google.github.io/styleguide/shellguide.html#when-to-use-shell, which states:
+    > if you are writing a script that is more than 100 lines long, or that uses non-straightforward control flow logic,
+    > you should rewrite it in a more structured language now.
+    > Bear in mind that scripts grow.
+    > Rewrite your script early to avoid a more time-consuming rewrite at a later date.
   - not many devops team members are proficient in bash
   - no OO and limited var scoping (most vars are global vars)
 - Possibility to run natively on Windows (with Python installed)
