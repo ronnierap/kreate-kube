@@ -19,6 +19,8 @@ class FileLocation(namedtuple("FileLocation", "filename package dir", defaults=[
             return f"FileLocation({self.filename} @package:{self.package.__name__})"
         return f"FileLocation({self.filename} @dir {self.dir})"
 
+# dirty hack to remember which file is being processed
+_current_jinja_file = None
 
 def load_data(file_loc : FileLocation):
     filename = file_loc.filename
@@ -46,6 +48,8 @@ def load_data(file_loc : FileLocation):
             return f.read()
 
 def load_jinja_data(file_loc : FileLocation, vars: Mapping):
+    global _current_jinja_file
+    _current_jinja_file = file_loc.filename # TODO: find better way
     filedata = load_data(file_loc=file_loc)
     tmpl = jinja2.Template(
         filedata,
@@ -53,7 +57,9 @@ def load_jinja_data(file_loc : FileLocation, vars: Mapping):
         trim_blocks=True,
         lstrip_blocks=True
     )
-    return tmpl.render(vars)
+    result = tmpl.render(vars)
+    _current_jinja_file = None
+    return result
 
 def load_yaml(file_loc : FileLocation) -> Mapping:
     return yaml_parser.load(load_data(file_loc=file_loc))

@@ -20,6 +20,8 @@ class DictWrapper(UserDict):
     def __setattr__(self, attr, val):
         self.data[attr] = val
 
+    def __repr__(self):
+        return "DictWrapper"
 
 class ListWrapper(UserList):
     def __init__(self, seq) -> None:

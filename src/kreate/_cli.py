@@ -4,6 +4,10 @@ import logging
 from . import _jinyaml, _krypt
 from ._app import App, AppDef
 import traceback
+from jinja2 import TemplateError
+from sys import exc_info
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,10 +59,12 @@ def run_cli(kreate_appdef_func, kreate_app_func=None):
             args.func(args)
     except Exception as e:
         if args.verbose:
-            print(e)
             traceback.print_exc()
         else:
-            print(e)
+            print(f"{type(e).__name__}: {e}")
+        if _jinyaml._current_jinja_file:
+            lineno = jinja2_template_error_lineno()
+            print(f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
 
 
 def add_main_options():
@@ -157,3 +163,17 @@ def enkrypt(args):
     appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
     filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.enkrypt_yaml(filename, appdef.dir)
+
+
+def jinja2_template_error_lineno():
+    type, value, tb = exc_info()
+    if not issubclass(type, TemplateError):
+        return None
+    if hasattr(value, 'lineno'):
+        # in case of TemplateSyntaxError
+        return value.lineno
+    while tb:
+        #print(tb.tb_frame.f_code.co_filename, tb.tb_lineno)
+        if tb.tb_frame.f_code.co_filename == '<template>':
+            return tb.tb_lineno
+        tb = tb.tb_next
