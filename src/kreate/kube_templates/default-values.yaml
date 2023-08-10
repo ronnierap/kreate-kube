@@ -49,5 +49,9 @@ default:
     liveness_path: actuator/info
     liveness_port: 8080
 
+  Ingress:
+    port: 8080
+    service: {{ val.app }}-service
+
   PodDisruptionBudget:
     minAvailable: 1

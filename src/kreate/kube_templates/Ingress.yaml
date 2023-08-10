@@ -15,6 +15,6 @@ spec:
             path: {{ konf.path or "/" }}
             backend:
               service:
-                name: {{ my.name }}
+                name: {{ default.service }}
                 port:
-                  number: {{ konf.port }}
+                  number: {{ default.port }}
