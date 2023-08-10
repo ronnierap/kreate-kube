@@ -20,8 +20,8 @@ configMapGenerator:
     labels:
       config-map: {{ cm }}
   literals:
-    {% for varname in konf.config_maps[cm].get("literals",{}).keys() %}
-     - {{ varname }}={{ konf.config_maps[cm].literals[varname ] }}
+    {% for varname in konf.config_maps[cm].get("vars",{}).keys() %}
+     - {{ varname }}={{ konf.config_maps[cm].vars[varname ] }}
     {% endfor %}
   files:
     {% for filename in konf.config_maps[cm].get("files",[]) %}
