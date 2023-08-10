@@ -1,6 +1,6 @@
 #!/bin/sh
 echo setting dekryption key
-export KREATE_KRYPT_KEY_DEV=C6XOvZALFPjTzWKOPV3EJFIpmmwMhXEEqtMAG26W7_c=
+export KREATE_KRYPT_KEY_DEV=C6XOvZALFPjTzWKOPV3EJFIpmmwMhXEE
 
 
 echo '###########################################'

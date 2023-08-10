@@ -21,7 +21,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  DB_PSW: dGVzdGR1bW15LUpoMndVNUJw
+  DB_PSW: dGVzdGR1bW15LXV3SXY3ZkJ6
   DB_USR: ZGJ1c3JkZXY=
 kind: Secret
 metadata:
