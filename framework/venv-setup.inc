@@ -8,7 +8,7 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
 
     # This is needed because pip version <21.3 does not support pyproject.toml
     echo upgrade to newest version of pip
-    pip install --upgrade pip  # TODO: specify >=21.3
+    python3 -m pip install --upgrade pip
   fi
   if [[ -f .venv/bin/activate ]]; then
     echo activating venv
@@ -16,9 +16,17 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
   fi
 else
   if [[ "$VIRTUAL_ENV" == "`pwd`/.venv" ]]; then
-    echo correct venv already activated
+    if [[ -d $VIRTUAL_ENV ]]; then
+      echo correct venv already activated
+    else
+      echo WARNING: venv does not exit at $VIRTUAL_ENV
+      echo run the following command, and try setup again
+      echo "   deactivate"
+      CORRECT_VENV=false
+      # can not exit, because this is sourced
+    fi
   else
-    echo WRONG venv activated $VIRTUAL_ENV
+    echo WARNING: WRONG venv activated $VIRTUAL_ENV
     echo run the following command, and try setup again
     echo "   deactivate"
     CORRECT_VENV=false
