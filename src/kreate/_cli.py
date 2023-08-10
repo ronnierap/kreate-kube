@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 import logging
 from . import _jinyaml, _krypt
 from ._app import App, AppDef
@@ -161,6 +162,9 @@ def dekstr(args):
     """dekrypt string value"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     value = args.str
+    if not value:
+        if not args.quiet: print("Enter string to dekrypt")
+        value = sys.stdin.readline().strip()
     print(_krypt.dekrypt_str(value))
 
 @subcommand([argument("-f", "--file", help="yaml filename to enkrypt")], aliases=["ey"])
@@ -175,6 +179,9 @@ def enkstr(args):
     """enkrypt string value"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     value = args.str
+    if not value:
+        if not args.quiet: print("Enter string to enkrypt")
+        value = sys.stdin.readline().strip()
     print(_krypt.enkrypt_str(value))
 
 
