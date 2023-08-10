@@ -1,6 +1,8 @@
 {% set appname = "demo" %} # reuse the appname in rest of this file
+{% set env = "dev" %} # reuse the appname in rest of this file
 values:
   app: {{ appname }}
+  env: {{ env }}
   team: myteam
   version: v1.3.4
 

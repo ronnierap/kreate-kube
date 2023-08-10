@@ -39,17 +39,17 @@ def get_class(name: str):
 
 
 class AppDef():
-    def __init__(self, env, filename="appdef.yaml", *args):
+    def __init__(self, filename="appdef.yaml", *args):
         self.dir = os.path.dirname(filename)
         self.filename = filename
-        self.env = env
-        self.values = { "env": env, "dekrypt": _krypt.dekrypt_str, "getenv": os.getenv }
+        self.values = { "dekrypt": _krypt.dekrypt_str, "getenv": os.getenv }
+        print(self.filename)
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
-        _krypt._krypt_key = self.yaml["krypt_key"]
-
         self.values.update(self.yaml.get("values",{}))
         self.name = self.values["app"]
+        self.env = self.values["env"]
         self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
+        _krypt._krypt_key = self.yaml.get("krypt_key","no-krypt-key-defined")
 
     def load_konfig_files(self):
         for fname in self.yaml.get("value_files",[]):

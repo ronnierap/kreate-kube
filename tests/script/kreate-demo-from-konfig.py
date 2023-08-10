@@ -7,9 +7,9 @@ In general it is preferred to not use a script but use `python3 -m kreate`
 
 import kreate
 
-def kreate_appdef(appdef_filename:str, env: str) -> kreate.AppDef:
+def kreate_appdef(appdef_filename:str) -> kreate.AppDef:
     # ignore passed in appdef
-    appdef = kreate.AppDef(env, "tests/script/appdef.yaml")
+    appdef = kreate.AppDef("tests/script/appdef.yaml")
     appdef.load_konfig_files()
     return appdef
 

@@ -69,7 +69,6 @@ def run_cli(kreate_appdef_func, kreate_app_func=None):
 
 def add_main_options():
     cli.add_argument("-a","--appdef", action="store", default="appdef.yaml")
-    cli.add_argument("-e","--env", action="store", default="dev")
     cli.add_argument("-k","--kind", action="store", default=None)
     cli.add_argument("-v","--verbose", action='count', default=0)
     cli.add_argument("-w","--warn", action="store_true")
@@ -90,7 +89,7 @@ def process_main_options(args):
 
 
 def kreate_files(args) -> App:
-    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
     app : App = args.kreate_app_func(appdef) # appdef knows the type of App to kreate
     app.kreate_files()
     return app
@@ -145,7 +144,7 @@ def testupdate(args):
 @subcommand([], aliases=["k"])
 def konfig(args):
     """show the konfig structure"""
-    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
     appdef.load_konfig_files()
     appdef.konfig().pprint(field=args.kind)
 
@@ -153,14 +152,14 @@ def konfig(args):
 @subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["dek"])
 def dekrypt(args):
     """decrypt values in a yaml file"""
-    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.dekrypt_yaml(filename, appdef.dir)
 
 @subcommand([argument("-f", "--filename", help="encrypt filename")], aliases=["enk"])
 def enkrypt(args):
     "encrypt values in a yaml file"
-    appdef : AppDef = args.kreate_appdef_func(args.appdef, args.env)
+    appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.filename or f"secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.enkrypt_yaml(filename, appdef.dir)
 
