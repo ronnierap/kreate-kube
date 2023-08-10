@@ -9,11 +9,11 @@ container_port: 8080
 ingress_host_external: api.kisst.org
 ingress_host_internal: private.kisst.org
 
-db_egress_cidr: 1.2.3.4/32
+db_egress_cidr_list: 1.2.3.4/32
 #db_egress_port: 8123
 
-redis_egress_cidr: dummy
-xyz_egress_cidr: dummy
+redis_egress_cidr_list: dummy
+xyz_egress_cidr_list: dummy
 
 # do not override cpu_limit
 cpu_request: "50m" # extra small for dev environment

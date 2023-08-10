@@ -21,8 +21,8 @@ metadata:
 ---
 apiVersion: v1
 data:
-  DB_PSW: testdummy-Jh2wU5Bp
-  DB_USR: dbusrdev
+  DB_PSW: dGVzdGR1bW15LUpoMndVNUJw
+  DB_USR: ZGJ1c3JkZXY=
 kind: Secret
 metadata:
   labels:
@@ -237,7 +237,7 @@ spec:
       paths:
       - backend:
           service:
-            name: demo-ingress-api
+            name: demo-service
             port:
               number: 8080
         path: /api
@@ -250,7 +250,7 @@ metadata:
     app.kubernetes.io/name: demo
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/auth-realm: demo-realm
-    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-secret: demo-basic-auth
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/proxy-read-timeout: "100"
     nginx.ingress.kubernetes.io/whitelist-source-range: 10.20.30.40
@@ -265,7 +265,7 @@ spec:
       paths:
       - backend:
           service:
-            name: demo-ingress-root
+            name: demo-service
             port:
               number: 8080
         path: /

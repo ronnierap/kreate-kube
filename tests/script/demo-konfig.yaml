@@ -31,18 +31,15 @@ Deployment:
 
 Egress:
   redis:
-    to:
-    - cidr: {{ val.redis_egress_cidr }}
-      port: {{ val.redis_egress_port | default(6379) }}
+    cidr_list: {{ val.redis_egress_cidr_list }}
+    port: 6379
   db:
     name: demo-egress-to-db
-    to:
-    - cidr: {{ val.db_egress_cidr }}
-      port: {{ val.db_egress_port | default(1521) }}
+    cidr_list: {{ val.db_egress_cidr_list }}
+    port: 1521
   xyz:
-    to:
-    - cidr: {{ val.xyz_egress_cidr }}
-      port: {{ val.xyz_egress_port | default(8443) }}
+    cidr_list: {{ val.xyz_egress_cidr_list }}
+    port: {{ val.xyz_egress_port | default(8443) }}
 
 HorizontalPodAutoscaler:
   main:

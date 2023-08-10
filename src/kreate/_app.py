@@ -20,11 +20,12 @@ def b64encode(value: str) -> str:
     print("empty")
     return ""
 
+#def load_file(filename: str):
+#    with open(filename) as f:
+#        return f.read()
 
 jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
 jinja2.filters.FILTERS["b64encode"] = b64encode
-
-
 
 def get_package_data(ur: str):
     module = importlib.import_module('my_package.my_module')
