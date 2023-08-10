@@ -63,13 +63,15 @@ Ingress:
     port: {{ val.service_port }}
     path: /api
 
-KustConfigMap:
-  vars:
-    vars:
-      ENV: {{ val.env }}
-      ORACLE_URL: {{ val.ORACLE_URL }}
-      ORACLE_USR: {{ val.ORACLE_USR }}
-      ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
+Kustomization:
+  main:
+    config_maps:
+      demo-vars:
+        literals:
+          ENV: {{ val.env }}
+          ORACLE_URL: {{ val.ORACLE_URL }}
+          ORACLE_USR: {{ val.ORACLE_USR }}
+          ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
 
 MyUdpService:
   main:
@@ -87,7 +89,7 @@ Secret:
   main:
     vars:
       DB_USR: {{ val.DB_USR }}
-      DB_PSW: {{ val.DB_PSW | dekrypt}}
+      DB_PSW: {{ val.DB_PSW | dekrypt }}
 
 Service:
   main: # default service

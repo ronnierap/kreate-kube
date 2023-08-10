@@ -21,7 +21,6 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=kust_templates)
-        self.register_template_class(KustConfigMap, package=kust_templates)
         self.register_template_class(AntiAffinityPatch, package=kust_templates)
         self.register_template_class(HttpProbesPatch, package=kust_templates)
 
