@@ -63,9 +63,10 @@ Ingress:
     port: {{ val.service_port }}
     path: /api
 
+
 Kustomization:
   main:
-    config_maps:
+    configmaps:
       demo-vars:
         vars:
           ENV: {{ val.env }}

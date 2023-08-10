@@ -14,17 +14,17 @@ patches:
 {% endfor %}
 
 configMapGenerator:
-{% for cm in konf.get("config_maps",{}).keys()  %}
+{% for cm in konf.get("configmaps",{}).keys()  %}
 - name: {{ cm }}
   options:
     labels:
       config-map: {{ cm }}
   literals:
-    {% for varname in konf.config_maps[cm].get("vars",{}).keys() %}
-     - {{ varname }}={{ konf.config_maps[cm].vars[varname ] }}
+    {% for varname in konf.configmaps[cm].get("vars",{}).keys() %}
+     - {{ varname }}={{ konf.configmaps[cm].vars[varname ] }}
     {% endfor %}
   files:
-    {% for filename in konf.config_maps[cm].get("files",[]) %}
+    {% for filename in konf.configmaps[cm].get("files",[]) %}
      - {{ filename }}
     {% endfor %}
 {% endfor %}
