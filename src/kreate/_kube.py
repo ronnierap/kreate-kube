@@ -2,6 +2,7 @@ import logging
 from ._app import App
 from ._komp import Komponent
 from ._jinyaml import FileLocation
+from . import _krypt
 from . import kube_templates
 
 logger = logging.getLogger(__name__)
@@ -16,6 +17,7 @@ class KubeApp(App):
         self.register_template_class(ConfigMap, aliases="cm", package=kube_templates)
         self.register_template_class(Ingress, package=kube_templates)
         self.register_template_class(Egress, package=kube_templates)
+        self.register_template_class(SecretBasicAuth, package=kube_templates)
         self.register_template_file("HorizontalPodAutoscaler", aliases="hpa", package=kube_templates)
         self.register_template_file("ServiceAccount", package=kube_templates)
         self.register_template_file("ServiceMonitor", package=kube_templates)
@@ -101,6 +103,17 @@ class Egress(Resource):
     def calc_name(self):
         return f"{self.app.name}-egress-to-{self.shortname}"
 
+class SecretBasicAuth(Resource):
+    def calc_name(self):
+        return f"{self.app.name}-{self.shortname}"
+
+    def users(self):
+        result=[]
+        for usr in self.konfig.users:
+            entry = _krypt.dekrypt_str(self.app.values[usr])
+            result.append(f"{usr}:{entry}")
+        result.append("")  # for the final newline
+        return "\n".join(result)
 
 
 class ConfigMap(Resource):
