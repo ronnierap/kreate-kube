@@ -1,7 +1,7 @@
-from .kore._app import AppDef, App
-from .kore._cli import run_cli
+from ..kore._app import AppDef, App
+from ..kore._cli import run_cli
 
-from .kube import KustApp
+from . import KustApp
 
 def kreate_appdef(appdef_filename:str) -> AppDef:
     appdef = AppDef(appdef_filename)
