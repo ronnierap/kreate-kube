@@ -13,6 +13,13 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
   if [[ -f .venv/bin/activate ]]; then
     echo activating venv
     . .venv/bin/activate
+    if [[ "$VIRTUAL_ENV" != "`pwd`/.venv" ]]; then
+      echo WARNING: venv does point to a differen directory $VIRTUAL_ENV
+      echo run the following command, and try setup again
+      echo "   deactivate"
+      CORRECT_VENV=false
+      # can not exit, because this is sourced
+    fi
   fi
 else
   if [[ "$VIRTUAL_ENV" == "`pwd`/.venv" ]]; then
