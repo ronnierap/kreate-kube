@@ -42,7 +42,6 @@ class AppDef():
         self.values.update(self.yaml.get("values", {}))
         self.name = self.values["app"]
         self.env = self.values["env"]
-        self.app_class = get_class(self.yaml.get("app_class", "kreate.kube.KustApp"))
 
     def load_konfig_files(self):
         for fname in self.yaml.get("value_files", []):
