@@ -1,5 +1,5 @@
 from ..kore._app import AppDef, App
-from ..kore._cli import run_cli
+from ..kore._cli import KoreCli
 
 from . import KustApp
 
@@ -13,4 +13,4 @@ def kreate_app(appdef: AppDef) -> App:
     app.konfigure_from_konfig()
     return app
 
-run_cli(kreate_appdef, kreate_app)
+KoreCli().run(kreate_appdef, kreate_app)

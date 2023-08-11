@@ -21,4 +21,4 @@ def kreate_app(appdef: kreate.kore.AppDef) -> kreate.kore.App:
     app.depl.main.label("this-is-added","by-script")
     return app
 
-kreate.kore.run_cli(kreate_appdef, kreate_app)
+kreate.kore.KoreCli().run(kreate_appdef, kreate_app)

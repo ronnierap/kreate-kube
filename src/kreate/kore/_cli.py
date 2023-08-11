@@ -9,24 +9,7 @@ import traceback
 from jinja2 import TemplateError
 from sys import exc_info
 
-
-
 logger = logging.getLogger(__name__)
-
-cli = argparse.ArgumentParser(
-    prog="kreate",
-    usage="kreate [optional arguments] <subcommand>",
-    description="kreates files for deploying applications on kubernetes",
-    #epilog="Epilog", # set later when all subcommands are known
-    formatter_class=argparse.RawTextHelpFormatter
-)
-subparsers = cli.add_subparsers(
-    #title="subcmd",
-    #description="valid subcommands",
-    dest="subcommand",
-)
-
-epilog = "subcommands:\n"
 
 def argument(*name_or_flags, **kwargs):
     """Convenience function to properly format arguments to pass to the
@@ -34,60 +17,87 @@ def argument(*name_or_flags, **kwargs):
     """
     return (list(name_or_flags), kwargs)
 
-# decorator from: https://mike.depalatis.net/blog/simplifying-argparse.html
-# adjusted to add aliases and list register subcommands for the epilog
-def subcommand(args=[], aliases=[], parent=subparsers):
-    def decorator(func):
-        global epilog
-        epilog += f"  {func.__name__:10}    {aliases[0] :4} {func.__doc__ or ''} \n"
-        parser = parent.add_parser(func.__name__, aliases=aliases, description=func.__doc__)
+class KoreCli:
+    def __init__(self):
+        self.epilog = "subcommands:\n"
+        self.cli = argparse.ArgumentParser(
+            prog="kreate",
+            usage="kreate [optional arguments] <subcommand>",
+            description="kreates files for deploying applications on kubernetes",
+            #epilog="Epilog", # set later when all subcommands are known
+            formatter_class=argparse.RawTextHelpFormatter
+        )
+        self.subparsers = self.cli.add_subparsers(
+            #title="subcmd",
+            #description="valid subcommands",
+            dest="subcommand",
+        )
+        self.add_subcommand(files, [], aliases=["f"])
+        self.add_subcommand(build, [], aliases=["b"])
+        self.add_subcommand(diff, [], aliases=["d"])
+        self.add_subcommand(apply, [], aliases=["a"])
+        self.add_subcommand(test, [], aliases=["t"])
+        self.add_subcommand(testupdate, [], aliases=["tu"])
+        self.add_subcommand(konfig, [], aliases=["k"])
+        self.add_subcommand(dekyaml, [argument("-f", "--file", help="yaml file to enkrypt")], aliases=["dy"])
+        self.add_subcommand(dekstr, [argument("-s", "--str", help="string value to dekrypt")], aliases=["ds"])
+        self.add_subcommand(dekfile, [argument("file", help=" filename to dekrypt")], aliases=["df"])
+        self.add_subcommand(enkyaml, [argument("-f", "--file", help="yaml filename to enkrypt")], aliases=["ey"])
+        self.add_subcommand(enkfile, [argument("file", help=" filename to enkrypt")], aliases=["ef"])
+        self.add_subcommand(enkstr, [argument("-s", "--str", help="string value to enkrypt")], aliases=["es"])
+
+
+
+    def add_subcommand(self, func, args=[], aliases=[], parent=None):
+        parent = parent or self.subparsers
+        self.epilog += f"  {func.__name__:10}    {aliases[0] :4} {func.__doc__ or ''} \n"
+        self.parser = parent.add_parser(func.__name__, aliases=aliases, description=func.__doc__)
         for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-    return decorator
+            self.parser.add_argument(*arg[0], **arg[1])
+        self.parser.set_defaults(func=func)
 
-def run_cli(kreate_appdef_func, kreate_app_func=None):
-    global epilog
-    cli.epilog = epilog+"\n"
-    add_main_options()
-    args = cli.parse_args()
-    args.kreate_appdef_func = kreate_appdef_func
-    args.kreate_app_func = kreate_app_func
-    process_main_options(args)
-    try:
-        if args.subcommand is None:
-            kreate_files(args)
+
+    def run(self, kreate_appdef_func, kreate_app_func=None):
+        self.cli.epilog = self.epilog+"\n"
+        self.add_main_options()
+        args = self.cli.parse_args()
+        args.kreate_appdef_func = kreate_appdef_func
+        args.kreate_app_func = kreate_app_func
+        self.process_main_options(args)
+        try:
+            if args.subcommand is None:
+                kreate_files(args)
+            else:
+                args.func(args)
+        except Exception as e:
+            if args.verbose:
+                traceback.print_exc()
+            else:
+                print(f"{type(e).__name__}: {e}")
+            if _jinyaml._current_jinja_file:
+                lineno = jinja2_template_error_lineno()
+                print(f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
+
+
+    def add_main_options(self):
+        self.cli.add_argument("-a","--appdef", action="store", default="appdef.yaml")
+        self.cli.add_argument("-k","--kind", action="store", default=None)
+        self.cli.add_argument("-v","--verbose", action='count', default=0)
+        self.cli.add_argument("-w","--warn", action="store_true")
+        self.cli.add_argument("-q","--quiet", action="store_true")
+
+    def process_main_options(self, args):
+        if args.verbose>=2:
+            logging.basicConfig(level=logging.DEBUG)
+        elif args.verbose==1:
+            logging.basicConfig(level=logging.DEBUG)
+            _jinyaml.logger.setLevel(logging.INFO)
+        elif args.warn:
+            logging.basicConfig(level=logging.WARN)
+        elif args.quiet:
+            logging.basicConfig(level=logging.ERROR)
         else:
-            args.func(args)
-    except Exception as e:
-        if args.verbose:
-            traceback.print_exc()
-        else:
-            print(f"{type(e).__name__}: {e}")
-        if _jinyaml._current_jinja_file:
-            lineno = jinja2_template_error_lineno()
-            print(f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
-
-
-def add_main_options():
-    cli.add_argument("-a","--appdef", action="store", default="appdef.yaml")
-    cli.add_argument("-k","--kind", action="store", default=None)
-    cli.add_argument("-v","--verbose", action='count', default=0)
-    cli.add_argument("-w","--warn", action="store_true")
-    cli.add_argument("-q","--quiet", action="store_true")
-
-def process_main_options(args):
-    if args.verbose>=2:
-        logging.basicConfig(level=logging.DEBUG)
-    elif args.verbose==1:
-        logging.basicConfig(level=logging.DEBUG)
-        _jinyaml.logger.setLevel(logging.INFO)
-    elif args.warn:
-        logging.basicConfig(level=logging.WARN)
-    elif args.quiet:
-        logging.basicConfig(level=logging.ERROR)
-    else:
-        logging.basicConfig(level=logging.INFO)
+            logging.basicConfig(level=logging.INFO)
 
 
 def kreate_files(args) -> App:
@@ -96,20 +106,17 @@ def kreate_files(args) -> App:
     app.kreate_files()
     return app
 
-@subcommand([], aliases=["f"])
 def files(args) -> App:
     """kreate all the files (default command)"""
     app = kreate_files(args)
 
-@subcommand([], aliases=["b"])
-def buikd(args):
+def build(args):
     """output all the resources"""
     app = kreate_files(args)
     cmd = f"kustomize build {app.target_dir}"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-@subcommand([], aliases=["d"])
 def diff(args):
     """diff with current existing resources"""
     app = kreate_files(args)
@@ -117,7 +124,6 @@ def diff(args):
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-@subcommand([], aliases=["a"])
 def apply(args):
     """apply the output to kubernetes"""
     app = kreate_files(args)
@@ -125,7 +131,6 @@ def apply(args):
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-@subcommand([], aliases=["t"])
 def test(args):
     """test output against test.out file"""
     _krypt._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
@@ -134,7 +139,6 @@ def test(args):
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-@subcommand([], aliases=["tu"])
 def testupdate(args):
     """update test.out file"""
     _krypt._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
@@ -143,7 +147,6 @@ def testupdate(args):
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
-@subcommand([], aliases=["k"])
 def konfig(args):
     """show the konfig structure"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
@@ -151,14 +154,12 @@ def konfig(args):
     appdef.konfig().pprint(field=args.kind)
 
 
-@subcommand([argument("-f", "--file", help="yaml file to enkrypt")], aliases=["dy"])
 def dekyaml(args):
     """dekrypt values in a yaml file"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.dekrypt_yaml(filename, ".")
 
-@subcommand([argument("-s", "--str", help="string value to dekrypt")], aliases=["ds"])
 def dekstr(args):
     """dekrypt string value"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
@@ -168,28 +169,24 @@ def dekstr(args):
         value = sys.stdin.readline().strip()
     print(_krypt.dekrypt_str(value))
 
-@subcommand([argument("file", help=" filename to dekrypt")], aliases=["df"])
 def dekfile(args):
     "dekrypt an entire file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file
     _krypt.dekrypt_file(filename)
 
-@subcommand([argument("-f", "--file", help="yaml filename to enkrypt")], aliases=["ey"])
 def enkyaml(args):
     "enkrypt values in a yaml file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.enkrypt_yaml(filename, ".")
 
-@subcommand([argument("file", help=" filename to enkrypt")], aliases=["ef"])
 def enkfile(args):
     "enkrypt an entire file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file
     _krypt.enkrypt_file(filename)
 
-@subcommand([argument("-s", "--str", help="string value to enkrypt")], aliases=["es"])
 def enkstr(args):
     """enkrypt string value"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
