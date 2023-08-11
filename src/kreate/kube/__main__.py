@@ -2,13 +2,13 @@ from ..kore import AppDef, App
 
 from . import KubeCli
 from . import KustApp
+from ..krypt import _krypt
+from ..kore import _app
 
 def kreate_appdef(appdef_filename:str) -> AppDef:
-    appdef = AppDef(appdef_filename)
-    return appdef
+    return AppDef(appdef_filename)
 
 def kreate_app(appdef: AppDef) -> App:
-    appdef.load_konfig_files()
     app = KustApp(appdef)
     app.konfigure_from_konfig()
     return app

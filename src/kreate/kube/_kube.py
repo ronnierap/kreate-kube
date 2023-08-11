@@ -1,5 +1,5 @@
 import logging
-from ..kore._app import App
+from ..kore._app import App, AppDef, b64encode
 from ..kore._komp import Komponent
 from ..kore._jinyaml import FileLocation
 from ..krypt import _krypt
@@ -9,6 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class KubeApp(App):
+    def __init__(self, appdef: AppDef):
+        appdef.values["dekrypt"]=_krypt.dekrypt_str
+        _krypt._krypt_key = b64encode(appdef.yaml.get("krypt_key","no-krypt-key-defined"))
+        super().__init__(appdef)
+
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Service, aliases="svc", package=templates)

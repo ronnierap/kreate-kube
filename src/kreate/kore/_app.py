@@ -5,10 +5,10 @@ import logging
 import importlib
 import base64
 
-from ..krypt import _krypt
 from ._core import  DeepChain, DictWrapper
 from ._jinyaml import load_jinyaml, FileLocation
 import jinja2.filters
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,11 +20,6 @@ def b64encode(value: str) -> str:
     print("empty")
     return ""
 
-#def load_file(filename: str):
-#    with open(filename) as f:
-#        return f.read()
-
-jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
 jinja2.filters.FILTERS["b64encode"] = b64encode
 
 def get_package_data(ur: str):
@@ -44,13 +39,14 @@ class AppDef():
             filename += "/appdef.yaml"
         self.dir = os.path.dirname(filename)
         self.filename = filename
-        self.values = { "dekrypt": _krypt.dekrypt_str, "getenv": os.getenv }
+        self.values = {  "getenv": os.getenv } # TODO "dekrypt": _krypt.dekrypt_str,
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
         self.values.update(self.yaml.get("values",{}))
         self.name = self.values["app"]
         self.env = self.values["env"]
         self.app_class = get_class(self.yaml.get("app_class","kreate.kube.KustApp"))
-        _krypt._krypt_key = b64encode(self.yaml.get("krypt_key","no-krypt-key-defined"))
+        #self.values = {  "getenv": os.getenv } # TODO "dekrypt": _krypt.dekrypt_str,
+        #_krypt._krypt_key = b64encode(self.yaml.get("krypt_key","no-krypt-key-defined"))
 
     def load_konfig_files(self):
         for fname in self.yaml.get("value_files",[]):
@@ -75,7 +71,6 @@ class App():
         self.name = appdef.name
         self.env = appdef.env
         self.appdef = appdef
-        self.konfig = appdef.konfig()
         self.values = appdef.values
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace
@@ -90,6 +85,9 @@ class App():
             templ = appdef.yaml['templates'][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ)
+        appdef.load_konfig_files()
+        self.konfig = appdef.konfig()
+
 
     def _init(self):
         pass

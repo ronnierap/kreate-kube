@@ -5,7 +5,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 _krypt_key = None
 _dekrypt_testdummy = False
 

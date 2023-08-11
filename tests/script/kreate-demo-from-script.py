@@ -11,9 +11,7 @@ import kreate.kube
 
 def kreate_appdef(appdef_filename:str) -> AppDef:
     # ignore passed in appdef
-    appdef = AppDef("tests/script/appdef.yaml")
-    appdef.load_konfig_files()
-    return appdef
+    return AppDef("tests/script/appdef.yaml")
 
 
 def kreate_app(appdef: AppDef) -> App:

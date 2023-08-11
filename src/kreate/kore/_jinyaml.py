@@ -36,16 +36,16 @@ def load_data(file_loc : FileLocation):
             raise ValueError(f"filename {filename} should be of format py:<package>:<file>")
         package_name = spl[0]
         filename = spl[1]
-        logger.debug(f"loading {filename} from package {package_name}")
+        logger.debug(f"loading file {filename} from package {package_name}")
         logger.debug(f"finding module {package_name}")
         package = importlib.import_module(package_name)
         return pkgutil.get_data(package.__package__, filename).decode('utf-8')
     elif package:
-        logger.debug(f"loading {filename} from package {package.__name__}")
+        logger.debug(f"loading file {filename} from package {package.__name__}")
         return pkgutil.get_data(package.__package__, filename).decode('utf-8')
     else:
         dirname = dirname or "."
-        logger.debug(f"loading {filename} from {dirname}")
+        logger.debug(f"loading file {filename} from {dirname}")
         with open(f"{dirname}/{filename}") as f:
             return f.read()
 
