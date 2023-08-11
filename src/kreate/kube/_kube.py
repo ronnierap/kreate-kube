@@ -3,7 +3,7 @@ from ..kore._app import App
 from ..kore._komp import Komponent
 from ..kore._jinyaml import FileLocation
 from ..krypt import _krypt
-from . import kube_templates
+from . import templates
 
 logger = logging.getLogger(__name__)
 
@@ -11,17 +11,17 @@ logger = logging.getLogger(__name__)
 class KubeApp(App):
     def register_std_templates(self) -> None:
         super().register_std_templates()
-        self.register_template_class(Service, aliases="svc", package=kube_templates)
-        self.register_template_class(Deployment, aliases="depl", package=kube_templates)
-        self.register_template_class(PodDisruptionBudget, aliases="pdb", package=kube_templates)
-        self.register_template_class(ConfigMap, aliases="cm", package=kube_templates)
-        self.register_template_class(Ingress, package=kube_templates)
-        self.register_template_class(Egress, package=kube_templates)
-        self.register_template_class(SecretBasicAuth, package=kube_templates)
-        self.register_template_file("HorizontalPodAutoscaler", aliases="hpa", package=kube_templates)
-        self.register_template_file("ServiceAccount", package=kube_templates)
-        self.register_template_file("ServiceMonitor", package=kube_templates)
-        self.register_template_file("Secret", package=kube_templates)
+        self.register_template_class(Service, aliases="svc", package=templates)
+        self.register_template_class(Deployment, aliases="depl", package=templates)
+        self.register_template_class(PodDisruptionBudget, aliases="pdb", package=templates)
+        self.register_template_class(ConfigMap, aliases="cm", package=templates)
+        self.register_template_class(Ingress, package=templates)
+        self.register_template_class(Egress, package=templates)
+        self.register_template_class(SecretBasicAuth, package=templates)
+        self.register_template_file("HorizontalPodAutoscaler", aliases="hpa", package=templates)
+        self.register_template_file("ServiceAccount", package=templates)
+        self.register_template_file("ServiceMonitor", package=templates)
+        self.register_template_file("Secret", package=templates)
 
     def register_template_file(self, kind:str, cls=None, filename=None, aliases=None, package=None):
         # Override parent, to provide default class Resource

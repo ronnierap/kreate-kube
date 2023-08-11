@@ -13,7 +13,7 @@ value_files:
   - values-{{appname}}-{{env}}.yaml
   - secrets-{{appname}}-{{env}}.yaml
 konfig_files:
-  - py:kreate.kube.kube_templates:default-values.yaml
+  - py:kreate.kube.templates:default-values.yaml
   - {{appname}}-konfig.yaml
   - override-{{appname}}-{{env}}.yaml
 templates:

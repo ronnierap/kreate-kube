@@ -6,7 +6,7 @@ from ..kore._core import DeepChain
 from ..kore._komp import Komponent
 from ._kube import KubeApp, Resource
 from ..kore._jinyaml import FileLocation
-from . import kust_templates
+from . import templates
 
 
 logger = logging.getLogger(__name__)
@@ -21,9 +21,9 @@ class KustApp(KubeApp):
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
-        self.register_template_class(Kustomization, package=kust_templates)
-        self.register_template_class(AntiAffinityPatch, package=kust_templates)
-        self.register_template_class(HttpProbesPatch, package=kust_templates)
+        self.register_template_class(Kustomization, package=templates)
+        self.register_template_class(AntiAffinityPatch, package=templates)
+        self.register_template_class(HttpProbesPatch, package=templates)
 
     def konfigure_from_konfig(self):
         super().konfigure_from_konfig()
