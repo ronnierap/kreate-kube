@@ -1,6 +1,4 @@
 import argparse
-import os
-import sys
 import logging
 import traceback
 from jinja2 import TemplateError

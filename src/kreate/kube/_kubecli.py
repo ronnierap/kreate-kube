@@ -1,10 +1,6 @@
-import argparse
 import os
-import sys
 import logging
 
-from ..kore import App, AppDef
-from ..kore import argument as argument
 from ..kore import kreate_files as kreate_files
 from ..krypt import _krypt, KryptCli
 

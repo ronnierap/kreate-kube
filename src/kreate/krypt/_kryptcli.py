@@ -1,11 +1,8 @@
-import argparse
-import os
 import sys
 import logging
-from sys import exc_info
 import jinja2.filters
 
-from ..kore import KoreCli, App, AppDef
+from ..kore import KoreCli, AppDef
 from ..kore import argument as argument
 from . import _krypt
 
