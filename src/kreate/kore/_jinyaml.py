@@ -27,7 +27,7 @@ class FileLocation(namedtuple("FileLocation", "filename package dir", defaults=[
 _current_jinja_file = None
 
 
-def load_data(file_loc : FileLocation):
+def load_data(file_loc: FileLocation):
     filename = file_loc.filename
     dirname = file_loc.dir
     package = file_loc.package
@@ -36,7 +36,7 @@ def load_data(file_loc : FileLocation):
         fname = filename[len(prefix):]
         if package:
             raise ValueError(f"filename {filename} specifies package, but package {package} is also provided")
-        spl = fname.split(":",1) # split into package_name and filename between :
+        spl = fname.split(":", 1) # split into package_name and filename between :
         if len(spl) < 2:
             raise ValueError(f"filename {filename} should be of format py:<package>:<file>")
         package_name = spl[0]
@@ -55,7 +55,7 @@ def load_data(file_loc : FileLocation):
             return f.read()
 
 
-def load_jinja_data(file_loc : FileLocation, vars: Mapping):
+def load_jinja_data(file_loc: FileLocation, vars: Mapping):
     global _current_jinja_file
     _current_jinja_file = file_loc.filename # TODO: find better way
     filedata = load_data(file_loc=file_loc)
@@ -70,11 +70,11 @@ def load_jinja_data(file_loc : FileLocation, vars: Mapping):
     return result
 
 
-def load_yaml(file_loc : FileLocation) -> Mapping:
+def load_yaml(file_loc: FileLocation) -> Mapping:
     return yaml_parser.load(load_data(file_loc=file_loc))
 
 
-def load_jinyaml(file_loc : FileLocation, vars: Mapping) -> Mapping:
+def load_jinyaml(file_loc: FileLocation, vars: Mapping) -> Mapping:
     return yaml_parser.load(load_jinja_data(file_loc=file_loc, vars=vars))
 
 
@@ -89,7 +89,7 @@ class YamlBase:
 
     def load_yaml(self):
         vars = self._template_vars()
-        self.yaml = wrap(load_jinyaml(self.template, vars ))
+        self.yaml = wrap(load_jinyaml(self.template, vars))
 
     def save_yaml(self, outfile) -> None:
         with open(outfile, 'wb') as f:

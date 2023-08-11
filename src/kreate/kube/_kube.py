@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 class KubeApp(App):
     def __init__(self, appdef: AppDef):
-        appdef.values["dekrypt"]=_krypt.dekrypt_str
-        _krypt._krypt_key = b64encode(appdef.yaml.get("krypt_key","no-krypt-key-defined"))
+        appdef.values["dekrypt"] = _krypt.dekrypt_str
+        _krypt._krypt_key = b64encode(appdef.yaml.get("krypt_key", "no-krypt-key-defined"))
         super().__init__(appdef)
 
     def register_std_templates(self) -> None:
@@ -28,7 +28,7 @@ class KubeApp(App):
         self.register_template_file("ServiceMonitor", package=templates)
         self.register_template_file("Secret", package=templates)
 
-    def register_template_file(self, kind:str, cls=None, filename=None, aliases=None, package=None):
+    def register_template_file(self, kind: str, cls=None, filename=None, aliases=None, package=None):
         # Override parent, to provide default class Resource
         cls = cls or Resource
         super().register_template_file(kind, cls, filename=filename, aliases=aliases, package=package)
@@ -58,22 +58,22 @@ class Resource(Komponent):
     def add_metadata(self):
         for key in self.konfig.get("annotations", {}):
             if not "annotations" in self.yaml.metadata:
-                self.yaml.metadata.annotations={}
-            self.yaml.metadata.annotations[key]=self.konfig.annotations[key]
+                self.yaml.metadata.annotations = {}
+            self.yaml.metadata.annotations[key] = self.konfig.annotations[key]
         for key in self.konfig.get("labels", {}):
             if not "labels" in self.yaml.metadata:
-                self.yaml.metadata.labels={}
-            self.yaml.metadata.labels[key]=self.konfig.labels[key]
+                self.yaml.metadata.labels = {}
+            self.yaml.metadata.labels[key] = self.konfig.labels[key]
 
     def annotation(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.metadata:
-            self.yaml.metadata["annotations"]={}
-        self.yaml.metadata.annotations[name]=val
+            self.yaml.metadata["annotations"] = {}
+        self.yaml.metadata.annotations[name] = val
 
     def label(self, name: str, val: str) -> None:
         if "labels" not in self.yaml.metadata:
-            self.yaml.metadata["labels"]={}
-        self.yaml.metadata.labels[name]=val
+            self.yaml.metadata["labels"] = {}
+        self.yaml.metadata.labels[name] = val
 
     def load_file(self, filename: str) -> str:
         with open(f"{self.app.appdef.dir}/{filename}") as f:
@@ -103,7 +103,7 @@ class PodDisruptionBudget(Resource):
 
 class Service(Resource):
     def headless(self):
-        self.yaml.spec.clusterIP="None"
+        self.yaml.spec.clusterIP = "None"
 
 
 class Egress(Resource):
@@ -116,7 +116,7 @@ class SecretBasicAuth(Resource):
         return f"{self.app.name}-{self.shortname}"
 
     def users(self):
-        result=[]
+        result = []
         for usr in self.konfig.users:
             entry = _krypt.dekrypt_str(self.app.values[usr])
             result.append(f"{usr}:{entry}")

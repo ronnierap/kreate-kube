@@ -42,17 +42,17 @@ class AppDef():
             filename += "/appdef.yaml"
         self.dir = os.path.dirname(filename)
         self.filename = filename
-        self.values = {  "getenv": os.getenv } # TODO "dekrypt": _krypt.dekrypt_str,
+        self.values = {"getenv": os.getenv} # TODO "dekrypt": _krypt.dekrypt_str,
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
-        self.values.update(self.yaml.get("values",{}))
+        self.values.update(self.yaml.get("values", {}))
         self.name = self.values["app"]
         self.env = self.values["env"]
-        self.app_class = get_class(self.yaml.get("app_class","kreate.kube.KustApp"))
+        self.app_class = get_class(self.yaml.get("app_class", "kreate.kube.KustApp"))
         #self.values = {  "getenv": os.getenv } # TODO "dekrypt": _krypt.dekrypt_str,
         #_krypt._krypt_key = b64encode(self.yaml.get("krypt_key","no-krypt-key-defined"))
 
     def load_konfig_files(self):
-        for fname in self.yaml.get("value_files",[]):
+        for fname in self.yaml.get("value_files", []):
             val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
         self.konfig_dicts = []
@@ -61,7 +61,7 @@ class AppDef():
         #self.add_konfig_file(f"@kreate.templates:default-values.yaml")#, package=templates )
 
     def add_konfig_file(self, filename, package=None, dir=None):
-        vars = { "val": self.values }
+        vars = {"val": self.values}
         yaml = load_jinyaml(FileLocation(filename, package=package, dir=dir), vars)
         self.konfig_dicts.append(yaml)
 
@@ -84,7 +84,7 @@ class App():
         self.aliases = {}
         self.register_std_templates()
         self._init()
-        for key in appdef.yaml.get("templates",[]):
+        for key in appdef.yaml.get("templates", []):
             templ = appdef.yaml['templates'][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ)
@@ -110,13 +110,13 @@ class App():
         kind = cls.__name__
         self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
 
-    def register_template_file(self, kind:str, cls, filename=None, aliases=None, package=None):
+    def register_template_file(self, kind: str, cls, filename=None, aliases=None, package=None):
         self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
 
     def register_std_templates(self) -> None:
         pass
 
-    def add_alias(self, kind: str, *aliases: str ) -> None:
+    def add_alias(self, kind: str, *aliases: str) -> None:
         if kind in self.aliases:
             self.aliases[kind].append(aliases)
         else:
@@ -166,7 +166,7 @@ class App():
                 logger.info(f"skipping file for {obj.kind}.{obj.shortname}")
 
 
-    def _shortnames(self, kind:str ) -> list:
+    def _shortnames(self, kind: str) -> list:
         if kind in self.konfig:
             return self.konfig[kind].keys()
         return []

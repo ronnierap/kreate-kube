@@ -65,16 +65,16 @@ class KoreCli:
                 print(f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
 
     def add_main_options(self):
-        self.cli.add_argument("-a","--appdef", action="store", default="appdef.yaml")
-        self.cli.add_argument("-k","--kind", action="store", default=None)
-        self.cli.add_argument("-v","--verbose", action='count', default=0)
-        self.cli.add_argument("-w","--warn", action="store_true")
-        self.cli.add_argument("-q","--quiet", action="store_true")
+        self.cli.add_argument("-a", "--appdef", action="store", default="appdef.yaml")
+        self.cli.add_argument("-k", "--kind", action="store", default=None)
+        self.cli.add_argument("-v", "--verbose", action='count', default=0)
+        self.cli.add_argument("-w", "--warn", action="store_true")
+        self.cli.add_argument("-q", "--quiet", action="store_true")
 
     def process_main_options(self, args):
-        if args.verbose>=2:
+        if args.verbose >= 2:
             logging.basicConfig(level=logging.DEBUG)
-        elif args.verbose==1:
+        elif args.verbose == 1:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)
         elif args.warn:
@@ -86,8 +86,8 @@ class KoreCli:
 
 
 def kreate_files(args) -> App:
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
-    app : App = args.kreate_app_func(appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
+    app: App = args.kreate_app_func(appdef)
     app.kreate_files()
     return app
 
@@ -99,7 +99,7 @@ def files(args) -> App:
 
 def konfig(args):
     """show the konfig structure"""
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
     appdef.load_konfig_files()
     appdef.konfig().pprint(field=args.kind)
 

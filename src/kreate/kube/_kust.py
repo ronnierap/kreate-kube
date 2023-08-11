@@ -44,7 +44,7 @@ class KustApp(KubeApp):
 
 class Kustomization(Komponent):
     def resources(self):
-        return [res for res in self.app.komponents if isinstance(res, Resource) ]
+        return [res for res in self.app.komponents if isinstance(res, Resource)]
 
     def patches(self):
         return [res for res in self.app.komponents if isinstance(res, Patch)]
@@ -55,7 +55,7 @@ class Kustomization(Komponent):
 
 
 class Patch(Komponent):
-    def __init__(self, target: Resource, kind: str = None, shortname: str = None, template: FileLocation=None, **kwargs):
+    def __init__(self, target: Resource, kind: str = None, shortname: str = None, template: FileLocation = None, **kwargs):
         self.target = target
         Komponent.__init__(self, target.app, kind=kind, shortname=shortname, template=template, **kwargs)
 
@@ -63,12 +63,12 @@ class Patch(Komponent):
         return f"<Patch {self.target.kind}.{self.target.shortname}:{self.kind}.{self.shortname}>"
 
     def _template_vars(self):
-        return { **super()._template_vars(),  "target": self.target }
+        return {**super()._template_vars(),  "target": self.target}
 
     def _find_konfig(self):
         root_konfig = super()._find_konfig()
         typename = self.kind
-        target_konfig = self.target.konfig.get("patches",{})
+        target_konfig = self.target.konfig.get("patches", {})
         if typename in target_konfig and self.shortname in target_konfig[typename]:
             logger.debug(f"using embedded konfig {typename}.{self.shortname} from {self.target.kind}.{self.target.shortname}")
             # The embedded_konfig is first, since the root_konfig will contain all default values

@@ -28,14 +28,14 @@ class KryptCli(KoreCli):
 
 def dekyaml(args):
     """dekrypt values in a yaml file"""
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.dekrypt_yaml(filename, ".")
 
 
 def dekstr(args):
     """dekrypt string value"""
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
     value = args.str
     if not value:
         if not args.quiet: print("Enter string to dekrypt")
@@ -45,28 +45,28 @@ def dekstr(args):
 
 def dekfile(args):
     "dekrypt an entire file"
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file
     _krypt.dekrypt_file(filename)
 
 
 def enkyaml(args):
     "enkrypt values in a yaml file"
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.enkrypt_yaml(filename, ".")
 
 
 def enkfile(args):
     "enkrypt an entire file"
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file
     _krypt.enkrypt_file(filename)
 
 
 def enkstr(args):
     """enkrypt string value"""
-    appdef : AppDef = args.kreate_appdef_func(args.appdef)
+    appdef: AppDef = args.kreate_appdef_func(args.appdef)
     value = args.str
     if not value:
         if not args.quiet: print("Enter string to enkrypt")

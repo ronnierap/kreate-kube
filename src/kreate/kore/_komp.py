@@ -75,10 +75,10 @@ class Komponent(YamlBase):
 
     def _template_vars(self):
         return {
-            "konf" : self.konfig,
-            "default" : self.konfig.default,
-            "app" : self.app,
-            "my" : self,
+            "konf": self.konfig,
+            "default": self.konfig.default,
+            "app": self.app,
+            "my": self,
             "val": self.app.values
         }
 

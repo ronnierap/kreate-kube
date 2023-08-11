@@ -3,7 +3,7 @@ from . import KubeCli
 from . import KustApp
 
 
-def kreate_appdef(appdef_filename:str) -> AppDef:
+def kreate_appdef(appdef_filename: str) -> AppDef:
     return AppDef(appdef_filename)
 
 

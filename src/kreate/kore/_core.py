@@ -51,13 +51,13 @@ class DeepChain(Mapping):
     def __getitem__(self, key):
         all_vals = tuple(m.get(key, None) for m in self._maps)
         vals = tuple(v for v in all_vals if v is not None)
-        nrof_map_vals = sum(isinstance(v,Mapping) for v in vals)
-        if nrof_map_vals>0:
+        nrof_map_vals = sum(isinstance(v, Mapping) for v in vals)
+        if nrof_map_vals > 0:
             if nrof_map_vals < len(vals):
                 raise AttributeError(f"key {key} is not mergeable into dictionary since not all values are maps {vals}")
-            args=list(m for m in vals)
+            args = list(m for m in vals)
             return DeepChain(*args)
-        if len(vals)>0:
+        if len(vals) > 0:
             return vals[0]
         return None
 
@@ -101,7 +101,7 @@ class DeepChain(Mapping):
         if field:
             print(f"{field}:")
             indent = indent + indent_step
-            map = map.get(field,{})
+            map = map.get(field, {})
         for key in sorted(map.keys()):
             val = map.get(key, None)
             if isinstance(val, Mapping):
