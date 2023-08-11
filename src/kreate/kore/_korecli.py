@@ -9,11 +9,13 @@ from ._app import App, AppDef
 
 logger = logging.getLogger(__name__)
 
+
 def argument(*name_or_flags, **kwargs):
     """Convenience function to properly format arguments to pass to the
     subcommand decorator.
     """
     return (list(name_or_flags), kwargs)
+
 
 class KoreCli:
     def __init__(self):
@@ -33,7 +35,6 @@ class KoreCli:
         self.add_subcommand(files, [], aliases=["f"])
         self.add_subcommand(konfig, [], aliases=["k"])
 
-
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
         self.epilog += f"  {func.__name__:10}    {aliases[0] :4} {func.__doc__ or ''} \n"
@@ -41,7 +42,6 @@ class KoreCli:
         for arg in args:
             self.parser.add_argument(*arg[0], **arg[1])
         self.parser.set_defaults(func=func)
-
 
     def run(self, kreate_appdef_func, kreate_app_func=None):
         self.cli.epilog = self.epilog+"\n"
@@ -63,7 +63,6 @@ class KoreCli:
             if _jinyaml._current_jinja_file:
                 lineno = jinja2_template_error_lineno()
                 print(f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
-
 
     def add_main_options(self):
         self.cli.add_argument("-a","--appdef", action="store", default="appdef.yaml")
@@ -92,9 +91,11 @@ def kreate_files(args) -> App:
     app.kreate_files()
     return app
 
+
 def files(args) -> App:
     """kreate all the files (default command)"""
     app = kreate_files(args)
+
 
 def konfig(args):
     """show the konfig structure"""

@@ -35,7 +35,6 @@ class KubeApp(App):
 
 
 ##################################################################
-
 class Resource(Komponent):
     def __init__(self,
                  app: App,
@@ -97,16 +96,20 @@ class Deployment(Resource):
             self.yaml.spec.template.metadata["labels"] = {}
         self.yaml.spec.template.metadata.labels[name] = val
 
+
 class PodDisruptionBudget(Resource):
     pass
+
 
 class Service(Resource):
     def headless(self):
         self.yaml.spec.clusterIP="None"
 
+
 class Egress(Resource):
     def calc_name(self):
         return f"{self.app.name}-egress-to-{self.shortname}"
+
 
 class SecretBasicAuth(Resource):
     def calc_name(self):

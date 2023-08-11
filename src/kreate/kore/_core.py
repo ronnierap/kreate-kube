@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class DictWrapper(UserDict):
     def __init__(self, dict):
         # do not copy the original dict as the normal UserDict does
@@ -23,6 +24,7 @@ class DictWrapper(UserDict):
     def __repr__(self):
         return "DictWrapper"
 
+
 class ListWrapper(UserList):
     def __init__(self, seq) -> None:
         # do not copy the original list as the normal UserList does
@@ -33,13 +35,13 @@ class ListWrapper(UserList):
         # Wrap the returned value
         return wrap(self._seq[idx])
 
+
 def wrap(obj):
     if isinstance(obj, Sequence) and not isinstance(obj, ListWrapper):
         return ListWrapper(obj)
     if isinstance(obj, Mapping) and not isinstance(obj, DictWrapper):
         return DictWrapper(obj)
     return obj
-
 
 
 class DeepChain(Mapping):
@@ -91,7 +93,6 @@ class DeepChain(Mapping):
 
     def __repr__(self):
         return f"DeepChain({self._maps})"
-
 
     def pprint(self, map=None, indent="", field=None):
         indent_step = "  "

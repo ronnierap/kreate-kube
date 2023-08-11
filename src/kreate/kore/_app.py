@@ -20,11 +20,14 @@ def b64encode(value: str) -> str:
     print("empty")
     return ""
 
+
 jinja2.filters.FILTERS["b64encode"] = b64encode
+
 
 def get_package_data(ur: str):
     module = importlib.import_module('my_package.my_module')
     my_class = getattr(module, 'MyClass')
+
 
 def get_class(name: str):
     module_name = name.rsplit(".", 1)[0]

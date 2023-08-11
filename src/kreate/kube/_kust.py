@@ -6,7 +6,6 @@ from ..kore._komp import Komponent
 from ._kube import KubeApp, Resource
 from . import templates
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -42,6 +41,7 @@ class KustApp(KubeApp):
                 for shortname in res.konfig.patches[kind]:
                     self.kreate_patch(res, kind=kind, shortname=shortname)
 
+
 class Kustomization(Komponent):
     def resources(self):
         return [res for res in self.app.komponents if isinstance(res, Resource) ]
@@ -52,6 +52,7 @@ class Kustomization(Komponent):
     @property
     def filename(self):
         return "kustomization.yaml"
+
 
 class Patch(Komponent):
     def __init__(self, target: Resource, kind: str = None, shortname: str = None, template: FileLocation=None, **kwargs):
@@ -78,5 +79,7 @@ class Patch(Komponent):
 
 class HttpProbesPatch(Patch):
     pass
+
+
 class AntiAffinityPatch(Patch):
     pass

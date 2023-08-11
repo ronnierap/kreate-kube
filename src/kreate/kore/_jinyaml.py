@@ -10,17 +10,22 @@ from ._core import wrap
 
 logger = logging.getLogger(__name__)
 
+
 yaml_parser = YAML()
+
 
 class FileLocation(namedtuple("FileLocation", "filename package dir", defaults=[None, None])):
     __slots__ = ()
+
     def __str__(self):
         if self.package:
             return f"FileLocation({self.filename} @package:{self.package.__name__})"
         return f"FileLocation({self.filename} @dir {self.dir})"
 
+
 # dirty hack to remember which file is being processed
 _current_jinja_file = None
+
 
 def load_data(file_loc : FileLocation):
     filename = file_loc.filename
@@ -49,6 +54,7 @@ def load_data(file_loc : FileLocation):
         with open(f"{dirname}/{filename}") as f:
             return f.read()
 
+
 def load_jinja_data(file_loc : FileLocation, vars: Mapping):
     global _current_jinja_file
     _current_jinja_file = file_loc.filename # TODO: find better way
@@ -63,15 +69,17 @@ def load_jinja_data(file_loc : FileLocation, vars: Mapping):
     _current_jinja_file = None
     return result
 
+
 def load_yaml(file_loc : FileLocation) -> Mapping:
     return yaml_parser.load(load_data(file_loc=file_loc))
+
 
 def load_jinyaml(file_loc : FileLocation, vars: Mapping) -> Mapping:
     return yaml_parser.load(load_jinja_data(file_loc=file_loc, vars=vars))
 
+
 def dump(data, file):
     yaml_parser.dump(data, file)
-
 
 
 class YamlBase:

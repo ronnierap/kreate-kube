@@ -8,7 +8,9 @@ from . import _krypt
 
 logger = logging.getLogger(__name__)
 
+
 jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
+
 
 class KryptCli(KoreCli):
     def __init__(self):
@@ -30,6 +32,7 @@ def dekyaml(args):
     filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.dekrypt_yaml(filename, ".")
 
+
 def dekstr(args):
     """dekrypt string value"""
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
@@ -39,11 +42,13 @@ def dekstr(args):
         value = sys.stdin.readline().strip()
     print(_krypt.dekrypt_str(value))
 
+
 def dekfile(args):
     "dekrypt an entire file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file
     _krypt.dekrypt_file(filename)
+
 
 def enkyaml(args):
     "enkrypt values in a yaml file"
@@ -51,11 +56,13 @@ def enkyaml(args):
     filename = args.file or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml"
     _krypt.enkrypt_yaml(filename, ".")
 
+
 def enkfile(args):
     "enkrypt an entire file"
     appdef : AppDef = args.kreate_appdef_func(args.appdef)
     filename = args.file
     _krypt.enkrypt_file(filename)
+
 
 def enkstr(args):
     """enkrypt string value"""
