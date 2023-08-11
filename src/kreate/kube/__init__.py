@@ -13,3 +13,5 @@ from ._kust import KustApp
 from ._kust import HttpProbesPatch
 from ._kust import AntiAffinityPatch
 from ._kust import Kustomization
+
+from ._kubecli import KubeCli

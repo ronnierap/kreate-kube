@@ -6,7 +6,7 @@ You can also configure them further in python.
 In general it is preferred to kreate all komponents from the konfig.
 """
 
-from kreate.kore import AppDef, App, KoreCli
+from kreate.kore import AppDef, App
 import kreate.kube
 
 def kreate_appdef(appdef_filename:str) -> AppDef:
@@ -54,4 +54,4 @@ def kreate_app(appdef: AppDef) -> App:
 
     return app
 
-KoreCli().run(kreate_appdef, kreate_app)
+kreate.kube.KubeCli().run(kreate_appdef, kreate_app)

@@ -6,6 +6,8 @@ In general it is preferred to not use a script but use `python3 -m kreate`
 """
 
 import kreate.kore
+import kreate.kube
+
 
 def kreate_appdef(appdef_filename:str) -> kreate.kore.AppDef:
     # ignore passed in appdef
@@ -21,4 +23,4 @@ def kreate_app(appdef: kreate.kore.AppDef) -> kreate.kore.App:
     app.depl.main.label("this-is-added","by-script")
     return app
 
-kreate.kore.KoreCli().run(kreate_appdef, kreate_app)
+kreate.kube.KubeCli().run(kreate_appdef, kreate_app)
