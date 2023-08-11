@@ -5,7 +5,7 @@ import logging
 import importlib
 import base64
 
-from ._core import  DeepChain, DictWrapper
+from ._core import DeepChain, DictWrapper
 from ._jinyaml import load_jinyaml, FileLocation
 import jinja2.filters
 
@@ -24,11 +24,6 @@ def b64encode(value: str) -> str:
 jinja2.filters.FILTERS["b64encode"] = b64encode
 
 
-def get_package_data(ur: str):
-    module = importlib.import_module('my_package.my_module')
-    my_class = getattr(module, 'MyClass')
-
-
 def get_class(name: str):
     module_name = name.rsplit(".", 1)[0]
     class_name = name.rsplit(".", 1)[1]
@@ -42,14 +37,12 @@ class AppDef():
             filename += "/appdef.yaml"
         self.dir = os.path.dirname(filename)
         self.filename = filename
-        self.values = {"getenv": os.getenv} # TODO "dekrypt": _krypt.dekrypt_str,
+        self.values = {"getenv": os.getenv}
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
         self.values.update(self.yaml.get("values", {}))
         self.name = self.values["app"]
         self.env = self.values["env"]
         self.app_class = get_class(self.yaml.get("app_class", "kreate.kube.KustApp"))
-        #self.values = {  "getenv": os.getenv } # TODO "dekrypt": _krypt.dekrypt_str,
-        #_krypt._krypt_key = b64encode(self.yaml.get("krypt_key","no-krypt-key-defined"))
 
     def load_konfig_files(self):
         for fname in self.yaml.get("value_files", []):
@@ -58,7 +51,6 @@ class AppDef():
         self.konfig_dicts = []
         for fname in self.yaml.get("konfig_files"):
             self.add_konfig_file(fname, dir=self.dir)
-        #self.add_konfig_file(f"@kreate.templates:default-values.yaml")#, package=templates )
 
     def add_konfig_file(self, filename, package=None, dir=None):
         vars = {"val": self.values}
@@ -90,7 +82,6 @@ class App():
             self.register_template_file(key, filename=templ)
         appdef.load_konfig_files()
         self.konfig = appdef.konfig()
-
 
     def _init(self):
         pass
@@ -164,7 +155,6 @@ class App():
                 obj.kreate_file()
             else:
                 logger.info(f"skipping file for {obj.kind}.{obj.shortname}")
-
 
     def _shortnames(self, kind: str) -> list:
         if kind in self.konfig:

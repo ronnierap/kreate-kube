@@ -1,6 +1,3 @@
-#from ..kore import AppDef
-#from ..kore import App
-
 from ._kube import Resource
 from ._kube import Deployment
 from ._kube import PodDisruptionBudget

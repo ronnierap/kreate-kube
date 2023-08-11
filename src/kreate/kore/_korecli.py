@@ -24,12 +24,11 @@ class KoreCli:
             prog="kreate",
             usage="kreate [optional arguments] <subcommand>",
             description="kreates files for deploying applications on kubernetes",
-            #epilog="Epilog", # set later when all subcommands are known
             formatter_class=argparse.RawTextHelpFormatter
         )
         self.subparsers = self.cli.add_subparsers(
-            #title="subcmd",
-            #description="valid subcommands",
+            # title="subcmd",
+            # description="valid subcommands",
             dest="subcommand",
         )
         self.add_subcommand(files, [], aliases=["f"])
@@ -94,7 +93,7 @@ def kreate_files(args) -> App:
 
 def files(args) -> App:
     """kreate all the files (default command)"""
-    app = kreate_files(args)
+    kreate_files(args)
 
 
 def konfig(args):
@@ -112,7 +111,7 @@ def jinja2_template_error_lineno():
         # in case of TemplateSyntaxError
         return value.lineno
     while tb:
-        #print(tb.tb_frame.f_code.co_filename, tb.tb_lineno)
+        # print(tb.tb_frame.f_code.co_filename, tb.tb_lineno)
         if tb.tb_frame.f_code.co_filename == '<template>':
             return tb.tb_lineno
         tb = tb.tb_next

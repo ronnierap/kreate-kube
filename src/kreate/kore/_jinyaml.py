@@ -36,7 +36,7 @@ def load_data(file_loc: FileLocation):
         fname = filename[len(prefix):]
         if package:
             raise ValueError(f"filename {filename} specifies package, but package {package} is also provided")
-        spl = fname.split(":", 1) # split into package_name and filename between :
+        spl = fname.split(":", 1)  # split into package_name and filename between :
         if len(spl) < 2:
             raise ValueError(f"filename {filename} should be of format py:<package>:<file>")
         package_name = spl[0]
@@ -57,7 +57,7 @@ def load_data(file_loc: FileLocation):
 
 def load_jinja_data(file_loc: FileLocation, vars: Mapping):
     global _current_jinja_file
-    _current_jinja_file = file_loc.filename # TODO: find better way
+    _current_jinja_file = file_loc.filename  # TODO: find better way
     filedata = load_data(file_loc=file_loc)
     tmpl = jinja2.Template(
         filedata,

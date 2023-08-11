@@ -1,7 +1,7 @@
 import logging
 from collections.abc import Mapping
 
-from ._core import  DeepChain
+from ._core import DeepChain
 from ._jinyaml import YamlBase
 from ._app import App
 from ._jinyaml import FileLocation
@@ -63,7 +63,7 @@ class Komponent(YamlBase):
         typename = self.kind
         if typename in self.app.konfig and self.shortname in self.app.konfig[typename]:
             logger.debug(f"using named konfig {typename}.{self.shortname}")
-            return  self.app.konfig[typename][self.shortname]
+            return self.app.konfig[typename][self.shortname]
         logger.info(f"could not find konfig for {typename}.{self.shortname} in")
         return {}
 
@@ -85,7 +85,7 @@ class Komponent(YamlBase):
     def invoke_options(self):
         options = self.konfig.get("options", [])
         for opt in options or []:
-            if type(opt) == str:
+            if type(opt) is str:
                 logger.debug(f"invoking {self} option {opt}")
                 getattr(self, opt)()
             elif isinstance(opt, Mapping):
@@ -108,7 +108,6 @@ class Komponent(YamlBase):
 
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")
-
 
     @property
     def dirname(self):

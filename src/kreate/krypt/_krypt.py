@@ -18,11 +18,10 @@ def dekrypt_str(value):
 
 def dekrypt_file(filename):
     fernet = Fernet(_krypt_key)
+    with open(filename) as f:
+        data = f.read()
     if _dekrypt_testdummy:
-        data =  f"testdummy-{data[len(data)//2-4:len(data)//2+4]}"
-    else:
-        with open(filename) as f:
-            data = f.read()
+        data = f"testdummy-{data[len(data)//2-4:len(data)//2+4]}"
     print(fernet.decrypt(data.encode("ascii")).decode("ascii"), end="")
 
 
@@ -45,14 +44,14 @@ def enkrypt_file(filename):
 def change_yaml_comments(filename: str, func, from_: str, to_: str, dir: str = None):
     dir = dir or "."
     yaml_parser = YAML()
-    yaml_parser.width = 4096 # prevent line wrapping
+    yaml_parser.width = 4096  # prevent line wrapping
     yaml_parser.preserve_quotes = True
     with open(f"{dir}/{filename}") as f:
         data = f.read()
     yaml = yaml_parser.load(data)
     ca = yaml.ca
     for key in yaml:
-        if key in ca.items: # and len(ca.items[key])>2:
+        if key in ca.items:  # and len(ca.items[key])>2:
             item = yaml[key]
             comment = ca.items[key][2]
             if from_ in comment.value:

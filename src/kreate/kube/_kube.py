@@ -36,13 +36,13 @@ class KubeApp(App):
 
 ##################################################################
 class Resource(Komponent):
-    def __init__(self,
-                 app: App,
-                 shortname: str = None,
-                 kind: str = None,
-                 template: FileLocation = None,
-                 **kwargs
-                ):
+    def __init__(
+            self,
+            app: App,
+            shortname: str = None,
+            kind: str = None,
+            template: FileLocation = None,
+            **kwargs):
         Komponent.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)
         self.add_metadata()
 
@@ -57,11 +57,11 @@ class Resource(Komponent):
 
     def add_metadata(self):
         for key in self.konfig.get("annotations", {}):
-            if not "annotations" in self.yaml.metadata:
+            if "annotations" not in self.yaml.metadata:
                 self.yaml.metadata.annotations = {}
             self.yaml.metadata.annotations[key] = self.konfig.annotations[key]
         for key in self.konfig.get("labels", {}):
-            if not "labels" in self.yaml.metadata:
+            if "labels" not in self.yaml.metadata:
                 self.yaml.metadata.labels = {}
             self.yaml.metadata.labels[key] = self.konfig.labels[key]
 
@@ -82,17 +82,17 @@ class Resource(Komponent):
 
 class Deployment(Resource):
     def calc_name(self):
-        if  self.shortname == "main":
+        if self.shortname == "main":
             return self.app.name
         return f"{self.app.name}-{self.shortname}"
 
     def pod_annotation(self, name: str, val: str) -> None:
-        if not "annotations" in self.yaml.spec.template.metadata:
+        if "annotations" not in self.yaml.spec.template.metadata:
             self.yaml.spec.template.metadata["annotations"] = {}
         self.yaml.spec.template.metadata.annotations[name] = val
 
     def pod_label(self, name: str, val: str) -> None:
-        if not "labels" in self.yaml.spec.template.metadata:
+        if "labels" not in self.yaml.spec.template.metadata:
             self.yaml.spec.template.metadata["labels"] = {}
         self.yaml.spec.template.metadata.labels[name] = val
 
