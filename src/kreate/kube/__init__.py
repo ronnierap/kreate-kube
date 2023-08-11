@@ -15,3 +15,19 @@ from ._kust import AntiAffinityPatch
 from ._kust import Kustomization
 
 from ._kubecli import KubeCli
+
+
+__all__ = [
+    "Resource",
+    "Deployment",
+    "PodDisruptionBudget",
+    "ConfigMap",
+    "Ingress",
+    "Service",
+    "Egress",
+    "KustApp",
+    "HttpProbesPatch",
+    "AntiAffinityPatch",
+    "Kustomization",
+    "KubeCli",
+]
