@@ -2,7 +2,8 @@ import argparse
 import os
 import sys
 import logging
-from . import _jinyaml, _krypt
+from . import _jinyaml
+from ..krypt import _krypt
 from ._app import App, AppDef
 import traceback
 from jinja2 import TemplateError

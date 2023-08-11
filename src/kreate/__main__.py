@@ -1,14 +1,16 @@
-import kreate
+from .kore._app import AppDef, App
+from .kore._cli import run_cli
 
-def kreate_appdef(appdef_filename:str) -> kreate.AppDef:
-    appdef = kreate.AppDef(appdef_filename)
+from .kube import KustApp
+
+def kreate_appdef(appdef_filename:str) -> AppDef:
+    appdef = AppDef(appdef_filename)
     return appdef
 
-def kreate_app(appdef: kreate.AppDef) -> kreate.App:
+def kreate_app(appdef: AppDef) -> App:
     appdef.load_konfig_files()
-    app = appdef.kreate_app()
+    app = KustApp(appdef)
     app.konfigure_from_konfig()
     return app
 
-
-kreate.run_cli(kreate_appdef, kreate_app)
+run_cli(kreate_appdef, kreate_app)

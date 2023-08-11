@@ -1,8 +1,8 @@
 import logging
-from ._app import App
-from ._komp import Komponent
-from ._jinyaml import FileLocation
-from . import _krypt
+from ..kore._app import App
+from ..kore._komp import Komponent
+from ..kore._jinyaml import FileLocation
+from ..krypt import _krypt
 from . import kube_templates
 
 logger = logging.getLogger(__name__)

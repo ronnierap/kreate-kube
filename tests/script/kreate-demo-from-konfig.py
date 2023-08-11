@@ -5,19 +5,20 @@ After this you can fientune them further in python.
 In general it is preferred to not use a script but use `python3 -m kreate`
 """
 
-import kreate
+import kreate.kore
 
-def kreate_appdef(appdef_filename:str) -> kreate.AppDef:
+def kreate_appdef(appdef_filename:str) -> kreate.kore.AppDef:
     # ignore passed in appdef
-    appdef = kreate.AppDef("tests/script/appdef.yaml")
+    appdef = kreate.kore.AppDef("tests/script/appdef.yaml")
     appdef.load_konfig_files()
     return appdef
 
-def kreate_app(appdef: kreate.AppDef) -> kreate.App:
-    app = appdef.kreate_app()
+def kreate_app(appdef: kreate.kore.AppDef) -> kreate.kore.App:
+    appdef.load_konfig_files()
+    app = kreate.kube.KustApp(appdef)
     app.konfigure_from_konfig()
     # find the (main) Deployment and modify it a bit
     app.depl.main.label("this-is-added","by-script")
     return app
 
-kreate.run_cli(kreate_appdef, kreate_app)
+kreate.kore.run_cli(kreate_appdef, kreate_app)

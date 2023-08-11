@@ -1,5 +1,5 @@
-from ._app import AppDef
-from ._app import App
+#from ..kore import AppDef
+#from ..kore import App
 
 from ._kube import Resource
 from ._kube import Deployment
@@ -13,5 +13,3 @@ from ._kust import KustApp
 from ._kust import HttpProbesPatch
 from ._kust import AntiAffinityPatch
 from ._kust import Kustomization
-
-from ._cli import run_cli

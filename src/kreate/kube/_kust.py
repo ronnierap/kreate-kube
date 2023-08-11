@@ -1,11 +1,11 @@
 import logging
 
-from ._app import App
-from ._jinyaml import FileLocation
-from ._core import DeepChain
-from ._komp import Komponent
+from ..kore._app import App
+from ..kore._jinyaml import FileLocation
+from ..kore._core import DeepChain
+from ..kore._komp import Komponent
 from ._kube import KubeApp, Resource
-from ._jinyaml import FileLocation
+from ..kore._jinyaml import FileLocation
 from . import kust_templates
 
 

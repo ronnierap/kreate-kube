@@ -5,7 +5,7 @@ import logging
 import importlib
 import base64
 
-from . import _krypt
+from ..krypt import _krypt
 from ._core import  DeepChain, DictWrapper
 from ._jinyaml import load_jinyaml, FileLocation
 import jinja2.filters
@@ -49,7 +49,7 @@ class AppDef():
         self.values.update(self.yaml.get("values",{}))
         self.name = self.values["app"]
         self.env = self.values["env"]
-        self.app_class = get_class(self.yaml.get("app_class","kreate.KustApp"))
+        self.app_class = get_class(self.yaml.get("app_class","kreate.kube.KustApp"))
         _krypt._krypt_key = b64encode(self.yaml.get("krypt_key","no-krypt-key-defined"))
 
     def load_konfig_files(self):
@@ -69,14 +69,6 @@ class AppDef():
     def konfig(self):
         return DeepChain(*reversed(self.konfig_dicts))
 
-    def kreate_app(self):
-        app: App = self.app_class(self)
-        for key in self.yaml.get("templates",[]):
-            templ = self.yaml['templates'][key]
-            logger.info(f"adding custom template {key}: {templ}")
-            app.register_template_file(key, filename=templ)
-        return app
-
 
 class App():
     def __init__(self, appdef: AppDef):
@@ -94,6 +86,10 @@ class App():
         self.aliases = {}
         self.register_std_templates()
         self._init()
+        for key in appdef.yaml.get("templates",[]):
+            templ = appdef.yaml['templates'][key]
+            logger.info(f"adding custom template {key}: {templ}")
+            self.register_template_file(key, filename=templ)
 
     def _init(self):
         pass
