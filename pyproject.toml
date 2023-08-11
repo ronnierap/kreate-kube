@@ -1,6 +1,6 @@
 [project]
-name = "kisst.kreate"
-version = "0.0.1"
+name = "kreate-kube"
+version = "0.1.0"
 authors = [
   { name="Mark Hooijkaas", email="mark@hooijkaas.net" },
 ]
@@ -19,8 +19,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/MarkHooijkaas/kisst.kreate"
-"Bug Tracker" = "https://github.com/MarkHooijkaas/kisst.kreate/issues"
+"Homepage" = "https://github.com/MarkHooijkaas/kreate-kube"
+"Bug Tracker" = "https://github.com/MarkHooijkaas/kreate-kube/issues"
 
 [build-system]
 requires = ["pdm-backend"]
