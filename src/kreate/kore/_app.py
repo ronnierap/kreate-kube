@@ -87,18 +87,30 @@ class App():
     def _init(self):
         pass
 
-    def register_template(self, kind: str, cls,
-                          filename, aliases=None, package=None):
+    def register_template(self, kind: str, cls=None,
+                          filename=None, aliases=None, package=None):
         if kind in self.kind_templates:
-            logger.warning(f"overriding template {kind}")
+            if cls is None:
+                cls = self.kind_classes[kind]
+                logger.warning(f"overriding template {kind} "
+                               f"using existing class {cls.__name__}")
+            else:
+                logger.warning(f"overriding template {kind} using "
+                               f"default class")
         filename = filename or f"{kind}.yaml"
         loc = FileLocation(filename=filename,
                            package=package, dir=self.appdef.dir)
         logger.debug(f"registering template {kind}: {loc}")
+        cls = cls or self._default_template_class()
+        if cls is None:
+            raise ValueError(f"No class specified for template {kind}: {loc}")
         self.kind_templates[kind] = loc
         self.kind_classes[kind] = cls
         if aliases:
             self.add_alias(kind, aliases)
+
+    def _default_template_class(self):
+        return None
 
     def register_template_class(self: str, cls,
                                 filename=None, aliases=None, package=None):
@@ -106,7 +118,7 @@ class App():
         self.register_template(kind, cls, filename=filename,
                                aliases=aliases, package=package)
 
-    def register_template_file(self, kind: str, cls,
+    def register_template_file(self, kind: str, cls=None,
                                filename=None, aliases=None, package=None):
         self.register_template(kind, cls, filename=filename,
                                aliases=aliases, package=package)

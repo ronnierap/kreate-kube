@@ -43,7 +43,7 @@ spec:
   ports:
   - name: http
     port: 8080
-    protocol: TCP
+    protocol: UDP
     targetPort: 8080
   selector:
     app: demo
@@ -59,7 +59,7 @@ spec:
   ports:
   - name: https
     port: 443
-    protocol: TCP
+    protocol: UDP
     targetPort: 443
   selector:
     app: demo

@@ -31,32 +31,17 @@ class KubeApp(App):
         self.register_template_class(Ingress, package=templates)
         self.register_template_class(Egress, package=templates)
         self.register_template_class(SecretBasicAuth, package=templates)
-        self.register_template_file(
-            "HorizontalPodAutoscaler",
-            aliases="hpa",
-            package=templates)
+        self.register_template_file("HorizontalPodAutoscaler",
+                                    aliases="hpa",
+                                    package=templates)
         self.register_template_file("ServiceAccount", package=templates)
         self.register_template_file("ServiceMonitor", package=templates)
         self.register_template_file("Secret", package=templates)
 
-    def register_template_file(
-            self,
-            kind: str,
-            cls=None,
-            filename=None,
-            aliases=None,
-            package=None):
-        # Override parent, to provide default class Resource
-        cls = cls or Resource
-        super().register_template_file(
-            kind,
-            cls,
-            filename=filename,
-            aliases=aliases,
-            package=package)
+    def _default_template_class(self):
+        return Resource
 
 
-##################################################################
 class Resource(Komponent):
     def __init__(
             self,
