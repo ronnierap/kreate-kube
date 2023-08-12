@@ -4,13 +4,13 @@ export KREATE_KRYPT_KEY_DEV=C6XOvZALFPjTzWKOPV3EJFIpmmwMhXEE
 
 
 echo '###########################################'
-echo python3 -m kreate.kube -a tests/script/appdef.yaml -q test
-python3 -m kreate.kube -a tests/script/appdef.yaml -q test
+echo python3 -m kreate.kube -a tests/script/appdef.yaml -w test
+python3 -m kreate.kube -a tests/script/appdef.yaml -w test
 
 echo '###########################################'
-echo ./tests/script/kreate-demo-from-script.py -q test
-./tests/script/kreate-demo-from-script.py -q test
+echo ./tests/script/kreate-demo-from-script.py -w test
+./tests/script/kreate-demo-from-script.py -w test
 
 echo '###########################################'
-echo ./tests/script/kreate-demo-from-konfig.py -q test
-./tests/script/kreate-demo-from-konfig.py -q test
+echo ./tests/script/kreate-demo-from-konfig.py -w test
+./tests/script/kreate-demo-from-konfig.py -w test
