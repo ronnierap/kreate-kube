@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Komponent(YamlBase):
     """An object that is parsed from a yaml template and konfiguration"""
+
     def __init__(self, app: App,
                  kind: str = None,
                  shortname: str = None,
@@ -31,7 +32,8 @@ class Komponent(YamlBase):
             # do not load the template (konfig might be missing)
             logger.info(f"ignoring {self.name}")
         else:
-            logger.debug(f"parsing {self.kind}.{self.shortname} at {self.template}")
+            logger.debug(
+                f"parsing {self.kind}.{self.shortname} at {self.template}")
             self.load_yaml()
         self.app.add(self)
         self.invoke_options()
@@ -64,7 +66,8 @@ class Komponent(YamlBase):
         if typename in self.app.konfig and self.shortname in self.app.konfig[typename]:
             logger.debug(f"using named konfig {typename}.{self.shortname}")
             return self.app.konfig[typename][self.shortname]
-        logger.info(f"could not find konfig for {typename}.{self.shortname} in")
+        logger.info(
+            f"could not find konfig for {typename}.{self.shortname} in")
         return {}
 
     def kreate_file(self) -> None:
@@ -85,26 +88,31 @@ class Komponent(YamlBase):
     def invoke_options(self):
         options = self.konfig.get("options", [])
         for opt in options or []:
-            if type(opt) is str:
+            if isinstance(opt, str):
                 logger.debug(f"invoking {self} option {opt}")
                 getattr(self, opt)()
             elif isinstance(opt, Mapping):
                 for key in opt.keys():
                     val = opt.get(key)
                     if isinstance(val, Mapping):
-                        logger.debug(f"invoking {self} option {key} with kwargs parameters {val}")
+                        logger.debug(
+                            f"invoking {self} option {key} with kwargs parameters {val}")
                         getattr(self, key)(**dict(val))
                     elif isinstance(val, list):
-                        logger.debug(f"invoking {self} option {key} with list parameters {val}")
+                        logger.debug(
+                            f"invoking {self} option {key} with list parameters {val}")
                         getattr(self, key)(*val)
                     elif isinstance(val, str):
-                        logger.debug(f"invoking {self} option {key} with string parameter {val}")
+                        logger.debug(
+                            f"invoking {self} option {key} with string parameter {val}")
                         getattr(self, key)(val)
                     elif isinstance(val, int):
-                        logger.debug(f"invoking {self} option {key} with int parameter {val}")
+                        logger.debug(
+                            f"invoking {self} option {key} with int parameter {val}")
                         getattr(self, key)(int(val))
                     else:
-                        logger.warn(f"option map {opt} for {self.name} not supported")
+                        logger.warn(
+                            f"option map {opt} for {self.name} not supported")
 
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")

@@ -45,7 +45,8 @@ class AppDef():
 
     def load_konfig_files(self):
         for fname in self.yaml.get("value_files", []):
-            val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), self.values)
+            val_yaml = load_jinyaml(FileLocation(
+                fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
         self.konfig_dicts = []
         for fname in self.yaml.get("konfig_files"):
@@ -53,7 +54,8 @@ class AppDef():
 
     def add_konfig_file(self, filename, package=None, dir=None):
         vars = {"val": self.values}
-        yaml = load_jinyaml(FileLocation(filename, package=package, dir=dir), vars)
+        yaml = load_jinyaml(FileLocation(
+            filename, package=package, dir=dir), vars)
         self.konfig_dicts.append(yaml)
 
     def konfig(self):
@@ -89,7 +91,8 @@ class App():
         if kind in self.kind_templates:
             logger.warning(f"overriding template {kind}")
         filename = filename or f"{kind}.yaml"
-        loc = FileLocation(filename=filename, package=package, dir=self.appdef.dir)
+        loc = FileLocation(filename=filename,
+                           package=package, dir=self.appdef.dir)
         logger.debug(f"registering template {kind}: {loc}")
         self.kind_templates[kind] = loc
         self.kind_classes[kind] = cls
@@ -98,10 +101,12 @@ class App():
 
     def register_template_class(self: str, cls, filename=None, aliases=None, package=None):
         kind = cls.__name__
-        self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
+        self.register_template(kind, cls, filename=filename,
+                               aliases=aliases, package=package)
 
     def register_template_file(self, kind: str, cls, filename=None, aliases=None, package=None):
-        self.register_template(kind, cls, filename=filename, aliases=aliases, package=package)
+        self.register_template(kind, cls, filename=filename,
+                               aliases=aliases, package=package)
 
     def register_std_templates(self) -> None:
         pass

@@ -37,7 +37,8 @@ class KoreCli:
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
         self.epilog += f"  {func.__name__:10}    {aliases[0] :4} {func.__doc__ or ''} \n"
-        self.parser = parent.add_parser(func.__name__, aliases=aliases, description=func.__doc__)
+        self.parser = parent.add_parser(
+            func.__name__, aliases=aliases, description=func.__doc__)
         for arg in args:
             self.parser.add_argument(*arg[0], **arg[1])
         self.parser.set_defaults(func=func)
@@ -61,10 +62,12 @@ class KoreCli:
                 print(f"{type(e).__name__}: {e}")
             if _jinyaml._current_jinja_file:
                 lineno = jinja2_template_error_lineno()
-                print(f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
+                print(
+                    f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
 
     def add_main_options(self):
-        self.cli.add_argument("-a", "--appdef", action="store", default="appdef.yaml")
+        self.cli.add_argument(
+            "-a", "--appdef", action="store", default="appdef.yaml")
         self.cli.add_argument("-k", "--kind", action="store", default=None)
         self.cli.add_argument("-v", "--verbose", action='count', default=0)
         self.cli.add_argument("-w", "--warn", action="store_true")

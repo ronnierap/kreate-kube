@@ -54,7 +54,8 @@ class DeepChain(Mapping):
         nrof_map_vals = sum(isinstance(v, Mapping) for v in vals)
         if nrof_map_vals > 0:
             if nrof_map_vals < len(vals):
-                raise AttributeError(f"key {key} is not mergeable into dictionary since not all values are maps {vals}")
+                raise AttributeError(
+                    f"key {key} is not mergeable into dictionary since not all values are maps {vals}")
             args = list(m for m in vals)
             return DeepChain(*args)
         if len(vals) > 0:
@@ -63,7 +64,8 @@ class DeepChain(Mapping):
 
     def __getattr__(self, attr):
         if attr not in self:
-            raise AttributeError(f"DeepChain object could not find attribute {attr} in {self}")
+            raise AttributeError(
+                f"DeepChain object could not find attribute {attr} in {self}")
         else:
             return self[attr]
 

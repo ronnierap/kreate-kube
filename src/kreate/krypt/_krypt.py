@@ -65,8 +65,10 @@ def change_yaml_comments(filename: str, func, from_: str, to_: str, dir: str = N
 
 
 def dekrypt_yaml(filename: str, dir: str = None):
-    change_yaml_comments(filename, dekrypt_str, "enkrypted", "dekrypted", dir=dir)
+    change_yaml_comments(filename, dekrypt_str,
+                         "enkrypted", "dekrypted", dir=dir)
 
 
 def enkrypt_yaml(filename: str, dir: str = None):
-    change_yaml_comments(filename, enkrypt_str, "dekrypted", "enkrypted", dir=dir)
+    change_yaml_comments(filename, enkrypt_str,
+                         "dekrypted", "enkrypted", dir=dir)

@@ -11,27 +11,49 @@ logger = logging.getLogger(__name__)
 class KubeApp(App):
     def __init__(self, appdef: AppDef):
         appdef.values["dekrypt"] = _krypt.dekrypt_str
-        _krypt._krypt_key = b64encode(appdef.yaml.get("krypt_key", "no-krypt-key-defined"))
+        _krypt._krypt_key = b64encode(
+            appdef.yaml.get(
+                "krypt_key",
+                "no-krypt-key-defined"))
         super().__init__(appdef)
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Service, aliases="svc", package=templates)
-        self.register_template_class(Deployment, aliases="depl", package=templates)
-        self.register_template_class(PodDisruptionBudget, aliases="pdb", package=templates)
-        self.register_template_class(ConfigMap, aliases="cm", package=templates)
+        self.register_template_class(
+            Deployment, aliases="depl", package=templates)
+        self.register_template_class(
+            PodDisruptionBudget,
+            aliases="pdb",
+            package=templates)
+        self.register_template_class(
+            ConfigMap, aliases="cm", package=templates)
         self.register_template_class(Ingress, package=templates)
         self.register_template_class(Egress, package=templates)
         self.register_template_class(SecretBasicAuth, package=templates)
-        self.register_template_file("HorizontalPodAutoscaler", aliases="hpa", package=templates)
+        self.register_template_file(
+            "HorizontalPodAutoscaler",
+            aliases="hpa",
+            package=templates)
         self.register_template_file("ServiceAccount", package=templates)
         self.register_template_file("ServiceMonitor", package=templates)
         self.register_template_file("Secret", package=templates)
 
-    def register_template_file(self, kind: str, cls=None, filename=None, aliases=None, package=None):
+    def register_template_file(
+            self,
+            kind: str,
+            cls=None,
+            filename=None,
+            aliases=None,
+            package=None):
         # Override parent, to provide default class Resource
         cls = cls or Resource
-        super().register_template_file(kind, cls, filename=filename, aliases=aliases, package=package)
+        super().register_template_file(
+            kind,
+            cls,
+            filename=filename,
+            aliases=aliases,
+            package=package)
 
 
 ##################################################################
@@ -43,7 +65,13 @@ class Resource(Komponent):
             kind: str = None,
             template: FileLocation = None,
             **kwargs):
-        Komponent.__init__(self, app, kind=kind, shortname=shortname, template=template, **kwargs)
+        Komponent.__init__(
+            self,
+            app,
+            kind=kind,
+            shortname=shortname,
+            template=template,
+            **kwargs)
         self.add_metadata()
 
     def __str__(self):

@@ -15,12 +15,30 @@ jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
 class KryptCli(KoreCli):
     def __init__(self):
         super().__init__()
-        self.add_subcommand(dekyaml, [argument("-f", "--file", help="yaml file to enkrypt")], aliases=["dy"])
-        self.add_subcommand(dekstr, [argument("-s", "--str", help="string value to dekrypt")], aliases=["ds"])
-        self.add_subcommand(dekfile, [argument("file", help=" filename to dekrypt")], aliases=["df"])
-        self.add_subcommand(enkyaml, [argument("-f", "--file", help="yaml filename to enkrypt")], aliases=["ey"])
-        self.add_subcommand(enkfile, [argument("file", help=" filename to enkrypt")], aliases=["ef"])
-        self.add_subcommand(enkstr, [argument("-s", "--str", help="string value to enkrypt")], aliases=["es"])
+        self.add_subcommand(
+            dekyaml, [
+                argument(
+                    "-f", "--file", help="yaml file to enkrypt")], aliases=["dy"])
+        self.add_subcommand(
+            dekstr, [
+                argument(
+                    "-s", "--str", help="string value to dekrypt")], aliases=["ds"])
+        self.add_subcommand(
+            dekfile, [
+                argument(
+                    "file", help=" filename to dekrypt")], aliases=["df"])
+        self.add_subcommand(
+            enkyaml, [
+                argument(
+                    "-f", "--file", help="yaml filename to enkrypt")], aliases=["ey"])
+        self.add_subcommand(
+            enkfile, [
+                argument(
+                    "file", help=" filename to enkrypt")], aliases=["ef"])
+        self.add_subcommand(
+            enkstr, [
+                argument(
+                    "-s", "--str", help="string value to enkrypt")], aliases=["es"])
 
 
 def dekyaml(args):
