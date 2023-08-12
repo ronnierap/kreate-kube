@@ -1,4 +1,4 @@
-# kisst.kreate
+# kreate-kube
 kreate kubernetes/kustomize yaml files based on templates
 
 The purpose of the kreate framework is to easily create
