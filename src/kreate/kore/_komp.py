@@ -63,7 +63,8 @@ class Komponent(YamlBase):
 
     def _find_konfig(self):
         typename = self.kind
-        if typename in self.app.konfig and self.shortname in self.app.konfig[typename]:
+        if ((typename in self.app.konfig  # ugly (( to satisfy flake8 E129))
+             and self.shortname in self.app.konfig[typename])):
             logger.debug(f"using named konfig {typename}.{self.shortname}")
             return self.app.konfig[typename][self.shortname]
         logger.info(
@@ -96,19 +97,23 @@ class Komponent(YamlBase):
                     val = opt.get(key)
                     if isinstance(val, Mapping):
                         logger.debug(
-                            f"invoking {self} option {key} with kwargs parameters {val}")
+                            f"invoking {self} option {key}"
+                            f" with kwargs parameters {val}")
                         getattr(self, key)(**dict(val))
                     elif isinstance(val, list):
                         logger.debug(
-                            f"invoking {self} option {key} with list parameters {val}")
+                            f"invoking {self} option {key}"
+                            f" with list parameters {val}")
                         getattr(self, key)(*val)
                     elif isinstance(val, str):
                         logger.debug(
-                            f"invoking {self} option {key} with string parameter {val}")
+                            f"invoking {self} option {key}"
+                            f" with string parameter {val}")
                         getattr(self, key)(val)
                     elif isinstance(val, int):
                         logger.debug(
-                            f"invoking {self} option {key} with int parameter {val}")
+                            f"invoking {self} option {key}"
+                            f" with int parameter {val}")
                         getattr(self, key)(int(val))
                     else:
                         logger.warn(

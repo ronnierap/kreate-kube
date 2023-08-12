@@ -55,7 +55,8 @@ class DeepChain(Mapping):
         if nrof_map_vals > 0:
             if nrof_map_vals < len(vals):
                 raise AttributeError(
-                    f"key {key} is not mergeable into dictionary since not all values are maps {vals}")
+                    f"key {key} is not mergeable into dictionary "
+                    f"since not all values are maps {vals}")
             args = list(m for m in vals)
             return DeepChain(*args)
         if len(vals) > 0:

@@ -23,7 +23,8 @@ class KoreCli:
         self.cli = argparse.ArgumentParser(
             prog="kreate",
             usage="kreate [optional arguments] <subcommand>",
-            description="kreates files for deploying applications on kubernetes",
+            description=(
+                "kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter
         )
         self.subparsers = self.cli.add_subparsers(
@@ -36,7 +37,8 @@ class KoreCli:
 
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
-        self.epilog += f"  {func.__name__:10}    {aliases[0] :4} {func.__doc__ or ''} \n"
+        self.epilog += (f"  {func.__name__:10}    {aliases[0] :4}"
+                        f" {func.__doc__ or ''} \n")
         self.parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__)
         for arg in args:
@@ -62,8 +64,8 @@ class KoreCli:
                 print(f"{type(e).__name__}: {e}")
             if _jinyaml._current_jinja_file:
                 lineno = jinja2_template_error_lineno()
-                print(
-                    f"while processing template {_jinyaml._current_jinja_file}:{lineno}")
+                print(f"while processing template "
+                      f"{_jinyaml._current_jinja_file}:{lineno}")
 
     def add_main_options(self):
         self.cli.add_argument(

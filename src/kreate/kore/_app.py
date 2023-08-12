@@ -87,7 +87,8 @@ class App():
     def _init(self):
         pass
 
-    def register_template(self, kind: str, cls, filename, aliases=None, package=None):
+    def register_template(self, kind: str, cls,
+                          filename, aliases=None, package=None):
         if kind in self.kind_templates:
             logger.warning(f"overriding template {kind}")
         filename = filename or f"{kind}.yaml"
@@ -99,12 +100,14 @@ class App():
         if aliases:
             self.add_alias(kind, aliases)
 
-    def register_template_class(self: str, cls, filename=None, aliases=None, package=None):
+    def register_template_class(self: str, cls,
+                                filename=None, aliases=None, package=None):
         kind = cls.__name__
         self.register_template(kind, cls, filename=filename,
                                aliases=aliases, package=package)
 
-    def register_template_file(self, kind: str, cls, filename=None, aliases=None, package=None):
+    def register_template_file(self, kind: str, cls,
+                               filename=None, aliases=None, package=None):
         self.register_template(kind, cls, filename=filename,
                                aliases=aliases, package=package)
 
@@ -144,7 +147,8 @@ class App():
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if inspect.isclass(cls):
-            return cls(app=self, kind=kind, shortname=shortname, template=templ, **kwargs)
+            return cls(app=self, kind=kind,
+                       shortname=shortname, template=templ, **kwargs)
         else:
             raise ValueError(f"Unknown template type {type(cls)}, {cls}")
 

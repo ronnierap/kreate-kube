@@ -81,7 +81,8 @@ class Patch(Komponent):
             **kwargs)
 
     def __str__(self):
-        return f"<Patch {self.target.kind}.{self.target.shortname}:{self.kind}.{self.shortname}>"
+        return (f"<Patch {self.target.kind}.{self.target.shortname}"
+                f":{self.kind}.{self.shortname}>")
 
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}
@@ -89,13 +90,14 @@ class Patch(Komponent):
     def _find_konfig(self):
         root_konfig = super()._find_konfig()
         typename = self.kind
-        target_konfig = self.target.konfig.get("patches", {})
-        if typename in target_konfig and self.shortname in target_konfig[typename]:
+        targt_konf = self.target.konfig.get("patches", {})
+        if typename in targt_konf and self.shortname in targt_konf[typename]:
             logger.debug(
-                f"using embedded konfig {typename}.{self.shortname} from {self.target.kind}.{self.target.shortname}")
+                f"using embedded konfig {typename}.{self.shortname}"
+                f" from {self.target.kind}.{self.target.shortname}")
             # The embedded_konfig is first, since the root_konfig will contain
             # all default values
-            embedded_konfig = target_konfig[typename][self.shortname]
+            embedded_konfig = targt_konf[typename][self.shortname]
             return DeepChain(embedded_konfig, root_konfig)
         return root_konfig
 

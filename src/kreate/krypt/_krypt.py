@@ -29,7 +29,8 @@ def enkrypt_str(value):
     fernet = Fernet(_krypt_key)
     part = b'\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa'
     # use the parts to prevent changes if secret was not changed
-    return fernet._encrypt_from_parts(value.encode("ascii"), 0, part).decode("ascii")
+    return fernet._encrypt_from_parts(
+        value.encode("ascii"), 0, part).decode("ascii")
 
 
 def enkrypt_file(filename):
@@ -41,7 +42,8 @@ def enkrypt_file(filename):
         f.write(fernet._encrypt_from_parts(data.encode("ascii"), 0, part))
 
 
-def change_yaml_comments(filename: str, func, from_: str, to_: str, dir: str = None):
+def change_yaml_comments(filename: str, func,
+                         from_: str, to_: str, dir: str = None):
     dir = dir or "."
     yaml_parser = YAML()
     yaml_parser.width = 4096  # prevent line wrapping

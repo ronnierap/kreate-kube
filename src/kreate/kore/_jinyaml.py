@@ -20,7 +20,8 @@ class FileLocation(namedtuple(
 
     def __str__(self):
         if self.package:
-            return f"FileLocation({self.filename} @package:{self.package.__name__})"
+            return (f"FileLocation({self.filename}"
+                    f" @package:{self.package.__name__})")
         return f"FileLocation({self.filename} @dir {self.dir})"
 
 
@@ -37,7 +38,8 @@ def load_data(file_loc: FileLocation):
         fname = filename[len(prefix):]
         if package:
             raise ValueError(
-                f"filename {filename} specifies package, but package {package} is also provided")
+                f"filename {filename} specifies package, "
+                f"but package {package} is also provided")
         # split into package_name and filename between :
         spl = fname.split(":", 1)
         if len(spl) < 2:
