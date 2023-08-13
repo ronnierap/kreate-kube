@@ -68,8 +68,6 @@ class App():
         self.env = appdef.env
         self.appdef = appdef
         self.values = appdef.values
-        self.namespace = self.name + "-" + self.env
-        self.target_dir = "./build/" + self.namespace
         self.kind_templates = {}
         self.kind_classes = {}
         self.komponents = []

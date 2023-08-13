@@ -16,6 +16,8 @@ class KubeApp(App):
                 "krypt_key",
                 "no-krypt-key-defined"))
         super().__init__(appdef)
+        self.namespace = self.name + "-" + self.env
+        self.target_dir = "./build/" + self.namespace
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
