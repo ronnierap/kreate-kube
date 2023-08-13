@@ -164,17 +164,23 @@ class App():
         else:
             raise ValueError(f"Unknown template type {type(cls)}, {cls}")
 
+    def aktivate(self):
+        for komp in self.komponents:
+            logger.debug(
+                f"aktivating {self.kind}.{self.shortname} at {self.template}")
+            komp.aktivate()
+
     def kreate_files(self):
         if os.path.exists(self.target_dir) and os.path.isdir(self.target_dir):
             shutil.rmtree(self.target_dir)
         os.makedirs(self.target_dir, exist_ok=True)
 
-        for obj in self.komponents:
-            if (obj.filename):
-                logger.info(f"kreating file {obj.filename}")
-                obj.kreate_file()
+        for komp in self.komponents:
+            if (komp.filename):
+                logger.info(f"kreating file {komp.filename}")
+                komp.kreate_file()
             else:
-                logger.info(f"skipping file for {obj.kind}.{obj.shortname}")
+                logger.info(f"skipping file for {komp.kind}.{komp.shortname}")
 
     def _shortnames(self, kind: str) -> list:
         if kind in self.konfig:

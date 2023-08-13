@@ -15,8 +15,7 @@ def kreate_appdef(appdef_filename:str) -> AppDef:
 def kreate_app(appdef: AppDef) -> App:
     app = KustApp(appdef)
     app.konfigure_from_konfig()
-    # find the (main) Deployment and modify it a bit
-    #TODO: This did work:
+    app.aktivate()
     app.depl.main.label("this-is-added","by-script")
     return app
 

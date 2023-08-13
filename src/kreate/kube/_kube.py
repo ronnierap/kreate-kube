@@ -43,20 +43,8 @@ class KubeApp(App):
 
 
 class Resource(Komponent):
-    def __init__(
-            self,
-            app: App,
-            shortname: str = None,
-            kind: str = None,
-            template: FileLocation = None,
-            **kwargs):
-        Komponent.__init__(
-            self,
-            app,
-            kind=kind,
-            shortname=shortname,
-            template=template,
-            **kwargs)
+    def aktivate(self):
+        super().aktivate()
         self.add_metadata()
 
     def __str__(self):

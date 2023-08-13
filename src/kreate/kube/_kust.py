@@ -10,12 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 class KustApp(KubeApp):
-    def kreate_files(self):
-        super().kreate_files()
-        # kreate the Kustomization again, but now the App has added all
-        # resources
-        kust = self.kreate_komponent("Kustomization")
-        kust.kreate_file()
+    #def kreate_files(self):
+    #    super().kreate_files()
+    #    # kreate the Kustomization again, but now the App has added all
+    #    # resources
+    #    #kust = self.kreate_komponent("Kustomization")
+    #    #kust.kreate_file()
 
     def register_std_templates(self) -> None:
         super().register_std_templates()

@@ -16,14 +16,7 @@ def kreate_appdef(appdef_filename:str) -> AppDef:
 
 def kreate_app(appdef: AppDef) -> App:
     app = kreate.kube.KustApp(appdef) # or appdef.kreate_app()?
-    app.register_template_file("MyUdpService", kreate.kube.Resource, "templates/MyUdpService.yaml")
-    app.kreate_komponent("MyUdpService", "main")
-
     kreate.kube.Ingress(app, "root")
-    app.ingress.root.sticky()
-    app.ingress.root.whitelist("10.20.30.40")
-    app.ingress.root.basic_auth()
-    app.ingress.root.label("dummy", "jan")
     kreate.kube.Ingress(app, "api")
 
     kreate.kube.Egress(app, "db")
@@ -31,24 +24,28 @@ def kreate_app(appdef: AppDef) -> App:
     kreate.kube.Egress(app, "xyz")
 
     depl=kreate.kube.Deployment(app)
-    depl.pod_label("egress-to-db", "enabled")
     kreate.kube.HttpProbesPatch(app.depl.main)
     kreate.kube.AntiAffinityPatch(depl)
     kreate.kube.Service(app)
-    app.service.main.headless()
     kreate.kube.Service(app, "https")
-
-
     pdb = kreate.kube.PodDisruptionBudget(app, name="demo-pdb")
-    pdb.yaml.spec.minAvailable = 2
-    pdb.label("testje","test")
-
+    kreate.kube.Kustomization(app)
     app.kreate_komponent("Secret", "main")
     app.kreate_komponent("ServiceAccount")
     app.kreate_komponent("ServiceMonitor")
     app.kreate_komponent("HorizontalPodAutoscaler")
+    app.kreate_komponent("MyUdpService", "main")
 
-    cm = kreate.kube.Kustomization(app)
+    app.aktivate()
+
+    app.ingress.root.sticky()
+    app.ingress.root.whitelist("10.20.30.40")
+    app.ingress.root.basic_auth()
+    app.ingress.root.label("dummy", "jan")
+    depl.pod_label("egress-to-db", "enabled")
+    app.service.main.headless()
+    pdb.yaml.spec.minAvailable = 2
+    pdb.label("testje","test")
 
     return app
 

@@ -13,8 +13,8 @@ class Komponent(YamlBase):
     """An object that is parsed from a yaml template and konfiguration"""
 
     def __init__(self, app: App,
-                 kind: str = None,
                  shortname: str = None,
+                 kind: str = None,
                  template: FileLocation = None,
                  **kwargs
                  ):
@@ -32,15 +32,17 @@ class Komponent(YamlBase):
             # do not load the template (konfig might be missing)
             logger.info(f"ignoring {self.name}")
         else:
-            logger.debug(
-                f"parsing {self.kind}.{self.shortname} at {self.template}")
-            self.load_yaml()
+            logger.info(f"adding  {self.kind}.{self.shortname}")
         self.app.add(self)
-        self.invoke_options()
 
     # to prevent subclass to make own constructors
     def _init(self):
         pass
+
+    def aktivate(self):
+        self.load_yaml()
+        self.invoke_options()
+
 
     def __str__(self):
         return f"<Komponent {self.kind}.{self.shortname} {self.name}>"
