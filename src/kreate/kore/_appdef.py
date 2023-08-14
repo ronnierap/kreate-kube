@@ -40,6 +40,7 @@ class AppDef():
         self.values.update(self.yaml.get("values", {}))
         self.name = self.values["app"]
         self.env = self.values["env"]
+        self._strukt_cache = None
 
     def _load_strukture_files(self, pre_files=None, post_files=None):
         for fname in self.yaml.get("value_files", []):
@@ -59,5 +60,7 @@ class AppDef():
         return load_jinyaml(FileLocation(filename, dir=self.dir), vars)
 
     def calc_strukture(self, pre_files=None, post_files=None):
-        dicts = self._load_strukture_files(pre_files=pre_files, post_files=post_files)
-        return DeepChain(*reversed(dicts))
+        if not self._strukt_cache:
+            dicts = self._load_strukture_files(pre_files=pre_files, post_files=post_files)
+            self._strukt_cache = DeepChain(*reversed(dicts))
+        return self._strukt_cache
