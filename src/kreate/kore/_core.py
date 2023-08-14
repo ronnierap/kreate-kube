@@ -22,7 +22,7 @@ class DictWrapper(UserDict):
         self.data[attr] = val
 
     def __repr__(self):
-        return "DictWrapper"
+        return f"DictWrapper({self.data})"
 
 
 class ListWrapper(UserList):
