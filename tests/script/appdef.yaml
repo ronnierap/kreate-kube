@@ -12,9 +12,9 @@ krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
 value_files:
   - values-{{appname}}-{{env}}.yaml
   - secrets-{{appname}}-{{env}}.yaml
-konfig_files:
+strukture_files:
   - py:kreate.kube.templates:default-values.yaml
-  - {{appname}}-konfig.yaml
+  - {{appname}}-strukture.yaml
   - override-{{appname}}-{{env}}.yaml
 templates:
   MyUdpService: ./templates/MyUdpService.yaml

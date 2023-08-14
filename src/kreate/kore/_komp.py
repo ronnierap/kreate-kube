@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Komponent(YamlBase):
-    """An object that is parsed from a yaml template and konfiguration"""
+    """An object that is parsed from a yaml template and struktureuration"""
 
     def __init__(self, app: App,
                  shortname: str = None,
@@ -21,15 +21,15 @@ class Komponent(YamlBase):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
-        self.konfig = self._calc_konfig(kwargs)
+        self.strukture = self._calc_strukture(kwargs)
         template = template or self.app.kind_templates[self.kind]
 
         YamlBase.__init__(self, template)
         self._init()
-        self.skip = self.konfig.get("ignore", False)
-        self.name = self.konfig.get("name", None) or self.calc_name().lower()
+        self.skip = self.strukture.get("ignore", False)
+        self.name = self.strukture.get("name", None) or self.calc_name().lower()
         if self.skip:
-            # do not load the template (konfig might be missing)
+            # do not load the template (strukture might be missing)
             logger.info(f"ignoring {self.name}")
         else:
             logger.info(f"adding  {self.kind}.{self.shortname}")
@@ -52,25 +52,25 @@ class Komponent(YamlBase):
             return f"{self.app.name}-{self.kind}"
         return f"{self.app.name}-{self.kind}-{self.shortname}"
 
-    def _calc_konfig(self, extra):
-        konf = self._find_konfig()
+    def _calc_strukture(self, extra):
+        konf = self._find_strukture()
         defaults = self._find_defaults()
         return DeepChain(extra, konf, {"default": defaults})
 
     def _find_defaults(self):
-        if self.kind in self.app.konfig.default:
+        if self.kind in self.app.strukture.default:
             logger.debug(f"using defaults for {self.kind}")
-            return self.app.konfig.default[self.kind]
+            return self.app.strukture.default[self.kind]
         return {}
 
-    def _find_konfig(self):
+    def _find_strukture(self):
         typename = self.kind
-        if ((typename in self.app.konfig  # ugly (( to satisfy flake8 E129))
-             and self.shortname in self.app.konfig[typename])):
-            logger.debug(f"using named konfig {typename}.{self.shortname}")
-            return self.app.konfig[typename][self.shortname]
+        if ((typename in self.app.strukture  # ugly (( to satisfy flake8 E129))
+             and self.shortname in self.app.strukture[typename])):
+            logger.debug(f"using named strukture {typename}.{self.shortname}")
+            return self.app.strukture[typename][self.shortname]
         logger.info(
-            f"could not find konfig for {typename}.{self.shortname} in")
+            f"could not find strukture for {typename}.{self.shortname} in")
         return {}
 
     def kreate_file(self) -> None:
@@ -81,15 +81,15 @@ class Komponent(YamlBase):
 
     def _template_vars(self):
         return {
-            "konf": self.konfig,
-            "default": self.konfig.default,
+            "konf": self.strukture,
+            "default": self.strukture.default,
             "app": self.app,
             "my": self,
             "val": self.app.values
         }
 
     def invoke_options(self):
-        options = self.konfig.get("options", [])
+        options = self.strukture.get("options", [])
         for opt in options or []:
             if isinstance(opt, str):
                 logger.debug(f"invoking {self} option {opt}")

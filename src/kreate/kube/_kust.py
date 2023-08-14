@@ -23,8 +23,8 @@ class KustApp(KubeApp):
         self.register_template_class(AntiAffinityPatch, package=templates)
         self.register_template_class(HttpProbesPatch, package=templates)
 
-    def konfigure_from_konfig(self):
-        super().konfigure_from_konfig()
+    def kreate_komponents_from_strukture(self):
+        super().kreate_komponents_from_strukture()
         for res in self.komponents:
             if isinstance(res, Resource):
                 self.kreate_patches(res)
@@ -43,9 +43,9 @@ class KustApp(KubeApp):
             f"class for {kind}.{shortname} is not a Patch but {cls}")
 
     def kreate_patches(self, res: Resource) -> None:
-        if "patches" in res.konfig:
-            for kind in res.konfig.patches:
-                for shortname in res.konfig.patches[kind]:
+        if "patches" in res.strukture:
+            for kind in res.strukture.patches:
+                for shortname in res.strukture.patches[kind]:
                     self.kreate_patch(res, kind=kind, shortname=shortname)
 
 
@@ -87,19 +87,19 @@ class Patch(Komponent):
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}
 
-    def _find_konfig(self):
-        root_konfig = super()._find_konfig()
+    def _find_strukture(self):
+        root_strukture = super()._find_strukture()
         typename = self.kind
-        targt_konf = self.target.konfig.get("patches", {})
+        targt_konf = self.target.strukture.get("patches", {})
         if typename in targt_konf and self.shortname in targt_konf[typename]:
             logger.debug(
-                f"using embedded konfig {typename}.{self.shortname}"
+                f"using embedded strukture {typename}.{self.shortname}"
                 f" from {self.target.kind}.{self.target.shortname}")
-            # The embedded_konfig is first, since the root_konfig will contain
+            # The embedded_strukture is first, since the root_strukture will contain
             # all default values
-            embedded_konfig = targt_konf[typename][self.shortname]
-            return DeepChain(embedded_konfig, root_konfig)
-        return root_konfig
+            embedded_strukture = targt_konf[typename][self.shortname]
+            return DeepChain(embedded_strukture, root_strukture)
+        return root_strukture
 
 
 class HttpProbesPatch(Patch):

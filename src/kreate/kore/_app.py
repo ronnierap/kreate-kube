@@ -43,23 +43,23 @@ class AppDef():
         self.name = self.values["app"]
         self.env = self.values["env"]
 
-    def load_konfig_files(self):
+    def load_strukture_files(self):
         for fname in self.yaml.get("value_files", []):
             val_yaml = load_jinyaml(FileLocation(
                 fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
-        self.konfig_dicts = []
-        for fname in self.yaml.get("konfig_files"):
-            self.add_konfig_file(fname, dir=self.dir)
+        self.strukture_dicts = []
+        for fname in self.yaml.get("strukture_files"):
+            self.add_strukture_file(fname, dir=self.dir)
 
-    def add_konfig_file(self, filename, package=None, dir=None):
+    def add_strukture_file(self, filename, package=None, dir=None):
         vars = {"val": self.values}
         yaml = load_jinyaml(FileLocation(
             filename, package=package, dir=dir), vars)
-        self.konfig_dicts.append(yaml)
+        self.strukture_dicts.append(yaml)
 
-    def konfig(self):
-        return DeepChain(*reversed(self.konfig_dicts))
+    def strukture(self):
+        return DeepChain(*reversed(self.strukture_dicts))
 
 
 class App():
@@ -79,8 +79,8 @@ class App():
             templ = appdef.yaml['templates'][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ)
-        appdef.load_konfig_files()
-        self.konfig = appdef.konfig()
+        appdef.load_strukture_files()
+        self.strukture = appdef.strukture()
 
     def _init(self):
         pass
@@ -181,15 +181,15 @@ class App():
                 logger.info(f"skipping file for {komp.kind}.{komp.shortname}")
 
     def _shortnames(self, kind: str) -> list:
-        if kind in self.konfig:
-            return self.konfig[kind].keys()
+        if kind in self.strukture:
+            return self.strukture[kind].keys()
         return []
 
-    def konfigure_from_konfig(self):
-        for kind in sorted(self.konfig.keys()):
+    def kreate_komponents_from_strukture(self):
+        for kind in sorted(self.strukture.keys()):
             if kind in self.kind_classes:
-                for shortname in sorted(self.konfig[kind].keys()):
-                    logger.info(f"konfiguring {kind}.{shortname}")
+                for shortname in sorted(self.strukture[kind].keys()):
+                    logger.info(f"kreating komponent {kind}.{shortname}")
                     self.kreate_komponent(kind, shortname)
             elif kind != "default":
                 logger.warning(f"Unknown toplevel komponent {kind}")

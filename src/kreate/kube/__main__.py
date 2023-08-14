@@ -9,7 +9,7 @@ def kreate_appdef(appdef_filename: str) -> AppDef:
 
 def kreate_app(appdef: AppDef) -> App:
     app = KustApp(appdef)
-    app.konfigure_from_konfig()
+    app.kreate_komponents_from_strukture()
     app.aktivate()
     return app
 

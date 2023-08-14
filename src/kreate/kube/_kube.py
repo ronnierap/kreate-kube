@@ -59,14 +59,14 @@ class Resource(Komponent):
         return f"{self.kind}-{self.name}.yaml".lower()
 
     def add_metadata(self):
-        for key in self.konfig.get("annotations", {}):
+        for key in self.strukture.get("annotations", {}):
             if "annotations" not in self.yaml.metadata:
                 self.yaml.metadata.annotations = {}
-            self.yaml.metadata.annotations[key] = self.konfig.annotations[key]
-        for key in self.konfig.get("labels", {}):
+            self.yaml.metadata.annotations[key] = self.strukture.annotations[key]
+        for key in self.strukture.get("labels", {}):
             if "labels" not in self.yaml.metadata:
                 self.yaml.metadata.labels = {}
-            self.yaml.metadata.labels[key] = self.konfig.labels[key]
+            self.yaml.metadata.labels[key] = self.strukture.labels[key]
 
     def annotation(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.metadata:
@@ -120,7 +120,7 @@ class SecretBasicAuth(Resource):
 
     def users(self):
         result = []
-        for usr in self.konfig.users:
+        for usr in self.strukture.users:
             entry = _krypt.dekrypt_str(self.app.values[usr])
             result.append(f"{usr}:{entry}")
         result.append("")  # for the final newline
