@@ -45,12 +45,21 @@ class Komponent:
     def _calc_strukture(self, extra):
         strukt = self._find_strukture()
         defaults = self._find_defaults()
-        return DeepChain(extra, strukt, {"default": defaults})
+        return DeepChain(extra,
+                         strukt,
+                         {"default": defaults},
+                         {"default": self._find_generic_defaults()})
 
     def _find_defaults(self):
         if self.kind in self.app.strukture.default:
             logger.debug(f"using defaults for {self.kind}")
             return self.app.strukture.default[self.kind]
+        return {}
+
+    def _find_generic_defaults(self):
+        if "generic" in self.app.strukture.default:
+            logger.debug(f"using generic defaults")
+            return self.app.strukture.default["generic"]
         return {}
 
     def _find_strukture(self):

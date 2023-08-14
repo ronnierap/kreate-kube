@@ -1,11 +1,15 @@
 # this is a default file. It does not define any toplevel Objects
 
 default:
+  generic:
+    container_name: app
+    service_port: 8080
+    pod_port: 8080
+
   AntiAffinityPatch:
     selector_key: app
 
   CronJob:
-    container_name: app
     imagePullPolicy: Always
     concurrencyPolicy: Allow
     successfulJobsHistoryLimit: 3
@@ -13,7 +17,6 @@ default:
     runAsGroup: 1000
 
   Deployment:
-    container_name: app
     imagePullPolicy: Always
     containerPort: 8080
     protocol: TCP
@@ -32,7 +35,6 @@ default:
     memory_averageUtilization: 70
 
   HttpProbesPatch:
-    container_name: app
     startup_initialDelaySeconds: 10
     startup_periodSeconds: 2
     startup_timeoutSeconds: 1
@@ -66,7 +68,6 @@ default:
     minAvailable: 1
 
   StatefulSet:
-    container_name: app
     imagePullPolicy: Always
     containerPort: 8080
     protocol: TCP
