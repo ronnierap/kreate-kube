@@ -104,8 +104,7 @@ def files(args) -> App:
 def strukture(args):
     """show the strukture structure"""
     appdef: AppDef = args.kreate_appdef_func(args.appdef)
-    appdef.load_strukture_files()
-    appdef.strukture().pprint(field=args.kind)
+    appdef.calc_strukture().pprint(field=args.kind)
 
 
 def jinja2_template_error_lineno():

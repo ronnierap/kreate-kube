@@ -4,7 +4,7 @@ import inspect
 import logging
 
 from ._core import DictWrapper
-from ._jinyaml import load_jinyaml, FileLocation
+from ._jinyaml import FileLocation
 from ._appdef import AppDef
 
 logger = logging.getLogger(__name__)
@@ -27,8 +27,7 @@ class App():
             templ = appdef.yaml['templates'][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ)
-        appdef.load_strukture_files()
-        self.strukture = appdef.strukture()
+        self.strukture = appdef.calc_strukture()
 
     def _init(self):
         pass

@@ -41,20 +41,23 @@ class AppDef():
         self.name = self.values["app"]
         self.env = self.values["env"]
 
-    def load_strukture_files(self):
+    def _load_strukture_files(self, pre_files=None, post_files=None):
         for fname in self.yaml.get("value_files", []):
             val_yaml = load_jinyaml(FileLocation(
                 fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
-        self.strukture_dicts = []
-        for fname in self.yaml.get("strukture_files"):
-            self.add_strukture_file(fname, dir=self.dir)
+        result = []
+        files = pre_files or []
+        files.extend(self.yaml.get("strukture_files",[]))
+        files.extend(post_files or [])
+        for fname in files:
+            result.append(self._load_strukture_file(fname))
+        return result
 
-    def add_strukture_file(self, filename, package=None, dir=None):
+    def _load_strukture_file(self, filename):
         vars = {"val": self.values}
-        yaml = load_jinyaml(FileLocation(
-            filename, package=package, dir=dir), vars)
-        self.strukture_dicts.append(yaml)
+        return load_jinyaml(FileLocation(filename, dir=self.dir), vars)
 
-    def strukture(self):
-        return DeepChain(*reversed(self.strukture_dicts))
+    def calc_strukture(self, pre_files=None, post_files=None):
+        dicts = self._load_strukture_files(pre_files=pre_files, post_files=post_files)
+        return DeepChain(*reversed(dicts))
