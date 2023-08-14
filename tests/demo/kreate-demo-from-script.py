@@ -11,7 +11,7 @@ import kreate.kube
 
 def kreate_appdef(appdef_filename:str) -> AppDef:
     # ignore passed in appdef
-    return AppDef("tests/script/appdef.yaml")
+    return AppDef("tests/demo/appdef.yaml")
 
 
 def kreate_app(appdef: AppDef) -> App:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 This test script shows that you can kreate komponents from strukture file.
-After this you can fientune them further in python.
+After this you can finetune them further in python.
 In general it is preferred to not use a script but use `python3 -m kreate`
 """
 
@@ -10,7 +10,7 @@ from kreate.kube import KustApp, KubeCli
 
 def kreate_appdef(appdef_filename:str) -> AppDef:
     # ignore passed in appdef
-    return AppDef("tests/script/appdef.yaml")
+    return AppDef("tests/demo/appdef.yaml")
 
 def kreate_app(appdef: AppDef) -> App:
     app = KustApp(appdef)
