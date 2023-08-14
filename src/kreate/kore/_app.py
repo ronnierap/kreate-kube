@@ -70,11 +70,6 @@ class App():
             else:
                 logger.info(f"skipping file for {komp.kind}.{komp.shortname}")
 
-    def _shortnames(self, kind: str) -> list:
-        if kind in self.strukture:
-            return self.strukture[kind].keys()
-        return []
-
     def kreate_komponents_from_strukture(self):
         for kind in sorted(self.strukture.keys()):
             if kind in self.kind_classes:

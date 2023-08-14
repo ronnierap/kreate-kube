@@ -67,8 +67,3 @@ class JinjaApp(App):
                        shortname=shortname, template=templ, **kwargs)
         else:
             raise ValueError(f"Unknown template type {type(cls)}, {cls}")
-
-    def _shortnames(self, kind: str) -> list:
-        if kind in self.strukture:
-            return self.strukture[kind].keys()
-        return []
