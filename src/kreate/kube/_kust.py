@@ -2,7 +2,7 @@ import logging
 
 from ..kore._jinyaml import FileLocation
 from ..kore._core import DeepChain
-from ..kore._komp import Komponent
+from ..kore import YamlKomponent
 from ._kube import KubeApp, Resource
 from . import templates
 
@@ -32,13 +32,13 @@ class KustApp(KubeApp):
     def kreate_patch(
             self,
             res: Resource,
-            kind: str,
+            kind: str = None,
             shortname: str = None,
             **kwargs):
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if issubclass(cls, Patch):
-            return cls(res, kind, shortname, template=templ, **kwargs)
+            return cls(res, shortname, kind, template=templ, **kwargs)
         raise TypeError(
             f"class for {kind}.{shortname} is not a Patch but {cls}")
 
@@ -49,7 +49,7 @@ class KustApp(KubeApp):
                     self.kreate_patch(res, kind=kind, shortname=shortname)
 
 
-class Kustomization(Komponent):
+class Kustomization(YamlKomponent):
     def resources(self):
         return [
             res for res in self.app.komponents if isinstance(
@@ -63,20 +63,19 @@ class Kustomization(Komponent):
         return "kustomization.yaml"
 
 
-class Patch(Komponent):
+class Patch(YamlKomponent):
     def __init__(
             self,
             target: Resource,
-            kind: str = None,
             shortname: str = None,
+            kind: str = None,
             template: FileLocation = None,
             **kwargs):
         self.target = target
-        Komponent.__init__(
-            self,
+        super().__init__(
             target.app,
-            kind=kind,
             shortname=shortname,
+            kind=kind,
             template=template,
             **kwargs)
 

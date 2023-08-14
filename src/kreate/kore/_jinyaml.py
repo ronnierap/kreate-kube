@@ -87,20 +87,3 @@ def load_jinyaml(file_loc: FileLocation, vars: Mapping) -> Mapping:
 
 def dump(data, file):
     yaml_parser.dump(data, file)
-
-
-class YamlBase:
-    def __init__(self, template: FileLocation):
-        self.template = template
-        self.dir = dir
-
-    def load_yaml(self):
-        vars = self._template_vars()
-        self.yaml = wrap(load_jinyaml(self.template, vars))
-
-    def save_yaml(self, outfile) -> None:
-        with open(outfile, 'wb') as f:
-            dump(self.yaml.data, f)
-
-    def _template_vars(self):
-        return {}

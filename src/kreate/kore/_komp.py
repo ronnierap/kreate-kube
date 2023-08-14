@@ -1,30 +1,27 @@
 import logging
 from collections.abc import Mapping
 
-from ._core import DeepChain
-from ._jinyaml import YamlBase
+from ._core import DeepChain, wrap
+from ._jinyaml import FileLocation, dump, load_jinyaml
 from ._app import App
-from ._jinyaml import FileLocation
 
 logger = logging.getLogger(__name__)
 
 
-class Komponent(YamlBase):
+class Komponent:
     """An object that is parsed from a yaml template and struktureuration"""
 
-    def __init__(self, app: App,
+    def __init__(self,
+                 app: App,
                  shortname: str = None,
                  kind: str = None,
-                 template: FileLocation = None,
                  **kwargs
                  ):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         self.strukture = self._calc_strukture(kwargs)
-        template = template or self.app.kind_templates[self.kind]
 
-        YamlBase.__init__(self, template)
         self._init()
         self.skip = self.strukture.get("ignore", False)
         self.name = self.strukture.get("name", None) or self.calc_name().lower()
@@ -40,8 +37,7 @@ class Komponent(YamlBase):
         pass
 
     def aktivate(self):
-        self.load_yaml()
-        self.invoke_options()
+        pass
 
 
     def __str__(self):
@@ -79,14 +75,6 @@ class Komponent(YamlBase):
             dir = self.dirname
             self.save_yaml(f"{dir}/{filename}")
 
-    def _template_vars(self):
-        return {
-            "strukt": self.strukture,
-            "default": self.strukture.default,
-            "app": self.app,
-            "my": self,
-            "val": self.app.values
-        }
 
     def invoke_options(self):
         options = self.strukture.get("options", [])
@@ -131,3 +119,38 @@ class Komponent(YamlBase):
     @property
     def filename(self):
         return f"{self.kind.lower()}-{self.shortname}.yaml"
+
+
+class YamlKomponent(Komponent):
+    def __init__(self,
+                 app: App,
+                 shortname: str = None,
+                 kind: str = None,
+                 template: FileLocation = None,
+                 **kwargs
+                 ):
+        super().__init__(app, shortname, kind, **kwargs)
+        template = template or self.app.kind_templates[self.kind]
+        self.template = template
+        #self.dir = dir
+
+    def aktivate(self):
+        self.load_yaml()
+        self.invoke_options()
+
+    def load_yaml(self):
+        vars = self._template_vars()
+        self.yaml = wrap(load_jinyaml(self.template, vars))
+
+    def save_yaml(self, outfile) -> None:
+        with open(outfile, 'wb') as f:
+            dump(self.yaml.data, f)
+
+    def _template_vars(self):
+        return {
+            "strukt": self.strukture,
+            "default": self.strukture.default,
+            "app": self.app,
+            "my": self,
+            "val": self.app.values
+        }
