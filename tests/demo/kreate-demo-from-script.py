@@ -45,6 +45,4 @@ def kreate_app(appdef: AppDef) -> App:
 
     return app
 
-kreator = kreate.kube.KubeKreator()
-kreator.set_appdef_file("tests/demo/appdef.yaml")
-kreator.kreate_cli().run(kreate_app)
+kreate.kube.KubeKreator().kreate_cli().run(kreate_app)

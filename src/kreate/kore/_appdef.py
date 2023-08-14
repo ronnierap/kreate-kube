@@ -5,7 +5,6 @@ import base64
 
 from ._core import DeepChain
 from ._jinyaml import load_jinyaml, FileLocation
-import jinja2.filters
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +29,7 @@ class AppDef():
     def __init__(self, filename="appdef.yaml", *args):
         if os.path.isdir(filename):
             filename += "/appdef.yaml"
-        self.dir = os.path.dirname(filename)
+        self.dir = os.path.dirname(filename) or "."
         self.filename = filename
         self.values = {"getenv": os.getenv}
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)

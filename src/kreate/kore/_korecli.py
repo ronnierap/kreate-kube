@@ -12,18 +12,12 @@ logger = logging.getLogger(__name__)
 
 
 class KoreKreator:
-    def __init__(self, appdef_file=None):
-        self.appdef_file = appdef_file
-
-    def set_appdef_file(self, filename):
-        self.appdef_file = filename
-
     def kreate_cli(self):
         return KoreCli(self)
 
     def kreate_appdef(self, filename):
         filters.FILTERS["b64encode"] = b64encode
-        appdef = AppDef(self.appdef_file or filename)
+        appdef = AppDef(filename)
         self.tune_appdef(appdef)
         return appdef
 

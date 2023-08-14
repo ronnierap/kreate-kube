@@ -15,6 +15,4 @@ def kreate_app(appdef: AppDef) -> App:
     app.depl.main.label("this-is-added","by-script")
     return app
 
-kreator = KubeKreator()
-kreator.set_appdef_file("tests/demo/appdef.yaml")
-kreator.kreate_cli().run(kreate_app)
+KubeKreator().kreate_cli().run(kreate_app)
