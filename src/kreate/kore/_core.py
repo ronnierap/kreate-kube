@@ -28,10 +28,12 @@ class DictWrapper(UserDict):
         keys = path.split(".")
         data = self.data
         for key in keys[:-1]:
+            key = key.replace("_dot_",".")
             if key not in data:
                 data[key]={}
             data=data[key]
         final_key=keys[-1]
+        final_key = final_key.replace("_dot_",".")
         if final_key in data:
             if isinstance(data[final_key], Mapping):
                 # Try to merge two Mappings
@@ -48,6 +50,7 @@ class DictWrapper(UserDict):
         keys = path.split(".")
         data = self.data
         for key in keys[:-1]:
+            key = key.replace("_dot_",".")
             if key not in data:
                 logger.warn(f"non existent key {key} in del_path {path}")
                 return
@@ -60,8 +63,9 @@ class DictWrapper(UserDict):
                     logger.warn(f"list at {key} in del_path {path}")
                     return
         final_key=keys[-1]
+        final_key = final_key.replace("_dot_",".")
         if final_key in data:
-            del data[final_key] #    = None
+            del data[final_key]
         else:
             logger.warn(f"non existent key {final_key} in del_path {path}")
 
