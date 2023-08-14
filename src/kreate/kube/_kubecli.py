@@ -2,24 +2,13 @@ import os
 import logging
 
 from ..kore._korecli import kreate_files as kreate_files
-from ..kore import AppDef
-from ..kore._korecli import KoreKreator
-from ..kore._appdef import b64encode
-from ..krypt import _krypt, KryptCli
+from ..krypt import _krypt, KryptCli, KryptKreator
 
 logger = logging.getLogger(__name__)
 
-class KubeKreator(KoreKreator):
+class KubeKreator(KryptKreator):
     def kreate_cli(self):
         return KubeCli(self)
-
-    def tune_appdef(self, appdef: AppDef):
-        appdef.values["dekrypt"] = _krypt.dekrypt_str
-        _krypt._krypt_key = b64encode(
-            appdef.yaml.get(
-                "krypt_key",
-                "no-krypt-key-defined"))
-
 
 class KubeCli(KryptCli):
     def __init__(self, kreator):

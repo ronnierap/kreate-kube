@@ -1,6 +1,7 @@
 
-from ._kryptcli import KryptCli
+from ._kryptcli import KryptCli, KryptKreator
 
 __all__ = [
     "KryptCli",
+    "KryptKreator",
 ]
