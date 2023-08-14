@@ -27,7 +27,7 @@ class Komponent:
             # do not load the template (strukture might be missing)
             logger.info(f"ignoring {self.name}")
         else:
-            logger.info(f"adding  {self.kind}.{self.shortname}")
+            logger.debug(f"adding  {self.kind}.{self.shortname}")
         self.app.add(self)
 
     def aktivate(self):
