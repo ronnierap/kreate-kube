@@ -1,7 +1,7 @@
 import logging
 
-from ..kore._jinyaml import FileLocation
-from ..kore._core import DeepChain
+from ..kore import FileLocation
+from ..kore import DeepChain
 from ..kore import JinYamlKomponent
 from ._kube import KubeApp, Resource
 from . import templates
