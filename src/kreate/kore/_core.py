@@ -24,6 +24,55 @@ class DictWrapper(UserDict):
     def __repr__(self):
         return f"DictWrapper({self.data})"
 
+    def _set_path(self, path:str, value):
+        keys = path.split(".")
+        data = self.data
+        for key in keys[:-1]:
+            if key not in data:
+                data[key]={}
+            data=data[key]
+        final_key=keys[-1]
+        if final_key in data:
+            if isinstance(data[final_key], Mapping):
+                # Try to merge two Mappings
+                if not isinstance(value, Mapping):
+                    raise ValueError(f"Can not assign non-dict {value} to"
+                        f"dict {data[final_key]} for path {path}")
+                data[final_key].update(value)
+            else:
+                data[final_key] = value
+        else:
+            data[final_key] = value
+
+    def _del_path(self, path:str):
+        keys = path.split(".")
+        data = self.data
+        for key in keys[:-1]:
+            if key not in data:
+                logger.warn(f"non existent key {key} in del_path {path}")
+                return
+            data=data[key]
+            while isinstance(data, Sequence):
+                # get first and only item of list
+                if len(data) == 1:
+                    data = data[0]
+                else:
+                    logger.warn(f"list at {key} in del_path {path}")
+                    return
+        final_key=keys[-1]
+        if final_key in data:
+            del data[final_key] #    = None
+        else:
+            logger.warn(f"non existent key {final_key} in del_path {path}")
+
+    def _get_path(self, path:str, default=None):
+        keys = path.split(".")
+        data = self.data
+        for key in keys:
+            if key not in data:
+                return default
+            data=data[key]
+        return data
 
 class ListWrapper(UserList):
     def __init__(self, seq) -> None:

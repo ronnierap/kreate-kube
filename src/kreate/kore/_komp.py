@@ -152,6 +152,8 @@ class JinYamlKomponent(JinjaKomponent):
         self.data = load_jinja_data(self.template, vars)
         self.yaml = wrap(yaml_parse(self.data))
         self.invoke_options()
+        self.add_additions()
+        self.remove_deletions()
 
     def kreate_file(self) -> None:
         filename = self.filename
@@ -159,3 +161,13 @@ class JinYamlKomponent(JinjaKomponent):
             dir = self.dirname
             with open(f"{dir}/{filename}", 'wb') as f:
                 yaml_dump(self.yaml.data, f)
+
+    def add_additions(self):
+        additions = self.strukture.get("add", {})
+        for path in additions:
+            self.yaml._set_path(path, additions[path])
+
+    def remove_deletions(self):
+        removals = self.strukture.get("remove", [])
+        for path in removals:
+            self.yaml._del_path(path)

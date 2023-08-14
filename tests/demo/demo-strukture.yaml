@@ -48,7 +48,13 @@ StatefulSet:
     project: kreate-demo
     replicas: {{ val.replicas | default(1) }}
     image_repo: {{ val.image_repo }}
-
+    add:
+      spec.template:
+        serviceName: jantje
+        klaas: pietje
+      some.long.and.very.long.strange.dummy: value
+    remove:
+      - spec.template.spec.containers.imagePullPolicy
 
 
 Egress:
