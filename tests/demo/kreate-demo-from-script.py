@@ -45,4 +45,4 @@ def kreate_app(appdef: AppDef) -> App:
 
     return app
 
-kreate.kube.KubeKreator().kreate_cli().run(kreate_app)
+kreate.kube.KubeKreator(kreate_app).kreate_cli().run()

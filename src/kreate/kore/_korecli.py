@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class KoreKreator:
+    def __init__(self, kreate_app_func=None) -> None:
+        self.kreate_app_func = kreate_app_func
+
     def kreate_cli(self):
         return KoreCli(self)
 
@@ -21,8 +24,16 @@ class KoreKreator:
         self.tune_appdef(appdef)
         return appdef
 
-    def tune_appdef(self, appdef: AppDef):
-        pass
+    def _app_class(self):
+        raise NotImplementedError()
+
+    def kreate_app(self, appdef: AppDef) -> App:
+        if self.kreate_app_func:
+            return self.kreate_app_func(appdef)
+        app = self._app_class()(appdef)
+        app.kreate_komponents_from_strukture()
+        app.aktivate()
+        return app
 
 
 def argument(*name_or_flags, **kwargs):
@@ -33,7 +44,7 @@ def argument(*name_or_flags, **kwargs):
 
 
 class KoreCli:
-    def __init__(self, kreator):
+    def __init__(self, kreator: KoreKreator):
         self.kreator = kreator
         self.epilog = "subcommands:\n"
         self.cli = argparse.ArgumentParser(
@@ -61,11 +72,10 @@ class KoreCli:
             self.parser.add_argument(*arg[0], **arg[1])
         self.parser.set_defaults(func=func)
 
-    def run(self, kreate_app_func=None):
+    def run(self, ):
         self.cli.epilog = self.epilog+"\n"
         self.add_main_options()
         self.args = self.cli.parse_args()
-        self.kreate_app_func = kreate_app_func
         self.process_main_options(self.args)
         try:
             if self.args.subcommand is None:
@@ -106,17 +116,17 @@ class KoreCli:
 
 def kreate_files(cli: KoreCli) -> App:
     appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
-    app: App = cli.kreate_app_func(appdef)
+    app: App = cli.kreator.kreate_app(appdef)
     app.kreate_files()
     return app
 
 
-def files(cli) -> App:
+def files(cli: KoreCli) -> App:
     """kreate all the files (default command)"""
     kreate_files(cli)
 
 
-def view_strukture(cli):
+def view_strukture(cli: KoreCli):
     """show the application strukture"""
     appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
     appdef.calc_strukture().pprint(field=cli.args.kind)

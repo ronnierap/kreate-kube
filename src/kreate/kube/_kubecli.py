@@ -3,6 +3,7 @@ import logging
 
 from ..kore._korecli import kreate_files as kreate_files
 from ..krypt import _krypt, KryptCli, KryptKreator
+from ._kust import KustApp
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +11,9 @@ logger = logging.getLogger(__name__)
 class KubeKreator(KryptKreator):
     def kreate_cli(self):
         return KubeCli(self)
+
+    def _app_class(self):
+        return KustApp
 
 
 class KubeCli(KryptCli):

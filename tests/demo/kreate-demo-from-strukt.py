@@ -15,4 +15,4 @@ def kreate_app(appdef: AppDef) -> App:
     app.depl.main.label("this-is-added","by-script")
     return app
 
-KubeKreator().kreate_cli().run(kreate_app)
+KubeKreator(kreate_app).kreate_cli().run()
