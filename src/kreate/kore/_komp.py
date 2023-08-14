@@ -53,9 +53,9 @@ class Komponent(YamlBase):
         return f"{self.app.name}-{self.kind}-{self.shortname}"
 
     def _calc_strukture(self, extra):
-        konf = self._find_strukture()
+        strukt = self._find_strukture()
         defaults = self._find_defaults()
-        return DeepChain(extra, konf, {"default": defaults})
+        return DeepChain(extra, strukt, {"default": defaults})
 
     def _find_defaults(self):
         if self.kind in self.app.strukture.default:
@@ -81,7 +81,7 @@ class Komponent(YamlBase):
 
     def _template_vars(self):
         return {
-            "konf": self.strukture,
+            "strukt": self.strukture,
             "default": self.strukture.default,
             "app": self.app,
             "my": self,

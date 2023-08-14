@@ -90,14 +90,14 @@ class Patch(Komponent):
     def _find_strukture(self):
         root_strukture = super()._find_strukture()
         typename = self.kind
-        targt_konf = self.target.strukture.get("patches", {})
-        if typename in targt_konf and self.shortname in targt_konf[typename]:
+        targt_strukt = self.target.strukture.get("patches", {})
+        if typename in targt_strukt and self.shortname in targt_strukt[typename]:
             logger.debug(
                 f"using embedded strukture {typename}.{self.shortname}"
                 f" from {self.target.kind}.{self.target.shortname}")
             # The embedded_strukture is first, since the root_strukture will contain
             # all default values
-            embedded_strukture = targt_konf[typename][self.shortname]
+            embedded_strukture = targt_strukt[typename][self.shortname]
             return DeepChain(embedded_strukture, root_strukture)
         return root_strukture
 

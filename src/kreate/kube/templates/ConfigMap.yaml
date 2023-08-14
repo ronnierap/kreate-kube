@@ -7,9 +7,9 @@ metadata:
   name: {{ my.name }}
   namespace: {{ app.namespace }}
 data:
-  {% for key in konf.get("vars", []) %}
-    {{key}}: {{ konf.vars[key] }}
+  {% for key in strukt.get("vars", []) %}
+    {{key}}: {{ strukt.vars[key] }}
   {% endfor %}
-  {% for key in konf.get("files", []) %}
-    {{key}}: {{ my.load_file(konf.files[key])  | b64encode }}
+  {% for key in strukt.get("files", []) %}
+    {{key}}: {{ my.load_file(strukt.files[key])  | b64encode }}
   {% endfor %}

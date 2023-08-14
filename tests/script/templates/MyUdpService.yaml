@@ -12,7 +12,7 @@ spec:
   selector:
     app: {{ app.name }}
   ports:
-{% for port in konf.ports %}
+{% for port in strukt.ports %}
   - protocol: UDP
     port: {{ port.port }}
     targetPort: {{ port.targetPort | default(port.port) }}

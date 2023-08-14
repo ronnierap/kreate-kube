@@ -10,11 +10,11 @@ spec:
   policyTypes:
     - Egress
   egress:
-    {% for addr in konf.cidr_list.split(",") %}
+    {% for addr in strukt.cidr_list.split(",") %}
     - to:
         - ipBlock:
             cidr: {{ addr }}
       ports:
-        - port: {{ konf.port }}
+        - port: {{ strukt.port }}
           protocol: TCP
     {% endfor %}
