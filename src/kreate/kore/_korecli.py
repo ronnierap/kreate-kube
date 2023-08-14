@@ -33,7 +33,7 @@ class KoreCli:
             dest="subcommand",
         )
         self.add_subcommand(files, [], aliases=["f"])
-        self.add_subcommand(strukture, [], aliases=["k"])
+        self.add_subcommand(view_strukture, [], aliases=["vs"])
 
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
@@ -101,8 +101,8 @@ def files(args) -> App:
     kreate_files(args)
 
 
-def strukture(args):
-    """show the strukture structure"""
+def view_strukture(args):
+    """show the application strukture"""
     appdef: AppDef = args.kreate_appdef_func(args.appdef)
     appdef.calc_strukture().pprint(field=args.kind)
 
