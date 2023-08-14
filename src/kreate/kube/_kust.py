@@ -5,6 +5,7 @@ from ..kore import DeepChain
 from ..kore import JinYamlKomponent
 from ._kube import KubeApp, Resource
 from . import templates
+from .templates import patches
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +14,8 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=templates)
-        self.register_template_class(AntiAffinityPatch, package=templates)
-        self.register_template_class(HttpProbesPatch, package=templates)
+        self.register_template_class(AntiAffinityPatch, package=patches)
+        self.register_template_class(HttpProbesPatch, package=patches)
 
     def kreate_komponents_from_strukture(self):
         super().kreate_komponents_from_strukture()
