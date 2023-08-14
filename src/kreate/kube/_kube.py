@@ -1,5 +1,5 @@
 import logging
-from ..kore import App, AppDef, YamlKomponent
+from ..kore import App, AppDef, JinYamlKomponent
 from ..kore._app import b64encode
 from ..krypt import _krypt
 from . import templates
@@ -43,7 +43,7 @@ class KubeApp(App):
         return Resource
 
 
-class Resource(YamlKomponent):
+class Resource(JinYamlKomponent):
     def aktivate(self):
         super().aktivate()
         self.add_metadata()

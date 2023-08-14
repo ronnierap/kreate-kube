@@ -2,14 +2,14 @@ import logging
 from collections.abc import Mapping
 
 from ._core import DeepChain, wrap
-from ._jinyaml import FileLocation, dump, load_jinyaml
+from ._jinyaml import FileLocation, yaml_dump, yaml_parse, load_jinja_data
 from ._app import App
 
 logger = logging.getLogger(__name__)
 
 
 class Komponent:
-    """An object that is parsed from a yaml template and struktureuration"""
+    """A base class for other komponents"""
 
     def __init__(self,
                  app: App,
@@ -70,11 +70,7 @@ class Komponent:
         return {}
 
     def kreate_file(self) -> None:
-        filename = self.filename
-        if filename:
-            dir = self.dirname
-            self.save_yaml(f"{dir}/{filename}")
-
+        raise NotImplementedError(f"no kreate_file for {type(self)}")
 
     def invoke_options(self):
         options = self.strukture.get("options", [])
@@ -121,7 +117,8 @@ class Komponent:
         return f"{self.kind.lower()}-{self.shortname}.yaml"
 
 
-class YamlKomponent(Komponent):
+class JinjaKomponent(Komponent):
+    """An object that is parsed from a jinja template and strukture"""
     def __init__(self,
                  app: App,
                  shortname: str = None,
@@ -132,19 +129,18 @@ class YamlKomponent(Komponent):
         super().__init__(app, shortname, kind, **kwargs)
         template = template or self.app.kind_templates[self.kind]
         self.template = template
-        #self.dir = dir
 
     def aktivate(self):
-        self.load_yaml()
+        vars = self._template_vars()
+        self.data = load_jinja_data(self.template, vars)
         self.invoke_options()
 
-    def load_yaml(self):
-        vars = self._template_vars()
-        self.yaml = wrap(load_jinyaml(self.template, vars))
-
-    def save_yaml(self, outfile) -> None:
-        with open(outfile, 'wb') as f:
-            dump(self.yaml.data, f)
+    def kreate_file(self) -> None:
+        filename = self.filename
+        if filename:
+            dir = self.dirname
+            with open(f"{dir}/{filename}", 'wb') as f:
+                f.write(self.data)
 
     def _template_vars(self):
         return {
@@ -154,3 +150,18 @@ class YamlKomponent(Komponent):
             "my": self,
             "val": self.app.values
         }
+
+class JinYamlKomponent(JinjaKomponent):
+    def aktivate(self):
+        # TODO: super().aktivate() will call invoke_options, before yaml is parse
+        vars = self._template_vars()
+        self.data = load_jinja_data(self.template, vars)
+        self.yaml = wrap(yaml_parse(self.data))
+        self.invoke_options()
+
+    def kreate_file(self) -> None:
+        filename = self.filename
+        if filename:
+            dir = self.dirname
+            with open(f"{dir}/{filename}", 'wb') as f:
+                yaml_dump(self.yaml.data, f)

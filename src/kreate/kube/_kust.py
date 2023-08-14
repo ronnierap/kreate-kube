@@ -2,7 +2,7 @@ import logging
 
 from ..kore._jinyaml import FileLocation
 from ..kore._core import DeepChain
-from ..kore import YamlKomponent
+from ..kore import JinYamlKomponent
 from ._kube import KubeApp, Resource
 from . import templates
 
@@ -49,7 +49,7 @@ class KustApp(KubeApp):
                     self.kreate_patch(res, kind=kind, shortname=shortname)
 
 
-class Kustomization(YamlKomponent):
+class Kustomization(JinYamlKomponent):
     def resources(self):
         return [
             res for res in self.app.komponents if isinstance(
@@ -63,7 +63,7 @@ class Kustomization(YamlKomponent):
         return "kustomization.yaml"
 
 
-class Patch(YamlKomponent):
+class Patch(JinYamlKomponent):
     def __init__(
             self,
             target: Resource,

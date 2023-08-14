@@ -85,5 +85,8 @@ def load_jinyaml(file_loc: FileLocation, vars: Mapping) -> Mapping:
     return yaml_parser.load(load_jinja_data(file_loc=file_loc, vars=vars))
 
 
-def dump(data, file):
+def yaml_parse(data):
+    return yaml_parser.load(data)
+
+def yaml_dump(data, file):
     yaml_parser.dump(data, file)
