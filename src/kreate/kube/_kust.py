@@ -10,13 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class KustApp(KubeApp):
-    #def kreate_files(self):
-    #    super().kreate_files()
-    #    # kreate the Kustomization again, but now the App has added all
-    #    # resources
-    #    #kust = self.kreate_komponent("Kustomization")
-    #    #kust.kreate_file()
-
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=templates)
@@ -89,14 +82,14 @@ class Patch(JinYamlKomponent):
     def _find_strukture(self):
         root_strukture = super()._find_strukture()
         typename = self.kind
-        targt_strukt = self.target.strukture.get("patches", {})
-        if typename in targt_strukt and self.shortname in targt_strukt[typename]:
+        tar_struk = self.target.strukture.get("patches", {})
+        if typename in tar_struk and self.shortname in tar_struk[typename]:
             logger.debug(
                 f"using embedded strukture {typename}.{self.shortname}"
                 f" from {self.target.kind}.{self.target.shortname}")
-            # The embedded_strukture is first, since the root_strukture will contain
-            # all default values
-            embedded_strukture = targt_strukt[typename][self.shortname]
+            # The embedded_strukture is first,
+            # since the root_strukture will contain all default values
+            embedded_strukture = tar_struk[typename][self.shortname]
             return DeepChain(embedded_strukture, root_strukture)
         return root_strukture
 

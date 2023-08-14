@@ -26,10 +26,10 @@ class JinjaApp(App):
             if cls is None:
                 cls = self.kind_classes[kind]
                 logger.debug(f"overriding template {kind} "
-                               f"using existing class {cls.__name__}")
+                             f"using existing class {cls.__name__}")
             else:
                 logger.debug(f"overriding template {kind} using "
-                               f"default class")
+                             f"default class")
         filename = filename or f"{kind}.yaml"
         loc = FileLocation(filename=filename,
                            package=package, dir=self.appdef.dir)
@@ -58,7 +58,6 @@ class JinjaApp(App):
 
     def register_std_templates(self) -> None:
         pass
-
 
     def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
         cls = self.kind_classes[kind]

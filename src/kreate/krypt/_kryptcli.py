@@ -8,6 +8,8 @@ from ..kore._appdef import b64encode
 from . import _krypt
 
 logger = logging.getLogger(__name__)
+
+
 class KryptKreator(KoreKreator):
     def kreate_cli(self):
         return KryptCli(self)
@@ -18,6 +20,7 @@ class KryptKreator(KoreKreator):
             appdef.yaml.get(
                 "krypt_key",
                 "no-krypt-key-defined"))
+
 
 class KryptCli(KoreCli):
     def __init__(self, kreator):

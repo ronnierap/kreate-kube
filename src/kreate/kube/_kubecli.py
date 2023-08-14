@@ -6,9 +6,11 @@ from ..krypt import _krypt, KryptCli, KryptKreator
 
 logger = logging.getLogger(__name__)
 
+
 class KubeKreator(KryptKreator):
     def kreate_cli(self):
         return KubeCli(self)
+
 
 class KubeCli(KryptCli):
     def __init__(self, kreator):

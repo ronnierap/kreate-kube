@@ -6,8 +6,6 @@ from collections.abc import Mapping
 from ruamel.yaml import YAML
 from collections import namedtuple
 
-from ._core import wrap
-
 logger = logging.getLogger(__name__)
 
 
@@ -87,6 +85,7 @@ def load_jinyaml(file_loc: FileLocation, vars: Mapping) -> Mapping:
 
 def yaml_parse(data):
     return yaml_parser.load(data)
+
 
 def yaml_dump(data, file):
     yaml_parser.dump(data, file)

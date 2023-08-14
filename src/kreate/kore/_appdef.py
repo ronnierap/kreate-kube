@@ -45,7 +45,7 @@ class AppDef():
             self.values.update(val_yaml)
         result = []
         files = pre_files or []
-        files.extend(self.yaml.get("strukture_files",[]))
+        files.extend(self.yaml.get("strukture_files", []))
         files.extend(post_files or [])
         for fname in files:
             result.append(self._load_strukture_file(fname))
@@ -57,6 +57,8 @@ class AppDef():
 
     def calc_strukture(self, pre_files=None, post_files=None):
         if not self._strukt_cache:
-            dicts = self._load_strukture_files(pre_files=pre_files, post_files=post_files)
+            dicts = self._load_strukture_files(
+                pre_files=pre_files,
+                post_files=post_files)
             self._strukt_cache = DeepChain(*reversed(dicts))
         return self._strukt_cache

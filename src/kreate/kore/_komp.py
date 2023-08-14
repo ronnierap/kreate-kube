@@ -22,7 +22,8 @@ class Komponent:
         self.shortname = shortname or "main"
         self.strukture = self._calc_strukture(kwargs)
         self.skip = self.strukture.get("ignore", False)
-        self.name = self.strukture.get("name", None) or self.calc_name().lower()
+        name = self.strukture.get("name", None) or self.calc_name()
+        self.name = name.lower()
         if self.skip:
             # do not load the template (strukture might be missing)
             logger.info(f"ignoring {self.name}")
@@ -144,9 +145,9 @@ class JinjaKomponent(Komponent):
             "val": self.app.values
         }
 
+
 class JinYamlKomponent(JinjaKomponent):
     def aktivate(self):
-        # TODO: super().aktivate() will call invoke_options, before yaml is parse
         vars = self._template_vars()
         self.data = load_jinja_data(self.template, vars)
         self.yaml = wrap(yaml_parse(self.data))

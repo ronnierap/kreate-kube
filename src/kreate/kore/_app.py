@@ -49,7 +49,8 @@ class App():
         return self._kinds.get(attr, None)
 
     def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
-        raise NotImplementedError(f"can not create komponent for {kind}.{shortname}" )
+        raise NotImplementedError(
+            f"can not create komponent for {kind}.{shortname}")
 
     def aktivate(self):
         for komp in self.komponents:

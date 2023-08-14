@@ -104,7 +104,7 @@ class KoreCli:
             logging.basicConfig(level=logging.INFO)
 
 
-def kreate_files(cli :KoreCli) -> App:
+def kreate_files(cli: KoreCli) -> App:
     appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
     app: App = cli.kreate_app_func(appdef)
     app.kreate_files()
