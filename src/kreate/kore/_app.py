@@ -90,10 +90,10 @@ class App():
         if kind in self.kind_templates:
             if cls is None:
                 cls = self.kind_classes[kind]
-                logger.warning(f"overriding template {kind} "
+                logger.info(f"overriding template {kind} "
                                f"using existing class {cls.__name__}")
             else:
-                logger.warning(f"overriding template {kind} using "
+                logger.info(f"overriding template {kind} using "
                                f"default class")
         filename = filename or f"{kind}.yaml"
         loc = FileLocation(filename=filename,
