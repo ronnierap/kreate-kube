@@ -19,9 +19,6 @@ def b64encode(value: str) -> str:
     return ""
 
 
-jinja2.filters.FILTERS["b64encode"] = b64encode
-
-
 def get_class(name: str):
     module_name = name.rsplit(".", 1)[0]
     class_name = name.rsplit(".", 1)[1]

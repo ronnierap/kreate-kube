@@ -1,6 +1,5 @@
 import logging
 from ..kore import JinjaApp, AppDef, JinYamlKomponent
-from ..kore._appdef import b64encode
 from ..krypt import _krypt
 from . import templates
 
@@ -9,11 +8,6 @@ logger = logging.getLogger(__name__)
 
 class KubeApp(JinjaApp):
     def __init__(self, appdef: AppDef):
-        appdef.values["dekrypt"] = _krypt.dekrypt_str
-        _krypt._krypt_key = b64encode(
-            appdef.yaml.get(
-                "krypt_key",
-                "no-krypt-key-defined"))
         super().__init__(appdef)
         self.namespace = self.name + "-" + self.env
         self.target_dir = "./build/" + self.namespace

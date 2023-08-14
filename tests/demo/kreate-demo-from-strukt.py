@@ -6,11 +6,7 @@ In general it is preferred to not use a script but use `python3 -m kreate`
 """
 
 from kreate.kore import AppDef, App
-from kreate.kube import KustApp, KubeCli
-
-def kreate_appdef(appdef_filename:str) -> AppDef:
-    # ignore passed in appdef
-    return AppDef("tests/demo/appdef.yaml")
+from kreate.kube import KustApp, KubeKreator
 
 def kreate_app(appdef: AppDef) -> App:
     app = KustApp(appdef)
@@ -19,4 +15,6 @@ def kreate_app(appdef: AppDef) -> App:
     app.depl.main.label("this-is-added","by-script")
     return app
 
-KubeCli().run(kreate_appdef, kreate_app)
+kreator = KubeKreator()
+kreator.set_appdef_file("tests/demo/appdef.yaml")
+kreator.kreate_cli().run(kreate_app)

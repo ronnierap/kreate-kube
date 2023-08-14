@@ -9,10 +9,6 @@ In general it is preferred to kreate all komponents from the strukture.
 from kreate.kore import AppDef, App
 import kreate.kube
 
-def kreate_appdef(appdef_filename:str) -> AppDef:
-    # ignore passed in appdef
-    return AppDef("tests/demo/appdef.yaml")
-
 
 def kreate_app(appdef: AppDef) -> App:
     app = kreate.kube.KustApp(appdef) # or appdef.kreate_app()?
@@ -49,4 +45,6 @@ def kreate_app(appdef: AppDef) -> App:
 
     return app
 
-kreate.kube.KubeCli().run(kreate_appdef, kreate_app)
+kreator = kreate.kube.KubeKreator()
+kreator.set_appdef_file("tests/demo/appdef.yaml")
+kreator.kreate_cli().run(kreate_app)

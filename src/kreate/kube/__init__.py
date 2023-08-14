@@ -11,8 +11,7 @@ from ._kust import HttpProbesPatch
 from ._kust import AntiAffinityPatch
 from ._kust import Kustomization
 
-from ._kubecli import KubeCli
-
+from ._kubecli import KubeCli, KubeKreator
 
 __all__ = [
     "Resource",
@@ -27,4 +26,5 @@ __all__ = [
     "AntiAffinityPatch",
     "Kustomization",
     "KubeCli",
+    "KubeKreator",
 ]

@@ -9,12 +9,10 @@ from . import _krypt
 logger = logging.getLogger(__name__)
 
 
-jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
-
-
 class KryptCli(KoreCli):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, kreator):
+        jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
+        super().__init__(kreator)
         self.add_subcommand(enkstr, [argument(
             "-f", "--file", help="yaml file to enkrypt")],
             aliases=["dy"])

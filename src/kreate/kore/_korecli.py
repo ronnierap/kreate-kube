@@ -1,13 +1,34 @@
 import argparse
 import logging
 import traceback
-from jinja2 import TemplateError
+from jinja2 import TemplateError, filters
 from sys import exc_info
 
 from . import _jinyaml
 from ._app import App, AppDef
+from ._appdef import b64encode
 
 logger = logging.getLogger(__name__)
+
+
+class KoreKreator:
+    def __init__(self, appdef_file=None):
+        self.appdef_file = appdef_file
+
+    def set_appdef_file(self, filename):
+        self.appdef_file = filename
+
+    def kreate_cli(self):
+        return KoreCli(self)
+
+    def kreate_appdef(self, filename):
+        filters.FILTERS["b64encode"] = b64encode
+        appdef = AppDef(self.appdef_file or filename)
+        self.tune_appdef(appdef)
+        return appdef
+
+    def tune_appdef(self, appdef: AppDef):
+        pass
 
 
 def argument(*name_or_flags, **kwargs):
@@ -18,7 +39,8 @@ def argument(*name_or_flags, **kwargs):
 
 
 class KoreCli:
-    def __init__(self):
+    def __init__(self, kreator):
+        self.kreator = kreator
         self.epilog = "subcommands:\n"
         self.cli = argparse.ArgumentParser(
             prog="kreate",
@@ -45,20 +67,19 @@ class KoreCli:
             self.parser.add_argument(*arg[0], **arg[1])
         self.parser.set_defaults(func=func)
 
-    def run(self, kreate_appdef_func, kreate_app_func=None):
+    def run(self, kreate_app_func=None):
         self.cli.epilog = self.epilog+"\n"
         self.add_main_options()
-        args = self.cli.parse_args()
-        args.kreate_appdef_func = kreate_appdef_func
-        args.kreate_app_func = kreate_app_func
-        self.process_main_options(args)
+        self.args = self.cli.parse_args()
+        self.kreate_app_func = kreate_app_func
+        self.process_main_options(self.args)
         try:
-            if args.subcommand is None:
-                kreate_files(args)
+            if self.args.subcommand is None:
+                kreate_files(self)
             else:
-                args.func(args)
+                self.args.func(self)
         except Exception as e:
-            if args.verbose:
+            if self.args.verbose:
                 traceback.print_exc()
             else:
                 print(f"{type(e).__name__}: {e}")
@@ -89,22 +110,22 @@ class KoreCli:
             logging.basicConfig(level=logging.INFO)
 
 
-def kreate_files(args) -> App:
-    appdef: AppDef = args.kreate_appdef_func(args.appdef)
-    app: App = args.kreate_app_func(appdef)
+def kreate_files(cli :KoreCli) -> App:
+    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
+    app: App = cli.kreate_app_func(appdef)
     app.kreate_files()
     return app
 
 
-def files(args) -> App:
+def files(cli) -> App:
     """kreate all the files (default command)"""
-    kreate_files(args)
+    kreate_files(cli)
 
 
-def view_strukture(args):
+def view_strukture(cli):
     """show the application strukture"""
-    appdef: AppDef = args.kreate_appdef_func(args.appdef)
-    appdef.calc_strukture().pprint(field=args.kind)
+    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
+    appdef.calc_strukture().pprint(field=cli.args.kind)
 
 
 def jinja2_template_error_lineno():

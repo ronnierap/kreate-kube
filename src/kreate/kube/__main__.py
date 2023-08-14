@@ -1,10 +1,10 @@
 from ..kore import AppDef, App
-from . import KubeCli
+from . import KubeKreator
 from . import KustApp
 
 
-def kreate_appdef(appdef_filename: str) -> AppDef:
-    return AppDef(appdef_filename)
+#def kreate_appdef(appdef_filename: str) -> AppDef:
+#    return AppDef(appdef_filename)
 
 
 def kreate_app(appdef: AppDef) -> App:
@@ -14,4 +14,4 @@ def kreate_app(appdef: AppDef) -> App:
     return app
 
 
-KubeCli().run(kreate_appdef, kreate_app)
+KubeKreator().kreate_cli().run(kreate_app)
