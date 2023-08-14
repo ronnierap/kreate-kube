@@ -21,8 +21,6 @@ class Komponent:
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         self.strukture = self._calc_strukture(kwargs)
-
-        self._init()
         self.skip = self.strukture.get("ignore", False)
         self.name = self.strukture.get("name", None) or self.calc_name().lower()
         if self.skip:
@@ -32,13 +30,8 @@ class Komponent:
             logger.info(f"adding  {self.kind}.{self.shortname}")
         self.app.add(self)
 
-    # to prevent subclass to make own constructors
-    def _init(self):
-        pass
-
     def aktivate(self):
         pass
-
 
     def __str__(self):
         return f"<Komponent {self.kind}.{self.shortname} {self.name}>"

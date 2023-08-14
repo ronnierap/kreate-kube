@@ -22,15 +22,11 @@ class App():
         self._kinds = {}
         self.aliases = {}
         self.register_std_templates()
-        self._init()
         for key in appdef.yaml.get("templates", []):
             templ = appdef.yaml['templates'][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ)
         self.strukture = appdef.calc_strukture()
-
-    def _init(self):
-        pass
 
     def register_template(self, kind: str, cls=None,
                           filename=None, aliases=None, package=None):
