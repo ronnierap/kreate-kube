@@ -1,6 +1,6 @@
 import logging
 from ..kore import App, AppDef, JinYamlKomponent
-from ..kore._app import b64encode
+from ..kore._appdef import b64encode
 from ..krypt import _krypt
 from . import templates
 
