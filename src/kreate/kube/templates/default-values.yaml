@@ -23,6 +23,7 @@ default:
     memory_request: 512M
     revisionHistoryLimit: 1
     restartPolicy: Always
+    terminationGracePeriodSeconds: 30
 
   HorizontalPodAutoscaler:
     minReplicas: 1
@@ -63,3 +64,16 @@ default:
 
   PodDisruptionBudget:
     minAvailable: 1
+
+  StatefulSet:
+    container_name: app
+    imagePullPolicy: Always
+    containerPort: 8080
+    protocol: TCP
+    cpu_limit: 1
+    memory_limit: 512M
+    cpu_request: 200m
+    memory_request: 512M
+    revisionHistoryLimit: 1
+    restartPolicy: Always
+    terminationGracePeriodSeconds: 30

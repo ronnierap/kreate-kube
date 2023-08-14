@@ -42,6 +42,15 @@ Deployment:
           startupProbe:
             failureThreshold: 120
 
+StatefulSet:
+  main:
+    version: {{ val.version }}
+    project: kreate-demo
+    replicas: {{ val.replicas | default(1) }}
+    image_repo: {{ val.image_repo }}
+
+
+
 Egress:
   redis:
     cidr_list: {{ val.redis_egress_cidr_list }}

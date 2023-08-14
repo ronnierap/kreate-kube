@@ -1,6 +1,7 @@
 ---
 apiVersion: apps/v1
-kind: Deployment
+# The kind can be used for Deployment and StatefulSet
+kind: {{ my.kind }}
 metadata:
   name: {{ my.name }}
 spec:
@@ -30,6 +31,14 @@ spec:
         {% endfor %}
     spec:
       restartPolicy: {{ default.restartPolicy }}
+      {% if "serviceAccount" in val %}
+      serviceAccount: {{ val.serviceAccount }}
+      serviceAccountName: {{ val.serviceAccountName }}
+      {% endif %}
+      {% if "serviceName" in default %}
+      serviceName: "" #{{ default.serviceName | default("") }}  # Only for StatefulSet
+      {% endif %}
+      terminationGracePeriodSeconds: {{ default.terminationGracePeriodSeconds }}
       containers:
       - name: {{ default.container_name }}
         image: {{ strukt.image_repo }}/{{ app.name }}.app:{{ strukt.version }}

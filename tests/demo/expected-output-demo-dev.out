@@ -166,6 +166,52 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
       restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: demo-statefulset
+  namespace: demo-dev
+spec:
+  replicas: 0
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: demo-statefulset
+  template:
+    metadata:
+      annotations:
+        app.kubernetes.io/component: webservice
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: demo-statefulset
+        app.kubernetes.io/part-of: kreate-demo
+        app.kubernetes.io/version: v1.3.4
+        co.elastic.logs/enabled: "true"
+        co.elastic.logs/exclude_lines: DEBUG
+      labels:
+        app: demo-statefulset
+      name: demo-statefulset
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef: null
+        - secretRef: null
+        image: https://repo.kisst.org/demo.app:v1.3.4
+        imagePullPolicy: Always
+        name: app
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1
+            memory: 512M
+          requests:
+            cpu: 200m
+            memory: 512M
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
 ---
 apiVersion: batch/v1
 kind: CronJob
