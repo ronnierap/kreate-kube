@@ -5,6 +5,19 @@ default:
     cpu_limit:   {{ val.cpu_limit   | default("500m") }}
     cpu_request: {{ val.cpu_request | default("100m") }}
 
+CronJob:
+  main:
+    version: {{ val.version }}
+    project: kreate-demo
+    replicas: {{ val.replicas | default(1) }}
+    image_repo: {{ val.image_repo }}
+    vars:
+    - demo-vars
+    secret-vars:
+    - demo-secrets
+    command: "echo Starting; do-some-job; echo done"
+    schedule: 0 2 * * ?
+
 Deployment:
   main:
     version: {{ val.version }}

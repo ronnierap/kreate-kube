@@ -31,6 +31,7 @@ def kreate_app(appdef: AppDef) -> App:
     app.kreate_komponent("ServiceMonitor")
     app.kreate_komponent("HorizontalPodAutoscaler")
     app.kreate_komponent("MyUdpService", "main")
+    app.kreate_komponent("CronJob", "main")
 
     app.aktivate()
 

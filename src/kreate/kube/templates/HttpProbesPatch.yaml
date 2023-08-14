@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       containers:
-      - name: {{ default.name }}
+      - name: {{ default.container_name }}
         startupProbe:
           initialDelaySeconds: {{ default.startup_initialDelaySeconds }}
           periodSeconds: {{ default.startup_periodSeconds }}

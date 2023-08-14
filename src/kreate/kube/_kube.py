@@ -32,6 +32,7 @@ class KubeApp(JinjaApp):
         self.register_template_file("ServiceAccount", package=templates)
         self.register_template_file("ServiceMonitor", package=templates)
         self.register_template_file("Secret", package=templates)
+        self.register_template_file("CronJob", package=templates)
 
     def _default_template_class(self):
         return Resource

@@ -31,17 +31,17 @@ spec:
     spec:
       restartPolicy: {{ default.restartPolicy }}
       containers:
-      - name: {{ default.name }}
+      - name: {{ default.container_name }}
         image: {{ strukt.image_repo }}/{{ app.name }}.app:{{ strukt.version }}
         imagePullPolicy: {{ default.imagePullPolicy }}
         envFrom:
-        - secretRef:
-        {% for secr in strukt.get("secret-vars",[]) %}
-            name: {{ secr }}
-        {% endfor %}
         - configMapRef:
         {% for cm in strukt.get("vars",[]) %}
             name: {{ cm }}
+        {% endfor %}
+        - secretRef:
+        {% for secr in strukt.get("secret-vars",[]) %}
+            name: {{ secr }}
         {% endfor %}
         ports:
         - containerPort: {{ default.containerPort }}

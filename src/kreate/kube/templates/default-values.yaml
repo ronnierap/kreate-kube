@@ -4,8 +4,16 @@ default:
   AntiAffinityPatch:
     selector_key: app
 
+  CronJob:
+    container_name: app
+    imagePullPolicy: Always
+    concurrencyPolicy: Allow
+    successfulJobsHistoryLimit: 3
+    runAsUser: 1000
+    runAsGroup: 1000
+
   Deployment:
-    name: app
+    container_name: app
     imagePullPolicy: Always
     containerPort: 8080
     protocol: TCP
@@ -23,7 +31,7 @@ default:
     memory_averageUtilization: 70
 
   HttpProbesPatch:
-    name: app
+    container_name: app
     startup_initialDelaySeconds: 10
     startup_periodSeconds: 2
     startup_timeoutSeconds: 1

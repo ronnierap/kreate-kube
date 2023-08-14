@@ -120,10 +120,10 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:
       - envFrom:
-        - secretRef:
-            name: demo-secrets
         - configMapRef:
             name: demo-vars-tmfmt8h78d
+        - secretRef:
+            name: demo-secrets
         image: https://repo.kisst.org/demo.app:v1.3.4
         imagePullPolicy: Always
         livenessProbe:
@@ -166,6 +166,58 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
       restartPolicy: Always
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: demo-cronjob
+  namespace: demo-dev
+spec:
+  concurrencyPolicy: Allow
+  jobTemplate:
+    spec:
+      containers:
+      - args:
+        - -c
+        - echo Starting; do-some-job; echo done
+        command: /bin/sh
+        envFrom:
+        - configMapRef:
+            name: demo-vars
+        - secretRef:
+            name: demo-secrets
+        image: https://repo.kisst.org/demo.app:v1.3.4
+        imagePullPolicy: Always
+        name: app
+        resources:
+          limits:
+            cpu: None
+            memory: None
+          requests:
+            cpu: None
+            memory: None
+        securityContext:
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+      serviceAccountName: null
+      template:
+        metadata:
+          annotations:
+            app.kubernetes.io/component: cronjob
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: demo-cronjob
+            app.kubernetes.io/part-of: kreate-demo
+            app.kubernetes.io/version: v1.3.4
+            co.elastic.logs/enabled: "true"
+            co.elastic.logs/exclude_lines: DEBUG
+          labels: {}
+          name: demo-cronjob
+        spec:
+          containers: null
+          restartPolicy: OnFailure
+  schedule: 0 2 * * ?
+  successfulJobsHistoryLimit: 3
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
