@@ -1,0 +1,12 @@
+---
+apiVersion: apps/v1
+# The kind can be used for Deployment and StatefulSet
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  template:
+    metadata:
+      annotations:
+        co.elastic.logs/enabled: "true"
+        co.elastic.logs/exclude_lines: DEBUG

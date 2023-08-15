@@ -20,5 +20,5 @@ strukture_files:
 templates:
   MyUdpService: ./templates/MyUdpService.yaml
   Service: ./templates/MyUdpService.yaml   # Override existing Service template
-#patch_templates:
-#  DemoPatch: ./templates/MyUdpService.yaml
+patch_templates:
+  ElasticLogging: ./templates/ElasticLogging.yaml
