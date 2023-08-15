@@ -7,6 +7,7 @@ from sys import exc_info
 from . import _jinyaml
 from ._app import App, AppDef
 from ._appdef import b64encode
+import importlib.metadata
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,10 @@ class KoreCli:
         )
         self.add_subcommand(files, [], aliases=["f"])
         self.add_subcommand(view_strukture, [], aliases=["vs"])
+        self.add_subcommand(view_version, [], aliases=["version"])
+
+    def dist_package_version(self, package_name: str):
+        return importlib.metadata.version(package_name)
 
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
@@ -130,6 +135,12 @@ def view_strukture(cli: KoreCli):
     """show the application strukture"""
     appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
     appdef.calc_strukture().pprint(field=cli.args.kind)
+
+
+def view_version(cli: KoreCli):
+    """show the version"""
+    version = cli.dist_package_version("kreate-kube")
+    print(f"kreate-kube: {version}")
 
 
 def jinja2_template_error_lineno():
