@@ -81,7 +81,6 @@ HorizontalPodAutoscaler:
 Ingress:
   root:
     host: {{ val.ingress_host_internal}}
-    port: {{ val.service_port }}
     path: /
     options:
       - sticky
@@ -92,7 +91,6 @@ Ingress:
       dummy: jan
   api:
     host: {{ val.ingress_host_internal}}
-    port: {{ val.service_port }}
     path: /api
 
 
