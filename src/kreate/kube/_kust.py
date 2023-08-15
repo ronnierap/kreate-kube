@@ -1,6 +1,6 @@
 import logging
 
-from ..kore import FileLocation
+from ..kore import FileLocation, AppDef
 from ..kore import DeepChain
 from ..kore import JinYamlKomponent
 from ._kube import KubeApp, Resource
@@ -11,6 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 class KustApp(KubeApp):
+    def __init__(self, appdef: AppDef):
+        super().__init__(appdef)
+        self.register_templates_from_appdef("patch_templates", Patch)
+
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=templates)

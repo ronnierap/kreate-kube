@@ -14,11 +14,15 @@ class JinjaApp(App):
         self.kind_templates = {}
         self.kind_classes = {}
         self.register_std_templates()
-        for key in appdef.yaml.get("templates", []):
-            templ = appdef.yaml['templates'][key]
-            logger.info(f"adding custom template {key}: {templ}")
-            self.register_template_file(key, filename=templ)
+        self.register_templates_from_appdef("templates")
         self.strukture = appdef.calc_strukture()
+
+    def register_templates_from_appdef(self, value_key: str, cls=None):
+        for key in self.appdef.yaml.get(value_key, []):
+            templ = self.appdef.yaml[value_key][key]
+            logger.info(f"adding custom template {key}: {templ}")
+            self.register_template_file(key, filename=templ, cls=cls)
+
 
     def register_template(self, kind: str, cls=None,
                           filename=None, aliases=None, package=None):
