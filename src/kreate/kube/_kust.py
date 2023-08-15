@@ -77,6 +77,10 @@ class Patch(JinYamlKomponent):
         return (f"<Patch {self.target.kind}.{self.target.shortname}"
                 f":{self.kind}.{self.shortname}>")
 
+    @property
+    def dirname(self):
+        return self.app.target_dir + "/patches"
+
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}
 

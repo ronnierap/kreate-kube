@@ -52,10 +52,14 @@ class Resource(JinYamlKomponent):
         return f"<Resource {self.kind}.{self.shortname} {self.name}>"
 
     @property
+    def dirname(self):
+        return self.app.target_dir + "/resources"
+
+    @property
     def filename(self):
         # prefix the file, because the name of a resource is not guaranteed
         # to be unique
-        return f"{self.kind}-{self.name}.yaml".lower()
+        return f"{self.kind}-{self.name}.yaml"
 
     def add_metadata(self):
         for key in self.strukture.get("annotations", {}):
