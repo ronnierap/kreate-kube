@@ -43,7 +43,9 @@ class KustApp(KubeApp):
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
             for kind in res.strukture.patches:
-                patches = res.strukture.patches.get(kind, { "main": {} })
+                patches = res.strukture.patches[kind]
+                if not patches.keys():
+                    patches={ "main": {} }
                 for shortname in patches:
                     self.kreate_patch(res, kind=kind, shortname=shortname)
 

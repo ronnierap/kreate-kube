@@ -22,6 +22,7 @@ class Komponent:
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         self.strukture = self._calc_strukture(kwargs)
+        #print(0, self.strukture)
         self.skip = self.strukture.get("ignore", False)
         name = self.strukture.get("name", None) or self.calc_name()
         self.name = name.lower()
@@ -73,7 +74,7 @@ class Komponent:
             logger.debug(f"using named strukture {typename}.{self.shortname}")
             return self.app.strukture[typename][self.shortname]
         logger.info(
-            f"could not find strukture for {typename}.{self.shortname} in")
+            f"could not find strukture for {typename}.{self.shortname}")
         return {}
 
     def kreate_file(self) -> None:

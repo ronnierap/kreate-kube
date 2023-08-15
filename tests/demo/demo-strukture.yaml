@@ -35,14 +35,12 @@ Deployment:
       annotations:
         some-demo-annotation: just-for-fun
     patches:
-      AntiAffinityPatch:
-        main: {}
+      AntiAffinityPatch: {}
       HttpProbesPatch:
         main:
           startupProbe:
             failureThreshold: 120
-      ElasticLogging:
-        main: {}
+      ElasticLogging: {}
 
 StatefulSet:
   main:
@@ -60,8 +58,7 @@ StatefulSet:
       - spec.template.metadata.annotations.co_dot_elastic_dot_logs/exclude_lines
       - some.long.and # remove the strange long thingy
     patches:
-      ElasticLogging:
-        main: {}
+      ElasticLogging: {}
 
 
 Egress:
