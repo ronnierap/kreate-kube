@@ -5,16 +5,15 @@ kind: Service
 apiVersion: v1
 metadata:
   name: {{ my.name }}
-  namespace: {{ app.namespace }}
   labels:
     app: {{ app.name }}
 spec:
   selector:
     app: {{ app.name }}
   ports:
-{% for port in strukt.ports %}
+{% for port in (strukt.ports or [{"name": "http"}] ) %}
   - protocol: UDP
-    port: {{ port.port }}
-    targetPort: {{ port.targetPort | default(port.port) }}
+    port: {{ port.port | default(default.service_port) }}
+    targetPort: {{ port.targetPort | default(default.container_port) }}
     name: {{ port.name | default("http") }}
 {% endfor %}

@@ -109,8 +109,6 @@ Kustomization:
 MyUdpService:
   main:
     name: demo-udp-service
-    ports:
-      - port: 8080
 
 PodDisruptionBudget:
   main:
@@ -125,14 +123,13 @@ Secret:
       DB_PSW: {{ val.DB_PSW | dekrypt }}
 
 Service:
-  main: # default service
-    ports:
-      - port: {{ val.service_port }}
+  main:
     options:
       - headless
   https:
     ports:
       - port: 443
+        targetPort: 443
         name: https
 
 ServiceAccount:

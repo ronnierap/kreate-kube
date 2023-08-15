@@ -16,4 +16,4 @@ spec:
               service:
                 name: {{ default.service }}
                 port:
-                  number: {{ default.port }}
+                  number: {{ default.container_port }}
