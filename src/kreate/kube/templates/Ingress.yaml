@@ -3,7 +3,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ my.name }}
-  namespace: {{ app.namespace }}
   annotations:
     app.kubernetes.io/name: {{ app.name }}
 spec:
