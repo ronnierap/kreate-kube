@@ -58,7 +58,7 @@ class Komponent:
 
     def _find_generic_defaults(self):
         if "generic" in self.app.strukture.default:
-            logger.debug(f"using generic defaults")
+            logger.debug("using generic defaults")
             return self.app.strukture.default["generic"]
         return {}
 
