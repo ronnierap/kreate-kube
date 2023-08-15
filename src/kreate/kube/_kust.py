@@ -43,7 +43,8 @@ class KustApp(KubeApp):
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
             for kind in res.strukture.patches:
-                for shortname in res.strukture.patches[kind]:
+                patches = res.strukture.patches.get(kind, { "main": {} })
+                for shortname in patches:
                     self.kreate_patch(res, kind=kind, shortname=shortname)
 
 
@@ -84,6 +85,10 @@ class Patch(JinYamlKomponent):
     @property
     def dirname(self):
         return self.app.target_dir + "/patches"
+
+    @property
+    def filename(self):
+        return f"{self.target.kind}-{self.target.shortname}-{self.kind}-{self.shortname}.yaml"
 
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}
