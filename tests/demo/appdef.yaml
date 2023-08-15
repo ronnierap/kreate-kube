@@ -10,6 +10,7 @@ values:
 krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
 
 value_files:
+  - shared-values.yaml
   - values-{{appname}}-{{env}}.yaml
   - secrets-{{appname}}-{{env}}.yaml
 strukture_files:

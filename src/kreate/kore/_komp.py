@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Mapping
+import os
 
 from ._core import DeepChain, wrap
 from ._jinyaml import FileLocation, yaml_dump, yaml_parse, load_jinja_data
@@ -29,7 +30,8 @@ class Komponent:
             logger.info(f"ignoring {self.name}")
         else:
             logger.debug(f"adding  {self.kind}.{self.shortname}")
-        self.app.add(self)
+        if self.app:  # TODO: issue warning?
+            self.app.add(self)
 
     def aktivate(self):
         pass
@@ -51,21 +53,23 @@ class Komponent:
                          {"default": self._find_generic_defaults()})
 
     def _find_defaults(self):
-        if self.kind in self.app.strukture.default:
+        strukt = self.app.strukture if self.app else {}
+        if self.kind in strukt.get("default", {}):
             logger.debug(f"using defaults for {self.kind}")
             return self.app.strukture.default[self.kind]
         return {}
 
     def _find_generic_defaults(self):
-        if "generic" in self.app.strukture.default:
+        strukt = self.app.strukture if self.app else {}
+        if "generic" in strukt.get("default", {}):
             logger.debug("using generic defaults")
             return self.app.strukture.default["generic"]
         return {}
 
     def _find_strukture(self):
         typename = self.kind
-        if ((typename in self.app.strukture  # ugly (( to satisfy flake8 E129))
-             and self.shortname in self.app.strukture[typename])):
+        strukt = self.app.strukture if self.app else {}
+        if typename in strukt and self.shortname in strukt[typename]:
             logger.debug(f"using named strukture {typename}.{self.shortname}")
             return self.app.strukture[typename][self.shortname]
         logger.info(
@@ -142,6 +146,7 @@ class JinjaKomponent(Komponent):
         filename = self.filename
         if filename:
             dir = self.dirname
+            os.makedirs(dir, exist_ok=True)
             with open(f"{dir}/{filename}", 'wb') as f:
                 f.write(self.data)
 
@@ -168,6 +173,7 @@ class JinYamlKomponent(JinjaKomponent):
         filename = self.filename
         if filename:
             dir = self.dirname
+            os.makedirs(dir, exist_ok=True)
             with open(f"{dir}/{filename}", 'wb') as f:
                 yaml_dump(self.yaml.data, f)
 

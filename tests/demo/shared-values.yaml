@@ -1,0 +1,2 @@
+kubeconfig_cluster_url: some-url
+kubeconfig_cluster_ca_data: long-ca-cert

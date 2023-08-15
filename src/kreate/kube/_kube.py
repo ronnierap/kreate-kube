@@ -1,6 +1,8 @@
+import os
 import logging
-from ..kore import JinjaApp, AppDef, JinYamlKomponent
+from ..kore import JinjaApp, App, AppDef, JinYamlKomponent
 from ..krypt import _krypt
+from ..kore._jinyaml import FileLocation
 from . import templates
 
 logger = logging.getLogger(__name__)
@@ -167,3 +169,43 @@ class Ingress(Resource):
         self.nginx_annon("auth-type", "basic")
         self.nginx_annon("auth-secret", secret)
         self.nginx_annon("auth-realm", self.app.name + "-realm")
+
+
+# TODO: KubeConfig does not have an app to be added to
+# This needs all kinds of workarounds that might need some refactoring
+class KubeConfig(JinYamlKomponent):
+    def __init__(self, appdef: AppDef):
+        self.appdef = appdef
+        template_loc = FileLocation("kubeconfig.yaml", package=templates)
+        super().__init__(None, "main", template=template_loc)
+        self.cluster_name = appdef.values.get(
+            "kubeconfig_cluster_name",
+            f"{appdef.env}-cluster")
+        self.cluster_user_name = appdef.values.get(
+            "kubeconfig_cluster_user_name",
+            f"kreate-user-{appdef.env}")
+        self.context_name = appdef.env
+        # api_token should not be set in a file, just as environment variable
+        token = os.getenv("KUBECONFIG_API_TOKEN")
+        if not token:
+            raise ValueError("environment var KUBECONFIG_API_TOKEN not set")
+        self.api_token = token
+        self.aktivate()
+
+    def _template_vars(self):
+        return {
+            "appdef": self.appdef,
+            "my": self,
+            "val": self.appdef.values
+        }
+
+    def calc_name(self):
+        return "kubeconfig"
+
+    @property
+    def filename(self):
+        return "kubeconfig"
+
+    @property
+    def dirname(self):
+        return "build"

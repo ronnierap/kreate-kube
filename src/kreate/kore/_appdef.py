@@ -37,12 +37,15 @@ class AppDef():
         self.name = self.values["app"]
         self.env = self.values["env"]
         self._strukt_cache = None
+        self._load_value_files()
 
-    def _load_strukture_files(self, pre_files=None, post_files=None):
+    def _load_value_files(self, pre_files=None, post_files=None):
         for fname in self.yaml.get("value_files", []):
             val_yaml = load_jinyaml(FileLocation(
                 fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
+
+    def _load_strukture_files(self, pre_files=None, post_files=None):
         result = []
         files = pre_files or []
         files.extend(self.yaml.get("strukture_files", []))

@@ -4,6 +4,7 @@ import logging
 from ..kore._korecli import kreate_files as kreate_files
 from ..krypt import _krypt, KryptCli, KryptKreator
 from ._kust import KustApp
+from ._kube import KubeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ class KubeCli(KryptCli):
         self.add_subcommand(apply, [], aliases=["a"])
         self.add_subcommand(test, [], aliases=["t"])
         self.add_subcommand(testupdate, [], aliases=["tu"])
+        self.add_subcommand(kubeconfig, [])
 
 
 def build(args):
@@ -69,3 +71,10 @@ def testupdate(args):
            f"> {app.appdef.dir}/expected-output-{app.name}-{app.env}.out")
     logger.info(f"running: {cmd}")
     os.system(cmd)
+
+def kubeconfig(cli: KubeCli):
+    # TODO: we only need a Dummy app
+    appdef = cli.kreator.kreate_appdef(cli.args.appdef)
+    kubeconfig = KubeConfig(appdef)
+    #kubeconfig.aktivate() not needed?
+    kubeconfig.kreate_file()
