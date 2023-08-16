@@ -16,7 +16,7 @@ spec:
           failureThreshold: {{ default.startup_failureThreshold }}
           httpGet:
             scheme: {{ default.startup_scheme }}
-            path: {{ default.startup_path }}
+            path: {{ default.startup_path or default.probe_path }}
             port: {{ default.startup_port }}
         readinessProbe:
           periodSeconds: {{ default.readiness_periodSeconds }}
@@ -25,7 +25,7 @@ spec:
           successThreshold: {{ default.readiness_successThreshold }}
           httpGet:
             scheme: {{ default.readiness_scheme }}
-            path: {{ default.readiness_path }}
+            path: {{ default.readiness_path or default.probe_path }}
             port: {{ default.readiness_port }}
         livenessProbe:
           periodSeconds: {{ default.liveness_periodSeconds }}
@@ -34,5 +34,5 @@ spec:
           successThreshold: {{ default.liveness_successThreshold }}
           httpGet:
             scheme: {{ default.liveness_scheme }}
-            path: {{ default.liveness_path }}
+            path: {{ default.liveness_path or default.probe_path }}
             port: {{ default.liveness_port }}

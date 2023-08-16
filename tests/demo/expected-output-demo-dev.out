@@ -129,7 +129,7 @@ spec:
         livenessProbe:
           failureThreshold: 3
           httpGet:
-            path: actuator/info
+            path: /actuator/info
             port: 8080
             scheme: HTTP
           periodSeconds: 2
@@ -142,7 +142,7 @@ spec:
         readinessProbe:
           failureThreshold: 1
           httpGet:
-            path: actuator/info
+            path: /actuator/info
             port: 8080
             scheme: HTTP
           periodSeconds: 2
@@ -158,7 +158,7 @@ spec:
         startupProbe:
           failureThreshold: 30
           httpGet:
-            path: actuator/info
+            path: /actuator/info
             port: 8080
             scheme: HTTP
           initialDelaySeconds: 10
