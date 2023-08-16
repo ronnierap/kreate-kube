@@ -7,9 +7,7 @@ default:
 
 CronJob:
   main:
-    version: {{ val.version }}
     project: kreate-demo
-    image_repo: {{ val.image_repo }}
     vars:
     - demo-vars
     secret-vars:
@@ -19,9 +17,7 @@ CronJob:
 
 Deployment:
   main:
-    version: {{ val.version }}
     project: kreate-demo
-    image_repo: {{ val.image_repo }}
     vars:
     - demo-vars
     secret-vars:
@@ -42,9 +38,7 @@ Deployment:
 
 StatefulSet:
   main:
-    version: {{ val.version }}
     project: kreate-demo
-    image_repo: {{ val.image_repo }}
     add:
       spec.template:
         serviceName: jantje

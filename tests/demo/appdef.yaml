@@ -4,7 +4,7 @@ values:
   app: {{ appname }}
   env: {{ env }}
   team: myteam
-  version: v1.3.4
+  image_version: v1.3.4
 
 # key the enkryption key for the DEV environment
 krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}

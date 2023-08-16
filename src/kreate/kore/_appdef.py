@@ -40,12 +40,14 @@ class AppDef():
         self._load_value_files()
 
     def _load_value_files(self, pre_files=None, post_files=None):
+        logger.debug("loading value files")
         for fname in self.yaml.get("value_files", []):
             val_yaml = load_jinyaml(FileLocation(
                 fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
 
     def _load_strukture_files(self, pre_files=None, post_files=None):
+        logger.debug("loading strukture files")
         result = []
         files = pre_files or []
         files.extend(self.yaml.get("strukture_files", []))
@@ -55,7 +57,7 @@ class AppDef():
         return result
 
     def _load_strukture_file(self, filename):
-        vars = {"val": self.values}
+        vars = {"val": self.values, "appdef": self}
         return load_jinyaml(FileLocation(filename, dir=self.dir), vars)
 
     def calc_strukture(self, pre_files=None, post_files=None):
