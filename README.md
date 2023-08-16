@@ -15,24 +15,6 @@ Usually there are ate least 3 files needed for a setup:
 - `values-<app>-<env>.yaml`  contains specific values for a certain environment
 Note that these filename may be changed.
 
-### appdef.yaml
-```
-{% set appname = "cls" %} # reuse the appname in rest of this file
-{% set env = "acc" %} # reuse the appname in rest of this file
-values:
-  appname: {{ appname }}
-  env: {{ env }}
-  team: knights
-  project: kreate-kube-demo
-  image_version: 2.0.2
-
-value_files:
-  - values-{{appname}}-{{env}}.yaml
-strukture_files:
-  - py:kreate.kube.templates:default-values.yaml
-  - {{appname}}-strukture.yaml
-```
-
 ### demo-strukture.yaml
 The structure file is a yaml describing in a high level which resources
 are needed:
@@ -87,6 +69,25 @@ Service:
     name: demo-service
 ```
 Note: This shows only a small subset of possibilities of kreate-kube
+
+### appdef.yaml
+```
+{% set appname = "cls" %} # reuse the appname in rest of this file
+{% set env = "acc" %} # reuse the appname in rest of this file
+values:
+  appname: {{ appname }}
+  env: {{ env }}
+  team: knights
+  project: kreate-kube-demo
+  image_version: 2.0.2
+
+value_files:
+  - values-{{appname}}-{{env}}.yaml
+strukture_files:
+  - py:kreate.kube.templates:default-values.yaml
+  - {{appname}}-strukture.yaml
+```
+
 
 ## Using a minimal python script
 The strukture file above is always needed, and usually it should be all you need.
