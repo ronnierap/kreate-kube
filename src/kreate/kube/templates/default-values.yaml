@@ -11,6 +11,11 @@ default:
     image_version: {{ val.image_version }}
     project: {{ val.project }}
 
+    cpu_limit:   1
+    cpu_request: 200m
+    memory_limit:   512M
+    memory_request: 512M
+
   AntiAffinityPatch:
     selector_key: app
 
@@ -25,10 +30,6 @@ default:
     imagePullPolicy: Always
     containerPort: 8080
     protocol: TCP
-    cpu_limit: 1
-    memory_limit: 512M
-    cpu_request: 200m
-    memory_request: 512M
     revisionHistoryLimit: 1
     restartPolicy: Always
     terminationGracePeriodSeconds: 30
@@ -77,10 +78,6 @@ default:
     imagePullPolicy: Always
     containerPort: 8080
     protocol: TCP
-    cpu_limit: 1
-    memory_limit: 512M
-    cpu_request: 200m
-    memory_request: 512M
     revisionHistoryLimit: 1
     restartPolicy: Always
     terminationGracePeriodSeconds: 30

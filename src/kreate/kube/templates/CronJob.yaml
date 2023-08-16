@@ -30,11 +30,11 @@ spec:
             imagePullPolicy: {{ default.imagePullPolicy }}
             resources:
               limits:
-                cpu: {{ default.cpu_limit }}
-                memory: {{ default.memory_limit }}
+                cpu: {{ val.cpu_limit | default(default.cpu_limit) }}
+                memory: {{ val.memory_limit | default(default.memory_limit) }}
               requests:
-                cpu: {{ default.cpu_request }}
-                memory: {{ default.memory_request }}
+                cpu: {{ val.cpu_request | default(default.cpu_request) }}
+                memory: {{ val.memory_request | default(default.memory_request) }}
             envFrom:
               - configMapRef:
               {% for cm in strukt.get("vars",[]) %}

@@ -211,7 +211,7 @@ spec:
             cpu: 1
             memory: 512M
           requests:
-            cpu: 200m
+            cpu: 50m
             memory: 512M
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
@@ -240,11 +240,11 @@ spec:
         name: app
         resources:
           limits:
-            cpu: None
-            memory: None
+            cpu: 1
+            memory: 512M
           requests:
-            cpu: None
-            memory: None
+            cpu: 50m
+            memory: 512M
         securityContext:
           runAsGroup: 1000
           runAsNonRoot: true
