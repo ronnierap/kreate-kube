@@ -1,118 +1,117 @@
 # kreate-kube
 kreate kubernetes/kustomize yaml files based on templates
 
-The purpose of the kreate framework is to easily create
+The purpose of the kreate-kube framework is to easily create
 kubernetes resources for an application.
 This is especially useful if you have many different applications
 that you would like to keep as similar as possible,
 while also having flexibility to tweak each application.
 
-## Simple example using python script
-This script creates different python objects that can be deployed to kubernetes
-For simplpicity sake, it does not show more extensive configuration
-```
-#!/usr/bin/env python3
-import kreate
-
-def kreate_demo_app():
-    app = kreate.App('demo', kustomize=True)
-
-    root=kreate.Ingress(app)  # create a root ingress object and remember it in var root
-    root.sticky()       # fine tune the root ingress by adding session affinity
-    root.basic_auth()   # fine tune the root ingress by adding basic authentication
-
-    kreate.Ingress(app, path="/api", name="api")  # kreate a second ingress that needs no tuning
-
-    kreate.Deployment(app)
-    # alternative syntax `app.depl` to get the deployment from the app for finetuning
-    app.depl.add_template_label("egress-to-oracle", "enabled")
-
-    # kreate some (kustomize patches on the deployment)
-    kreate.HttpProbesPatch(app.depl)
-    kreate.AntiAffinityPatch(app.depl)
-
-    kreate.Service(app)
-
-    kreate.PodDisruptionBudget(app, name="demo-pdb")
-    app.pdb.yaml.spec.minAvailable = 2
-    app.pdb.add_label("testje","test")
-
-    kreate.ConfigMap(app, name="demo-vars")
-    app.cm.add_var("ENV", value=app.config["env"])
-    app.cm.add_var("ORACLE_URL")
-    app.cm.add_var("ORACLE_USR")
-    app.cm.add_var("ORACLE_SCHEMA")
-
-    return app
-
-kreate.run_cli(kreate_demo_app)
-```
-
 ## Example using application structure file
-The Python objects in the above script are the basis for the kreating resources
-based on a application strukture definition file.
+Kreating resources is based on a application strukture definition file.
+Usually there are ate least 3 files needed for a setup:
+- `appdef.yaml`  ties all together
+- `<app>-strukture.yaml`  describes the structure of all application components
+- `values-<app>-<env>.yaml`  contains specific values for a certain environment
+Note that these filename may be changed.
 
-We will use a simple script that loads an application structure file,
-and generates all components from that file.
-
-Note: this is still a rough design, and many details and names might
-change in the near future
-### kreate.py
+### appdef.yaml
 ```
-#!/usr/bin/env python3
-import kreate
+{% set appname = "cls" %} # reuse the appname in rest of this file
+{% set env = "acc" %} # reuse the appname in rest of this file
+values:
+  appname: {{ appname }}
+  env: {{ env }}
+  team: knights
+  project: kreate-kube-demo
+  image_version: 2.0.2
 
-def demo_app():
-    app = kreate.AppStructure('demo')
-    # It is possible to finetune the app object if needed
-
-kreate.cli(demo_app)
+value_files:
+  - values-{{appname}}-{{env}}.yaml
+strukture_files:
+  - py:kreate.kube.templates:default-values.yaml
+  - {{appname}}-strukture.yaml
 ```
-The `kreate.AppStructure('demo')` command will create all components, described in a
-`demo-app-structure.yaml` file with configuration/tuning from several config files,
-that can be load automatically, such as:
-- `kreate-defaults.yaml`: default files for all kreate templates in kreate package
-- `demo-app-struct.yaml`: high level application definition
-- `demo-prd-values.yaml`: specific values for the prd (production) environment
-All these files are automatically loaded based on the application name (demo)
-and the environment variable (prd)
 
-### demo-app-structure.yaml
+### demo-strukture.yaml
 The structure file is a yaml describing in a high level which resources
 are needed:
 ```
-kind: Deployment/StatefulSet/CronJob
-container:
-  app:
-    image: abc.app
-    probePath: actuator/info
-ingress:
-  root:
+Deployment:
+  main:
+    vars:
+    - demo-vars
+    secret-vars:
+    - demo-secrets
+    patches:
+      AntiAffinityPatch: {}
+      HttpProbesPatch: {}
+      AddEgressLabelsPatch: {}
+
+Egress:
+  db:
+    name: egress-to-db
+    cidr_list: {{ val.db_egress_cidr_list }}
+    port: {{ val.db_port }}
+
+Ingress:
+  all:
+    host: {{ val.ingress_host_internal }}
     path: /
-    sticky: True
-  api:
-    path: /api
-    read-timeout: 60  # This always is a slow api, so it should be longer
-egress: # dict to be mergable with fields, but bit ugly with all emtpy {}'s
-  db: {}
-  redis: {}
-  xyz: {}
-vars: # just list what vars are required for the image to work
-  - ENV
-  - DB_URL
-  - DB_SCHEMA
-secrets:
-  - DB_USR
-  - DB_PSW
-files:
-  - application.properties
-  - logging.properties
-secret-files
-  - certificate.key
+    options:
+      - basic_auth
+
+Kustomization:
+  main:
+    configmaps:
+      demo-vars:
+        vars:
+          ENV: {{ val.env }}
+          DB_URL: {{ val.DB_URL }}
+
+Secret:
+  main:
+    name: demo-secrets
+    vars:
+      DB_PSW: {{ val.DB_PSW | dekrypt() }}
+      DB_USR: {{ val.DB_USR }}
+
+SecretBasicAuth:
+  basic-auth:
+    users:
+      - admin
+      - guest
+
+Service:
+  main:
+    name: demo-service
 ```
-These resources will be created using
+Note: This shows only a small subset of possibilities of kreate-kube
 
+## Using a minimal python script
+The strukture file above is always needed, and usually it should be all you need.
+However originally `kreate` was more script based (originally even bash scripts).
+It is still possible to use a script and there might be cases where you need to finetune some things
+that can only be done in Python.
+### kreate-demo.py
+```
+#!/usr/bin/env python3
 
+from kreate.kore import AppDef, App
+from kreate.kube import KustApp, KubeKreator
+
+def kreate_app(appdef: AppDef) -> App:
+    app = KustApp(appdef)
+    app.kreate_komponents_from_strukture()
+    app.aktivate()
+
+    # Start finetuning the yaml komponents
+    # Note: adding a custom label does not require python
+    app.depl.main.label("custom-label","added-by-script")
+    return app
+
+KubeKreator(kreate_app).kreate_cli().run()
+```
 
 ## History
 This is a rewrite of a similar project written as bash scripts.
