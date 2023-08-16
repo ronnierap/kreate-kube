@@ -24,8 +24,6 @@ def kreate_app(appdef: AppDef) -> App:
     kreate.kube.Service(app, "https")
     pdb = kreate.kube.PodDisruptionBudget(app, name="demo-pdb")
     kreate.kube.Kustomization(app)
-    app.kreate_patch(app.depl.main, "HttpProbesPatch")
-    app.kreate_patch(depl, "AntiAffinityPatch")
     app.kreate_komponent("Secret", "main")
     app.kreate_komponent("ServiceAccount")
     app.kreate_komponent("ServiceMonitor")
@@ -33,6 +31,9 @@ def kreate_app(appdef: AppDef) -> App:
     app.kreate_komponent("MyUdpService", "main")
     app.kreate_komponent("CronJob", "main")
     app.kreate_komponent("StatefulSet", "main")
+    app.kreate_patch(app.depl.main, "HttpProbesPatch")
+    app.kreate_patch(depl, "AntiAffinityPatch")
+    app.kreate_patch(depl, "MountVolumeFiles")
 
     app.aktivate()
 

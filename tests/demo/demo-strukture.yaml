@@ -18,6 +18,15 @@ Deployment:
     - demo-vars
     secret-vars:
     - demo-secrets
+    volumes:
+    - demo-files:
+        files:
+        - /home/spring/application.properties
+        - /home/spring/logback.xml
+    - demo-secret-files:
+        type: secret
+        files:
+        - /home/spring/credential.properties
     pod:
       annotations:
         some-demo-annotation: just-for-fun
@@ -29,6 +38,14 @@ Deployment:
             failureThreshold: 120
       ElasticLogging: {}
       AddEgressLabelsPatch: {}
+      MountVolumeFiles:
+        demo-files:
+          files:
+            - /home/spring/application.properties
+            - /home/spring/logback.xml
+        demo-extra-files:
+          files:
+            - /home/spring/environment.properties
 
 StatefulSet:
   main:

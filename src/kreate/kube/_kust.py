@@ -21,6 +21,7 @@ class KustApp(KubeApp):
         self.register_template_class(AddEgressLabelsPatch, package=patches)
         self.register_template_file("AntiAffinityPatch", cls=Patch, package=patches)
         self.register_template_file("HttpProbesPatch", cls=Patch, package=patches)
+        self.register_template_file("MountVolumeFiles", cls=Patch, package=patches)
 
     def kreate_komponents_from_strukture(self):
         super().kreate_komponents_from_strukture()
