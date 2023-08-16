@@ -36,6 +36,7 @@ def kreate_app(appdef: AppDef) -> App:
     # Add the next two in alphabetical order, to be predictable
     app.kreate_patch(depl, "MountVolumeFiles", "demo-extra-files")
     app.kreate_patch(depl, "MountVolumeFiles", "demo-files")
+    app.kreate_patch(depl, "MountVolumeFiles", "demo-secret-files")
 
     app.aktivate()
 

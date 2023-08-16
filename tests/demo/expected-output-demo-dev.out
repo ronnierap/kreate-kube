@@ -165,6 +165,9 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         volumeMounts:
+        - mountPath: /home/spring/credential.properties
+          name: demo-secret-files
+          subPath: credential.properties
         - mountPath: /home/spring/application.properties
           name: demo-files
           subPath: application.properties
@@ -177,6 +180,9 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
+      - name: demo-secret-files
+        secret:
+          secretName: demo-secret-files
       - configMap:
           name: demo-files
         name: demo-files
