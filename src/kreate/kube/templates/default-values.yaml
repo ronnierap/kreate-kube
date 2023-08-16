@@ -7,7 +7,7 @@ default:
     container_port: 8080
     replicas: {{ val.replicas | default(1) }}
     image_repo: {{ val.image_repo }}
-    image_name: {{ appdef.name}}.app
+    image_name: {{ appdef.appname }}.app
     image_version: {{ val.image_version }}
     project: {{ val.project }}
 
@@ -69,7 +69,7 @@ default:
     liveness_port: 8080
 
   Ingress:
-    service: {{ val.app }}-service
+    service: {{ val.appname }}-service
 
   PodDisruptionBudget:
     minAvailable: 1

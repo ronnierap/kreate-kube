@@ -34,7 +34,7 @@ class AppDef():
         self.values = {"getenv": os.getenv}
         self.yaml = load_jinyaml(FileLocation(filename, dir="."), self.values)
         self.values.update(self.yaml.get("values", {}))
-        self.name = self.values["app"]
+        self.appname = self.values["appname"]
         self.env = self.values["env"]
         self._strukt_cache = None
         self._load_value_files()

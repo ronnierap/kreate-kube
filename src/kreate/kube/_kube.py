@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class KubeApp(JinjaApp):
     def __init__(self, appdef: AppDef):
         super().__init__(appdef)
-        self.namespace = self.name + "-" + self.env
+        self.namespace = self.appname + "-" + self.env
         self.target_dir = "./build/" + self.namespace
 
     def register_std_templates(self) -> None:
@@ -90,8 +90,8 @@ class Resource(JinYamlKomponent):
 class Deployment(Resource):
     def calc_name(self):
         if self.shortname == "main":
-            return self.app.name
-        return f"{self.app.name}-{self.shortname}"
+            return self.app.appname
+        return f"{self.app.appname}-{self.shortname}"
 
     def pod_annotation(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.spec.template.metadata:
@@ -115,12 +115,12 @@ class Service(Resource):
 
 class Egress(Resource):
     def calc_name(self):
-        return f"{self.app.name}-egress-to-{self.shortname}"
+        return f"{self.app.appname}-egress-to-{self.shortname}"
 
 
 class SecretBasicAuth(Resource):
     def calc_name(self):
-        return f"{self.app.name}-{self.shortname}"
+        return f"{self.app.appname}-{self.shortname}"
 
     def users(self):
         result = []
@@ -133,7 +133,7 @@ class SecretBasicAuth(Resource):
 
 class ConfigMap(Resource):
     def calc_name(self):
-        return f"{self.app.name}-{self.shortname}"
+        return f"{self.app.appname}-{self.shortname}"
 
     @property
     def filename(self) -> str:
@@ -169,10 +169,10 @@ class Ingress(Resource):
         self.nginx_annon("session-cookie-samesite", "None")
 
     def basic_auth(self, secret: str = None) -> None:
-        secret = secret or f"{self.app.name}-basic-auth"
+        secret = secret or f"{self.app.appname}-basic-auth"
         self.nginx_annon("auth-type", "basic")
         self.nginx_annon("auth-secret", secret)
-        self.nginx_annon("auth-realm", self.app.name + "-realm")
+        self.nginx_annon("auth-realm", self.app.appname + "-realm")
 
 
 # TODO: KubeConfig does not have an app to be added to

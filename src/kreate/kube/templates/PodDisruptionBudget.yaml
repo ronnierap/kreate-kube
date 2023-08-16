@@ -8,4 +8,4 @@ spec:
   minAvailable: {{ default.minAvailable }}
   selector:
     matchLabels:
-      app: {{ app.name }}
+      app: {{ app.appname }}

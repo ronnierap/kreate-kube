@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class App():
     def __init__(self, appdef: AppDef):
-        self.name = appdef.name
+        self.appname = appdef.appname
         self.env = appdef.env
         self.appdef = appdef
         self.values = appdef.values

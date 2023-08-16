@@ -42,8 +42,8 @@ class Komponent:
 
     def calc_name(self):
         if self.shortname == "main":
-            return f"{self.app.name}-{self.kind}"
-        return f"{self.app.name}-{self.kind}-{self.shortname}"
+            return f"{self.app.appname}-{self.kind}"
+        return f"{self.app.appname}-{self.kind}-{self.shortname}"
 
     def _calc_strukture(self, extra):
         strukt = self._find_strukture()

@@ -7,7 +7,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ app.name }}
+    name: {{ app.appname }}
   minReplicas: {{ strukt.minReplicas }}
   maxReplicas: {{ strukt.maxReplicas }}
   metrics:

@@ -1,7 +1,7 @@
 {% set appname = "demo" %} # reuse the appname in rest of this file
 {% set env = "dev" %} # reuse the appname in rest of this file
 values:
-  app: {{ appname }}
+  appname: {{ appname }}
   env: {{ env }}
   team: myteam
   project: kreate-demo

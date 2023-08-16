@@ -15,4 +15,4 @@ spec:
     - {{ app.namespace }}
   selector:
     matchLabels:
-      app: {{ app.name }}
+      app: {{ app.appname }}

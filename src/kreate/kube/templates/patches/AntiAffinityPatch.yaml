@@ -14,5 +14,5 @@ spec:
                   - key: {{ default.selector_key }}
                     operator: In
                     values:
-                      - {{ app.name }}
+                      - {{ app.appname }}
               topologyKey: "kubernetes.io/hostname"
