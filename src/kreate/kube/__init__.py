@@ -7,8 +7,6 @@ from ._kube import Service
 from ._kube import Egress
 
 from ._kust import KustApp
-from ._kust import HttpProbesPatch
-from ._kust import AntiAffinityPatch
 from ._kust import Kustomization
 
 from ._kubecli import KubeCli, KubeKreator

@@ -3,7 +3,7 @@ import logging
 from ..kore import FileLocation, AppDef
 from ..kore import DeepChain
 from ..kore import JinYamlKomponent
-from ._kube import KubeApp, Resource
+from ._kube import KubeApp, Resource, Egress
 from . import templates
 from .templates import patches
 
@@ -18,8 +18,8 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=templates)
-        self.register_template_class(AntiAffinityPatch, package=patches)
-        self.register_template_class(HttpProbesPatch, package=patches)
+        self.register_template_file("AntiAffinityPatch", cls=Patch, package=patches)
+        self.register_template_file("HttpProbesPatch", cls=Patch, package=patches)
 
     def kreate_komponents_from_strukture(self):
         super().kreate_komponents_from_strukture()
@@ -108,11 +108,3 @@ class Patch(JinYamlKomponent):
             embedded_strukture = tar_struk[typename][self.shortname]
             return DeepChain(embedded_strukture, root_strukture)
         return root_strukture
-
-
-class HttpProbesPatch(Patch):
-    pass
-
-
-class AntiAffinityPatch(Patch):
-    pass
