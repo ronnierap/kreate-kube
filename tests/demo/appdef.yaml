@@ -4,6 +4,7 @@ values:
   app: {{ appname }}
   env: {{ env }}
   team: myteam
+  project: kreate-demo
   image_version: v1.3.4
 
 # key the enkryption key for the DEV environment

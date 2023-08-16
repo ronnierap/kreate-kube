@@ -7,7 +7,6 @@ default:
 
 CronJob:
   main:
-    project: kreate-demo
     vars:
     - demo-vars
     secret-vars:
@@ -17,7 +16,6 @@ CronJob:
 
 Deployment:
   main:
-    project: kreate-demo
     vars:
     - demo-vars
     secret-vars:
@@ -38,7 +36,6 @@ Deployment:
 
 StatefulSet:
   main:
-    project: kreate-demo
     add:
       spec.template:
         serviceName: jantje

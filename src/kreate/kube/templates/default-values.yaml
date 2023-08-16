@@ -9,6 +9,7 @@ default:
     image_repo: {{ val.image_repo }}
     image_name: {{ appdef.name}}.app
     image_version: {{ val.image_version }}
+    project: {{ val.project }}
 
   AntiAffinityPatch:
     selector_key: app
