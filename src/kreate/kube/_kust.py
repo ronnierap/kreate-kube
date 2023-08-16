@@ -18,6 +18,7 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=templates)
+        self.register_template_class(AddEgressLabelsPatch, package=patches)
         self.register_template_file("AntiAffinityPatch", cls=Patch, package=patches)
         self.register_template_file("HttpProbesPatch", cls=Patch, package=patches)
 
@@ -108,3 +109,8 @@ class Patch(JinYamlKomponent):
             embedded_strukture = tar_struk[typename][self.shortname]
             return DeepChain(embedded_strukture, root_strukture)
         return root_strukture
+
+
+class AddEgressLabelsPatch(Patch):
+    def egresses(self):
+        return [k for k in self.app.komponents if isinstance(k, Egress)]

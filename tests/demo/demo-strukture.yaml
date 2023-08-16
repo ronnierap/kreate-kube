@@ -19,9 +19,6 @@ Deployment:
     secret-vars:
     - demo-secrets
     pod:
-      labels:
-        egress-to-db: enabled
-        egress-to-redis: enabled
       annotations:
         some-demo-annotation: just-for-fun
     patches:
@@ -31,6 +28,7 @@ Deployment:
           startupProbe:
             failureThreshold: 120
       ElasticLogging: {}
+      AddEgressLabelsPatch: {}
 
 StatefulSet:
   main:
