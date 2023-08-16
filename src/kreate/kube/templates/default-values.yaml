@@ -5,6 +5,7 @@ default:
     container_name: app
     service_port: 8080
     container_port: 8080
+    replicas: {{ val.replicas | default(1) }}
 
   AntiAffinityPatch:
     selector_key: app

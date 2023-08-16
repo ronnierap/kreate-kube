@@ -5,7 +5,7 @@ kind: {{ my.kind }}
 metadata:
   name: {{ my.name }}
 spec:
-  replicas: {{ strukt.replicas }}
+  replicas: {{ default.replicas }}
   revisionHistoryLimit: {{ default.revisionHistoryLimit }}
   selector:
     matchLabels:

@@ -86,7 +86,7 @@ metadata:
   name: demo
   namespace: demo-dev
 spec:
-  replicas: 0
+  replicas: 3
   revisionHistoryLimit: 1
   selector:
     matchLabels:
@@ -173,13 +173,16 @@ kind: StatefulSet
 metadata:
   name: demo-statefulset
   namespace: demo-dev
+some:
+  long: {}
 spec:
-  replicas: 0
+  replicas: 3
   revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: demo-statefulset
   template:
+    klaas: pietje
     metadata:
       annotations:
         app.kubernetes.io/component: webservice
@@ -192,13 +195,13 @@ spec:
       labels:
         app: demo-statefulset
       name: demo-statefulset
+    serviceName: jantje
     spec:
       containers:
       - envFrom:
         - configMapRef: null
         - secretRef: null
         image: https://repo.kisst.org/demo.app:v1.3.4
-        imagePullPolicy: Always
         name: app
         ports:
         - containerPort: 8080
