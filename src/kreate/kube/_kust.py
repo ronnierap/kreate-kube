@@ -44,11 +44,13 @@ class KustApp(KubeApp):
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
-            for kind in res.strukture.patches:
-                patches = res.strukture.patches[kind]
-                if not patches.keys():
-                    patches={ "main": {} }
-                for shortname in patches:
+            for kind in sorted(res.strukture.patches.keys()):
+                subpatches = res.strukture.patches[kind]
+                if not subpatches.keys():
+                    subpatches={ "main": {} }
+                # use sorted because some patches, e.g. the MountVolumes
+                # result in a list, were the order can be unpredictable
+                for shortname in sorted(subpatches.keys()):
                     self.kreate_patch(res, kind=kind, shortname=shortname)
 
 

@@ -165,24 +165,24 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         volumeMounts:
-        - mountPath: /home/spring/environment.properties
-          name: demo-extra-files
-          subPath: environment.properties
         - mountPath: /home/spring/application.properties
           name: demo-files
           subPath: application.properties
         - mountPath: /home/spring/logback.xml
           name: demo-files
           subPath: logback.xml
+        - mountPath: /home/spring/environment.properties
+          name: demo-extra-files
+          subPath: environment.properties
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
       - configMap:
-          name: demo-extra-files
-        name: demo-extra-files
-      - configMap:
           name: demo-files
         name: demo-files
+      - configMap:
+          name: demo-extra-files
+        name: demo-extra-files
 ---
 apiVersion: apps/v1
 kind: StatefulSet

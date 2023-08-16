@@ -47,6 +47,10 @@ Deployment:
           files:
             - /home/spring/environment.properties
 
+#      MountSecretFiles:
+#        demo-secret-files:
+#        - /home/spring/credential.properties
+
 StatefulSet:
   main:
     add:

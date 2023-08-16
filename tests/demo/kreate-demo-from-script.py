@@ -33,8 +33,9 @@ def kreate_app(appdef: AppDef) -> App:
     app.kreate_komponent("StatefulSet", "main")
     app.kreate_patch(app.depl.main, "HttpProbesPatch")
     app.kreate_patch(depl, "AntiAffinityPatch")
-    app.kreate_patch(depl, "MountVolumeFiles", "demo-files")
+    # Add the next two in alphabetical order, to be predictable
     app.kreate_patch(depl, "MountVolumeFiles", "demo-extra-files")
+    app.kreate_patch(depl, "MountVolumeFiles", "demo-files")
 
     app.aktivate()
 
