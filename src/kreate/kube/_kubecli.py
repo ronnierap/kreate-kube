@@ -2,6 +2,7 @@ import os
 import logging
 
 from ..kore._korecli import kreate_files as kreate_files
+from ..kore import AppDef
 from ..krypt import _krypt, KryptCli, KryptKreator
 from ._kust import KustApp
 from ._kube import KubeConfig
@@ -15,6 +16,10 @@ class KubeKreator(KryptKreator):
 
     def _app_class(self):
         return KustApp
+
+    def tune_appdef(self, appdef: AppDef):
+        super().tune_appdef(appdef)
+        appdef._default_strukture_files.append("py:kreate.kube.templates:default-values.yaml")
 
 
 class KubeCli(KryptCli):

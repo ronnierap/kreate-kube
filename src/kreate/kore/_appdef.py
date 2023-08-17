@@ -38,20 +38,21 @@ class AppDef():
         self.env = self.values["env"]
         self._strukt_cache = None
         self._load_value_files()
+        self._default_strukture_files = []
 
-    def _load_value_files(self, pre_files=None, post_files=None):
+    def _load_value_files(self):
         logger.debug("loading value files")
         for fname in self.yaml.get("value_files", []):
             val_yaml = load_jinyaml(FileLocation(
                 fname, dir=self.dir), self.values)
             self.values.update(val_yaml)
 
-    def _load_strukture_files(self, pre_files=None, post_files=None):
+    def _load_strukture_files(self):
         logger.debug("loading strukture files")
         result = []
-        files = pre_files or []
+        files = self._default_strukture_files
         files.extend(self.yaml.get("strukture_files", []))
-        files.extend(post_files or [])
+        #files.extend(post_files or [])
         for fname in files:
             result.append(self._load_strukture_file(fname))
         return result
@@ -60,10 +61,8 @@ class AppDef():
         vars = {"val": self.values, "appdef": self}
         return load_jinyaml(FileLocation(filename, dir=self.dir), vars)
 
-    def calc_strukture(self, pre_files=None, post_files=None):
+    def calc_strukture(self):
         if not self._strukt_cache:
-            dicts = self._load_strukture_files(
-                pre_files=pre_files,
-                post_files=post_files)
+            dicts = self._load_strukture_files()
             self._strukt_cache = DeepChain(*reversed(dicts))
         return self._strukt_cache

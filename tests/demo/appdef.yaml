@@ -15,7 +15,6 @@ value_files:
   - values-{{appname}}-{{env}}.yaml
   - secrets-{{appname}}-{{env}}.yaml
 strukture_files:
-  - py:kreate.kube.templates:default-values.yaml
   - {{appname}}-strukture.yaml
   - override-{{appname}}-{{env}}.yaml
 templates:

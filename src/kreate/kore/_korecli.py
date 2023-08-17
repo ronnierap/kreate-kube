@@ -25,6 +25,9 @@ class KoreKreator:
         self.tune_appdef(appdef)
         return appdef
 
+    def tune_appdef(self, appdef: AppDef):
+        pass
+
     def _app_class(self):
         raise NotImplementedError()
 
