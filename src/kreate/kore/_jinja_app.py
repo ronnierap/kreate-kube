@@ -2,24 +2,24 @@ import inspect
 import logging
 
 from ._jinyaml import FileLocation
-from ._appdef import AppDef
+from ._konfig import Konfig
 from ._app import App
 
 logger = logging.getLogger(__name__)
 
 
 class JinjaApp(App):
-    def __init__(self, appdef: AppDef):
-        super().__init__(appdef)
+    def __init__(self, konfig: Konfig):
+        super().__init__(konfig)
         self.kind_templates = {}
         self.kind_classes = {}
         self.register_std_templates()
-        self.register_templates_from_appdef("templates")
-        self.strukture = appdef.calc_strukture()
+        self.register_templates_from_konfig("templates")
+        self.strukture = konfig.calc_strukture()
 
-    def register_templates_from_appdef(self, value_key: str, cls=None):
-        for key in self.appdef.yaml.get(value_key, []):
-            templ = self.appdef.yaml[value_key][key]
+    def register_templates_from_konfig(self, value_key: str, cls=None):
+        for key in self.konfig.yaml.get(value_key, []):
+            templ = self.konfig.yaml[value_key][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ, cls=cls)
 
@@ -36,7 +36,7 @@ class JinjaApp(App):
                              f"default class")
         filename = filename or f"{kind}.yaml"
         loc = FileLocation(filename=filename,
-                           package=package, dir=self.appdef.dir)
+                           package=package, dir=self.konfig.dir)
         logger.debug(f"registering template {kind}: {loc}")
         cls = cls or self._default_template_class()
         if cls is None:

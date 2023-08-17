@@ -1,6 +1,6 @@
 import logging
 
-from ..kore import FileLocation, AppDef
+from ..kore import FileLocation, Konfig
 from ..kore import DeepChain
 from ..kore import JinYamlKomponent
 from ._kube import KubeApp, Resource, Egress
@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 class KustApp(KubeApp):
-    def __init__(self, appdef: AppDef):
-        super().__init__(appdef)
-        self.register_templates_from_appdef("patch_templates", Patch)
+    def __init__(self, konfig: Konfig):
+        super().__init__(konfig)
+        self.register_templates_from_konfig("patch_templates", Patch)
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
@@ -90,7 +90,7 @@ class Patch(JinYamlKomponent):
 
     @property
     def dirname(self):
-        return self.app.appdef.target_dir + "/patches"
+        return self.app.konfig.target_dir + "/patches"
 
     @property
     def filename(self):

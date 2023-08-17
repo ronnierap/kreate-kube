@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
 This test script shows that you can kreate komponents from a python script.
-The komponents will still be configured by the appdef.strukture.
+The komponents will still be configured by the konfig.strukture.
 You can also configure them further in python.
 In general it is preferred to kreate all komponents from the strukture.
 """
 
-from kreate.kore import AppDef, App
+from kreate.kore import Konfig, App
 import kreate.kube
 
 
-def kreate_app(appdef: AppDef) -> App:
-    app = kreate.kube.KustApp(appdef) # or appdef.kreate_app()?
+def kreate_app(konfig: Konfig) -> App:
+    app = kreate.kube.KustApp(konfig) # or konfig.kreate_app()?
     kreate.kube.Ingress(app, "root")
     kreate.kube.Ingress(app, "api")
 

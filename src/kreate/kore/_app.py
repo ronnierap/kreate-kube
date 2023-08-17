@@ -3,20 +3,20 @@ import shutil
 import logging
 
 from ._core import DictWrapper
-from ._appdef import AppDef
+from ._konfig import Konfig
 
 logger = logging.getLogger(__name__)
 
 
 class App():
-    def __init__(self, appdef: AppDef):
-        self.appname = appdef.appname
-        self.env = appdef.env
-        self.appdef = appdef
+    def __init__(self, konfig: Konfig):
+        self.appname = konfig.appname
+        self.env = konfig.env
+        self.konfig = konfig
         self.komponents = []
         self._kinds = {}
         self.aliases = {}
-        self.strukture = appdef.calc_strukture()
+        self.strukture = konfig.calc_strukture()
 
     def add_alias(self, kind: str, *aliases: str) -> None:
         if kind in self.aliases:
@@ -58,9 +58,9 @@ class App():
             komp.aktivate()
 
     def kreate_files(self):
-        if os.path.exists(self.appdef.target_dir) and os.path.isdir(self.appdef.target_dir):
-            shutil.rmtree(self.appdef.target_dir)
-        os.makedirs(self.appdef.target_dir, exist_ok=True)
+        if os.path.exists(self.konfig.target_dir) and os.path.isdir(self.konfig.target_dir):
+            shutil.rmtree(self.konfig.target_dir)
+        os.makedirs(self.konfig.target_dir, exist_ok=True)
 
         for komp in self.komponents:
             if (komp.filename):

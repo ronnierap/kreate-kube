@@ -1,4 +1,4 @@
-from ._appdef import AppDef
+from ._konfig import Konfig
 from ._app import App
 from ._jinja_app import JinjaApp
 from ._korecli import KoreCli, KoreKreator
@@ -7,7 +7,7 @@ from ._jinyaml import FileLocation
 from ._core import DeepChain, wrap, DictWrapper
 
 __all__ = [
-    "AppDef",
+    "Konfig",
     "App",
     "JinjaApp",
     "KoreKreator",

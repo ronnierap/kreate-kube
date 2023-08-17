@@ -25,10 +25,10 @@ def get_class(name: str):
     return getattr(module, class_name)
 
 
-class AppDef():
-    def __init__(self, filename="appdef.yaml", *args):
+class Konfig():
+    def __init__(self, filename="konfig.yaml", *args):
         if os.path.isdir(filename):
-            filename += "/appdef.yaml"
+            filename += "/konfig.yaml"
         self.dir = os.path.dirname(filename) or "."
         self.filename = filename
         self.values = {"getenv": os.getenv}
@@ -76,7 +76,7 @@ class AppDef():
 
     def _load_strukture_file(self, filename):
         vars = {
-                "appdef": self,
+                "konfig": self,
                 "val": self.values,
                 "secret": self.secrets,
         }
@@ -97,13 +97,13 @@ class AppDef():
             dekrypt = file.get("dekrypt", dekrypt_default)
             name = file.get("name", None)
             if not name:
-                raise ValueError(f"file in appdef {key} should have name {file}")
+                raise ValueError(f"file in konfig {key} should have name {file}")
             from_ = file.get("from", f"{key}/{name}" +(".encrypted" if dekrypt else f""))
             template = file.get("template", False)
             loc = FileLocation(from_, dir=self.dir)
             if template:
                 vars = {
-                        "appdef": self,
+                        "konfig": self,
                         "val": self.values,
                         "secret": self.secrets,
                 }

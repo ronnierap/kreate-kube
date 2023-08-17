@@ -5,10 +5,10 @@ from jinja2 import TemplateError, filters
 from sys import exc_info
 
 from . import _jinyaml
-from ._app import App, AppDef
+from ._app import App, Konfig
 from ._jinja_app import JinjaApp
 from ._jinyaml import load_data
-from ._appdef import b64encode
+from ._konfig import b64encode
 import importlib.metadata
 
 logger = logging.getLogger(__name__)
@@ -22,22 +22,22 @@ class KoreKreator:
     def kreate_cli(self):
         return KoreCli(self)
 
-    def kreate_appdef(self, filename):
+    def kreate_konfig(self, filename):
         filters.FILTERS["b64encode"] = b64encode
-        appdef = AppDef(filename)
-        self.tune_appdef(appdef)
-        return appdef
+        konfig = Konfig(filename)
+        self.tune_konfig(konfig)
+        return konfig
 
-    def tune_appdef(self, appdef: AppDef):
+    def tune_konfig(self, konfig: Konfig):
         pass
 
     def _app_class(self):
         raise NotImplementedError()
 
-    def kreate_app(self, appdef: AppDef) -> App:
+    def kreate_app(self, konfig: Konfig) -> App:
         if self.kreate_app_func:
-            return self.kreate_app_func(appdef)
-        app = self._app_class()(appdef)
+            return self.kreate_app_func(konfig)
+        app = self._app_class()(konfig)
         app.kreate_komponents_from_strukture()
         app.aktivate()
         if self.tune_app_func:
@@ -111,7 +111,7 @@ class KoreCli:
 
     def add_main_options(self):
         self.cli.add_argument(
-            "-a", "--appdef", action="store", default="appdef.yaml")
+            "-a", "--konfig", action="store", default="konfig.yaml")
         self.cli.add_argument("-k", "--kind", action="store", default=None)
         self.cli.add_argument("-v", "--verbose", action='count', default=0)
         self.cli.add_argument("-w", "--warn", action="store_true")
@@ -132,8 +132,8 @@ class KoreCli:
 
 
 def kreate_files(cli: KoreCli) -> App:
-    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
-    app: App = cli.kreator.kreate_app(appdef)
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    app: App = cli.kreator.kreate_app(konfig)
     app.kreate_files()
     return app
 
@@ -145,19 +145,19 @@ def files(cli: KoreCli) -> App:
 
 def view_strukture(cli: KoreCli):
     """show the application strukture"""
-    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
-    appdef.calc_strukture().pprint(field=cli.args.kind)
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig.calc_strukture().pprint(field=cli.args.kind)
 
 
 def view_defaults(cli: KoreCli):
     """show the application strukture defaults"""
-    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
-    appdef.calc_strukture().default.pprint(field=cli.args.kind)
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig.calc_strukture().default.pprint(field=cli.args.kind)
 
 def view_template(cli: KoreCli):
     """show the template for a specific kind"""
-    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
-    app: JinjaApp = cli.kreator._app_class()(appdef)
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    app: JinjaApp = cli.kreator._app_class()(konfig)
     kind = cli.args.kind
     if kind:
         if kind not in app.kind_templates or kind not in app.kind_classes:
@@ -177,8 +177,8 @@ def view_template(cli: KoreCli):
 
 def view_values(cli: KoreCli):
     """show the application values"""
-    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
-    for k,v in appdef.values.items():
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    for k,v in konfig.values.items():
         print(f"{k}: {v}")
 
 

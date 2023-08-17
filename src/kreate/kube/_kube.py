@@ -1,6 +1,6 @@
 import os
 import logging
-from ..kore import JinjaApp, App, AppDef, JinYamlKomponent
+from ..kore import JinjaApp, App, Konfig, JinYamlKomponent
 from ..krypt import _krypt
 from ..kore._jinyaml import FileLocation
 from . import templates
@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class KubeApp(JinjaApp):
-    def __init__(self, appdef: AppDef):
-        super().__init__(appdef)
+    def __init__(self, konfig: Konfig):
+        super().__init__(konfig)
         self.namespace = self.appname + "-" + self.env
         #self.target_dir = "./build/" + self.namespace
 
@@ -53,7 +53,7 @@ class Resource(JinYamlKomponent):
 
     @property
     def dirname(self):
-        return self.app.appdef.target_dir + "/resources"
+        return self.app.konfig.target_dir + "/resources"
 
     @property
     def filename(self):
@@ -83,7 +83,7 @@ class Resource(JinYamlKomponent):
         self.yaml.metadata.labels[name] = val
 
     def load_file(self, filename: str) -> str:
-        with open(f"{self.app.appdef.dir}/{filename}") as f:
+        with open(f"{self.app.konfig.dir}/{filename}") as f:
             return f.read()
 
 
@@ -125,7 +125,7 @@ class SecretBasicAuth(Resource):
     def users(self):
         result = []
         for usr in self.strukture.users:
-            entry = _krypt.dekrypt_str(self.app.appdef.secrets[usr])
+            entry = _krypt.dekrypt_str(self.app.konfig.secrets[usr])
             result.append(f"{usr}:{entry}")
         result.append("")  # for the final newline
         return "\n".join(result)
@@ -141,7 +141,7 @@ class ConfigMap(Resource):
 
     def add_var(self, name, value=None):
         if value is None:
-            value = self.app.appdef.values[name]
+            value = self.app.konfig.values[name]
         # We can not use self.yaml.data, since data is a field in UserDict
         self.yaml["data"][name] = value
 
@@ -178,17 +178,17 @@ class Ingress(Resource):
 # TODO: KubeConfig does not have an app to be added to
 # This needs all kinds of workarounds that might need some refactoring
 class KubeConfig(JinYamlKomponent):
-    def __init__(self, appdef: AppDef):
-        self.appdef = appdef
+    def __init__(self, konfig: Konfig):
+        self.konfig = konfig
         template_loc = FileLocation("kubeconfig.yaml", package=templates)
         super().__init__(None, "main", template=template_loc)
-        self.cluster_name = appdef.values.get(
+        self.cluster_name = konfig.values.get(
             "kubeconfig_cluster_name",
-            f"{appdef.env}-cluster")
-        self.cluster_user_name = appdef.values.get(
+            f"{konfig.env}-cluster")
+        self.cluster_user_name = konfig.values.get(
             "kubeconfig_cluster_user_name",
-            f"kreate-user-{appdef.env}")
-        self.context_name = appdef.env
+            f"kreate-user-{konfig.env}")
+        self.context_name = konfig.env
         # api_token should not be set in a file, just as environment variable
         token = os.getenv("KUBECONFIG_API_TOKEN")
         if not token:
@@ -198,9 +198,9 @@ class KubeConfig(JinYamlKomponent):
 
     def _template_vars(self):
         return {
-            "appdef": self.appdef,
+            "konfig": self.konfig,
             "my": self,
-            "val": self.appdef.values
+            "val": self.konfig.values
         }
 
     def calc_name(self):

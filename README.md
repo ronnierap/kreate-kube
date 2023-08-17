@@ -10,7 +10,7 @@ while also having flexibility to tweak each application.
 ## Example using application structure file
 Kreating resources is based on a application strukture definition file.
 Usually there are ate least 3 files needed for a setup:
-- `appdef.yaml`  ties all together
+- `konfig.yaml`  ties all together
 - `<app>-strukture.yaml`  describes the structure of all application components
 - `values-<app>-<env>.yaml`  contains specific values for a certain environment
 Note that these filename may be changed.
@@ -70,7 +70,7 @@ Service:
 ```
 Note: This shows only a small subset of possibilities of kreate-kube
 
-### appdef.yaml
+### konfig.yaml
 ```
 {% set appname = "cls" %} # reuse the appname in rest of this file
 {% set env = "acc" %} # reuse the appname in rest of this file
@@ -98,11 +98,11 @@ that can only be done in Python.
 ```
 #!/usr/bin/env python3
 
-from kreate.kore import AppDef, App
+from kreate.kore import Konfig, App
 from kreate.kube import KustApp, KubeKreator
 
-def kreate_app(appdef: AppDef) -> App:
-    app = KustApp(appdef)
+def kreate_app(konfig: Konfig) -> App:
+    app = KustApp(konfig)
     app.kreate_komponents_from_strukture()
     app.aktivate()
 

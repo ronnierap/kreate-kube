@@ -2,9 +2,9 @@ import sys
 import logging
 import jinja2.filters
 
-from ..kore import KoreCli, KoreKreator,  AppDef
+from ..kore import KoreCli, KoreKreator,  Konfig
 from ..kore._korecli import argument as argument
-from ..kore._appdef import b64encode
+from ..kore._konfig import b64encode
 from . import _krypt
 
 logger = logging.getLogger(__name__)
@@ -14,10 +14,10 @@ class KryptKreator(KoreKreator):
     def kreate_cli(self):
         return KryptCli(self)
 
-    def tune_appdef(self, appdef: AppDef):
-        appdef.values["dekrypt"] = _krypt.dekrypt_str
+    def tune_konfig(self, konfig: Konfig):
+        konfig.values["dekrypt"] = _krypt.dekrypt_str
         _krypt._krypt_key = b64encode(
-            appdef.yaml.get(
+            konfig.yaml.get(
                 "krypt_key",
                 "no-krypt-key-defined"))
 
@@ -48,16 +48,16 @@ class KryptCli(KoreCli):
 
 def dekyaml(cli):
     """dekrypt values in a yaml file"""
-    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
 
     filename = (cli.args.file or
-                f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml")
+                f"{konfig.dir}/secrets-{konfig.name}-{konfig.env}.yaml")
     _krypt.dekrypt_yaml(filename, ".")
 
 
 def dekstr(cli):
     """dekrypt string value"""
-    cli.kreator.kreate_appdef(cli.args.appdef)
+    cli.kreator.kreate_konfig(cli.args.konfig)
     value = cli.args.str
     if not value:
         if not cli.args.quiet:
@@ -68,29 +68,29 @@ def dekstr(cli):
 
 def dekfile(cli):
     "dekrypt an entire file"
-    cli.kreator.kreate_appdef(cli.args.appdef)
+    cli.kreator.kreate_konfig(cli.args.konfig)
     filename = cli.args.file
     _krypt.dekrypt_file(filename)
 
 
 def enkyaml(cli):
     "enkrypt values in a yaml file"
-    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     filename = (cli.args.file
-                or f"{appdef.dir}/secrets-{appdef.name}-{appdef.env}.yaml")
+                or f"{konfig.dir}/secrets-{konfig.name}-{konfig.env}.yaml")
     _krypt.enkrypt_yaml(filename, ".")
 
 
 def enkfile(cli):
     "enkrypt an entire file"
-    cli.kreator.kreate_appdef(cli.args.appdef)
+    cli.kreator.kreate_konfig(cli.args.konfig)
     filename = cli.args.file
     _krypt.enkrypt_file(filename)
 
 
 def enkstr(cli):
     """enkrypt string value"""
-    cli.kreator.kreate_appdef(cli.args.appdef)
+    cli.kreator.kreate_konfig(cli.args.konfig)
     value = cli.args.str
     if not value:
         if not cli.args.quiet:

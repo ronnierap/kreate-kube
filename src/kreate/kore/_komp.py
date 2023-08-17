@@ -118,7 +118,7 @@ class Komponent:
 
     @property
     def dirname(self):
-        return self.app.appdef.target_dir
+        return self.app.konfig.target_dir
 
     @property
     def filename(self):
@@ -157,8 +157,8 @@ class JinjaKomponent(Komponent):
             "default": self.strukture.default,
             "app": self.app,
             "my": self,
-            "val": self.app.appdef.values,
-            "secret": self.app.appdef.secrets,
+            "val": self.app.konfig.values,
+            "secret": self.app.konfig.secrets,
         }
 
 
