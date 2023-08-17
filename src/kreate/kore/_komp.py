@@ -157,7 +157,8 @@ class JinjaKomponent(Komponent):
             "default": self.strukture.default,
             "app": self.app,
             "my": self,
-            "val": self.app.values
+            "val": self.app.appdef.values,
+            "secret": self.app.appdef.secrets,
         }
 
 

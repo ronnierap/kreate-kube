@@ -1,20 +1,26 @@
 {% set appname = "demo" %} # reuse the appname in rest of this file
 {% set env = "dev" %} # reuse the appname in rest of this file
 values:
-  appname: {{ appname }}
-  env: {{ env }}
-  team: myteam
-  project: kreate-demo
-  image_version: v1.3.4
-
+  vars:
+    appname: {{ appname }}
+    env: {{ env }}
+    team: myteam
+    project: kreate-demo
+    image_version: v1.3.4
+  files:
+    - shared-values.yaml
+    - values-{{appname}}-{{env}}.yaml
+secrets:
+  files:
+    - secrets-{{appname}}-{{env}}.yaml
+files:
+  - TODO
+secret_files:
+  - TODO
 # key the enkryption key for the DEV environment
 krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
 
-value_files:
-  - shared-values.yaml
-  - values-{{appname}}-{{env}}.yaml
-  - secrets-{{appname}}-{{env}}.yaml
-strukture_files:
+strukture:
   - {{appname}}-strukture.yaml
   - override-{{appname}}-{{env}}.yaml
 templates:
