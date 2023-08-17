@@ -55,8 +55,8 @@ Secret:
   main:
     name: demo-secrets
     vars:
-      DB_PSW: {{ val.DB_PSW | dekrypt() }}
-      DB_USR: {{ val.DB_USR }}
+      DB_PSW: {{ secret.DB_PSW | dekrypt() }}
+      DB_USR: {{ secret.DB_USR }}
 
 SecretBasicAuth:
   basic-auth:
@@ -72,17 +72,21 @@ Note: This shows only a small subset of possibilities of kreate-kube
 
 ### konfig.yaml
 ```
-{% set appname = "cls" %} # reuse the appname in rest of this file
-{% set env = "acc" %} # reuse the appname in rest of this file
+{% set appname = "demo" %} # reuse the appname in rest of this file
+{% set env = "acc" %}      # reuse the env in rest of this file
 values:
-  appname: {{ appname }}
-  env: {{ env }}
-  team: knights
-  project: kreate-kube-demo
-  image_version: 2.0.2
+  vars:
+    appname: {{ appname }}
+    env: {{ env }}
+    team: knights
+    project: kreate-kube-demo
+    image_version: 2.0.2
+  files:
+    - values-{{appname}}-{{env}}.yaml
+secrets:
+  files:
+    - secrets-{{appname}}-{{env}}.yaml
 
-value_files:
-  - values-{{appname}}-{{env}}.yaml
 strukture_files:
   - py:kreate.kube.templates:default-values.yaml
   - {{appname}}-strukture.yaml
