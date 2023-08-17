@@ -5,14 +5,11 @@ After this you can finetune them further in python.
 In general it is preferred to not use a script but use `python3 -m kreate`
 """
 
-from kreate.kore import AppDef, App
-from kreate.kube import KustApp, KubeKreator
+from kreate.kore import App
+from kreate.kube import  KubeKreator
 
-def kreate_app(appdef: AppDef) -> App:
-    app = KustApp(appdef)
-    app.kreate_komponents_from_strukture()
-    app.aktivate()
+def tune_app(app: App) -> None:
     app.depl.main.label("this-is-added","by-script")
-    return app
 
-KubeKreator(kreate_app).kreate_cli().run()
+
+KubeKreator(tune_app).kreate_cli().run()

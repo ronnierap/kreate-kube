@@ -6,6 +6,8 @@ from sys import exc_info
 
 from . import _jinyaml
 from ._app import App, AppDef
+from ._jinja_app import JinjaApp
+from ._jinyaml import load_data
 from ._appdef import b64encode
 import importlib.metadata
 
@@ -13,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 class KoreKreator:
-    def __init__(self, kreate_app_func=None) -> None:
+    def __init__(self, tune_app_func=None, kreate_app_func=None) -> None:
+        self.tune_app_func = tune_app_func
         self.kreate_app_func = kreate_app_func
 
     def kreate_cli(self):
@@ -37,6 +40,8 @@ class KoreKreator:
         app = self._app_class()(appdef)
         app.kreate_komponents_from_strukture()
         app.aktivate()
+        if self.tune_app_func:
+            self.tune_app_func(app)
         return app
 
 
@@ -65,6 +70,9 @@ class KoreCli:
         )
         self.add_subcommand(files, [], aliases=["f"])
         self.add_subcommand(view_strukture, [], aliases=["vs"])
+        self.add_subcommand(view_defaults, [], aliases=["vd"])
+        self.add_subcommand(view_values, [], aliases=["vv"])
+        self.add_subcommand(view_template, [], aliases=["vt"])
         self.add_subcommand(view_version, [], aliases=["version"])
 
     def dist_package_version(self, package_name: str):
@@ -139,6 +147,39 @@ def view_strukture(cli: KoreCli):
     """show the application strukture"""
     appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
     appdef.calc_strukture().pprint(field=cli.args.kind)
+
+
+def view_defaults(cli: KoreCli):
+    """show the application strukture defaults"""
+    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
+    appdef.calc_strukture().default.pprint(field=cli.args.kind)
+
+def view_template(cli: KoreCli):
+    """show the template for a specific kind"""
+    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
+    app: JinjaApp = cli.kreator.kreate_bare_app(appdef)
+    kind = cli.args.kind
+    if kind:
+        if kind not in app.kind_templates or kind not in app.kind_classes:
+            logger.warn(f"Unknown template kind {kind}")
+            return
+        if not cli.args.quiet:
+            print(f"{app.kind_classes[kind].__name__}: {app.kind_templates[kind]}")
+            print("==========================")
+        print(load_data(app.kind_templates[kind]))
+    else:
+        for kind in app.kind_templates:
+            if kind in app.kind_templates and kind in app.kind_classes:
+                print(f"{app.kind_classes[kind].__name__}: {app.kind_templates[kind]}")
+            else:
+                logger.debug("skipping kind")
+
+
+def view_values(cli: KoreCli):
+    """show the application values"""
+    appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
+    for k,v in appdef.values.items():
+        print(f"{k}: {v}")
 
 
 def view_version(cli: KoreCli):
