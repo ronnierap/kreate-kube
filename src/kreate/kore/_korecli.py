@@ -124,11 +124,11 @@ class KoreCli:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)
         elif args.warn:
-            logging.basicConfig(level=logging.WARN)
+            logging.basicConfig(format='%(message)s', level=logging.WARN)
         elif args.quiet:
-            logging.basicConfig(level=logging.ERROR)
+            logging.basicConfig(format='%(message)s', level=logging.ERROR)
         else:
-            logging.basicConfig(level=logging.INFO)
+            logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 
 def kreate_files(cli: KoreCli) -> App:

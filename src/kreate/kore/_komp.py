@@ -73,7 +73,7 @@ class Komponent:
         if typename in strukt and self.shortname in strukt[typename]:
             logger.debug(f"using named strukture {typename}.{self.shortname}")
             return self.app.strukture[typename][self.shortname]
-        logger.info(
+        logger.debug(
             f"could not find strukture for {typename}.{self.shortname}")
         return {}
 
