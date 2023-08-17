@@ -157,7 +157,7 @@ def view_defaults(cli: KoreCli):
 def view_template(cli: KoreCli):
     """show the template for a specific kind"""
     appdef: AppDef = cli.kreator.kreate_appdef(cli.args.appdef)
-    app: JinjaApp = cli.kreator.kreate_bare_app(appdef)
+    app: JinjaApp = cli.kreator._app_class()(appdef)
     kind = cli.args.kind
     if kind:
         if kind not in app.kind_templates or kind not in app.kind_classes:
