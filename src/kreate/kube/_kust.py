@@ -90,7 +90,7 @@ class Patch(JinYamlKomponent):
 
     @property
     def dirname(self):
-        return self.app.target_dir + "/patches"
+        return self.app.appdef.target_dir + "/patches"
 
     @property
     def filename(self):

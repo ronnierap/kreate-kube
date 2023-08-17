@@ -36,7 +36,7 @@ class KubeCli(KryptCli):
 def build(args):
     """output all the resources"""
     app = kreate_files(args)
-    cmd = f"kustomize build {app.target_dir}"
+    cmd = f"kustomize build {app.appdef.target_dir}"
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
@@ -44,7 +44,7 @@ def build(args):
 def diff(args):
     """diff with current existing resources"""
     app = kreate_files(args)
-    cmd = (f"kustomize build {app.target_dir} "
+    cmd = (f"kustomize build {app.appdef.target_dir} "
            f"| kubectl --context={app.env} -n {app.namespace} diff -f - ")
     logger.info(f"running: {cmd}")
     os.system(cmd)
@@ -53,7 +53,7 @@ def diff(args):
 def apply(args):
     """apply the output to kubernetes"""
     app = kreate_files(args)
-    cmd = f"kustomize build {app.target_dir} | kubectl apply --dry-run -f - "
+    cmd = f"kustomize build {app.appdef.target_dir} | kubectl apply --dry-run -f - "
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
@@ -62,7 +62,7 @@ def test(args):
     """test output against test.out file"""
     _krypt._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
     app = kreate_files(args)
-    cmd = (f"kustomize build {app.target_dir} | diff "
+    cmd = (f"kustomize build {app.appdef.target_dir} | diff "
            f"{app.appdef.dir}/expected-output-{app.appname}-{app.env}.out -")
     logger.info(f"running: {cmd}")
     os.system(cmd)
@@ -72,7 +72,7 @@ def testupdate(args):
     """update test.out file"""
     _krypt._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
     app = kreate_files(args)
-    cmd = (f"kustomize build {app.target_dir} "
+    cmd = (f"kustomize build {app.appdef.target_dir} "
            f"> {app.appdef.dir}/expected-output-{app.appname}-{app.env}.out")
     logger.info(f"running: {cmd}")
     os.system(cmd)

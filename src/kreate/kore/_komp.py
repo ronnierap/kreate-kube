@@ -118,7 +118,7 @@ class Komponent:
 
     @property
     def dirname(self):
-        return self.app.target_dir
+        return self.app.appdef.target_dir
 
     @property
     def filename(self):

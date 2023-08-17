@@ -14,9 +14,15 @@ secrets:
   files:
     - secrets-{{appname}}-{{env}}.yaml
 files:
-  - TODO
+  - name: application.properties
+    template: True
+  - name: environment.properties
+  - name: default-values.yaml
+    from: py:kreate.kube.templates:default-values.yaml
 secret_files:
-  - TODO
+  - name: credential.properties
+    dekrypt: False
+
 # key the enkryption key for the DEV environment
 krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
 

@@ -12,7 +12,7 @@ class KubeApp(JinjaApp):
     def __init__(self, appdef: AppDef):
         super().__init__(appdef)
         self.namespace = self.appname + "-" + self.env
-        self.target_dir = "./build/" + self.namespace
+        #self.target_dir = "./build/" + self.namespace
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
@@ -53,7 +53,7 @@ class Resource(JinYamlKomponent):
 
     @property
     def dirname(self):
-        return self.app.target_dir + "/resources"
+        return self.app.appdef.target_dir + "/resources"
 
     @property
     def filename(self):
