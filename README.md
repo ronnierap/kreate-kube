@@ -88,7 +88,6 @@ secrets:
     - secrets-{{appname}}-{{env}}.yaml
 
 strukture_files:
-  - py:kreate.kube.templates:default-values.yaml
   - {{appname}}-strukture.yaml
 ```
 
