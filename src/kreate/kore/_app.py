@@ -13,7 +13,6 @@ class App():
         self.appname = appdef.appname
         self.env = appdef.env
         self.appdef = appdef
-        self.values = appdef.values
         self.komponents = []
         self._kinds = {}
         self.aliases = {}

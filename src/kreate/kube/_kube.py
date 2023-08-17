@@ -141,7 +141,7 @@ class ConfigMap(Resource):
 
     def add_var(self, name, value=None):
         if value is None:
-            value = self.app.values[name]
+            value = self.app.appdef.values[name]
         # We can not use self.yaml.data, since data is a field in UserDict
         self.yaml["data"][name] = value
 
