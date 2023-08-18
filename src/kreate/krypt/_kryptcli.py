@@ -2,8 +2,6 @@ import sys
 import logging
 import jinja2.filters
 
-from kreate.kore._app import Konfig
-
 from ..kore import KoreCli, KoreKreator,  Konfig
 from ..kore._korecli import argument as argument
 from . import KryptKonfig

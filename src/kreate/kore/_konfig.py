@@ -40,7 +40,8 @@ class Konfig():
         self._default_strukture_files = []
         self.dekrypt_func = None
         self._add_jinja_filter("b64encode",  b64encode)
-        self.yaml = load_jinyaml(FileLocation(self.filename, dir="."), {"function": self.functions})
+        self.yaml = load_jinyaml(FileLocation(self.filename, dir="."),
+                                 {"function": self.functions})
         self.values.update(self.yaml.get("values", {}).get("vars", {}))
         self.appname = self.values["appname"]
         self.env = self.values["env"]
@@ -50,7 +51,6 @@ class Konfig():
 
     def _add_jinja_filter(self, name, func):
         filters.FILTERS[name] = func
-
 
     def load(self):
         self._load_files("values", self.values)
@@ -78,7 +78,6 @@ class Konfig():
         result = []
         files = self._default_strukture_files
         files.extend(self.yaml.get("strukture", []))
-        #files.extend(post_files or [])
         for fname in files:
             result.append(self._load_strukture_file(fname))
         return result
@@ -98,7 +97,7 @@ class Konfig():
             self._strukt_cache = DeepChain(*reversed(dicts))
         return self._strukt_cache
 
-    def kopy_files(self, key, target_subdir, dekrypt_default=False ):
+    def kopy_files(self, key, target_subdir, dekrypt_default=False):
         file_list = self.yaml.get(key, [])
         if not file_list:
             return
@@ -107,8 +106,10 @@ class Konfig():
             dekrypt = file.get("dekrypt", dekrypt_default)
             name = file.get("name", None)
             if not name:
-                raise ValueError(f"file in konfig {key} should have name {file}")
-            from_ = file.get("from", f"{key}/{name}" +(".encrypted" if dekrypt else f""))
+                raise ValueError(f"file in konfig {key}"
+                                 f"should have name {file}")
+            from_ = file.get("from", f"{key}/{name}"
+                             + (".encrypted" if dekrypt else ""))
             template = file.get("template", False)
             loc = FileLocation(from_, dir=self.dir)
             if template:

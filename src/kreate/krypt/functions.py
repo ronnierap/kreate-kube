@@ -1,11 +1,13 @@
+from ruamel.yaml import YAML
 from cryptography.fernet import Fernet
 import logging
 
-
 logger = logging.getLogger(__name__)
+
 
 _krypt_key = None
 _dekrypt_testdummy = False
+
 
 def dekrypt_str(value):
     fernet = Fernet(_krypt_key)
@@ -38,8 +40,6 @@ def enkrypt_file(filename):
     with open(filename + ".encrypted", "wb") as f:
         part = b'\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa'
         f.write(fernet._encrypt_from_parts(data.encode("ascii"), 0, part))
-
-
 
 
 def change_yaml_comments(filename: str, func,

@@ -58,8 +58,9 @@ class App():
             komp.aktivate()
 
     def kreate_files(self):
-        if os.path.exists(self.konfig.target_dir) and os.path.isdir(self.konfig.target_dir):
-            shutil.rmtree(self.konfig.target_dir)
+        target_dir = self.konfig.target_dir
+        if os.path.exists(target_dir) and os.path.isdir(target_dir):
+            shutil.rmtree(target_dir)
         os.makedirs(self.konfig.target_dir, exist_ok=True)
 
         for komp in self.komponents:

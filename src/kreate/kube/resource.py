@@ -14,8 +14,8 @@ __all__ = [
     "Ingress",
     "Service",
     "Egress",
-    "KustApp",
 ]
+
 
 class Resource(JinYamlKomponent):
     def aktivate(self):

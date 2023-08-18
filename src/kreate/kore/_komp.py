@@ -22,7 +22,6 @@ class Komponent:
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         self.strukture = self._calc_strukture(kwargs)
-        #print(0, self.strukture)
         self.skip = self.strukture.get("ignore", False)
         name = self.strukture.get("name", None) or self.calc_name()
         self.name = name.lower()

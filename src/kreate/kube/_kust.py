@@ -1,6 +1,6 @@
 import logging
 
-from ..kore import  Konfig
+from ..kore import Konfig
 from ..kore import JinYamlKomponent
 from .resource import Resource
 from . import KubeApp
@@ -33,8 +33,8 @@ class KustApp(KubeApp):
             package=patch_templates)
 
     def register_patch_file(self,
-            kind: str = None,
-            aliases=None) -> None:
+                            kind: str = None,
+                            aliases=None) -> None:
         super().register_template_file(
             kind=kind,
             cls=Patch,
@@ -65,7 +65,7 @@ class KustApp(KubeApp):
             for kind in sorted(res.strukture.patches.keys()):
                 subpatches = res.strukture.patches[kind]
                 if not subpatches.keys():
-                    subpatches={ "main": {} }
+                    subpatches = {"main": {}}
                 # use sorted because some patches, e.g. the MountVolumes
                 # result in a list, were the order can be unpredictable
                 for shortname in sorted(subpatches.keys()):

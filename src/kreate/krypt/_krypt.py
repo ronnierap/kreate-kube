@@ -1,4 +1,3 @@
-from ruamel.yaml import YAML
 import logging
 
 from ..kore import Konfig, App
@@ -8,12 +7,13 @@ from . import functions
 
 logger = logging.getLogger(__name__)
 
+
 class KryptKonfig(Konfig):
     def __init__(self, filename: str = None):
         super().__init__(filename=filename)
         self.functions.update({"dekrypt": functions.dekrypt_str})
-        krypt_key = self.yaml.get("krypt_key","no-krypt-key-defined")
-        functions._krypt_key = b64encode(krypt_key)  # TODOL why encode not decode?
+        krypt_key = self.yaml.get("krypt_key", "no-krypt-key-defined")
+        functions._krypt_key = b64encode(krypt_key)
 
 
 class KryptApp(App):

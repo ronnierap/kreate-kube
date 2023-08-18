@@ -19,7 +19,8 @@ class KubeKreator(krypt.KryptKreator):
 
     def tune_konfig(self, konfig: Konfig):
         super().tune_konfig(konfig)
-        konfig._default_strukture_files.append("py:kreate.kube.other_templates:default-values.yaml")
+        konfig._default_strukture_files.append(
+            "py:kreate.kube.other_templates:default-values.yaml")
 
     def kreate_app(self, konfig: Konfig) -> KustApp:
         app = KustApp(konfig)
@@ -58,14 +59,16 @@ def diff(args):
 def apply(args):
     """apply the output to kubernetes"""
     app = kreate_files(args)
-    cmd = f"kustomize build {app.konfig.target_dir} | kubectl apply --dry-run -f - "
+    cmd = (f"kustomize build {app.konfig.target_dir} "
+           f"| kubectl apply --dry-run -f - ")
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
 
 def test(args):
     """test output against test.out file"""
-    krypt_functions._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
+    # Do not dekrypt secrets for testing
+    krypt_functions._dekrypt_testdummy = True
     app = kreate_files(args)
     cmd = (f"kustomize build {app.konfig.target_dir} | diff "
            f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out -")
@@ -75,16 +78,18 @@ def test(args):
 
 def testupdate(args):
     """update test.out file"""
-    krypt_functions._dekrypt_testdummy = True  # Do not dekrypt secrets for testing
+    # Do not dekrypt secrets for testing
+    krypt_functions._dekrypt_testdummy = True
     app = kreate_files(args)
     cmd = (f"kustomize build {app.konfig.target_dir} "
            f"> {app.konfig.dir}/expected-output-{app.appname}-{app.env}.out")
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
+
 def kubeconfig(cli: KubeCli):
     # TODO: we only need a Dummy app
     konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     kubeconfig = KubeConfig(konfig)
-    #kubeconfig.aktivate() not needed?
+    # kubeconfig.aktivate() not needed?
     kubeconfig.kreate_file()

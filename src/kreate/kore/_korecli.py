@@ -13,13 +13,12 @@ import importlib.metadata
 logger = logging.getLogger(__name__)
 
 
-
-
 def argument(*name_or_flags, **kwargs):
     """Convenience function to properly format arguments to pass to the
     subcommand decorator.
     """
     return (list(name_or_flags), kwargs)
+
 
 class KoreKreator:
     def kreate_konfig(self, filename):
@@ -39,6 +38,7 @@ class KoreKreator:
         app.kreate_komponents_from_strukture()
         app.aktivate()
         pass
+
 
 class KoreCli:
     def __init__(self, kreator: KoreKreator):
@@ -142,6 +142,7 @@ def view_defaults(cli: KoreCli):
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     konfig.calc_strukture().default.pprint(field=cli.args.kind)
 
+
 def view_template(cli: KoreCli):
     """show the template for a specific kind"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
@@ -152,13 +153,15 @@ def view_template(cli: KoreCli):
             logger.warn(f"Unknown template kind {kind}")
             return
         if not cli.args.quiet:
-            print(f"{app.kind_classes[kind].__name__}: {app.kind_templates[kind]}")
+            print(f"{app.kind_classes[kind].__name__}: "
+                  f"{app.kind_templates[kind]}")
             print("==========================")
         print(load_data(app.kind_templates[kind]))
     else:
         for kind in app.kind_templates:
             if kind in app.kind_templates and kind in app.kind_classes:
-                print(f"{app.kind_classes[kind].__name__}: {app.kind_templates[kind]}")
+                print(f"{app.kind_classes[kind].__name__}: "
+                      f"{app.kind_templates[kind]}")
             else:
                 logger.debug("skipping kind")
 
@@ -166,7 +169,7 @@ def view_template(cli: KoreCli):
 def view_values(cli: KoreCli):
     """show the application values"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    for k,v in konfig.values.items():
+    for k, v in konfig.values.items():
         print(f"{k}: {v}")
 
 

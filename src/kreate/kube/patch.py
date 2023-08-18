@@ -13,6 +13,7 @@ __all__ = [
     "AddEgressLabelsPatch",
 ]
 
+
 class Patch(JinYamlKomponent):
     def __init__(
             self,
@@ -39,7 +40,8 @@ class Patch(JinYamlKomponent):
 
     @property
     def filename(self):
-        return f"{self.target.kind}-{self.target.shortname}-{self.kind}-{self.shortname}.yaml"
+        return (f"{self.target.kind}-{self.target.shortname}"
+                f"-{self.kind}-{self.shortname}.yaml")
 
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}

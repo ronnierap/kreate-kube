@@ -12,7 +12,6 @@ class KubeApp(JinjaApp):
     def __init__(self, konfig: Konfig):
         super().__init__(konfig)
         self.namespace = self.appname + "-" + self.env
-        #self.target_dir = "./build/" + self.namespace
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
@@ -39,15 +38,14 @@ class KubeApp(JinjaApp):
             package=resource_templates)
 
     def register_resource_file(self,
-            cls: str,
-            filename: str = None,
-            aliases=None) -> None:
+                               cls: str,
+                               filename: str = None,
+                               aliases=None) -> None:
         super().register_template_file(
             cls,
             filename=filename,
             aliases=aliases,
             package=resource_templates)
-
 
     def _default_template_class(self):
         return resource.Resource
@@ -55,8 +53,6 @@ class KubeApp(JinjaApp):
 
 class KubeKonfig(KryptKonfig):
     pass
-    #def __init__(self, filename: str = None):
-    #    super().__init__(filename=filename)
 
 
 # TODO: KubeConfig does not have an app to be added to

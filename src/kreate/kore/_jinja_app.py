@@ -23,7 +23,6 @@ class JinjaApp(App):
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ, cls=cls)
 
-
     def register_template(self, kind: str, cls=None,
                           filename=None, aliases=None, package=None):
         if kind in self.kind_templates:
