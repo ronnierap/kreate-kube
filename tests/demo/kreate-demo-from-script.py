@@ -9,21 +9,22 @@ In general it is preferred to kreate all komponents from the strukture.
 from kreate.kore import Konfig
 from kreate.kore._app import App
 import kreate.kube
+import kreate.kube.resource
 
 
 def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
     app = kreate.kube.KustApp(konfig)
-    kreate.kube.Ingress(app, "root")
-    kreate.kube.Ingress(app, "api")
+    kreate.kube.resource.Ingress(app, "root")
+    kreate.kube.resource.Ingress(app, "api")
 
-    kreate.kube.Egress(app, "db")
-    kreate.kube.Egress(app, "redis")
-    kreate.kube.Egress(app, "xyz")
+    kreate.kube.resource.Egress(app, "db")
+    kreate.kube.resource.Egress(app, "redis")
+    kreate.kube.resource.Egress(app, "xyz")
 
-    depl=kreate.kube.Deployment(app)
-    kreate.kube.Service(app)
-    kreate.kube.Service(app, "https")
-    pdb = kreate.kube.PodDisruptionBudget(app, name="demo-pdb")
+    depl=kreate.kube.resource.Deployment(app)
+    kreate.kube.resource.Service(app)
+    kreate.kube.resource.Service(app, "https")
+    pdb = kreate.kube.resource.PodDisruptionBudget(app, name="demo-pdb")
     kreate.kube.Kustomization(app)
     app.kreate_komponent("Secret", "main")
     app.kreate_komponent("ServiceAccount")

@@ -18,7 +18,7 @@ files:
     template: True
   - name: environment.properties
   - name: default-values.yaml
-    from: py:kreate.kube.templates:default-values.yaml
+    from: py:kreate.kube.other_templates:default-values.yaml
 secret_files:
   - name: credential.properties
     dekrypt: False

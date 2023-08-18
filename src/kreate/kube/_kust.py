@@ -1,11 +1,13 @@
 import logging
 
-from ..kore import FileLocation, Konfig
-from ..kore import DeepChain
+from ..kore import  Konfig
 from ..kore import JinYamlKomponent
-from ._kube import KubeApp, Resource, Egress
-from . import templates
-from .templates import patches
+from .resource import Resource
+from . import KubeApp
+from . import other_templates
+from . import patch_templates
+from .patch import AddEgressLabelsPatch
+from .patch import Patch
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +19,27 @@ class KustApp(KubeApp):
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
-        self.register_template_class(Kustomization, package=templates)
-        self.register_template_class(AddEgressLabelsPatch, package=patches)
-        self.register_template_file("AntiAffinityPatch", cls=Patch, package=patches)
-        self.register_template_file("HttpProbesPatch", cls=Patch, package=patches)
-        self.register_template_file("MountVolumeFiles", cls=Patch, package=patches)
+        self.register_template_class(Kustomization, package=other_templates)
+        self.register_patch_class(AddEgressLabelsPatch)
+        self.register_patch_file("AntiAffinityPatch")
+        self.register_patch_file("HttpProbesPatch")
+        self.register_patch_file("MountVolumeFiles")
+
+    def register_patch_class(self: str, cls: str, aliases=None) -> None:
+        super().register_template_class(
+            cls,
+            filename=None,
+            aliases=aliases,
+            package=patch_templates)
+
+    def register_patch_file(self,
+            kind: str = None,
+            aliases=None) -> None:
+        super().register_template_file(
+            kind=kind,
+            cls=Patch,
+            aliases=aliases,
+            package=patch_templates)
 
     def kreate_komponents_from_strukture(self):
         super().kreate_komponents_from_strukture()
@@ -66,54 +84,3 @@ class Kustomization(JinYamlKomponent):
     @property
     def filename(self):
         return "kustomization.yaml"
-
-
-class Patch(JinYamlKomponent):
-    def __init__(
-            self,
-            target: Resource,
-            shortname: str = None,
-            kind: str = None,
-            template: FileLocation = None,
-            **kwargs):
-        self.target = target
-        super().__init__(
-            target.app,
-            shortname=shortname,
-            kind=kind,
-            template=template,
-            **kwargs)
-
-    def __str__(self):
-        return (f"<Patch {self.target.kind}.{self.target.shortname}"
-                f":{self.kind}.{self.shortname}>")
-
-    @property
-    def dirname(self):
-        return self.app.konfig.target_dir + "/patches"
-
-    @property
-    def filename(self):
-        return f"{self.target.kind}-{self.target.shortname}-{self.kind}-{self.shortname}.yaml"
-
-    def _template_vars(self):
-        return {**super()._template_vars(), "target": self.target}
-
-    def _find_strukture(self):
-        root_strukture = super()._find_strukture()
-        typename = self.kind
-        tar_struk = self.target.strukture.get("patches", {})
-        if typename in tar_struk and self.shortname in tar_struk[typename]:
-            logger.debug(
-                f"using embedded strukture {typename}.{self.shortname}"
-                f" from {self.target.kind}.{self.target.shortname}")
-            # The embedded_strukture is first,
-            # since the root_strukture will contain all default values
-            embedded_strukture = tar_struk[typename][self.shortname]
-            return DeepChain(embedded_strukture, root_strukture)
-        return root_strukture
-
-
-class AddEgressLabelsPatch(Patch):
-    def egresses(self):
-        return [k for k in self.app.komponents if isinstance(k, Egress)]

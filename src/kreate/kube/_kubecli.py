@@ -18,7 +18,7 @@ class KubeKreator(KryptKreator):
 
     def tune_konfig(self, konfig: Konfig):
         super().tune_konfig(konfig)
-        konfig._default_strukture_files.append("py:kreate.kube.templates:default-values.yaml")
+        konfig._default_strukture_files.append("py:kreate.kube.other_templates:default-values.yaml")
 
     def kreate_app(self, konfig: Konfig) -> KustApp:
         app = KustApp(konfig)
