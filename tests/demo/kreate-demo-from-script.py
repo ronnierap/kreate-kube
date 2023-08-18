@@ -27,6 +27,7 @@ def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
     pdb = kreate.kube.resource.PodDisruptionBudget(app, name="demo-pdb")
     kreate.kube.Kustomization(app)
     app.kreate_komponent("Secret", "main")
+    app.kreate_komponent("Secret", "secret-files")
     app.kreate_komponent("ServiceAccount")
     app.kreate_komponent("ServiceMonitor")
     app.kreate_komponent("HorizontalPodAutoscaler")

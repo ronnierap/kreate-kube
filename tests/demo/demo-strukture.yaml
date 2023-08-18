@@ -139,6 +139,9 @@ Secret:
     vars:
       DB_USR: {{ secret.DB_USR }}
       DB_PSW: {{ secret.DB_PSW | dekrypt }}
+  secret-files:
+    files:
+    - secrets/files/credential.properties
 
 Service:
   main:

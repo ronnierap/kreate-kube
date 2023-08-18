@@ -92,6 +92,15 @@ class Egress(Resource):
         return f"{self.app.appname}-egress-to-{self.shortname}"
 
 class Secret(Resource):
+    def load_some_file(self, filename: str) -> str:
+        with open(f"{self.app.konfig.target_dir}/{filename}") as f:
+            return f.read()
+
+    def calc_name(self):
+        if self.shortname == "main":
+            return f"{self.app.appname}-secrets"
+        return f"{self.app.appname}-{self.shortname}"
+
     @property
     def dirname(self):
         return "secrets"
@@ -114,9 +123,9 @@ class ConfigMap(Resource):
     def calc_name(self):
         return f"{self.app.appname}-{self.shortname}"
 
-    @property
-    def filename(self) -> str:
-        return super().filename
+    #@property
+    #def filename(self) -> str:
+    #    return super().filename
 
     def add_var(self, name, value=None):
         if value is None:

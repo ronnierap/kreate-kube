@@ -126,13 +126,47 @@ metadata:
 ---
 apiVersion: v1
 data:
+  credential.properties: dGVzdGR1bW15LUtJN2JSN3Jf
+kind: Secret
+metadata:
+  labels:
+    secret: demo-secret-files
+  name: demo-secret-files
+  namespace: demo-dev
+type: Opaque
+---
+apiVersion: v1
+data:
+  credential.properties: dGVzdGR1bW15LUtJN2JSN3Jf
+kind: Secret
+metadata:
+  labels:
+    secret: demo-secret-files-from-kustomize
+  name: demo-secret-files-from-kustomize-5h8h7b7d2b
+  namespace: demo-dev
+type: Opaque
+---
+apiVersion: v1
+data:
   DB_PSW: dGVzdGR1bW15LXV3SXY3ZkJ6
   DB_USR: ZGJ1c3JkZXY=
 kind: Secret
 metadata:
   labels:
-    secret: demo-secret
-  name: demo-secret
+    secret: demo-secrets
+  name: demo-secrets
+  namespace: demo-dev
+type: Opaque
+---
+apiVersion: v1
+data:
+  DB_PSW: dGVzdGR1bW15LXV3SXY3ZkJ6
+  DB_USR: ZGJ1c3JkZXY=
+kind: Secret
+metadata:
+  labels:
+    secret: demo-secrets-from-kustomize
+  name: demo-secrets-from-kustomize-2dt975665m
   namespace: demo-dev
 type: Opaque
 ---

@@ -34,7 +34,7 @@ secretGenerator:
 - name: {{ cm }}
   options:
     labels:
-      config-map: {{ cm }}
+      secret: {{ cm }}
   literals:
     {% for varname in strukt.secrets[cm].get("vars",{}).keys() %}
      - {{ varname }}={{ strukt.secrets[cm].vars[varname ] }}
