@@ -8,7 +8,6 @@ from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp
 from ._jinyaml import load_data
-from ._konfig import b64encode
 import importlib.metadata
 
 logger = logging.getLogger(__name__)
