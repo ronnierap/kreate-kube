@@ -28,3 +28,19 @@ configMapGenerator:
      - {{ filename }}
     {% endfor %}
 {% endfor %}
+
+secretGenerator:
+{% for cm in strukt.get("secrets",{}).keys()  %}
+- name: {{ cm }}
+  options:
+    labels:
+      config-map: {{ cm }}
+  literals:
+    {% for varname in strukt.secrets[cm].get("vars",{}).keys() %}
+     - {{ varname }}={{ strukt.secrets[cm].vars[varname ] }}
+    {% endfor %}
+  files:
+    {% for filename in strukt.secrets[cm].get("files",[]) %}
+     - {{ filename }}
+    {% endfor %}
+{% endfor %}

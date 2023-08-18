@@ -115,6 +115,14 @@ Kustomization:
       demo-extra-files:
         files:
           - files/environment.properties
+    secrets:
+      demo-secrets-from-kustomize:
+        vars:
+          DB_USR: {{ secret.DB_USR }}
+          DB_PSW: {{ secret.DB_PSW | dekrypt }}
+      demo-secret-files-from-kustomize:
+        files:
+          - secrets/files/credential.properties
 
 MyUdpService:
   main:
