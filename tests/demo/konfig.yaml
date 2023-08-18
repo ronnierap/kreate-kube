@@ -10,9 +10,9 @@ values:
   files:
     - shared-values.yaml
     - values-{{appname}}-{{env}}.yaml
-secrets:
-  files:
-    - secrets-{{appname}}-{{env}}.yaml
+#secrets:
+#  files:
+#    - secrets-{{appname}}-{{env}}.yaml
 files:
   - name: application.properties
     template: True

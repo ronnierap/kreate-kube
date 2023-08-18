@@ -44,25 +44,25 @@ class Konfig():
         self.appname = self.values["appname"]
         self.env = self.values["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
-        self._load_value_files()
-        self._load_secrets_files()
+        self._load_files("values", self.values)
+        self._load_files("secrets", self.secrets)
         self.kopy_files("files", "files")
         self.kopy_files("secret_files", "secrets/files", dekrypt_default=True)
 
-    def _load_value_files(self):
-        logger.debug("loading value files")
-        for fname in self.yaml.get("values", {}).get("files", []):
-            val_yaml = load_jinyaml(FileLocation(
-                fname, dir=self.dir), self.values)
-            self.values.update(val_yaml)
+    def _load_files(self, key, dict_):
+        logger.debug(f"loading {key} files")
+        files = self.yaml.get(key, {}).get("files", [])
+        if not files:
+            file = f"{key}-{self.appname}-{self.env}.yaml"
+            if os.path.exists(f"{self.dir}/{file}"):
+                logger.debug(f"adding standard {key} file {file}")
+                files = [file]
+            else:
+                logger.info(f"no {key} files found")
 
-    def _load_secrets_files(self):
-        logger.debug("loading secrets files")
-        for fname in self.yaml.get("secrets", {}).get("files", []):
-            val_yaml = load_jinyaml(FileLocation(
-                fname, dir=self.dir), self.values)
-            self.secrets.update(val_yaml)
-
+        for fname in files:
+            val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), dict_)
+            dict_.update(val_yaml)
 
     def _load_strukture_files(self):
         logger.debug("loading strukture files")
