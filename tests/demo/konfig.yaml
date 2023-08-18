@@ -21,7 +21,7 @@ files:
     from: py:kreate.kube.other_templates:default-values.yaml
 secret_files:
   - name: credential.properties
-    dekrypt: False
+    dekrypt: True
 
 # key the enkryption key for the DEV environment
 krypt_key: {{ function.getenv("KREATE_KRYPT_KEY_"+env.upper()) }}

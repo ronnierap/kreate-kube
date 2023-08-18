@@ -5,7 +5,7 @@ import jinja2.filters
 from ..kore import KoreCli, KoreKreator,  Konfig
 from ..kore._korecli import argument as argument
 from . import KryptKonfig
-from . import functions
+from . import krypt_functions
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class KryptKreator(KoreKreator):
 
 class KryptCli(KoreCli):
     def __init__(self, kreator: KryptKreator):
-        jinja2.filters.FILTERS["dekrypt"] = functions.dekrypt_str
+        jinja2.filters.FILTERS["dekrypt"] = krypt_functions.dekrypt_str
         super().__init__(kreator)
         self.add_subcommand(dekyaml, [argument(
             "-f", "--file", help="yaml file to enkrypt")],
@@ -50,7 +50,7 @@ def dekyaml(cli):
 
     filename = (cli.args.file or
                 f"{konfig.dir}/secrets-{konfig.name}-{konfig.env}.yaml")
-    functions.dekrypt_yaml(filename, ".")
+    krypt_functions.dekrypt_yaml(filename, ".")
 
 
 def dekstr(cli):
@@ -61,14 +61,14 @@ def dekstr(cli):
         if not cli.args.quiet:
             print("Enter string to dekrypt")
         value = sys.stdin.readline().strip()
-    print(functions.dekrypt_str(value))
+    print(krypt_functions.dekrypt_str(value))
 
 
 def dekfile(cli):
     "dekrypt an entire file"
     cli.kreator.kreate_konfig(cli.args.konfig)
     filename = cli.args.file
-    functions.dekrypt_file(filename)
+    krypt_functions.dekrypt_file(filename)
 
 
 def enkyaml(cli):
@@ -76,14 +76,14 @@ def enkyaml(cli):
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     filename = (cli.args.file
                 or f"{konfig.dir}/secrets-{konfig.name}-{konfig.env}.yaml")
-    functions.enkrypt_yaml(filename, ".")
+    krypt_functions.enkrypt_yaml(filename, ".")
 
 
 def enkfile(cli):
     "enkrypt an entire file"
     cli.kreator.kreate_konfig(cli.args.konfig)
     filename = cli.args.file
-    functions.enkrypt_file(filename)
+    krypt_functions.enkrypt_file(filename)
 
 
 def enkstr(cli):
@@ -94,4 +94,4 @@ def enkstr(cli):
         if not cli.args.quiet:
             print("Enter string to enkrypt")
         value = sys.stdin.readline().strip()
-    print(functions.enkrypt_str(value))
+    print(krypt_functions.enkrypt_str(value))

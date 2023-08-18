@@ -1,7 +1,7 @@
 import logging
 
 from ..kore import JinYamlKomponent
-from ..krypt.functions import dekrypt_str
+from ..krypt.krypt_functions import dekrypt_str
 
 logger = logging.getLogger(__name__)
 

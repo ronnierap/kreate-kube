@@ -3,7 +3,7 @@ import logging
 from ..kore import Konfig, App
 from ..kore._konfig import b64encode
 
-from . import functions
+from . import krypt_functions
 
 logger = logging.getLogger(__name__)
 
@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 class KryptKonfig(Konfig):
     def __init__(self, filename: str = None):
         super().__init__(filename=filename)
-        self.functions.update({"dekrypt": functions.dekrypt_str})
+        self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
         krypt_key = self.yaml.get("krypt_key", "no-krypt-key-defined")
-        functions._krypt_key = b64encode(krypt_key)
+        krypt_functions._krypt_key = b64encode(krypt_key)
 
 
 class KryptApp(App):

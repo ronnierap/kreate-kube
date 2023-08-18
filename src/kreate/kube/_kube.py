@@ -2,7 +2,7 @@ import os
 import shutil
 import logging
 from ..kore import JinjaApp, Konfig
-from ..krypt import KryptKonfig
+from ..krypt import KryptKonfig, krypt_functions
 from ..kore import _jinyaml
 from . import resource, other_templates, resource_templates
 
@@ -84,14 +84,17 @@ class KubeKonfig(KryptKonfig):
                         "val": self.values,
                         "secret": self.secrets,
                 }
-                logger.info(f"rendering template {from_} to {key}/{name}")
+                logger.debug(f"rendering template {from_}")
+                prefix = "rendered template " + from_
                 data = _jinyaml.load_jinja_data(loc, vars)
             else:
-                logger.info(f"kopying {from_} to {key}/{name}")
+                prefix = from_
                 data = _jinyaml.load_data(loc)
             if dekrypt:
-                data = "TODO: dekrypt from other module"
+                prefix = "dekrypted "+ prefix
+                data = krypt_functions.dekrypt_str(data)
             with open(f"{self.target_dir}/{target_subdir}/{name}", "w") as f:
+                logger.info(f"kreating file {key}/{name} from {prefix}")
                 f.write(data)
 
 

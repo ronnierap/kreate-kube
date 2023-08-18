@@ -4,7 +4,7 @@ import logging
 from ..kore._korecli import kreate_files as kreate_files
 from ..kore import Konfig
 from .. import krypt
-from ..krypt import functions as krypt_functions
+from ..krypt import krypt_functions
 from ._kust import KustApp
 from ._kube import KubeKonfig, kreate_kubeconfig
 
