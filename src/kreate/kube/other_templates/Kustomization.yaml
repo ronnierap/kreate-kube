@@ -5,7 +5,7 @@ namespace: {{ app.namespace }}
 
 resources:
 {% for res in my.resources() %}
-- resources/{{ res.filename }}
+- {{ res.dirname }}/{{ res.filename }}
 {% endfor %}
 
 patches:

@@ -27,7 +27,7 @@ class Resource(JinYamlKomponent):
 
     @property
     def dirname(self):
-        return self.app.konfig.target_dir + "/resources"
+        return  "resources"
 
     @property
     def filename(self):
@@ -91,8 +91,13 @@ class Egress(Resource):
     def calc_name(self):
         return f"{self.app.appname}-egress-to-{self.shortname}"
 
+class Secret(Resource):
+    @property
+    def dirname(self):
+        return "secrets"
 
-class SecretBasicAuth(Resource):
+
+class SecretBasicAuth(Secret):
     def calc_name(self):
         return f"{self.app.appname}-{self.shortname}"
 

@@ -23,11 +23,11 @@ class KubeApp(JinjaApp):
         self.register_resource_class(resource.Ingress)
         self.register_resource_class(resource.Egress)
         self.register_resource_class(resource.SecretBasicAuth)
+        self.register_resource_class(resource.Secret)
 
         self.register_resource_file("HorizontalPodAutoscaler", aliases="hpa")
         self.register_resource_file("ServiceAccount")
         self.register_resource_file("ServiceMonitor")
-        self.register_resource_file("Secret")
         self.register_resource_file("CronJob")
         self.register_resource_file("StatefulSet", filename="Deployment.yaml")
 

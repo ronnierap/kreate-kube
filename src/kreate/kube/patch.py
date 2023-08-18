@@ -36,7 +36,7 @@ class Patch(JinYamlKomponent):
 
     @property
     def dirname(self):
-        return self.app.konfig.target_dir + "/patches"
+        return "patches"
 
     @property
     def filename(self):

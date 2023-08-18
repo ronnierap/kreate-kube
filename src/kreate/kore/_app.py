@@ -60,7 +60,10 @@ class App():
         os.makedirs(self.konfig.target_dir, exist_ok=True)
         for komp in self.komponents:
             if (komp.filename):
-                logger.info(f"kreating file {komp.filename}")
+                if komp.dirname:
+                    logger.info(f"kreating file {komp.dirname}/{komp.filename}")
+                else:
+                    logger.info(f"kreating file {komp.filename}")
                 komp.kreate_file()
             else:
                 logger.info(f"skipping file for {komp.kind}.{komp.shortname}")

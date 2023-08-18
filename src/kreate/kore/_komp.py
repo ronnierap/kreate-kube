@@ -117,7 +117,7 @@ class Komponent:
 
     @property
     def dirname(self):
-        return self.app.konfig.target_dir
+        return None
 
     @property
     def filename(self):
@@ -145,7 +145,10 @@ class JinjaKomponent(Komponent):
     def kreate_file(self) -> None:
         filename = self.filename
         if filename:
-            dir = self.dirname
+            if self.dirname:
+                dir = f"{self.app.konfig.target_dir}/{self.dirname}"
+            else:
+                dir = self.app.konfig.target_dir
             os.makedirs(dir, exist_ok=True)
             with open(f"{dir}/{filename}", 'wb') as f:
                 f.write(self.data)
@@ -174,7 +177,10 @@ class JinYamlKomponent(JinjaKomponent):
     def kreate_file(self) -> None:
         filename = self.filename
         if filename:
-            dir = self.dirname
+            if self.dirname:
+                dir = f"{self.app.konfig.target_dir}/{self.dirname}"
+            else:
+                dir = self.app.konfig.target_dir
             os.makedirs(dir, exist_ok=True)
             with open(f"{dir}/{filename}", 'wb') as f:
                 yaml_dump(self.yaml.data, f)
