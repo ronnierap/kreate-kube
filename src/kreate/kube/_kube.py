@@ -52,14 +52,13 @@ class KubeApp(JinjaApp):
         return resource.Resource
 
     def aktivate(self):
-        super().aktivate()
         target_dir = self.konfig.target_dir
         if os.path.exists(target_dir) and os.path.isdir(target_dir):
             logger.info(f"removing target directory {target_dir}")
             shutil.rmtree(target_dir)
         self.konfig.kopy_files("files", "files")
         self.konfig.kopy_files("secret_files", "secrets/files", dekrypt_default=True)
-
+        super().aktivate()
 
 
 class KubeKonfig(KryptKonfig):

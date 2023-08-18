@@ -1,3 +1,5 @@
+import os
+import shutil
 import argparse
 import logging
 import traceback
@@ -96,6 +98,16 @@ class KoreCli:
                 lineno = jinja2_template_error_lineno()
                 print(f"while processing template "
                       f"{_jinyaml._current_jinja_file}:{lineno}")
+        finally:
+            if not self.args.keepsecrets:
+                # TODO: konfig was already loaded but not remembered
+                konfig = self.kreator.kreate_konfig(self.args.konfig)
+                dir = konfig.target_dir
+                secrets_dir = f"{dir}/secrets"
+                if os.path.exists(secrets_dir):
+                    logger.info(f"removing {secrets_dir}, "
+                                f"use --keep-secrets or -K option to keep it")
+                    shutil.rmtree(secrets_dir)
 
     def add_main_options(self):
         self.cli.add_argument(
@@ -104,6 +116,7 @@ class KoreCli:
         self.cli.add_argument("-v", "--verbose", action='count', default=0)
         self.cli.add_argument("-w", "--warn", action="store_true")
         self.cli.add_argument("-q", "--quiet", action="store_true")
+        self.cli.add_argument("-K", "--keepsecrets", action='store_true')
 
     def process_main_options(self, args):
         if args.verbose >= 2:
