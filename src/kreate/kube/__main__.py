@@ -1,4 +1,4 @@
-from . import KubeKreator
+from . import KubeKreator, KubeCli
 
 
-KubeKreator().kreate_cli().run()
+KubeCli(KubeKreator()).run()

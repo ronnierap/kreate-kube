@@ -6,12 +6,13 @@ You can also configure them further in python.
 In general it is preferred to kreate all komponents from the strukture.
 """
 
-from kreate.kore import Konfig, App
+from kreate.kore import Konfig
+from kreate.kore._app import App
 import kreate.kube
 
 
-def kreate_app(konfig: Konfig) -> App:
-    app = kreate.kube.KustApp(konfig) # or konfig.kreate_app()?
+def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
+    app = kreate.kube.KustApp(konfig)
     kreate.kube.Ingress(app, "root")
     kreate.kube.Ingress(app, "api")
 
@@ -50,4 +51,9 @@ def kreate_app(konfig: Konfig) -> App:
 
     return app
 
-kreate.kube.KubeKreator(kreate_app_func=kreate_app).kreate_cli().run()
+class DemoScriptKreator(kreate.kube.KubeKreator):
+    def kreate_app(self, konfig : kreate.kube.KubeKonfig) -> kreate.kube.KustApp:
+        return kreate_app_script(konfig)
+
+kreator = DemoScriptKreator()
+kreate.kube.KubeCli(kreator).run()

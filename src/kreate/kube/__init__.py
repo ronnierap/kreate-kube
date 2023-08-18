@@ -5,6 +5,8 @@ from ._kube import ConfigMap
 from ._kube import Ingress
 from ._kube import Service
 from ._kube import Egress
+from ._kube import KubeApp
+from ._kube import KubeKonfig
 
 from ._kust import KustApp
 from ._kust import Kustomization
@@ -25,4 +27,6 @@ __all__ = [
     "Kustomization",
     "KubeCli",
     "KubeKreator",
+    "KubeApp",
+    "KubeKonfig",
 ]

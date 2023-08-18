@@ -1,9 +1,22 @@
 from cryptography.fernet import Fernet
 from ruamel.yaml import YAML
 import logging
+from ..kore import Konfig, App
+from ..kore._konfig import b64encode
 
 logger = logging.getLogger(__name__)
 
+class KryptKonfig(Konfig):
+    def __init__(self, filename: str = None):
+        super().__init__(filename=filename)
+        self.functions.update({"dekrypt": dekrypt_str})
+        krypt_key = self.yaml.get("krypt_key","no-krypt-key-defined")
+        global _krypt_key
+        _krypt_key = b64encode(krypt_key)  # TODOL why encode not decode?
+
+
+class KryptApp(App):
+    pass  # Just for consistency
 
 _krypt_key = None
 _dekrypt_testdummy = False

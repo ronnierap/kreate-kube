@@ -1,7 +1,7 @@
 import argparse
 import logging
 import traceback
-from jinja2 import TemplateError, filters
+from jinja2 import TemplateError
 from sys import exc_info
 
 from . import _jinyaml
@@ -14,35 +14,6 @@ import importlib.metadata
 logger = logging.getLogger(__name__)
 
 
-class KoreKreator:
-    def __init__(self, tune_app_func=None, kreate_app_func=None) -> None:
-        self.tune_app_func = tune_app_func
-        self.kreate_app_func = kreate_app_func
-
-    def kreate_cli(self):
-        return KoreCli(self)
-
-    def kreate_konfig(self, filename):
-        filters.FILTERS["b64encode"] = b64encode
-        konfig = Konfig(filename)
-        self.tune_konfig(konfig)
-        return konfig
-
-    def tune_konfig(self, konfig: Konfig):
-        pass
-
-    def _app_class(self):
-        raise NotImplementedError()
-
-    def kreate_app(self, konfig: Konfig) -> App:
-        if self.kreate_app_func:
-            return self.kreate_app_func(konfig)
-        app = self._app_class()(konfig)
-        app.kreate_komponents_from_strukture()
-        app.aktivate()
-        if self.tune_app_func:
-            self.tune_app_func(app)
-        return app
 
 
 def argument(*name_or_flags, **kwargs):
@@ -51,6 +22,24 @@ def argument(*name_or_flags, **kwargs):
     """
     return (list(name_or_flags), kwargs)
 
+class KoreKreator:
+    def kreate_konfig(self, filename):
+        konfig = Konfig(filename)
+        self.tune_konfig(konfig)
+        return konfig
+
+    def tune_konfig(self, konfig: Konfig) -> None:
+        pass
+
+    def kreate_app(self, konfig: Konfig) -> App:
+        app = App(konfig)
+        self.tune_app(app)
+        return app
+
+    def tune_app(self, app: App) -> None:
+        app.kreate_komponents_from_strukture()
+        app.aktivate()
+        pass
 
 class KoreCli:
     def __init__(self, kreator: KoreKreator):
@@ -89,7 +78,7 @@ class KoreCli:
             self.parser.add_argument(*arg[0], **arg[1])
         self.parser.set_defaults(func=func)
 
-    def run(self, ):
+    def run(self):
         self.cli.epilog = self.epilog+"\n"
         self.add_main_options()
         self.args = self.cli.parse_args()

@@ -5,25 +5,29 @@ from ..kore._korecli import kreate_files as kreate_files
 from ..kore import Konfig
 from ..krypt import _krypt, KryptCli, KryptKreator
 from ._kust import KustApp
-from ._kube import KubeConfig
+from ._kube import KubeConfig, KubeKonfig
 
 logger = logging.getLogger(__name__)
 
 
 class KubeKreator(KryptKreator):
-    def kreate_cli(self):
-        return KubeCli(self)
-
-    def _app_class(self):
-        return KustApp
+    def kreate_konfig(self, filename: str = None) -> KubeKonfig:
+        konfig = KubeKonfig(filename)
+        self.tune_konfig(konfig)
+        return konfig
 
     def tune_konfig(self, konfig: Konfig):
         super().tune_konfig(konfig)
         konfig._default_strukture_files.append("py:kreate.kube.templates:default-values.yaml")
 
+    def kreate_app(self, konfig: Konfig) -> KustApp:
+        app = KustApp(konfig)
+        self.tune_app(app)
+        return app
+
 
 class KubeCli(KryptCli):
-    def __init__(self, kreator):
+    def __init__(self, kreator: KubeKreator):
         super().__init__(kreator)
         self.add_subcommand(build, [], aliases=["b"])
         self.add_subcommand(diff, [], aliases=["d"])

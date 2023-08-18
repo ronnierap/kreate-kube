@@ -2,28 +2,27 @@ import sys
 import logging
 import jinja2.filters
 
+from kreate.kore._app import Konfig
+
 from ..kore import KoreCli, KoreKreator,  Konfig
 from ..kore._korecli import argument as argument
-from ..kore._konfig import b64encode
 from . import _krypt
 
 logger = logging.getLogger(__name__)
 
 
 class KryptKreator(KoreKreator):
-    def kreate_cli(self):
-        return KryptCli(self)
+    def kreate_konfig(self, filename: str = None) -> _krypt.KryptKonfig:
+        konfig = _krypt.KryptKonfig(filename)
+        self._tune_konfig(konfig)
+        return konfig
 
-    def tune_konfig(self, konfig: Konfig):
-        konfig.values["dekrypt"] = _krypt.dekrypt_str
-        _krypt._krypt_key = b64encode(
-            konfig.yaml.get(
-                "krypt_key",
-                "no-krypt-key-defined"))
+    def _tune_konfig(self, konfig: Konfig):
+        super()._tune_konfig(konfig)
 
 
 class KryptCli(KoreCli):
-    def __init__(self, kreator):
+    def __init__(self, kreator: KryptKreator):
         jinja2.filters.FILTERS["dekrypt"] = _krypt.dekrypt_str
         super().__init__(kreator)
         self.add_subcommand(dekyaml, [argument(

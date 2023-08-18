@@ -159,6 +159,7 @@ class JinjaKomponent(Komponent):
             "my": self,
             "val": self.app.konfig.values,
             "secret": self.app.konfig.secrets,
+            "function": self.app.konfig.functions,
         }
 
 

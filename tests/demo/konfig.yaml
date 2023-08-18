@@ -24,7 +24,7 @@ secret_files:
     dekrypt: False
 
 # key the enkryption key for the DEV environment
-krypt_key: {{ getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
+krypt_key: {{ function.getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
 
 strukture:
   - {{appname}}-strukture.yaml

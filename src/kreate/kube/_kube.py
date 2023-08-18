@@ -1,7 +1,7 @@
 import os
 import logging
-from ..kore import JinjaApp, App, Konfig, JinYamlKomponent
-from ..krypt import _krypt
+from ..kore import JinjaApp, Konfig, JinYamlKomponent
+from ..krypt import _krypt, KryptKonfig
 from ..kore._jinyaml import FileLocation
 from . import templates
 
@@ -174,6 +174,11 @@ class Ingress(Resource):
         self.nginx_annon("auth-secret", secret)
         self.nginx_annon("auth-realm", self.app.appname + "-realm")
 
+
+class KubeKonfig(KryptKonfig):
+    pass
+    #def __init__(self, filename: str = None):
+    #    super().__init__(filename=filename)
 
 # TODO: KubeConfig does not have an app to be added to
 # This needs all kinds of workarounds that might need some refactoring
