@@ -1,4 +1,5 @@
 import os
+import shutil
 import logging
 from ..kore import JinjaApp, Konfig
 from ..krypt import KryptKonfig
@@ -50,9 +51,48 @@ class KubeApp(JinjaApp):
     def _default_template_class(self):
         return resource.Resource
 
+    def aktivate(self):
+        super().aktivate()
+        target_dir = self.konfig.target_dir
+        if os.path.exists(target_dir) and os.path.isdir(target_dir):
+            logger.info(f"removing target directory {target_dir}")
+            shutil.rmtree(target_dir)
+        self.konfig.kopy_files("files", "files")
+        self.konfig.kopy_files("secret_files", "secrets/files", dekrypt_default=True)
+
+
 
 class KubeKonfig(KryptKonfig):
-    pass
+    def kopy_files(self, key, target_subdir, dekrypt_default=False):
+        file_list = self.yaml.get(key, [])
+        if not file_list:
+            return
+        os.makedirs(f"{self.target_dir}/{target_subdir}", exist_ok=True)
+        for file in file_list:
+            dekrypt = file.get("dekrypt", dekrypt_default)
+            name = file.get("name", None)
+            if not name:
+                raise ValueError(f"file in konfig {key}"
+                                 f"should have name {file}")
+            from_ = file.get("from", f"{key}/{name}"
+                             + (".encrypted" if dekrypt else ""))
+            template = file.get("template", False)
+            loc = _jinyaml.FileLocation(from_, dir=self.dir)
+            if template:
+                vars = {
+                        "konfig": self,
+                        "val": self.values,
+                        "secret": self.secrets,
+                }
+                logger.info(f"rendering template {from_} to {key}/{name}")
+                data = _jinyaml.load_jinja_data(loc, vars)
+            else:
+                logger.info(f"kopying {from_} to {key}/{name}")
+                data = _jinyaml.load_data(loc)
+            if dekrypt:
+                data = "TODO: dekrypt from other module"
+            with open(f"{self.target_dir}/{target_subdir}/{name}", "w") as f:
+                f.write(data)
 
 
 # Note the KubeKonfig class is totally unrelated to the

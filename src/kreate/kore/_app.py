@@ -1,5 +1,4 @@
 import os
-import shutil
 import logging
 
 from ._core import DictWrapper
@@ -58,11 +57,7 @@ class App():
             komp.aktivate()
 
     def kreate_files(self):
-        target_dir = self.konfig.target_dir
-        if os.path.exists(target_dir) and os.path.isdir(target_dir):
-            shutil.rmtree(target_dir)
         os.makedirs(self.konfig.target_dir, exist_ok=True)
-
         for komp in self.komponents:
             if (komp.filename):
                 logger.info(f"kreating file {komp.filename}")
