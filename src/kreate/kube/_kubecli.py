@@ -6,7 +6,7 @@ from ..kore import Konfig
 from .. import krypt
 from ..krypt import functions as krypt_functions
 from ._kust import KustApp
-from ._kube import KubeConfig, KubeKonfig
+from ._kube import KubeKonfig, kreate_kubeconfig
 
 logger = logging.getLogger(__name__)
 
@@ -88,8 +88,5 @@ def testupdate(args):
 
 
 def kubeconfig(cli: KubeCli):
-    # TODO: we only need a Dummy app
     konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    kubeconfig = KubeConfig(konfig)
-    # kubeconfig.aktivate() not needed?
-    kubeconfig.kreate_file()
+    kreate_kubeconfig(konfig)

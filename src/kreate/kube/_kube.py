@@ -1,8 +1,8 @@
 import os
 import logging
-from ..kore import JinjaApp, Konfig, JinYamlKomponent
+from ..kore import JinjaApp, Konfig
 from ..krypt import KryptKonfig
-from ..kore._jinyaml import FileLocation
+from ..kore import _jinyaml
 from . import resource, other_templates, resource_templates
 
 logger = logging.getLogger(__name__)
@@ -55,41 +55,36 @@ class KubeKonfig(KryptKonfig):
     pass
 
 
-# TODO: KubeConfig does not have an app to be added to
-# This needs all kinds of workarounds that might need some refactoring
-class KubeConfig(JinYamlKomponent):
-    def __init__(self, konfig: Konfig):
-        self.konfig = konfig
-        template_loc = FileLocation("kubeconfig.yaml", package=other_templates)
-        super().__init__(None, "main", template=template_loc)
-        self.cluster_name = konfig.values.get(
-            "kubeconfig_cluster_name",
-            f"{konfig.env}-cluster")
-        self.cluster_user_name = konfig.values.get(
-            "kubeconfig_cluster_user_name",
-            f"kreate-user-{konfig.env}")
-        self.context_name = konfig.env
-        # api_token should not be set in a file, just as environment variable
-        token = os.getenv("KUBECONFIG_API_TOKEN")
-        if not token:
-            raise ValueError("environment var KUBECONFIG_API_TOKEN not set")
-        self.api_token = token
-        self.aktivate()
-
-    def _template_vars(self):
-        return {
-            "konfig": self.konfig,
-            "my": self,
-            "val": self.konfig.values
+# Note the KubeKonfig class is totally unrelated to the
+# kubeconfig file
+def kreate_kubeconfig(konfig: Konfig):
+    cluster_name = konfig.values.get("kubeconfig_cluster_name", None)
+    if not cluster_name:
+        cluster_name = f"{konfig.env}-cluster"
+    user_name = konfig.values.get("kubeconfig_cluster_user_name", None)
+    if not user_name:
+        user_name = f"kreate-user-{konfig.env}"
+    context_name = konfig.env
+    # api_token should not be set in a file, just as environment variable
+    token = os.getenv("KUBECONFIG_API_TOKEN")
+    if not token:
+        raise ValueError("environment var KUBECONFIG_API_TOKEN not set")
+    api_token = token
+    my = {
+        "cluster_name": cluster_name,
+        "cluster_user_name": user_name,
+        "context_name": context_name,
+        "api_token": api_token,
+    }
+    vars = {
+            "konfig": konfig,
+            "my": my,
+            "val": konfig.values
         }
-
-    def calc_name(self):
-        return "kubeconfig"
-
-    @property
-    def filename(self):
-        return "kubeconfig"
-
-    @property
-    def dirname(self):
-        return "build"
+    loc = _jinyaml.FileLocation("kubeconfig.yaml", package=other_templates)
+    data = _jinyaml.load_jinja_data(loc, vars)
+    filename = f"{konfig.target_dir}/secrets/kubeconfig"
+    logging.info(f"writing {filename}")
+    os.makedirs(f"{konfig.target_dir}/secrets", exist_ok=True)
+    with open(filename, "wt") as f:
+        f.write(data)
