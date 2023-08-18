@@ -108,6 +108,13 @@ Kustomization:
           ORACLE_URL: {{ val.ORACLE_URL }}
           ORACLE_USR: {{ val.ORACLE_USR }}
           ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
+      demo-files:
+        files:
+          - files/application.properties
+          - files/default-values.yaml
+      demo-extra-files:
+        files:
+          - files/environment.properties
 
 MyUdpService:
   main:
