@@ -18,9 +18,17 @@ dependencies = [
     "cryptography",
 ]
 
+# This is needed for a namespace packages without __init__.py
+[tool.pdm.build]
+includes = ["kreate/"]
+
 [project.urls]
 "Homepage" = "https://github.com/MarkHooijkaas/kreate-kube"
 "Bug Tracker" = "https://github.com/MarkHooijkaas/kreate-kube/issues"
+
+[project.scripts]
+kreate = "kreate.kube.__main__:main"
+
 
 [build-system]
 requires = ["pdm-backend"]
