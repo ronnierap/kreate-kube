@@ -71,7 +71,7 @@ class KoreCli:
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
         alias0 = aliases[0] if aliases else ""
-        self.epilog += (f"  {func.__name__:10}    {alias0 :4}"
+        self.epilog += (f"  {func.__name__:14}    {alias0 :3}"
                         f" {func.__doc__ or ''} \n")
         self.parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__)
