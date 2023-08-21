@@ -107,5 +107,6 @@ def testupdate(args):
 
 
 def kubeconfig(cli: KubeCli):
+    """kreate a kubeconfig file from a template"""
     konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     kreate_kubeconfig(konfig)
