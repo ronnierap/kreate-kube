@@ -7,6 +7,24 @@ This is especially useful if you have many different applications
 that you would like to keep as similar as possible,
 while also having flexibility to tweak each application.
 
+## Installing kreate-kube
+The `kreate-kube` framework is available on PyPi.
+To install it, you will need:
+- `python3`  At least version 3.8 is needed.
+- `venv` virtual environments in Python when you need to use different versions of the framework.
+- `pip` package installer for python, to install packages
+
+To create a virtual environment with kreate-kube one should:
+```
+python3 -m venv .venv         # create a virtual environment in the .venv directory
+. .venv/bin/activate          # activate the virtual environment
+python3 -m pip  kreate-kube   # install the latest version of kreate-kube
+```
+This will install the kreate-kube package, including a script `kreate` that can be called from the commandline.
+
+In general you should specify a specific version of kreate with a `requirements.txt` file.
+
+
 ## Example using application structure file
 Kreating resources is based on a application strukture definition file.
 Usually there are ate least 3 files needed for a setup:
