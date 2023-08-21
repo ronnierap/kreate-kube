@@ -25,8 +25,6 @@ This will install the kreate-kube package, including a script `kreate` that can 
 Note: For Windows the commands might be slightly different, but `venv` and `pip`
 are well documented in the Python community.
 
-In general you should specify a specific version of kreate with a `requirements.txt` file.
-
 You can now call the `kreate` command line. Some examples:
 ```
 kreate -h          # show help info
@@ -129,6 +127,25 @@ secrets:
 strukture_files:
   - {{appname}}-strukture.yaml
 ```
+
+## Versions of kreate-kube
+At this moment there are not many versions of kreate-kube:
+- `0.1.0`  This version was incomplete and does not work when installed from Pypi
+- `0.2.0`  This is the current version, and the first to be functional
+
+It is expected that new versions will come out regulary:
+- fixing bugs
+- enhancing command line interface
+- adding templates
+- improving templates and default values
+- improving Python API
+Some of these enhancements may not be backward compatible.
+While in `0.x` stage there will be only garantuee for backward compatibility
+between patch versions (e.g. `0.x.1` and `0.x.2`)
+
+After the `1.0` release a semantic versioning for backward compatibilty will be used.
+
+In general you should specify a specific version of kreate with a `requirements.txt` file.
 
 
 
