@@ -65,11 +65,21 @@ class KoreCli:
             dest="subcommand",
         )
         self.add_subcommand(version, [], aliases=["vr"])
-        self.add_subcommand(view_strukture, [], aliases=["vs"])
-        self.add_subcommand(view_defaults, [], aliases=["vd"])
-        self.add_subcommand(view_values, [], aliases=["vv"])
-        self.add_subcommand(view_template, [], aliases=["vt"])
-        self.add_subcommand(view_konfig, [], aliases=["vk"])
+
+        cmd = self.add_subcommand(view_strukture, [], aliases=["vs"])
+        cmd.add_argument("-k", "--key", help="key to show", action="store", default=None)
+
+        cmd = self.add_subcommand(view_defaults, [], aliases=["vd"])
+        cmd.add_argument("-k", "--key", help="key to show", action="store", default=None)
+
+        cmd = self.add_subcommand(view_values, [], aliases=["vv"])
+
+
+        cmd = self.add_subcommand(view_template, [], aliases=["vt"])
+        cmd.add_argument("-k", "--key", help="template to show", action="store", default=None)
+
+        cmd = self.add_subcommand(view_konfig, [], aliases=["vk"])
+        cmd.add_argument("-k", "--kind", action="store", default=None)
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
@@ -79,11 +89,12 @@ class KoreCli:
         alias0 = aliases[0] if aliases else ""
         self.epilog += (f"  {func.__name__:14}    {alias0 :3}"
                         f" {func.__doc__ or ''} \n")
-        self.parser = parent.add_parser(
+        parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__)
         for arg in args:
-            self.parser.add_argument(*arg[0], **arg[1])
-        self.parser.set_defaults(func=func)
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+        return parser
 
     def run(self):
         self.cli.epilog = self.epilog+"\n"
@@ -122,7 +133,6 @@ class KoreCli:
     def add_main_options(self):
         self.cli.add_argument(
             "-a", "--konfig", action="store", default="konfig.yaml")
-        self.cli.add_argument("-k", "--kind", action="store", default=None)
         self.cli.add_argument("-v", "--verbose", action='count', default=0)
         self.cli.add_argument("-w", "--warn", action="store_true")
         self.cli.add_argument("-q", "--quiet", action="store_true")
@@ -146,20 +156,20 @@ class KoreCli:
 def view_strukture(cli: KoreCli):
     """view the application strukture"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    konfig.calc_strukture().pprint(field=cli.args.kind)
+    konfig.calc_strukture().pprint(field=cli.args.key)
 
 
 def view_defaults(cli: KoreCli):
     """view the application strukture defaults"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    konfig.calc_strukture().default.pprint(field=cli.args.kind)
+    konfig.calc_strukture().default.pprint(field=cli.args.key)
 
 
 def view_template(cli: KoreCli):
     """view the template for a specific kind"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     app: JinjaApp = cli.kreator.kreate_app(konfig, tune_app=False)
-    kind = cli.args.kind
+    kind = cli.args.key
     if kind:
         if kind not in app.kind_templates or kind not in app.kind_classes:
             logger.warn(f"Unknown template kind {kind}")
