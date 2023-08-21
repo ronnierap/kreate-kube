@@ -31,22 +31,27 @@ class KubeApp(JinjaApp):
         self.register_resource_file("CronJob")
         self.register_resource_file("StatefulSet", filename="Deployment.yaml")
 
-    def register_resource_class(self: str, cls: str, aliases=None) -> None:
+    def register_resource_class(self: str, cls: str, aliases=None, package=None) -> None:
+        package = package or resource_templates
         super().register_template_class(
             cls,
             filename=None,
             aliases=aliases,
-            package=resource_templates)
+            package=package,
+        )
 
     def register_resource_file(self,
                                cls: str,
                                filename: str = None,
-                               aliases=None) -> None:
+                               aliases=None,
+                               package=None,
+        ) -> None:
+        package = package or resource_templates
         super().register_template_file(
             cls,
             filename=filename,
             aliases=aliases,
-            package=resource_templates)
+            package=package)
 
     def _default_template_class(self):
         return resource.Resource
