@@ -4,6 +4,7 @@ import shutil
 import argparse
 import logging
 import traceback
+import inspect
 from jinja2 import TemplateError
 from sys import exc_info
 
@@ -170,7 +171,11 @@ def view_template(cli: KoreCli):
                   f"{app.kind_classes[kind].__name__}: "
                   f"{app.kind_templates[kind]}")
             print("==========================")
-        print(load_data(app.kind_templates[kind]))
+            if app.kind_classes[kind].__doc__:
+                print(inspect.cleandoc(app.kind_classes[kind].__doc__))
+                print("==========================")
+        if app.kind_templates[kind].filename != "NoTemplate":
+            print(load_data(app.kind_templates[kind]))
     else:
         for kind in app.kind_templates:
             if kind in app.kind_templates and kind in app.kind_classes:
