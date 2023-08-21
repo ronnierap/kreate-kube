@@ -8,6 +8,7 @@ that you would like to keep as similar as possible,
 while also having flexibility to tweak each application.
 
 ## Installing and running kreate-kube
+### Installing
 The `kreate-kube` framework is available on PyPi.
 To install it, you will need:
 - `python3`  At least version 3.8 is needed.
@@ -25,6 +26,7 @@ This will install the kreate-kube package, including a script `kreate` that can 
 Note: For Windows the commands might be slightly different, but `venv` and `pip`
 are well documented in the Python community.
 
+### Running
 You can now call the `kreate` command line. Some examples:
 ```
 kreate -h          # show help info
@@ -108,6 +110,21 @@ Service:
 Note: This shows only a small subset of possibilities of kreate-kube
 
 ### konfig.yaml
+The `konfig.yaml` ties everything together:
+- Some general values (mainly application name and enviroment)
+- extra environment specific "stuff" to load
+  -  values such as IP numbers and urls
+  -  secrets such as usernames and passwords
+- what strukture file(s) to use
+In general values and secrets will be loaded from separate files, to keep the `konfig.yaml` file simple,
+and to separate this environment specific part separated.
+
+The file can contain several other things as well:
+-  files to be mounted in a pod, such as application configuration files
+-  secret_files as files, but encrypted and stored as kubernetes Secret
+-  extra custom templates for resources and patches
+
+Below is a simple but typical example.
 ```
 {% set appname = "demo" %} # reuse the appname in rest of this file
 {% set env = "acc" %}      # reuse the env in rest of this file
@@ -127,6 +144,8 @@ secrets:
 strukture_files:
   - {{appname}}-strukture.yaml
 ```
+Note: In a future version, the value-files, secrets-files and strukture_files might use sane defaults
+(as allready shown using `{{ appname }}` and `{{ env }}`), so these section might be omitted in the future
 
 ## Versions of kreate-kube
 At this moment there are not many versions of kreate-kube:
