@@ -94,6 +94,10 @@ data:
       Ingress:
         service: {{ val.appname }}-service
 
+      KubernetesAnnotations:
+        component: webservice
+        managed_by: kreate-kube/kustomize
+
       PodDisruptionBudget:
         minAvailable: 1
 
@@ -108,7 +112,7 @@ kind: ConfigMap
 metadata:
   labels:
     config-map: demo-files
-  name: demo-files-2d5bkg55mt
+  name: demo-files-ht6c8hk4t4
   namespace: demo-dev
 ---
 apiVersion: v1
@@ -234,7 +238,7 @@ spec:
     metadata:
       annotations:
         app.kubernetes.io/component: webservice
-        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/managed-by: kreate-kube/kustomize
         app.kubernetes.io/name: demo
         app.kubernetes.io/part-of: kreate-demo
         app.kubernetes.io/version: v1.3.4
@@ -323,7 +327,7 @@ spec:
         secret:
           secretName: demo-secret-files
       - configMap:
-          name: demo-files-2d5bkg55mt
+          name: demo-files-ht6c8hk4t4
         name: demo-files
       - configMap:
           name: demo-extra-files-hmm7226mdf
@@ -347,7 +351,7 @@ spec:
     metadata:
       annotations:
         app.kubernetes.io/component: webservice
-        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/managed-by: kreate-kube/kustomize
         app.kubernetes.io/name: demo-statefulset
         app.kubernetes.io/part-of: kreate-demo
         app.kubernetes.io/version: v1.3.4
