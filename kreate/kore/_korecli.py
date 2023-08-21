@@ -155,21 +155,25 @@ def view_defaults(cli: KoreCli):
 def view_template(cli: KoreCli):
     """view the template for a specific kind"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    app: JinjaApp = cli.kreator._app_class()(konfig)
+    app: JinjaApp = cli.kreator.kreate_app(konfig, tune_app=False)
+    if not cli.args.quiet:
+        print("==========================")
     kind = cli.args.kind
     if kind:
         if kind not in app.kind_templates or kind not in app.kind_classes:
             logger.warn(f"Unknown template kind {kind}")
             return
         if not cli.args.quiet:
-            print(f"{app.kind_classes[kind].__name__}: "
+            print(f"{kind} "
+                  f"{app.kind_classes[kind].__name__}: "
                   f"{app.kind_templates[kind]}")
             print("==========================")
         print(load_data(app.kind_templates[kind]))
     else:
         for kind in app.kind_templates:
             if kind in app.kind_templates and kind in app.kind_classes:
-                print(f"{app.kind_classes[kind].__name__}: "
+                print(f"{kind:24} "
+                      f"{app.kind_classes[kind].__name__}: "
                       f"{app.kind_templates[kind]}")
             else:
                 logger.debug("skipping kind")

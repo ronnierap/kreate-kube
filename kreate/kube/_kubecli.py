@@ -23,9 +23,10 @@ class KubeKreator(krypt.KryptKreator):
         konfig._default_strukture_files.append(
             "py:kreate.kube.other_templates:default-values.yaml")
 
-    def kreate_app(self, konfig: Konfig) -> KustApp:
+    def kreate_app(self, konfig: Konfig, tune_app=True) -> KustApp:
         app = KustApp(konfig)
-        self.tune_app(app)
+        if tune_app:  # Ugly hack for view_templates
+            self.tune_app(app)
         return app
 
 
