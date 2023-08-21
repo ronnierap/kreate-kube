@@ -18,6 +18,11 @@ class FileLocation(namedtuple(
 
     def __str__(self):
         if self.package:
+            return f"py:{self.package.__name__}:{self.filename}"
+        return f"{self.dir}/{self.filename}"
+
+    def __repr__(self):
+        if self.package:
             return (f"FileLocation({self.filename}"
                     f" @package:{self.package.__name__})")
         return f"FileLocation({self.filename} @dir {self.dir})"
