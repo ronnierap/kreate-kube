@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import argparse
 import logging
@@ -9,7 +10,7 @@ from sys import exc_info
 from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp
-from ._jinyaml import load_data
+from ._jinyaml import load_data, yaml_dump
 import importlib.metadata
 
 logger = logging.getLogger(__name__)
@@ -67,6 +68,7 @@ class KoreCli:
         self.add_subcommand(view_defaults, [], aliases=["vd"])
         self.add_subcommand(view_values, [], aliases=["vv"])
         self.add_subcommand(view_template, [], aliases=["vt"])
+        self.add_subcommand(view_konfig, [], aliases=["vk"])
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
@@ -185,6 +187,12 @@ def view_values(cli: KoreCli):
     for k, v in konfig.values.items():
         print(f"{k}: {v}")
 
+def view_konfig(cli: KoreCli):
+    """view the application konfig file (with defaults)"""
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    if "krypt_key" in konfig.yaml:
+        konfig.yaml["krypt_key"]="censored"
+    yaml_dump(konfig.yaml, sys.stdout)
 
 def version(cli: KoreCli):
     """view the version"""
