@@ -7,14 +7,14 @@ This is especially useful if you have many different applications
 that you would like to keep as similar as possible,
 while also having flexibility to tweak each application.
 
-## Installing kreate-kube
+## Installing and running kreate-kube
 The `kreate-kube` framework is available on PyPi.
 To install it, you will need:
 - `python3`  At least version 3.8 is needed.
 - `venv` virtual environments in Python when you need to use different versions of the framework.
 - `pip` package installer for python, to install packages
 
-To create a virtual environment with kreate-kube one should:
+To create a virtual environment with kreate-kube in a Linux or Unix environment (like MacOs) one should:
 ```
 python3 -m venv .venv         # create a virtual environment in the .venv directory
 . .venv/bin/activate          # activate the virtual environment
@@ -22,7 +22,28 @@ python3 -m pip  kreate-kube   # install the latest version of kreate-kube
 ```
 This will install the kreate-kube package, including a script `kreate` that can be called from the commandline.
 
+Note: For Windows the commands might be slightly different, but `venv` and `pip`
+are well documented in the Python community.
+
 In general you should specify a specific version of kreate with a `requirements.txt` file.
+
+You can now call the `kreate` command line. Some examples:
+```
+kreate -h          # show help info
+kreate version     # show the version
+
+kreate files   # kreate all files based on the konfig.yaml in the current directory
+kreate         # The same (files is the default command)
+
+kreate diff    # kreate output that shows differences between the kreate and a real kubernetes cluster
+kreate apply   # apply the kreated files to a kubernetes cluster
+```
+Note: for `diff` and `apply` your `.kube/config` should be set up correctly
+
+
+By default `kreate` It will look for a file `konfig.yaml` in your current directory.
+It is possible to specify a different directory or file using the `--konfig` option.
+If this is a directory it will look for a `konfig.yaml` file in this directory.
 
 
 ## Example using application structure file
