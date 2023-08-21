@@ -16,12 +16,11 @@ class Komponent:
                  app: App,
                  shortname: str = None,
                  kind: str = None,
-                 **kwargs
                  ):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
-        self.strukture = self._calc_strukture(kwargs)
+        self.strukture = self._calc_strukture()
         self.skip = self.strukture.get("ignore", False)
         name = self.strukture.get("name", None) or self.calc_name()
         self.name = name.lower()
@@ -44,11 +43,10 @@ class Komponent:
             return f"{self.app.appname}-{self.kind}"
         return f"{self.app.appname}-{self.kind}-{self.shortname}"
 
-    def _calc_strukture(self, extra):
+    def _calc_strukture(self):
         strukt = self._find_strukture()
         defaults = self._find_defaults()
-        return DeepChain(extra,
-                         strukt,
+        return DeepChain(strukt,
                          {"default": defaults},
                          {"default": self._find_generic_defaults()})
 
@@ -131,9 +129,8 @@ class JinjaKomponent(Komponent):
                  shortname: str = None,
                  kind: str = None,
                  template: FileLocation = None,
-                 **kwargs
                  ):
-        super().__init__(app, shortname, kind, **kwargs)
+        super().__init__(app, shortname, kind)
         template = template or self.app.kind_templates[self.kind]
         self.template = template
 

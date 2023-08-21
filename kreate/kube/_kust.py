@@ -59,13 +59,14 @@ class KustApp(KubeApp):
             res: Resource,
             kind: str = None,
             shortname: str = None,
-            **kwargs):
+            ) -> None:
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if issubclass(cls, Patch):
-            return cls(res, shortname, kind, template=templ, **kwargs)
-        raise TypeError(
-            f"class for {kind}.{shortname} is not a Patch but {cls}")
+            cls(res, shortname, kind, template=templ)
+        else:
+            raise TypeError(
+                f"class for {kind}.{shortname} is not a Patch but {cls}")
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:

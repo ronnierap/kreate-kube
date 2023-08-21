@@ -62,11 +62,11 @@ class JinjaApp(App):
     def register_std_templates(self) -> None:
         pass
 
-    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
+    def kreate_komponent(self, kind: str, shortname: str = None):
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if inspect.isclass(cls):
             return cls(app=self, kind=kind,
-                       shortname=shortname, template=templ, **kwargs)
+                       shortname=shortname, template=templ)
         else:
             raise ValueError(f"Unknown template type {type(cls)}, {cls}")

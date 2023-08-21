@@ -24,7 +24,7 @@ def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
     depl=kreate.kube.resource.Deployment(app)
     kreate.kube.resource.Service(app)
     kreate.kube.resource.Service(app, "https")
-    pdb = kreate.kube.resource.PodDisruptionBudget(app, name="demo-pdb")
+    pdb = kreate.kube.resource.PodDisruptionBudget(app)
     kreate.kube.Kustomization(app)
     app.kreate_komponent("Secret", "main")
     app.kreate_komponent("Secret", "secret-files")
@@ -42,6 +42,7 @@ def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
     app.kreate_patch(depl, "MountVolumeFiles", "demo-secret-files")
     app.kreate_patch(depl, "KubernetesAnnotations")
     app.kreate_patch(depl, "ElasticLogging")
+    app.kreate_patch(depl, "AddEgressLabelsPatch")
     app.kreate_patch(app.StatefulSet.main, "KubernetesAnnotations")
     app.kreate_patch(app.StatefulSet.main, "ElasticLogging")
 

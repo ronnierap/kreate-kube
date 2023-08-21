@@ -31,7 +31,7 @@ class KubeApp(JinjaApp):
         self.register_resource_file("CronJob")
         self.register_resource_file("StatefulSet", filename="Deployment.yaml")
 
-    def register_resource_class(self: str, cls: str, aliases=None, package=None) -> None:
+    def register_resource_class(self: str, cls, aliases=None, package=None) -> None:
         package = package or resource_templates
         super().register_template_class(
             cls,

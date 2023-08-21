@@ -46,7 +46,7 @@ class App():
             return super().__getattribute__(attr)
         return self._kinds.get(attr, None)
 
-    def kreate_komponent(self, kind: str, shortname: str = None, **kwargs):
+    def kreate_komponent(self, kind: str, shortname: str = None):
         raise NotImplementedError(
             f"can not create komponent for {kind}.{shortname}")
 

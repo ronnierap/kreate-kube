@@ -21,14 +21,14 @@ class Patch(JinYamlKomponent):
             shortname: str = None,
             kind: str = None,
             template: FileLocation = None,
-            **kwargs):
+        ):
         self.target = target
         super().__init__(
             target.app,
             shortname=shortname,
             kind=kind,
             template=template,
-            **kwargs)
+        )
 
     def __str__(self):
         return (f"<Patch {self.target.kind}.{self.target.shortname}"
