@@ -1,5 +1,5 @@
 #!/bin/sh
-echo setting dekryption key
+echo setting dekryption key for testing
 export KREATE_KRYPT_KEY_DEV=C6XOvZALFPjTzWKOPV3EJFIpmmwMhXEE
 
 

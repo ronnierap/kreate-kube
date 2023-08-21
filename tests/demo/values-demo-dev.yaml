@@ -1,4 +1,5 @@
 # This file should just provide basic values, no nested hierarchy
+project: kreate-demo
 
 probe_path: /demo/actuator/info
 image_repo: https://repo.kisst.org

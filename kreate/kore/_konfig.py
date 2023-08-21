@@ -42,7 +42,7 @@ class Konfig():
         self._add_jinja_filter("b64encode",  b64encode)
         self.yaml = load_jinyaml(FileLocation(self.filename, dir="."),
                                  {"function": self.functions})
-        self.values.update(self.yaml.get("values", {}).get("vars", {}))
+        self.values.update(self.yaml.get("app", {}))
         self.appname = self.values["appname"]
         self.env = self.values["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
@@ -58,7 +58,7 @@ class Konfig():
 
     def _load_files(self, key, dict_):
         logger.debug(f"loading {key} files")
-        files = self.yaml.get(key, {}).get("files", [])
+        files = self.yaml.get(key, [])
         if not files:
             file = f"{key}-{self.appname}-{self.env}.yaml"
             if os.path.exists(f"{self.dir}/{file}"):
