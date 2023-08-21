@@ -1,0 +1,15 @@
+---
+apiVersion: apps/v1
+# The kind can be used for Deployment and StatefulSet
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  template:
+    metadata:
+      annotations:
+        app.kubernetes.io/name: {{ my.target.name }}
+        app.kubernetes.io/version: "{{ default.image_version }}"
+        app.kubernetes.io/component: {{ default.component }}
+        app.kubernetes.io/part-of: {{ default.project }}
+        app.kubernetes.io/managed-by: {{ default.managed_by }}

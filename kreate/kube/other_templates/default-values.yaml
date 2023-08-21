@@ -71,6 +71,10 @@ default:
   Ingress:
     service: {{ val.appname }}-service
 
+  KubernetesAnnotations:
+    component: webservice
+    managed_by: kreate-kube/kustomize
+
   PodDisruptionBudget:
     minAvailable: 1
 

@@ -24,6 +24,7 @@ class KustApp(KubeApp):
         self.register_patch_file("AntiAffinityPatch")
         self.register_patch_file("HttpProbesPatch")
         self.register_patch_file("MountVolumeFiles")
+        self.register_patch_file("KubernetesAnnotations")
 
     def register_patch_class(self: str, cls: str, aliases=None) -> None:
         super().register_template_class(

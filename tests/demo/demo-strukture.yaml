@@ -38,6 +38,7 @@ Deployment:
             failureThreshold: 120
       ElasticLogging: {}
       AddEgressLabelsPatch: {}
+      KubernetesAnnotations: {}
       MountVolumeFiles:
         demo-files:
           files:
@@ -60,10 +61,11 @@ StatefulSet:
       some.long.and.very.long.strange.dummy: value
     remove:
       - spec.template.spec.containers.imagePullPolicy
-      - spec.template.metadata.annotations.co_dot_elastic_dot_logs/exclude_lines
+      #- spec.template.metadata.annotations.co_dot_elastic_dot_logs/exclude_lines
       - some.long.and # remove the strange long thingy
     patches:
       ElasticLogging: {}
+      KubernetesAnnotations: {}
 
 
 Egress:
