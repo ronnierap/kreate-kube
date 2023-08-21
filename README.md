@@ -150,7 +150,12 @@ Note: In a future version, the value-files, secrets-files and strukture_files mi
 ## Versions of kreate-kube
 At this moment there are not many versions of kreate-kube:
 - `0.1.0`  This version was incomplete and does not work when installed from Pypi
-- `0.2.0`  This is the current version, and the first to be functional
+- `0.2.0`  This was the first functional version
+- `0.3.0`  This is the current version, and adds many backward incompatible changes
+  - use of a more flat `konfig.yaml`, with a main `app` section
+  - support for default files to simplify `konfig.yaml`
+  - rename of several patches to remove `Patch` suffix, and not start with a verb
+  - many improvements and cleanup changes
 
 It is expected that new versions will come out regulary:
 - fixing bugs
