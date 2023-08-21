@@ -23,10 +23,14 @@ def argument(*name_or_flags, **kwargs):
 
 
 class KoreKreator:
+    def __init__(self):
+        self.konfig = None
+
     def kreate_konfig(self, filename):
-        konfig = Konfig(filename)
-        self.tune_konfig(konfig)
-        return konfig
+        if not self.konfig:
+            self.konfig = Konfig(filename)
+            self.tune_konfig(self.konfig)
+        return self.konfig
 
     def tune_konfig(self, konfig: Konfig) -> None:
         pass
@@ -100,14 +104,15 @@ class KoreCli:
                       f"{_jinyaml._current_jinja_file}:{lineno}")
         finally:
             if not self.args.keepsecrets:
-                # TODO: konfig was already loaded but not remembered
-                konfig = self.kreator.kreate_konfig(self.args.konfig)
-                dir = konfig.target_dir
-                secrets_dir = f"{dir}/secrets"
-                if os.path.exists(secrets_dir):
-                    logger.info(f"removing {secrets_dir}, "
-                                f"use --keep-secrets or -K option to keep it")
-                    shutil.rmtree(secrets_dir)
+                if self.kreator.konfig:
+                    # konfig was kreated so secrets might need to be cleaned
+                    konfig = self.kreator.konfig
+                    dir = konfig.target_dir
+                    secrets_dir = f"{dir}/secrets"
+                    if os.path.exists(secrets_dir):
+                        logger.info(f"removing {secrets_dir}, "
+                                    f"use --keep-secrets or -K option to keep it")
+                        shutil.rmtree(secrets_dir)
 
     def add_main_options(self):
         self.cli.add_argument(

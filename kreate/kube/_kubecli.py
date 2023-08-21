@@ -13,9 +13,10 @@ logger = logging.getLogger(__name__)
 
 class KubeKreator(krypt.KryptKreator):
     def kreate_konfig(self, filename: str = None) -> KubeKonfig:
-        konfig = KubeKonfig(filename)
-        self.tune_konfig(konfig)
-        return konfig
+        if not self.konfig:
+            self.konfig = KubeKonfig(filename)
+            self.tune_konfig(self.konfig)
+        return self.konfig
 
     def tune_konfig(self, konfig: Konfig):
         super().tune_konfig(konfig)

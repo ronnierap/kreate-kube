@@ -12,9 +12,10 @@ logger = logging.getLogger(__name__)
 
 class KryptKreator(KoreKreator):
     def kreate_konfig(self, filename: str = None) -> KryptKonfig:
-        konfig = KryptKonfig(filename)
-        self._tune_konfig(konfig)
-        return konfig
+        if not self.konfig:
+            self.konfig = KryptKonfig(filename)
+            self._tune_konfig(self.konfig)
+        return self.konfig
 
     def _tune_konfig(self, konfig: Konfig):
         super()._tune_konfig(konfig)
