@@ -171,5 +171,5 @@ for several reasons:
 - Much cleaner code
   - yaml parser
   - jinja templates
-  - modular design
+  - modular design, where a team can add team-specific templates and defaults for their set of applications
   - powerful requirements.txt/pip dependency management
