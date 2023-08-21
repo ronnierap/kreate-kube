@@ -1,7 +1,7 @@
 import os
 import logging
 
-from ..kore._korecli import kreate_files as kreate_files
+from ..kore import KoreCli, App
 from ..kore import Konfig
 from .. import krypt
 from ..krypt import krypt_functions
@@ -32,12 +32,29 @@ class KubeKreator(krypt.KryptKreator):
 class KubeCli(krypt.KryptCli):
     def __init__(self, kreator: KubeKreator):
         super().__init__(kreator)
+        self.add_subcommand(files, [], aliases=["f"])
         self.add_subcommand(build, [], aliases=["b"])
         self.add_subcommand(diff, [], aliases=["d"])
         self.add_subcommand(apply, [], aliases=["a"])
         self.add_subcommand(test, [], aliases=["t"])
         self.add_subcommand(testupdate, [], aliases=["tu"])
         self.add_subcommand(kubeconfig, [])
+
+    def default_command(self):
+        files(self)
+
+
+
+def kreate_files(cli: KoreCli) -> App:
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    app: App = cli.kreator.kreate_app(konfig)
+    app.kreate_files()
+    return app
+
+
+def files(cli: KoreCli) -> App:
+    """kreate all the files (default command)"""
+    kreate_files(cli)
 
 
 def build(args):

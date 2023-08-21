@@ -62,12 +62,11 @@ class KoreCli:
             # description="valid subcommands",
             dest="subcommand",
         )
-        self.add_subcommand(files, [], aliases=["f"])
+        self.add_subcommand(version, [], aliases=["vr"])
         self.add_subcommand(view_strukture, [], aliases=["vs"])
         self.add_subcommand(view_defaults, [], aliases=["vd"])
         self.add_subcommand(view_values, [], aliases=["vv"])
         self.add_subcommand(view_template, [], aliases=["vt"])
-        self.add_subcommand(view_version, [], aliases=["version"])
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
@@ -90,7 +89,7 @@ class KoreCli:
         self.process_main_options(self.args)
         try:
             if self.args.subcommand is None:
-                kreate_files(self)
+                self.default_command()
             else:
                 self.args.func(self)
         except Exception as e:
@@ -113,6 +112,9 @@ class KoreCli:
                         logger.info(f"removing {secrets_dir}, "
                                     f"use --keep-secrets or -K option to keep it")
                         shutil.rmtree(secrets_dir)
+
+    def default_command(self):
+        version(self)
 
     def add_main_options(self):
         self.cli.add_argument(
@@ -137,32 +139,21 @@ class KoreCli:
             logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 
-def kreate_files(cli: KoreCli) -> App:
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    app: App = cli.kreator.kreate_app(konfig)
-    app.kreate_files()
-    return app
-
-
-def files(cli: KoreCli) -> App:
-    """kreate all the files (default command)"""
-    kreate_files(cli)
-
 
 def view_strukture(cli: KoreCli):
-    """show the application strukture"""
+    """view the application strukture"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     konfig.calc_strukture().pprint(field=cli.args.kind)
 
 
 def view_defaults(cli: KoreCli):
-    """show the application strukture defaults"""
+    """view the application strukture defaults"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     konfig.calc_strukture().default.pprint(field=cli.args.kind)
 
 
 def view_template(cli: KoreCli):
-    """show the template for a specific kind"""
+    """view the template for a specific kind"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     app: JinjaApp = cli.kreator._app_class()(konfig)
     kind = cli.args.kind
@@ -185,14 +176,14 @@ def view_template(cli: KoreCli):
 
 
 def view_values(cli: KoreCli):
-    """show the application values"""
+    """view the application values"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     for k, v in konfig.values.items():
         print(f"{k}: {v}")
 
 
-def view_version(cli: KoreCli):
-    """show the version"""
+def version(cli: KoreCli):
+    """view the version"""
     version = cli.dist_package_version("kreate-kube")
     print(f"kreate-kube: {version}")
 
