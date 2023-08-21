@@ -61,6 +61,6 @@ class Patch(JinYamlKomponent):
         return root_strukture
 
 
-class AddEgressLabelsPatch(Patch):
+class EgressLabels(Patch):
     def egresses(self):
         return [k for k in self.app.komponents if isinstance(k, Egress)]

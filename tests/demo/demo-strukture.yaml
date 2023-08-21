@@ -31,15 +31,15 @@ Deployment:
       annotations:
         some-demo-annotation: just-for-fun
     patches:
-      AntiAffinityPatch: {}
-      HttpProbesPatch:
+      AntiAffinity: {}
+      HttpProbes:
         main:
           startupProbe:
             failureThreshold: 120
       ElasticLogging: {}
-      AddEgressLabelsPatch: {}
+      EgressLabels: {}
       KubernetesAnnotations: {}
-      MountVolumeFiles:
+      VolumeMounts:
         demo-files:
           files:
             - /home/spring/application.properties

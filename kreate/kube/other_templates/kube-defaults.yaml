@@ -16,7 +16,7 @@ default:
     memory_limit:   512M
     memory_request: 512M
 
-  AntiAffinityPatch:
+  AntiAffinity:
     selector_key: app
 
   CronJob:
@@ -40,7 +40,7 @@ default:
     cpu_averageUtilization: 70
     memory_averageUtilization: 70
 
-  HttpProbesPatch:
+  HttpProbes:
     probe_path: /actuator/info
 
     startup_initialDelaySeconds: 10

@@ -39,7 +39,7 @@ data:
         memory_limit:   512M
         memory_request: 512M
 
-      AntiAffinityPatch:
+      AntiAffinity:
         selector_key: app
 
       CronJob:
@@ -63,7 +63,7 @@ data:
         cpu_averageUtilization: 70
         memory_averageUtilization: 70
 
-      HttpProbesPatch:
+      HttpProbes:
         probe_path: /actuator/info
 
         startup_initialDelaySeconds: 10
@@ -112,7 +112,7 @@ kind: ConfigMap
 metadata:
   labels:
     config-map: demo-files
-  name: demo-files-ht6c8hk4t4
+  name: demo-files-786g5g49mc
   namespace: demo-dev
 ---
 apiVersion: v1
@@ -327,7 +327,7 @@ spec:
         secret:
           secretName: demo-secret-files
       - configMap:
-          name: demo-files-ht6c8hk4t4
+          name: demo-files-786g5g49mc
         name: demo-files
       - configMap:
           name: demo-extra-files-hmm7226mdf

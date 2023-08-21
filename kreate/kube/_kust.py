@@ -6,7 +6,7 @@ from .resource import Resource
 from . import KubeApp
 from . import other_templates
 from . import patch_templates
-from .patch import AddEgressLabelsPatch
+from .patch import EgressLabels
 from .patch import Patch
 
 logger = logging.getLogger(__name__)
@@ -20,10 +20,10 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=other_templates)
-        self.register_patch_class(AddEgressLabelsPatch)
-        self.register_patch_file("AntiAffinityPatch")
-        self.register_patch_file("HttpProbesPatch")
-        self.register_patch_file("MountVolumeFiles")
+        self.register_patch_class(EgressLabels)
+        self.register_patch_file("AntiAffinity")
+        self.register_patch_file("HttpProbes")
+        self.register_patch_file("VolumeMounts")
         self.register_patch_file("KubernetesAnnotations")
 
     def register_patch_class(self: str, cls: str, aliases=None, package=None) -> None:
