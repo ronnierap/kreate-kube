@@ -74,7 +74,6 @@ class KoreCli:
 
         cmd = self.add_subcommand(view_values, [], aliases=["vv"])
 
-
         cmd = self.add_subcommand(view_template, [], aliases=["vt"])
         cmd.add_argument("-k", "--key", help="template to show", action="store", default=None)
 
