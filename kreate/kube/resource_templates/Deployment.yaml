@@ -31,19 +31,24 @@ spec:
       {% if "serviceName" in default %}
       serviceName: "" #{{ default.serviceName | default("") }}  # Only for StatefulSet
       {% endif %}
+      {% if default.terminationGracePeriodSeconds %}
       terminationGracePeriodSeconds: {{ default.terminationGracePeriodSeconds }}
+      {% endif %}
+
       containers:
       - name: {{ default.container_name }}
         image: {{ default.image_repo }}/{{ default.image_name }}:{{ default.image_version }}
+        {% if default.imagePullPolicy %}
         imagePullPolicy: {{ default.imagePullPolicy }}
+        {% endif %}
         envFrom:
-        - configMapRef:
-        {% for cm in strukt.get("vars",[]) %}
-            name: {{ cm }}
-        {% endfor %}
         - secretRef:
         {% for secr in strukt.get("secret-vars",[]) %}
             name: {{ secr }}
+        {% endfor %}
+        - configMapRef:
+        {% for cm in strukt.get("vars",[]) %}
+            name: {{ cm }}
         {% endfor %}
         ports:
         - containerPort: {{ default.containerPort }}

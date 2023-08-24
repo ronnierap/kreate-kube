@@ -31,8 +31,8 @@ default:
     containerPort: 8080
     protocol: TCP
     revisionHistoryLimit: 1
-    restartPolicy: Always
-    terminationGracePeriodSeconds: 30
+    restartPolicy: "" # if not specfied explicetly defaults to Always
+    terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
 
   HorizontalPodAutoscaler:
     minReplicas: 1
@@ -73,7 +73,7 @@ default:
 
   KubernetesAnnotations:
     component: webservice
-    managed_by: kreate-kube/kustomize
+    managed_by: kustomize
 
   PodDisruptionBudget:
     minAvailable: 1
@@ -83,5 +83,5 @@ default:
     containerPort: 8080
     protocol: TCP
     revisionHistoryLimit: 1
-    restartPolicy: Always
-    terminationGracePeriodSeconds: 30
+    restartPolicy: "" # if not specfied explicetly defaults to Always
+    terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
