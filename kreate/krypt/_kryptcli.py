@@ -50,7 +50,7 @@ def dekyaml(cli):
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
 
     filename = (cli.args.file or
-                f"{konfig.dir}/secrets-{konfig.name}-{konfig.env}.yaml")
+                f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml")
     krypt_functions.dekrypt_yaml(filename, ".")
 
 
@@ -76,7 +76,7 @@ def enkyaml(cli):
     "enkrypt values in a yaml file"
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
     filename = (cli.args.file
-                or f"{konfig.dir}/secrets-{konfig.name}-{konfig.env}.yaml")
+                or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml")
     krypt_functions.enkrypt_yaml(filename, ".")
 
 
