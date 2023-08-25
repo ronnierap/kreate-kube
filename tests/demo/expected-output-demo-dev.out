@@ -34,10 +34,10 @@ data:
         image_version: {{ val.image_version }}
         project: {{ val.project }}
 
-        cpu_limit:   1
-        cpu_request: 200m
-        memory_limit:   512M
-        memory_request: 512M
+        cpu_limit:    {{ val.cpu_limit | default(1) }}
+        cpu_request:  {{ val.cpu_request | default(1) }}
+        memory_limit:    {{ val.memory_limit | default("512M") }}
+        memory_request:  {{ val.memory_request | default("512M") }}
 
       AntiAffinity:
         selector_key: app
@@ -54,8 +54,8 @@ data:
         containerPort: 8080
         protocol: TCP
         revisionHistoryLimit: 1
-        restartPolicy: Always
-        terminationGracePeriodSeconds: 30
+        restartPolicy: "" # if not specfied explicetly defaults to Always
+        terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
 
       HorizontalPodAutoscaler:
         minReplicas: 1
@@ -96,7 +96,7 @@ data:
 
       KubernetesAnnotations:
         component: webservice
-        managed_by: kreate-kube/kustomize
+        managed_by: kustomize
 
       PodDisruptionBudget:
         minAvailable: 1
@@ -106,13 +106,13 @@ data:
         containerPort: 8080
         protocol: TCP
         revisionHistoryLimit: 1
-        restartPolicy: Always
-        terminationGracePeriodSeconds: 30
+        restartPolicy: "" # if not specfied explicetly defaults to Always
+        terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
 kind: ConfigMap
 metadata:
   labels:
     config-map: demo-files
-  name: demo-files-786g5g49mc
+  name: demo-files-mkmcmmhc48
   namespace: demo-dev
 ---
 apiVersion: v1
@@ -238,7 +238,7 @@ spec:
     metadata:
       annotations:
         app.kubernetes.io/component: webservice
-        app.kubernetes.io/managed-by: kreate-kube/kustomize
+        app.kubernetes.io/managed-by: kustomize
         app.kubernetes.io/name: demo
         app.kubernetes.io/part-of: kreate-demo
         app.kubernetes.io/version: v1.3.4
@@ -262,10 +262,10 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:
       - envFrom:
-        - configMapRef:
-            name: demo-vars-tmfmt8h78d
         - secretRef:
             name: demo-secrets
+        - configMapRef:
+            name: demo-vars-tmfmt8h78d
         image: https://repo.kisst.org/demo.app:v1.3.4
         imagePullPolicy: Always
         livenessProbe:
@@ -320,14 +320,12 @@ spec:
         - mountPath: /home/spring/environment.properties
           name: demo-extra-files
           subPath: environment.properties
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
       volumes:
       - name: demo-secret-files
         secret:
           secretName: demo-secret-files
       - configMap:
-          name: demo-files-786g5g49mc
+          name: demo-files-mkmcmmhc48
         name: demo-files
       - configMap:
           name: demo-extra-files-hmm7226mdf
@@ -351,7 +349,7 @@ spec:
     metadata:
       annotations:
         app.kubernetes.io/component: webservice
-        app.kubernetes.io/managed-by: kreate-kube/kustomize
+        app.kubernetes.io/managed-by: kustomize
         app.kubernetes.io/name: demo-statefulset
         app.kubernetes.io/part-of: kreate-demo
         app.kubernetes.io/version: v1.3.4
@@ -364,8 +362,8 @@ spec:
     spec:
       containers:
       - envFrom:
-        - configMapRef: null
         - secretRef: null
+        - configMapRef: null
         image: https://repo.kisst.org/demo.app:v1.3.4
         name: app
         ports:
@@ -378,8 +376,6 @@ spec:
           requests:
             cpu: 50m
             memory: 512M
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -492,8 +488,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    app.kubernetes.io/name: demo
   name: demo-ingress-api
   namespace: demo-dev
 spec:
@@ -513,7 +507,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    app.kubernetes.io/name: demo
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/auth-realm: demo-realm
     nginx.ingress.kubernetes.io/auth-secret: demo-basic-auth
