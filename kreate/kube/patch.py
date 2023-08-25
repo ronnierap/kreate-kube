@@ -16,12 +16,12 @@ __all__ = [
 
 class Patch(JinYamlKomponent):
     def __init__(
-            self,
-            target: Resource,
-            shortname: str = None,
-            kind: str = None,
-            template: FileLocation = None,
-        ):
+        self,
+        target: Resource,
+        shortname: str = None,
+        kind: str = None,
+        template: FileLocation = None,
+    ):
         self.target = target
         super().__init__(
             target.app,
@@ -31,8 +31,10 @@ class Patch(JinYamlKomponent):
         )
 
     def __str__(self):
-        return (f"<Patch {self.target.kind}.{self.target.shortname}"
-                f":{self.kind}.{self.shortname}>")
+        return (
+            f"<Patch {self.target.kind}.{self.target.shortname}"
+            f":{self.kind}.{self.shortname}>"
+        )
 
     @property
     def dirname(self):
@@ -40,8 +42,10 @@ class Patch(JinYamlKomponent):
 
     @property
     def filename(self):
-        return (f"{self.target.kind}-{self.target.shortname}"
-                f"-{self.kind}-{self.shortname}.yaml")
+        return (
+            f"{self.target.kind}-{self.target.shortname}"
+            f"-{self.kind}-{self.shortname}.yaml"
+        )
 
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}
@@ -53,7 +57,8 @@ class Patch(JinYamlKomponent):
         if typename in tar_struk and self.shortname in tar_struk[typename]:
             logger.debug(
                 f"using embedded strukture {typename}.{self.shortname}"
-                f" from {self.target.kind}.{self.target.shortname}")
+                f" from {self.target.kind}.{self.target.shortname}"
+            )
             # The embedded_strukture is first,
             # since the root_strukture will contain all default values
             embedded_strukture = tar_struk[typename][self.shortname]

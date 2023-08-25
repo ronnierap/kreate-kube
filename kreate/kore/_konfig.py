@@ -26,7 +26,7 @@ def get_class(name: str):
     return getattr(module, class_name)
 
 
-class Konfig():
+class Konfig:
     def __init__(self, filename: str = None):
         filename = filename or "konfig.yaml"
         if os.path.isdir(filename):
@@ -39,9 +39,10 @@ class Konfig():
         self._strukt_cache = None
         self._default_strukture_files = []
         self.dekrypt_func = None
-        self._add_jinja_filter("b64encode",  b64encode)
-        self.yaml = load_jinyaml(FileLocation(self.filename, dir="."),
-                                 {"function": self.functions})
+        self._add_jinja_filter("b64encode", b64encode)
+        self.yaml = load_jinyaml(
+            FileLocation(self.filename, dir="."), {"function": self.functions}
+        )
         self.values.update(self.yaml.get("app", {}))
         self.appname = self.values["appname"]
         self.env = self.values["env"]
@@ -82,10 +83,10 @@ class Konfig():
 
     def _load_strukture_file(self, filename):
         vars = {
-                "konfig": self,
-                "val": self.values,
-                "secret": self.secrets,
-                "function": self.functions,
+            "konfig": self,
+            "val": self.values,
+            "secret": self.secrets,
+            "function": self.functions,
         }
         return load_jinyaml(FileLocation(filename, dir=self.dir), vars)
 

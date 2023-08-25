@@ -38,8 +38,10 @@ class DictWrapper(UserDict):
             if isinstance(data[final_key], Mapping):
                 # Try to merge two Mappings
                 if not isinstance(value, Mapping):
-                    raise ValueError(f"Can not assign non-dict {value} to"
-                                     f"dict {data[final_key]} for path {path}")
+                    raise ValueError(
+                        f"Can not assign non-dict {value} to"
+                        f"dict {data[final_key]} for path {path}"
+                    )
                 data[final_key].update(value)
             else:
                 data[final_key] = value
@@ -111,7 +113,8 @@ class DeepChain(Mapping):
             if nrof_map_vals < len(vals):
                 raise AttributeError(
                     f"key {key} is not mergeable into dictionary "
-                    f"since not all values are maps {vals}")
+                    f"since not all values are maps {vals}"
+                )
             args = list(m for m in vals)
             return DeepChain(*args)
         if len(vals) > 0:
@@ -121,7 +124,8 @@ class DeepChain(Mapping):
     def __getattr__(self, attr):
         if attr not in self:
             raise AttributeError(
-                f"DeepChain object could not find attribute {attr} in {self}")
+                f"DeepChain object could not find attribute {attr} in {self}"
+            )
         else:
             return self[attr]
 
@@ -164,7 +168,7 @@ class DeepChain(Mapping):
             val = map.get(key, None)
             if isinstance(val, Mapping):
                 if len(val) == 0:
-                    print(f"{indent}{key}: "+"{}")
+                    print(f"{indent}{key}: " + "{}")
                 else:
                     print(f"{indent}{key}:")
                     self.pprint(map=val, indent=indent + indent_step)

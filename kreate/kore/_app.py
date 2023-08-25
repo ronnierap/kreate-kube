@@ -7,7 +7,7 @@ from ._konfig import Konfig
 logger = logging.getLogger(__name__)
 
 
-class App():
+class App:
     def __init__(self, konfig: Konfig):
         self.appname = konfig.appname
         self.env = konfig.env
@@ -48,20 +48,22 @@ class App():
 
     def kreate_komponent(self, kind: str, shortname: str = None):
         raise NotImplementedError(
-            f"can not create komponent for {kind}.{shortname}")
+            f"can not create komponent for {kind}.{shortname}"
+        )
 
     def aktivate(self):
         for komp in self.komponents:
-            logger.debug(
-                f"aktivating {komp.kind}.{komp.shortname}")
+            logger.debug(f"aktivating {komp.kind}.{komp.shortname}")
             komp.aktivate()
 
     def kreate_files(self):
         os.makedirs(self.konfig.target_dir, exist_ok=True)
         for komp in self.komponents:
-            if (komp.filename):
+            if komp.filename:
                 if komp.dirname:
-                    logger.info(f"kreating file {komp.dirname}/{komp.filename}")
+                    logger.info(
+                        f"kreating file {komp.dirname}/{komp.filename}"
+                    )
                 else:
                     logger.info(f"kreating file {komp.filename}")
                 komp.kreate_file()

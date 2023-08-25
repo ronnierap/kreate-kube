@@ -13,6 +13,7 @@ class DemoStruktKreator(KubeKreator):
     def tune_app(self, app: App) -> None:
         app.kreate_komponents_from_strukture()
         app.aktivate()
-        app.depl.main.label("this-is-added","by-script")
+        app.depl.main.label("this-is-added", "by-script")
+
 
 KubeCli(DemoStruktKreator()).run()

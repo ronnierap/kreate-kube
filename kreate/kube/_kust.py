@@ -26,7 +26,9 @@ class KustApp(KubeApp):
         self.register_patch_file("VolumeMounts")
         self.register_patch_file("KubernetesAnnotations")
 
-    def register_patch_class(self: str, cls: str, aliases=None, package=None) -> None:
+    def register_patch_class(
+        self: str, cls: str, aliases=None, package=None
+    ) -> None:
         package = package or patch_templates
         super().register_template_class(
             cls,
@@ -35,17 +37,15 @@ class KustApp(KubeApp):
             package=patch_templates,
         )
 
-    def register_patch_file(self,
-                            kind: str = None,
-                            aliases=None,
-                            package=None,
-        ) -> None:
+    def register_patch_file(
+        self,
+        kind: str = None,
+        aliases=None,
+        package=None,
+    ) -> None:
         package = package or patch_templates
         super().register_template_file(
-            kind=kind,
-            cls=Patch,
-            aliases=aliases,
-            package=package
+            kind=kind, cls=Patch, aliases=aliases, package=package
         )
 
     def kreate_komponents_from_strukture(self):
@@ -55,18 +55,19 @@ class KustApp(KubeApp):
                 self.kreate_patches(res)
 
     def kreate_patch(
-            self,
-            res: Resource,
-            kind: str = None,
-            shortname: str = None,
-            ) -> None:
+        self,
+        res: Resource,
+        kind: str = None,
+        shortname: str = None,
+    ) -> None:
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if issubclass(cls, Patch):
             cls(res, shortname, kind, template=templ)
         else:
             raise TypeError(
-                f"class for {kind}.{shortname} is not a Patch but {cls}")
+                f"class for {kind}.{shortname} is not a Patch but {cls}"
+            )
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
@@ -83,8 +84,8 @@ class KustApp(KubeApp):
 class Kustomization(JinYamlKomponent):
     def resources(self):
         return [
-            res for res in self.app.komponents if isinstance(
-                res, Resource)]
+            res for res in self.app.komponents if isinstance(res, Resource)
+        ]
 
     def patches(self):
         return [res for res in self.app.komponents if isinstance(res, Patch)]

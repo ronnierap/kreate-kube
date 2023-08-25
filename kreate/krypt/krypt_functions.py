@@ -27,10 +27,11 @@ def dekrypt_file(filename):
 
 def enkrypt_str(value):
     fernet = Fernet(_krypt_key)
-    part = b'\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa'
+    part = b"\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa"
     # use the parts to prevent changes if secret was not changed
-    return fernet._encrypt_from_parts(
-        value.encode("ascii"), 0, part).decode("ascii")
+    return fernet._encrypt_from_parts(value.encode("ascii"), 0, part).decode(
+        "ascii"
+    )
 
 
 def enkrypt_file(filename):
@@ -38,12 +39,13 @@ def enkrypt_file(filename):
     with open(filename) as f:
         data = f.read()
     with open(filename + ".encrypted", "wb") as f:
-        part = b'\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa'
+        part = b"\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa"
         f.write(fernet._encrypt_from_parts(data.encode("ascii"), 0, part))
 
 
-def change_yaml_comments(filename: str, func,
-                         from_: str, to_: str, dir: str = None):
+def change_yaml_comments(
+    filename: str, func, from_: str, to_: str, dir: str = None
+):
     dir = dir or "."
     yaml_parser = YAML()
     yaml_parser.width = 4096  # prevent line wrapping
@@ -62,15 +64,17 @@ def change_yaml_comments(filename: str, func,
                 yaml[key] = func(item)
                 logger.info(f"{to_} {key}")
 
-    with open(f"{dir}/{filename}", 'wb') as f:
+    with open(f"{dir}/{filename}", "wb") as f:
         yaml_parser.dump(yaml, f)
 
 
 def dekrypt_yaml(filename: str, dir: str = None):
-    change_yaml_comments(filename, dekrypt_str,
-                         "enkrypted", "dekrypted", dir=dir)
+    change_yaml_comments(
+        filename, dekrypt_str, "enkrypted", "dekrypted", dir=dir
+    )
 
 
 def enkrypt_yaml(filename: str, dir: str = None):
-    change_yaml_comments(filename, enkrypt_str,
-                         "dekrypted", "enkrypted", dir=dir)
+    change_yaml_comments(
+        filename, enkrypt_str, "dekrypted", "enkrypted", dir=dir
+    )

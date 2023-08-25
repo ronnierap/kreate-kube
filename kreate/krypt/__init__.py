@@ -1,4 +1,3 @@
-
 from ._krypt import KryptKonfig, KryptApp
 from ._kryptcli import KryptCli, KryptKreator
 

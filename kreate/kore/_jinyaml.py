@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 yaml_parser = YAML()
 
 
-class FileLocation(namedtuple(
-        "FileLocation", "filename package dir", defaults=[None, None])):
+class FileLocation(
+    namedtuple("FileLocation", "filename package dir", defaults=[None, None])
+):
     __slots__ = ()
 
     def __str__(self):
@@ -23,8 +24,10 @@ class FileLocation(namedtuple(
 
     def __repr__(self):
         if self.package:
-            return (f"FileLocation({self.filename}"
-                    f" @package:{self.package.__name__})")
+            return (
+                f"FileLocation({self.filename}"
+                f" @package:{self.package.__name__})"
+            )
         return f"FileLocation({self.filename} @dir {self.dir})"
 
 
@@ -38,26 +41,29 @@ def load_data(file_loc: FileLocation):
     package = file_loc.package
     prefix = "py:"
     if filename.startswith(prefix):
-        fname = filename[len(prefix):]
+        fname = filename[len(prefix) :]
         if package:
             raise ValueError(
                 f"filename {filename} specifies package, "
-                f"but package {package} is also provided")
+                f"but package {package} is also provided"
+            )
         # split into package_name and filename between :
         spl = fname.split(":", 1)
         if len(spl) < 2:
             raise ValueError(
-                f"filename {filename} should be of format py:<package>:<file>")
+                f"filename {filename} should be of format py:<package>:<file>"
+            )
         package_name = spl[0]
         filename = spl[1]
         logger.debug(f"loading file {filename} from package {package_name}")
         logger.debug(f"finding module {package_name}")
         package = importlib.import_module(package_name)
-        return pkgutil.get_data(package.__package__, filename).decode('utf-8')
+        return pkgutil.get_data(package.__package__, filename).decode("utf-8")
     elif package:
         logger.debug(
-            f"loading file {filename} from package {package.__name__}")
-        return pkgutil.get_data(package.__package__, filename).decode('utf-8')
+            f"loading file {filename} from package {package.__name__}"
+        )
+        return pkgutil.get_data(package.__package__, filename).decode("utf-8")
     else:
         dirname = dirname or "."
         logger.debug(f"loading file {filename} from {dirname}")
@@ -73,7 +79,7 @@ def load_jinja_data(file_loc: FileLocation, vars: Mapping):
         filedata,
         undefined=jinja2.StrictUndefined,
         trim_blocks=True,
-        lstrip_blocks=True
+        lstrip_blocks=True,
     )
     result = tmpl.render(vars)
     _current_jinja_file = None

@@ -2,7 +2,7 @@ import sys
 import logging
 import jinja2.filters
 
-from ..kore import KoreCli, KoreKreator,  Konfig
+from ..kore import KoreCli, KoreKreator, Konfig
 from ..kore._korecli import argument as argument
 from . import KryptKonfig
 from . import krypt_functions
@@ -25,32 +25,46 @@ class KryptCli(KoreCli):
     def __init__(self, kreator: KryptKreator):
         jinja2.filters.FILTERS["dekrypt"] = krypt_functions.dekrypt_str
         super().__init__(kreator)
-        self.add_subcommand(dekyaml, [argument(
-            "-f", "--file", help="yaml file to enkrypt")],
-            aliases=["dy"])
-        self.add_subcommand(dekstr, [argument(
-            "-s", "--str", help="string value to dekrypt")],
-            aliases=["ds"])
-        self.add_subcommand(dekfile, [argument(
-            "file", help=" filename to dekrypt")],
-            aliases=["df"])
-        self.add_subcommand(enkyaml, [argument(
-            "-f", "--file", help="yaml filename to enkrypt")],
-            aliases=["ey"])
-        self.add_subcommand(enkfile, [argument(
-            "file", help=" filename to enkrypt")],
-            aliases=["ef"])
-        self.add_subcommand(enkstr, [argument(
-            "-s", "--str", help="string value to enkrypt")],
-            aliases=["es"])
+        self.add_subcommand(
+            dekyaml,
+            [argument("-f", "--file", help="yaml file to enkrypt")],
+            aliases=["dy"],
+        )
+        self.add_subcommand(
+            dekstr,
+            [argument("-s", "--str", help="string value to dekrypt")],
+            aliases=["ds"],
+        )
+        self.add_subcommand(
+            dekfile,
+            [argument("file", help=" filename to dekrypt")],
+            aliases=["df"],
+        )
+        self.add_subcommand(
+            enkyaml,
+            [argument("-f", "--file", help="yaml filename to enkrypt")],
+            aliases=["ey"],
+        )
+        self.add_subcommand(
+            enkfile,
+            [argument("file", help=" filename to enkrypt")],
+            aliases=["ef"],
+        )
+        self.add_subcommand(
+            enkstr,
+            [argument("-s", "--str", help="string value to enkrypt")],
+            aliases=["es"],
+        )
 
 
 def dekyaml(cli):
     """dekrypt values in a yaml file"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
 
-    filename = (cli.args.file or
-                f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml")
+    filename = (
+        cli.args.file
+        or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
+    )
     krypt_functions.dekrypt_yaml(filename, ".")
 
 
@@ -75,8 +89,10 @@ def dekfile(cli):
 def enkyaml(cli):
     "enkrypt values in a yaml file"
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    filename = (cli.args.file
-                or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml")
+    filename = (
+        cli.args.file
+        or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
+    )
     krypt_functions.enkrypt_yaml(filename, ".")
 
 

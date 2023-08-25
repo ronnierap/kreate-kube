@@ -21,7 +21,7 @@ def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
     kreate.kube.resource.Egress(app, "redis")
     kreate.kube.resource.Egress(app, "xyz")
 
-    depl=kreate.kube.resource.Deployment(app)
+    depl = kreate.kube.resource.Deployment(app)
     kreate.kube.resource.Service(app)
     kreate.kube.resource.Service(app, "https")
     pdb = kreate.kube.resource.PodDisruptionBudget(app)
@@ -46,7 +46,6 @@ def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
     app.kreate_patch(app.StatefulSet.main, "KubernetesAnnotations")
     app.kreate_patch(app.StatefulSet.main, "ElasticLogging")
 
-
     app.aktivate()
 
     app.ingress.root.sticky()
@@ -55,13 +54,17 @@ def kreate_app_script(konfig: Konfig) -> kreate.kube.KustApp:
     app.ingress.root.label("dummy", "jan")
     app.service.main.headless()
     pdb.yaml.spec.minAvailable = 2
-    pdb.label("testje","test")
+    pdb.label("testje", "test")
 
     return app
 
+
 class DemoScriptKreator(kreate.kube.KubeKreator):
-    def kreate_app(self, konfig : kreate.kube.KubeKonfig) -> kreate.kube.KustApp:
+    def kreate_app(
+        self, konfig: kreate.kube.KubeKonfig
+    ) -> kreate.kube.KustApp:
         return kreate_app_script(konfig)
+
 
 kreator = DemoScriptKreator()
 kreate.kube.KubeCli(kreator).run()

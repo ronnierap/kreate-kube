@@ -27,7 +27,7 @@ class Resource(JinYamlKomponent):
 
     @property
     def dirname(self):
-        return  "resources"
+        return "resources"
 
     @property
     def filename(self):
@@ -39,8 +39,9 @@ class Resource(JinYamlKomponent):
         for key in self.strukture.get("annotations", {}):
             if "annotations" not in self.yaml.metadata:
                 self.yaml.metadata.annotations = {}
-            self.yaml.metadata.annotations[key] = (
-                self.strukture.annotations[key])
+            self.yaml.metadata.annotations[key] = self.strukture.annotations[
+                key
+            ]
         for key in self.strukture.get("labels", {}):
             if "labels" not in self.yaml.metadata:
                 self.yaml.metadata.labels = {}
@@ -91,6 +92,7 @@ class Egress(Resource):
     def calc_name(self):
         return f"{self.app.appname}-egress-to-{self.shortname}"
 
+
 class Secret(Resource):
     def load_some_file(self, filename: str) -> str:
         with open(f"{self.app.konfig.target_dir}/{filename}") as f:
@@ -123,8 +125,8 @@ class ConfigMap(Resource):
     def calc_name(self):
         return f"{self.app.appname}-{self.shortname}"
 
-    #@property
-    #def filename(self) -> str:
+    # @property
+    # def filename(self) -> str:
     #    return super().filename
 
     def add_var(self, name, value=None):

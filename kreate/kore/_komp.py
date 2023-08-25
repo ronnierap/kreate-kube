@@ -12,11 +12,12 @@ logger = logging.getLogger(__name__)
 class Komponent:
     """A base class for other komponents"""
 
-    def __init__(self,
-                 app: App,
-                 shortname: str = None,
-                 kind: str = None,
-                 ):
+    def __init__(
+        self,
+        app: App,
+        shortname: str = None,
+        kind: str = None,
+    ):
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
@@ -46,9 +47,11 @@ class Komponent:
     def _calc_strukture(self):
         strukt = self._find_strukture()
         defaults = self._find_defaults()
-        return DeepChain(strukt,
-                         {"default": defaults},
-                         {"default": self._find_generic_defaults()})
+        return DeepChain(
+            strukt,
+            {"default": defaults},
+            {"default": self._find_generic_defaults()},
+        )
 
     def _find_defaults(self):
         strukt = self.app.strukture if self.app else {}
@@ -71,7 +74,8 @@ class Komponent:
             logger.debug(f"using named strukture {typename}.{self.shortname}")
             return self.app.strukture[typename][self.shortname]
         logger.debug(
-            f"could not find strukture for {typename}.{self.shortname}")
+            f"could not find strukture for {typename}.{self.shortname}"
+        )
         return {}
 
     def kreate_file(self) -> None:
@@ -89,26 +93,31 @@ class Komponent:
                     if isinstance(val, Mapping):
                         logger.debug(
                             f"invoking {self} option {key}"
-                            f" with kwargs parameters {val}")
+                            f" with kwargs parameters {val}"
+                        )
                         getattr(self, key)(**dict(val))
                     elif isinstance(val, list):
                         logger.debug(
                             f"invoking {self} option {key}"
-                            f" with list parameters {val}")
+                            f" with list parameters {val}"
+                        )
                         getattr(self, key)(*val)
                     elif isinstance(val, str):
                         logger.debug(
                             f"invoking {self} option {key}"
-                            f" with string parameter {val}")
+                            f" with string parameter {val}"
+                        )
                         getattr(self, key)(val)
                     elif isinstance(val, int):
                         logger.debug(
                             f"invoking {self} option {key}"
-                            f" with int parameter {val}")
+                            f" with int parameter {val}"
+                        )
                         getattr(self, key)(int(val))
                     else:
                         logger.warn(
-                            f"option map {opt} for {self.name} not supported")
+                            f"option map {opt} for {self.name} not supported"
+                        )
 
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")
@@ -124,12 +133,14 @@ class Komponent:
 
 class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""
-    def __init__(self,
-                 app: App,
-                 shortname: str = None,
-                 kind: str = None,
-                 template: FileLocation = None,
-                 ):
+
+    def __init__(
+        self,
+        app: App,
+        shortname: str = None,
+        kind: str = None,
+        template: FileLocation = None,
+    ):
         super().__init__(app, shortname, kind)
         template = template or self.app.kind_templates[self.kind]
         self.template = template
@@ -147,7 +158,7 @@ class JinjaKomponent(Komponent):
             else:
                 dir = self.app.konfig.target_dir
             os.makedirs(dir, exist_ok=True)
-            with open(f"{dir}/{filename}", 'wb') as f:
+            with open(f"{dir}/{filename}", "wb") as f:
                 f.write(self.data)
 
     def _template_vars(self):
@@ -179,7 +190,7 @@ class JinYamlKomponent(JinjaKomponent):
             else:
                 dir = self.app.konfig.target_dir
             os.makedirs(dir, exist_ok=True)
-            with open(f"{dir}/{filename}", 'wb') as f:
+            with open(f"{dir}/{filename}", "wb") as f:
                 yaml_dump(self.yaml.data, f)
 
     def add_additions(self):

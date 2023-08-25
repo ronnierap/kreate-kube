@@ -21,7 +21,8 @@ class KubeKreator(krypt.KryptKreator):
     def tune_konfig(self, konfig: Konfig):
         super().tune_konfig(konfig)
         konfig._default_strukture_files.append(
-            "py:kreate.kube.other_templates:kube-defaults.yaml")
+            "py:kreate.kube.other_templates:kube-defaults.yaml"
+        )
 
     def kreate_app(self, konfig: Konfig, tune_app=True) -> KustApp:
         app = KustApp(konfig)
@@ -38,10 +39,22 @@ class KubeCli(krypt.KryptCli):
         self.add_subcommand(diff, [], aliases=["d"])
         self.add_subcommand(apply, [], aliases=["a"])
         cmd = self.add_subcommand(test, [], aliases=["t"])
-        cmd.add_argument("-e", "--expected-output", help="file with expected output of build", action="store", default=None)
+        cmd.add_argument(
+            "-e",
+            "--expected-output",
+            help="file with expected output of build",
+            action="store",
+            default=None,
+        )
 
         cmd = self.add_subcommand(testupdate, [], aliases=["tu"])
-        cmd.add_argument("-e", "--expected-output", help="file with expected output of build", action="store", default=None)
+        cmd.add_argument(
+            "-e",
+            "--expected-output",
+            help="file with expected output of build",
+            action="store",
+            default=None,
+        )
 
         self.add_subcommand(kubeconfig, [])
 
@@ -72,8 +85,10 @@ def build(cli: KubeCli) -> None:
 def diff(cli: KubeCli) -> None:
     """diff with current existing resources"""
     app = kreate_files(cli)
-    cmd = (f"kustomize build {app.konfig.target_dir} "
-           f"| kubectl --context={app.env} -n {app.namespace} diff -f - ")
+    cmd = (
+        f"kustomize build {app.konfig.target_dir} "
+        f"| kubectl --context={app.env} -n {app.namespace} diff -f - "
+    )
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
@@ -81,8 +96,10 @@ def diff(cli: KubeCli) -> None:
 def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
     app = kreate_files(cli)
-    cmd = (f"kustomize build {app.konfig.target_dir} "
-           f"| kubectl apply --dry-run -f - ")
+    cmd = (
+        f"kustomize build {app.konfig.target_dir} "
+        f"| kubectl apply --dry-run -f - "
+    )
     logger.info(f"running: {cmd}")
     os.system(cmd)
 
@@ -92,8 +109,10 @@ def test(cli: KubeCli) -> None:
     # Do not dekrypt secrets for testing
     krypt_functions._dekrypt_testdummy = True
     app = kreate_files(cli)
-    expected = (cli.args.expected_output or
-        f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out")
+    expected = (
+        cli.args.expected_output
+        or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"
+    )
     cmd = f"kustomize build {app.konfig.target_dir} | diff {expected} -"
     logger.info(f"running: {cmd}")
     os.system(cmd)
@@ -104,8 +123,10 @@ def testupdate(cli: KubeCli) -> None:
     # Do not dekrypt secrets for testing
     krypt_functions._dekrypt_testdummy = True
     app = kreate_files(cli)
-    expected = (cli.args.expected_output or
-        f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out")
+    expected = (
+        cli.args.expected_output
+        or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"
+    )
     cmd = f"kustomize build {app.konfig.target_dir} >{expected}"
     logger.info(f"running: {cmd}")
     os.system(cmd)
