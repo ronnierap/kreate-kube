@@ -11,10 +11,10 @@ default:
     image_version: {{ val.image_version }}
     project: {{ val.project }}
 
-    cpu_limit:   1
-    cpu_request: 200m
-    memory_limit:   512M
-    memory_request: 512M
+    cpu_limit:    {{ val.cpu_limit | default(1) }}
+    cpu_request:  {{ val.cpu_request | default(1) }}
+    memory_limit:    {{ val.memory_limit | default("512M") }}
+    memory_request:  {{ val.memory_request | default("512M") }}
 
   AntiAffinity:
     selector_key: app
