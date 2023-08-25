@@ -71,14 +71,11 @@ class KoreCli:
         cmd.add_argument(
             "-k", "--key", help="key to show", action="store", default=None
         )
-
         cmd = self.add_subcommand(view_defaults, [], aliases=["vd"])
         cmd.add_argument(
             "-k", "--key", help="key to show", action="store", default=None
         )
-
         cmd = self.add_subcommand(view_values, [], aliases=["vv"])
-
         cmd = self.add_subcommand(view_template, [], aliases=["vt"])
         cmd.add_argument(
             "-k",
@@ -87,9 +84,9 @@ class KoreCli:
             action="store",
             default=None,
         )
-
         cmd = self.add_subcommand(view_konfig, [], aliases=["vk"])
         cmd.add_argument("-k", "--kind", action="store", default=None)
+        cmd = self.add_subcommand(requirements, [], aliases=["req"])
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
@@ -227,6 +224,15 @@ def view_konfig(cli: KoreCli):
     if "krypt_key" in konfig.yaml:
         konfig.yaml["krypt_key"] = "censored"
     yaml_dump(konfig.yaml, sys.stdout)
+
+
+def requirements(cli: KoreCli):
+    """view the listed requirements"""
+    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    for pckg in konfig.yaml.get("requires", {}).keys():
+        version = konfig.yaml["requires"][pckg]
+        line = f"{pckg} {version}"
+        print(line)
 
 
 def version(cli: KoreCli):

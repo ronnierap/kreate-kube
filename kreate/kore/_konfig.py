@@ -2,7 +2,10 @@ import os
 import logging
 import importlib
 import base64
+import pkg_resources
 from jinja2 import filters
+from pathlib import Path
+
 
 from ._core import DeepChain
 from ._jinyaml import load_jinyaml, FileLocation
@@ -47,7 +50,7 @@ class Konfig:
         self.appname = self.values["appname"]
         self.env = self.values["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
-
+        self.check_requires()
         self.load()
 
     def _add_jinja_filter(self, name, func):
@@ -95,3 +98,16 @@ class Konfig:
             dicts = self._load_strukture_files()
             self._strukt_cache = DeepChain(*reversed(dicts))
         return self._strukt_cache
+
+    def check_requires(self):
+        error = False
+        for pckg in self.yaml.get("requires", {}).keys():
+            try:
+                version = self.yaml["requires"][pckg]
+                line = f"{pckg} {version}"
+                logger.info(f"checking requirement {line}")
+                pkg_resources.require(line)
+            except pkg_resources.VersionConflict as e:
+                logger.warn(e)
+                error = True
+        return error
