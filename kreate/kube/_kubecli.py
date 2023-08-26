@@ -11,29 +11,10 @@ from ._kube import KubeKonfig, kreate_kubeconfig
 logger = logging.getLogger(__name__)
 
 
-class KubeKreator(krypt.KryptKreator):
-    def kreate_konfig(self, filename: str = None) -> KubeKonfig:
-        if not self.konfig:
-            self.konfig = KubeKonfig(filename)
-            self.tune_konfig(self.konfig)
-        return self.konfig
-
-    def tune_konfig(self, konfig: Konfig):
-        super().tune_konfig(konfig)
-        konfig._default_strukture_files.append(
-            "py:kreate.kube.other_templates:kube-defaults.yaml"
-        )
-
-    def kreate_app(self, konfig: Konfig, tune_app=True) -> KustApp:
-        app = KustApp(konfig)
-        if tune_app:  # Ugly hack for view_templates
-            self.tune_app(app)
-        return app
-
 
 class KubeCli(krypt.KryptCli):
-    def __init__(self, kreator: KubeKreator):
-        super().__init__(kreator)
+    def __init__(self):
+        super().__init__()
         self.add_subcommand(files, [], aliases=["f"])
         self.add_subcommand(build, [], aliases=["b"])
         self.add_subcommand(diff, [], aliases=["d"])
@@ -58,13 +39,24 @@ class KubeCli(krypt.KryptCli):
 
         self.add_subcommand(kubeconfig, [])
 
+    def _kreate_konfig(self, filename: str) -> KubeKonfig:
+        return KubeKonfig(filename)
+
+    def _kreate_app(self, tune_app=True) -> KustApp: # TODO: test tune_app
+        return KustApp(self.konfig())
+
+    def _tune_konfig(self):
+        super()._tune_konfig()
+        self._konfig._default_strukture_files.append(
+            "py:kreate.kube.other_templates:kube-defaults.yaml"
+        )
+
     def default_command(self):
         files(self)
 
 
 def kreate_files(cli: KubeCli) -> KustApp:
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    app: App = cli.kreator.kreate_app(konfig)
+    app: App = cli.app()
     app.kreate_files()
     return app
 
@@ -134,5 +126,5 @@ def testupdate(cli: KubeCli) -> None:
 
 def kubeconfig(cli: KubeCli):
     """kreate a kubeconfig file from a template"""
-    konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig = cli.konfig()
     kreate_kubeconfig(konfig)

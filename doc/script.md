@@ -10,18 +10,16 @@ This is an example how to do that
 ```
 #!/usr/bin/env python3
 
-from kreate.kore import Konfig, App
-from kreate.kube import KustApp, KubeKreator
+from kreate.kore import App
+from kreate.kube import KubeCli
 
-def kreate_app(konfig: Konfig) -> App:
-    app = KustApp(konfig)
-    app.kreate_komponents_from_strukture()
-    app.aktivate()
 
-    # Start finetuning the yaml komponents
-    # Note: adding a custom label does not require python
-    app.depl.main.label("custom-label","added-by-script")
-    return app
+class DemoStruktCli(KubeCli):
+    def _tune_app(self, app: App) -> None:
+        app.kreate_komponents_from_strukture()
+        app.aktivate()
+        app.depl.main.label("this-is-added", "by-script")
 
-KubeKreator(kreate_app).kreate_cli().run()
+
+DemoStruktCli().run()
 ```

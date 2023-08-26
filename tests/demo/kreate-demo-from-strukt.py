@@ -6,14 +6,14 @@ In general it is preferred to not use a script but use `python3 -m kreate`
 """
 
 from kreate.kore import App
-from kreate.kube import KubeKreator, KubeCli
+from kreate.kube import KubeCli
 
 
-class DemoStruktKreator(KubeKreator):
-    def tune_app(self, app: App) -> None:
+class DemoStruktCli(KubeCli):
+    def _tune_app(self, app: App) -> None:
         app.kreate_komponents_from_strukture()
         app.aktivate()
         app.depl.main.label("this-is-added", "by-script")
 
 
-KubeCli(DemoStruktKreator()).run()
+DemoStruktCli().run()

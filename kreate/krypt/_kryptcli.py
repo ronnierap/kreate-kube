@@ -2,7 +2,7 @@ import sys
 import logging
 import jinja2.filters
 
-from ..kore import KoreCli, KoreKreator, Konfig
+from ..kore import KoreCli, Konfig
 from ..kore._korecli import argument as argument
 from . import KryptKonfig
 from . import krypt_functions
@@ -10,21 +10,10 @@ from . import krypt_functions
 logger = logging.getLogger(__name__)
 
 
-class KryptKreator(KoreKreator):
-    def kreate_konfig(self, filename: str = None) -> KryptKonfig:
-        if not self.konfig:
-            self.konfig = KryptKonfig(filename)
-            self._tune_konfig(self.konfig)
-        return self.konfig
-
-    def _tune_konfig(self, konfig: Konfig):
-        super()._tune_konfig(konfig)
-
-
 class KryptCli(KoreCli):
-    def __init__(self, kreator: KryptKreator):
+    def __init__(self):
         jinja2.filters.FILTERS["dekrypt"] = krypt_functions.dekrypt_str
-        super().__init__(kreator)
+        super().__init__()
         self.add_subcommand(
             dekyaml,
             [argument("-f", "--file", help="yaml file to enkrypt")],
@@ -56,10 +45,13 @@ class KryptCli(KoreCli):
             aliases=["es"],
         )
 
+    def _kreate_konfig(self, filename: str) -> KryptKonfig:
+         return KryptKonfig()
 
-def dekyaml(cli):
+
+def dekyaml(cli: KryptCli):
     """dekrypt values in a yaml file"""
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig: Konfig = cli.konfig()
 
     filename = (
         cli.args.file
@@ -68,9 +60,9 @@ def dekyaml(cli):
     krypt_functions.dekrypt_yaml(filename, ".")
 
 
-def dekstr(cli):
+def dekstr(cli: KryptCli):
     """dekrypt string value"""
-    cli.kreator.kreate_konfig(cli.args.konfig)
+    cli.konfig()   # init konfig to set the secret value
     value = cli.args.str
     if not value:
         if not cli.args.quiet:
@@ -79,16 +71,16 @@ def dekstr(cli):
     print(krypt_functions.dekrypt_str(value))
 
 
-def dekfile(cli):
+def dekfile(cli: KryptCli):
     "dekrypt an entire file"
-    cli.kreator.kreate_konfig(cli.args.konfig)
+    cli.konfig()   # init konfig to set the secret value
     filename = cli.args.file
     krypt_functions.dekrypt_file(filename)
 
 
-def enkyaml(cli):
+def enkyaml(cli: KryptCli):
     "enkrypt values in a yaml file"
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig: Konfig = cli.konfig()
     filename = (
         cli.args.file
         or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
@@ -96,16 +88,16 @@ def enkyaml(cli):
     krypt_functions.enkrypt_yaml(filename, ".")
 
 
-def enkfile(cli):
+def enkfile(cli: KryptCli):
     "enkrypt an entire file"
-    cli.kreator.kreate_konfig(cli.args.konfig)
+    cli.konfig()
     filename = cli.args.file
     krypt_functions.enkrypt_file(filename)
 
 
-def enkstr(cli):
+def enkstr(cli: KryptCli):
     """enkrypt string value"""
-    cli.kreator.kreate_konfig(cli.args.konfig)
+    cli.konfig()
     value = cli.args.str
     if not value:
         if not cli.args.quiet:

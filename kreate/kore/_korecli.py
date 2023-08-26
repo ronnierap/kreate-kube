@@ -24,33 +24,11 @@ def argument(*name_or_flags, **kwargs):
     return (list(name_or_flags), kwargs)
 
 
-class KoreKreator:
-    def __init__(self):
-        self.konfig = None
-
-    def kreate_konfig(self, filename):
-        if not self.konfig:
-            self.konfig = Konfig(filename)
-            self.tune_konfig(self.konfig)
-        return self.konfig
-
-    def tune_konfig(self, konfig: Konfig) -> None:
-        pass
-
-    def kreate_app(self, konfig: Konfig) -> App:
-        app = App(konfig)
-        self.tune_app(app)
-        return app
-
-    def tune_app(self, app: App) -> None:
-        app.kreate_komponents_from_strukture()
-        app.aktivate()
-        pass
-
 
 class KoreCli:
-    def __init__(self, kreator: KoreKreator):
-        self.kreator = kreator
+    def __init__(self):
+        self._konfig = None
+        self._app = None
         self.epilog = "subcommands:\n"
         self.cli = argparse.ArgumentParser(
             prog="kreate",
@@ -65,17 +43,49 @@ class KoreCli:
             # description="valid subcommands",
             dest="subcommand",
         )
-        self.add_subcommand(version, [], aliases=["vr"])
+        self.add_subcommands()
 
+    def konfig(self):
+        if not self._konfig:
+            self._konfig = self._kreate_konfig(self.konfig_filename)
+            self._tune_konfig()
+        return self._konfig
+
+    def app(self):
+        if not self._app:
+            self._app = self._kreate_app()
+            self._tune_app(self._app)
+        return self._app
+
+    def _kreate_konfig(self, filename: str) -> Konfig:
+        return Konfig(filename)
+
+    def _kreate_app(self) -> App:
+        return App(self.konfig())
+
+    def _tune_konfig(self) -> None:
+        pass
+
+    def _tune_app(self, app: App) -> None:
+        app.kreate_komponents_from_strukture()
+        app.aktivate()
+
+    def add_subcommands(self):
+        # subcommand: version
+        self.add_subcommand(version, [], aliases=["vr"])
+        # subcommand: view_strukture
         cmd = self.add_subcommand(view_strukture, [], aliases=["vs"])
         cmd.add_argument(
             "-k", "--key", help="key to show", action="store", default=None
         )
+        # subcommand: view defaults
         cmd = self.add_subcommand(view_defaults, [], aliases=["vd"])
         cmd.add_argument(
             "-k", "--key", help="key to show", action="store", default=None
         )
+        # subcommand: view_values
         cmd = self.add_subcommand(view_values, [], aliases=["vv"])
+        # subcommand: view_template
         cmd = self.add_subcommand(view_template, [], aliases=["vt"])
         cmd.add_argument(
             "-k",
@@ -84,8 +94,10 @@ class KoreCli:
             action="store",
             default=None,
         )
+        # subcommand: view_konfig
         cmd = self.add_subcommand(view_konfig, [], aliases=["vk"])
         cmd.add_argument("-k", "--kind", action="store", default=None)
+        # subcommand: requirements
         cmd = self.add_subcommand(requirements, [], aliases=["req"])
 
     def dist_package_version(self, package_name: str):
@@ -128,9 +140,9 @@ class KoreCli:
                 )
         finally:
             if not self.args.keepsecrets:
-                if self.kreator.konfig:
+                if self._konfig:
                     # konfig was kreated so secrets might need to be cleaned
-                    konfig = self.kreator.konfig
+                    konfig = self.konfig()
                     dir = konfig.target_dir
                     secrets_dir = f"{dir}/secrets"
                     if os.path.exists(secrets_dir):
@@ -164,24 +176,25 @@ class KoreCli:
             logging.basicConfig(format="%(message)s", level=logging.ERROR)
         else:
             logging.basicConfig(format="%(message)s", level=logging.INFO)
+        self.konfig_filename = args.konfig
+
 
 
 def view_strukture(cli: KoreCli):
     """view the application strukture"""
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig: Konfig = cli.konfig()
     konfig.calc_strukture().pprint(field=cli.args.key)
 
 
 def view_defaults(cli: KoreCli):
     """view the application strukture defaults"""
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig: Konfig = cli.konfig()
     konfig.calc_strukture().default.pprint(field=cli.args.key)
 
 
 def view_template(cli: KoreCli):
     """view the template for a specific kind"""
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    app: JinjaApp = cli.kreator.kreate_app(konfig, tune_app=False)
+    app: JinjaApp = cli.app()  #tune_app=False)  # TODO test this
     kind = cli.args.key
     if kind:
         if kind not in app.kind_templates or kind not in app.kind_classes:
@@ -213,14 +226,14 @@ def view_template(cli: KoreCli):
 
 def view_values(cli: KoreCli):
     """view the application values"""
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig: Konfig = cli.konfig()
     for k, v in konfig.values.items():
         print(f"{k}: {v}")
 
 
 def view_konfig(cli: KoreCli):
     """view the application konfig file (with defaults)"""
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig: Konfig = cli.konfig()
     if "krypt_key" in konfig.yaml:
         konfig.yaml["krypt_key"] = "censored"
     yaml_dump(konfig.yaml, sys.stdout)
@@ -228,7 +241,7 @@ def view_konfig(cli: KoreCli):
 
 def requirements(cli: KoreCli):
     """view the listed requirements"""
-    konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
+    konfig: Konfig = cli.konfig()
     for line in konfig.get_requires():
         print(line)
 

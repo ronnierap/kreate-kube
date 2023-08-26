@@ -1,8 +1,8 @@
-from . import KubeKreator, KubeCli
+from . import KubeCli
 
 
 def main():
-    KubeCli(KubeKreator()).run()
+    KubeCli().run()
 
 
 if __name__ == "__main__":
