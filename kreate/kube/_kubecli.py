@@ -2,11 +2,11 @@ import os
 import logging
 
 from ..kore import App
-from ..kore import Konfig
 from .. import krypt
 from ..krypt import krypt_functions
 from ._kust import KustApp
-from ._kube import KubeKonfig, kreate_kubeconfig
+from ._kube import KubeKonfig
+from ._kubeconfig import kreate_kubeconfig
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,6 @@ class KubeCli(krypt.KryptCli):
             action="store",
             default=None,
         )
-
         cmd = self.add_subcommand(testupdate, [], aliases=["tu"])
         cmd.add_argument(
             "-e",
@@ -36,8 +35,12 @@ class KubeCli(krypt.KryptCli):
             action="store",
             default=None,
         )
+        cmd = self.add_subcommand(kubeconfig, [])
+        cmd.add_argument("-f", "--force",
+            help="overwrite existing file",
+            action="store_true"
+        )
 
-        self.add_subcommand(kubeconfig, [])
 
     def _kreate_konfig(self, filename: str) -> KubeKonfig:
         return KubeKonfig(filename)
@@ -127,4 +130,4 @@ def testupdate(cli: KubeCli) -> None:
 def kubeconfig(cli: KubeCli):
     """kreate a kubeconfig file from a template"""
     konfig = cli.konfig()
-    kreate_kubeconfig(konfig)
+    kreate_kubeconfig(konfig, force=cli.args.force)
