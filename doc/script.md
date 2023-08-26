@@ -10,15 +10,14 @@ This is an example how to do that
 ```
 #!/usr/bin/env python3
 
-from kreate.kore import App
 from kreate.kube import KubeCli
 
 
 class DemoStruktCli(KubeCli):
-    def _tune_app(self, app: App) -> None:
-        app.kreate_komponents_from_strukture()
-        app.aktivate()
-        app.depl.main.label("this-is-added", "by-script")
+    def _tune_app(self) -> None:
+        self._app.kreate_komponents_from_strukture()
+        self._app.aktivate()
+        self._app.depl.main.label("this-is-added", "by-script")
 
 
 DemoStruktCli().run()

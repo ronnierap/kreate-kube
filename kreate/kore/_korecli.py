@@ -54,7 +54,7 @@ class KoreCli:
     def app(self):
         if not self._app:
             self._app = self._kreate_app()
-            self._tune_app(self._app)
+            self._tune_app()
         return self._app
 
     def _kreate_konfig(self, filename: str) -> Konfig:
@@ -66,9 +66,9 @@ class KoreCli:
     def _tune_konfig(self) -> None:
         pass
 
-    def _tune_app(self, app: App) -> None:
-        app.kreate_komponents_from_strukture()
-        app.aktivate()
+    def _tune_app(self) -> None:
+        self._app.kreate_komponents_from_strukture()
+        self._app.aktivate()
 
     def add_subcommands(self):
         # subcommand: version

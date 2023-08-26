@@ -61,7 +61,7 @@ class DemoScriptCli(kreate.kube.KubeCli):
     def _kreate_app(self) -> kreate.kube.KustApp:
         return kreate_app_from_script(self.konfig())
 
-    def _tune_app(self, app: kreate.kube.KustApp) -> None:
+    def _tune_app(self) -> None:
         pass
 
 

@@ -5,15 +5,14 @@ After this you can finetune them further in python.
 In general it is preferred to not use a script but use `python3 -m kreate`
 """
 
-from kreate.kore import App
 from kreate.kube import KubeCli
 
 
 class DemoStruktCli(KubeCli):
-    def _tune_app(self, app: App) -> None:
-        app.kreate_komponents_from_strukture()
-        app.aktivate()
-        app.depl.main.label("this-is-added", "by-script")
+    def _tune_app(self) -> None:
+        self._app.kreate_komponents_from_strukture()
+        self._app.aktivate()
+        self._app.depl.main.label("this-is-added", "by-script")
 
 
 DemoStruktCli().run()
