@@ -30,8 +30,9 @@ class Komponent:
             logger.info(f"ignoring {self.name}")
         else:
             logger.debug(f"adding  {self.kind}.{self.shortname}")
-        if self.app:  # TODO: issue warning?
-            self.app.add(self)
+        if not self.app:
+            raise(ValueError("Komponent {self.name} has no application"))
+        self.app.add(self)
 
     def aktivate(self):
         pass
