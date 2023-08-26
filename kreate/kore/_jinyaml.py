@@ -73,7 +73,9 @@ def load_data(file_loc: FileLocation):
 
 def load_jinja_data(file_loc: FileLocation, vars: Mapping):
     global _current_jinja_file
-    _current_jinja_file = file_loc.filename  # TODO: find better way
+    # we remember the file that jinja is parsing for better error messages
+    # Not sure if there is a better way to do this currently
+    _current_jinja_file = file_loc.filename
     filedata = load_data(file_loc=file_loc)
     tmpl = jinja2.Template(
         filedata,
