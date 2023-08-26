@@ -229,9 +229,7 @@ def view_konfig(cli: KoreCli):
 def requirements(cli: KoreCli):
     """view the listed requirements"""
     konfig: Konfig = cli.kreator.kreate_konfig(cli.args.konfig)
-    for pckg in konfig.yaml.get("requires", {}).keys():
-        version = konfig.yaml["requires"][pckg]
-        line = f"{pckg} {version}"
+    for line in konfig.get_requires():
         print(line)
 
 

@@ -99,15 +99,26 @@ class Konfig:
             self._strukt_cache = DeepChain(*reversed(dicts))
         return self._strukt_cache
 
+    def get_requires(self):
+        reqs = []
+        filename = f"{self.dir}/requirements.txt"
+        if os.path.exists(filename):
+            with open(filename) as f:
+                for line in f.readlines():
+                    reqs.append(line.strip())
+        for pckg in self.yaml.get("requires", {}).keys():
+            version = self.yaml["requires"][pckg]
+            reqs.append(f"{pckg}{version}")
+        return reqs
+
+
     def check_requires(self):
         error = False
-        for pckg in self.yaml.get("requires", {}).keys():
+        for line in self.get_requires():
             try:
-                version = self.yaml["requires"][pckg]
-                line = f"{pckg} {version}"
                 logger.info(f"checking requirement {line}")
                 pkg_resources.require(line)
-            except pkg_resources.VersionConflict as e:
+            except (pkg_resources.VersionConflict, pkg_resources.DistributionNotFound)  as e:
                 logger.warn(e)
                 error = True
         return error
