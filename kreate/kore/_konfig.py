@@ -18,8 +18,10 @@ def b64encode(value: str) -> str:
     if value:
         res = base64.b64encode(value.encode("ascii"))
         return res.decode("ascii")
-    print("empty")
-    return ""
+    else:
+        logger.warning("empty value to b64encode")
+        return ""
+
 
 
 def get_class(name: str):
