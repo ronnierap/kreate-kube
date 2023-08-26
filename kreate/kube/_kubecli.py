@@ -42,7 +42,7 @@ class KubeCli(krypt.KryptCli):
     def _kreate_konfig(self, filename: str) -> KubeKonfig:
         return KubeKonfig(filename)
 
-    def _kreate_app(self, tune_app=True) -> KustApp: # TODO: test tune_app
+    def _kreate_app(self) -> KustApp:
         return KustApp(self.konfig())
 
     def _tune_konfig(self):

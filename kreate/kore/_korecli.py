@@ -194,7 +194,9 @@ def view_defaults(cli: KoreCli):
 
 def view_template(cli: KoreCli):
     """view the template for a specific kind"""
-    app: JinjaApp = cli.app()  #tune_app=False)  # TODO test this
+    # we call the _kreate_app method and not the convenience app()
+    # method, because aktivating the app, will kopy_files
+    app: JinjaApp = cli._kreate_app()
     kind = cli.args.key
     if kind:
         if kind not in app.kind_templates or kind not in app.kind_classes:
