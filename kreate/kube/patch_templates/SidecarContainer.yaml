@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: {{ target.kind }}
+metadata:
+  name: {{ target.name }}
+spec:
+  template:
+    spec:
+      containers:
+      - name: {{ my.shortname }}
+        image: {{ strukt.image }}
+        {% if default.imagePullPolicy %}
+        imagePullPolicy: {{ default.imagePullPolicy }}
+        {% endif %}
+        securityContext:
+          runAsUser: {{ default.runAsUser }}
+        envFrom:
+        - secretRef:
+        {% for secr in strukt.get("secret-vars",[]) %}
+            name: {{ secr }}
+        {% endfor %}
+        - configMapRef:
+        {% for cm in strukt.get("vars",[]) %}
+            name: {{ cm }}
+        {% endfor %}
+        ports:
+        - containerPort: {{ default.containerPort }}
+          protocol: {{ default.protocol }}
+        resources:
+          limits:
+            cpu: {{ val.sidecar_cpu_limit | default(default.cpu_limit) }}
+            memory: {{ val.sidecar_memory_limit | default(default.memory_limit) }}
+          requests:
+            cpu: {{ val.sidecar_cpu_request | default(default.cpu_request) }}
+            memory: {{ val.sidecar_memory_request | default(default.memory_request) }}

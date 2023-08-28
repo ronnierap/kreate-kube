@@ -85,3 +85,15 @@ default:
     revisionHistoryLimit: 1
     restartPolicy: "" # if not specfied explicetly defaults to Always
     terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
+
+  SidecarContainer:
+    imagePullPolicy: Always
+    containerPort: 8888  # different from 8080
+    protocol: TCP
+    #revisionHistoryLimit: 1
+    #restartPolicy: "" # if not specfied explicetly defaults to Always
+    #terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
+    cpu_limit:    {{ val.cpu_limit | default(1) }}
+    cpu_request:  {{ val.cpu_request | default(1) }}
+    memory_limit:    {{ val.memory_limit | default("512M") }}
+    memory_request:  {{ val.memory_request | default("512M") }}

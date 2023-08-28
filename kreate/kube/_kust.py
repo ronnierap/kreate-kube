@@ -25,6 +25,7 @@ class KustApp(KubeApp):
         self.register_patch_file("HttpProbes")
         self.register_patch_file("VolumeMounts")
         self.register_patch_file("KubernetesAnnotations")
+        self.register_patch_file("SidecarContainer")
 
     def register_patch_class(
         self: str, cls: str, aliases=None, package=None
