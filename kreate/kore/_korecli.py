@@ -76,20 +76,20 @@ class KoreCli:
         # subcommand: view_strukture
         cmd = self.add_subcommand(view_strukture, [], aliases=["vs"])
         cmd.add_argument(
-            "-k", "--key", help="key to show", action="store", default=None
+            "-k", "--komp", help="komponent to show", action="store", default=None
         )
         # subcommand: view defaults
         cmd = self.add_subcommand(view_defaults, [], aliases=["vd"])
         cmd.add_argument(
-            "-k", "--key", help="key to show", action="store", default=None
+            "-k", "--komp", help="komponent to show", action="store", default=None
         )
         # subcommand: view_values
         cmd = self.add_subcommand(view_values, [], aliases=["vv"])
         # subcommand: view_template
         cmd = self.add_subcommand(view_template, [], aliases=["vt"])
         cmd.add_argument(
-            "-k",
-            "--key",
+            "-t",
+            "--template",
             help="template to show",
             action="store",
             default=None,
@@ -197,30 +197,31 @@ def view_template(cli: KoreCli):
     # we call the _kreate_app method and not the convenience app()
     # method, because aktivating the app, will kopy_files
     app: JinjaApp = cli._kreate_app()
-    kind = cli.args.key
-    if kind:
-        if kind not in app.kind_templates or kind not in app.kind_classes:
-            logger.warn(f"Unknown template kind {kind}")
+    template = cli.args.template
+    if template:
+        if template not in app.kind_templates or template not in app.kind_classes:
+            logger.warn(f"Unknown template kind {template}")
             return
         if not cli.args.quiet:
+            print("==========================")
             print(
-                f"{kind} "
-                f"{app.kind_classes[kind].__name__}: "
-                f"{app.kind_templates[kind]}"
+                f"{template} "
+                f"{app.kind_classes[template].__name__}: "
+                f"{app.kind_templates[template]}"
             )
             print("==========================")
-            if app.kind_classes[kind].__doc__:
-                print(inspect.cleandoc(app.kind_classes[kind].__doc__))
+            if app.kind_classes[template].__doc__:
+                print(inspect.cleandoc(app.kind_classes[template].__doc__))
                 print("==========================")
-        if app.kind_templates[kind].filename != "NoTemplate":
-            print(load_data(app.kind_templates[kind]))
+        if app.kind_templates[template].filename != "NoTemplate":
+            print(load_data(app.kind_templates[template]))
     else:
-        for kind in app.kind_templates:
-            if kind in app.kind_templates and kind in app.kind_classes:
+        for template in app.kind_templates:
+            if template in app.kind_templates and template in app.kind_classes:
                 print(
-                    f"{kind:24} "
-                    f"{app.kind_classes[kind].__name__:20} "
-                    f"{app.kind_templates[kind]}"
+                    f"{template:24} "
+                    f"{app.kind_classes[template].__name__:20} "
+                    f"{app.kind_templates[template]}"
                 )
             else:
                 logger.debug("skipping kind")
