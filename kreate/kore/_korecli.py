@@ -32,7 +32,7 @@ class KoreCli:
         self.epilog = "subcommands:\n"
         self.cli = argparse.ArgumentParser(
             prog="kreate",
-            usage="kreate [optional arguments] <subcommand>",
+            usage="kreate [optional arguments] [<subcommand>] [subcommand options]",
             description=(
                 "kreates files for deploying applications on kubernetes"
             ),
@@ -42,6 +42,7 @@ class KoreCli:
             # title="subcmd",
             # description="valid subcommands",
             dest="subcommand",
+            metavar="see subcommands"
         )
         self.add_subcommands()
 
