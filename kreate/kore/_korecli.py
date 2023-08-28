@@ -226,13 +226,13 @@ class KoreCli:
 def view_strukture(cli: KoreCli):
     """view the application strukture"""
     konfig: Konfig = cli.konfig()
-    konfig.calc_strukture().pprint(field=cli.args.key)
+    konfig.calc_strukture().pprint(field=cli.args.komp)
 
 
 def view_defaults(cli: KoreCli):
     """view the application strukture defaults"""
     konfig: Konfig = cli.konfig()
-    konfig.calc_strukture().default.pprint(field=cli.args.key)
+    konfig.calc_strukture().default.pprint(field=cli.args.komp)
 
 
 def view_template(cli: KoreCli):
