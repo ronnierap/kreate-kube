@@ -13,8 +13,8 @@ spec:
     {% if strukt.cidr_list == "allow-all" %}
     - {}
     {% else %}
-    {% for port in "{}".format(strukt.port).split(",") %}
-    {% for addr in strukt.cidr_list.split(",") %}
+    {% for port in my.port_list() %}
+    {% for addr in my.cidr_list() %}
     - to:
         - ipBlock:
             cidr: {{ addr }}

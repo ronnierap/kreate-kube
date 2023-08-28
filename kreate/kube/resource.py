@@ -92,6 +92,14 @@ class Egress(Resource):
     def calc_name(self):
         return f"{self.app.appname}-egress-to-{self.shortname}"
 
+    def cidr_list(self) -> list:
+        r = self._field("cidr_list")
+        return str(r).split(",") if r else []
+
+    def port_list(self) -> list:
+        r = self._field("port_list")
+        return str(r).split(",") if r else []
+
 
 class Secret(Resource):
     def load_some_file(self, filename: str) -> str:

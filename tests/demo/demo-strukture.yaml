@@ -70,15 +70,14 @@ StatefulSet:
 
 Egress:
   redis:
-    cidr_list: {{ val.redis_egress_cidr_list }}
-    port: 6379
+    port_list: 6379
   db:
-    name: demo-egress-to-db
-    cidr_list: {{ val.db_egress_cidr_list }}
-    port: 1521
+    #name: demo-egress-to-db
+    cidr_list: {{ val.db.cidr_list }}
+    port_list: 1521
   xyz:
-    cidr_list: {{ val.xyz_egress_cidr_list }}
-    port: {{ val.xyz_egress_port | default(8443) }}
+    cidr_list: {{ val.xyz.cidr_list }}
+    port_list: {{ val.xyz.port_list | default(8443) }}
 
 HorizontalPodAutoscaler: {}
 
