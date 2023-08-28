@@ -103,9 +103,9 @@ Kustomization:
       demo-vars:
         vars:
           ENV: {{ val.env }}
-          ORACLE_URL: {{ val.ORACLE_URL }}
-          ORACLE_USR: {{ val.ORACLE_USR }}
-          ORACLE_SCHEMA: {{ val.ORACLE_SCHEMA }}
+          ORACLE_URL: {}
+          ORACLE_USR: {}
+          ORACLE_SCHEMA: {{ var.ORACLE_SCHEMA }}
       demo-files:
         files:
           - files/application.properties

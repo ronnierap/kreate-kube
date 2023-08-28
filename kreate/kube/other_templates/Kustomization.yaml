@@ -22,7 +22,7 @@ configMapGenerator:
   {% if strukt.configmaps[cm].get("vars",{}) %}
   literals:
     {% for varname in strukt.configmaps[cm].get("vars",{}).keys() %}
-     - {{ varname }}={{ strukt.configmaps[cm].vars[varname ] }}
+     - {{ varname }}={{ my.var(cm, varname) }}
     {% endfor %}
   {% endif %}
   {% if strukt.configmaps[cm].get("files",{}) %}

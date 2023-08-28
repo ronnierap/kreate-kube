@@ -88,6 +88,7 @@ class Konfig:
         vars = {
             "konfig": self,
             "val": self.values,
+            "var": self.values.get("vars",{}),
             "secret": self.secrets,
             "function": self.functions,
         }

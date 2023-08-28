@@ -201,6 +201,7 @@ class JinjaKomponent(Komponent):
             "app": self.app,
             "my": self,
             "val": self.app.konfig.values,
+            "var": self.app.konfig.values.get("vars", {}),
             "secret": self.app.konfig.secrets,
             "function": self.app.konfig.functions,
         }

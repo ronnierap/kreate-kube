@@ -91,6 +91,12 @@ class Kustomization(JinYamlKomponent):
     def patches(self):
         return [res for res in self.app.komponents if isinstance(res, Patch)]
 
+    def var(self, cm: str, varname: str):
+        value = self.strukture.configmaps[cm].vars[varname]
+        if not isinstance(value, str):
+            value = self.app.konfig.values.get("vars",{}).get(varname, None)
+        return value
+
     @property
     def filename(self):
         return "kustomization.yaml"
