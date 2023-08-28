@@ -35,7 +35,7 @@ class KubeCli(krypt.KryptCli):
             action="store",
             default=None,
         )
-        cmd = self.add_subcommand(kubeconfig, [])
+        cmd = self.add_subcommand(kubeconfig, [], aliases=["kc"])
         cmd.add_argument("-f", "--force",
             help="overwrite existing file",
             action="store_true"

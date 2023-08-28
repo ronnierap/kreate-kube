@@ -98,7 +98,7 @@ class KoreCli:
         cmd = self.add_subcommand(view_konfig, [], aliases=["vk"])
         cmd.add_argument("-k", "--kind", action="store", default=None)
         # subcommand: requirements
-        cmd = self.add_subcommand(requirements, [], aliases=["req"])
+        cmd = self.add_subcommand(requirements, [], aliases=["rq"])
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
