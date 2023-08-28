@@ -70,6 +70,15 @@ def load_data(file_loc: FileLocation):
         with open(f"{dirname}/{filename}") as f:
             return f.read()
 
+def raise_error_if_none(thing):
+    if thing is None:
+        # would be nice if we could include context
+        raise ValueError("should not be None")
+    return thing
+
+# TODO: maybe an Environment will give better error messages
+# wit filename and linenumber
+#jinja2_env = jinja2.Environment(finalize=my_finalize)
 
 def load_jinja_data(file_loc: FileLocation, vars: Mapping):
     global _current_jinja_file
@@ -80,6 +89,7 @@ def load_jinja_data(file_loc: FileLocation, vars: Mapping):
     tmpl = jinja2.Template(
         filedata,
         undefined=jinja2.StrictUndefined,
+        finalize=raise_error_if_none,
         trim_blocks=True,
         lstrip_blocks=True,
     )
