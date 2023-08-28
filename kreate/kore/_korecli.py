@@ -46,6 +46,9 @@ class KoreCli:
         )
         self.add_subcommands()
 
+    def get_packages(self):
+        return []
+
     def konfig(self):
         if not self._konfig:
             self._konfig = self._kreate_konfig(self.konfig_filename)
@@ -266,8 +269,12 @@ def requirements(cli: KoreCli):
 
 def version(cli: KoreCli):
     """view the version"""
-    version = cli.dist_package_version("kreate-kube")
-    print(f"kreate-kube: {version}")
+    for pckg in cli.get_packages():
+        try:
+            version = cli.dist_package_version(pckg)
+        except importlib.metadata.PackageNotFoundError:
+            version = "Unknown"
+        print(f"{pckg}: {version}")
 
 
 def jinja2_template_error_lineno():

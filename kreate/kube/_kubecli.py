@@ -41,6 +41,9 @@ class KubeCli(krypt.KryptCli):
             action="store_true"
         )
 
+    def get_packages(self):
+        return ["kreate-kube"]
+
 
     def _kreate_konfig(self, filename: str) -> KubeKonfig:
         return KubeKonfig(filename)
