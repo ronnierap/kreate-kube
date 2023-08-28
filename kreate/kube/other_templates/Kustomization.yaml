@@ -8,7 +8,7 @@ resources:
 - {{ res.dirname }}/{{ res.filename }}
 {% endfor %}
 
-patches:
+patchesStrategicMerge:
 {% for pat in my.patches() %}
 - patches/{{ pat.filename }}
 {% endfor %}
@@ -19,14 +19,18 @@ configMapGenerator:
   options:
     labels:
       config-map: {{ cm }}
+  {% if strukt.configmaps[cm].get("vars",{}) %}
   literals:
     {% for varname in strukt.configmaps[cm].get("vars",{}).keys() %}
      - {{ varname }}={{ strukt.configmaps[cm].vars[varname ] }}
     {% endfor %}
+  {% endif %}
+  {% if strukt.configmaps[cm].get("files",{}) %}
   files:
     {% for filename in strukt.configmaps[cm].get("files",[]) %}
      - {{ filename }}
     {% endfor %}
+  {% endif %}
 {% endfor %}
 
 secretGenerator:
@@ -35,12 +39,16 @@ secretGenerator:
   options:
     labels:
       secret: {{ cm }}
+  {% if strukt.secrets[cm].get("vars",{}) %}
   literals:
     {% for varname in strukt.secrets[cm].get("vars",{}).keys() %}
      - {{ varname }}={{ strukt.secrets[cm].vars[varname ] }}
     {% endfor %}
+  {% endif %}
+  {% if strukt.secrets[cm].get("files",{}) %}
   files:
     {% for filename in strukt.secrets[cm].get("files",[]) %}
      - {{ filename }}
     {% endfor %}
+  {% endif %}
 {% endfor %}
