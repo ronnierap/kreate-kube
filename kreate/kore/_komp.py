@@ -139,6 +139,10 @@ class Komponent:
     def _field(self, fieldname: str):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
+        if (self.shortname in self.app.konfig.values
+            and fieldname in self.app.konfig.values[self.shortname]
+        ):
+            return self.app.konfig.values[self.shortname][fieldname]
         if fieldname in self.app.konfig.values:
             return self.app.konfig.values[fieldname]
         if fieldname in self.strukture.get("default", {}):
