@@ -10,10 +10,10 @@ spec:
       - name: {{ my.shortname }}
         image: {{ strukt.image }}
         {% if default.imagePullPolicy %}
-        imagePullPolicy: {{ default.imagePullPolicy }}
+        imagePullPolicy: {{ my.field.imagePullPolicy }}
         {% endif %}
         securityContext:
-          runAsUser: {{ default.runAsUser }}
+          runAsUser: {{ my.field.runAsUser }}
         envFrom:
         - secretRef:
         {% for secr in strukt.get("secret-vars",[]) %}
@@ -24,12 +24,12 @@ spec:
             name: {{ cm }}
         {% endfor %}
         ports:
-        - containerPort: {{ default.containerPort }}
-          protocol: {{ default.protocol }}
+        - containerPort: {{ my.field.containerPort }}
+          protocol: {{ my.field.protocol }}
         resources:
           limits:
-            cpu: {{ val.sidecar_cpu_limit | default(default.cpu_limit) }}
-            memory: {{ val.sidecar_memory_limit | default(default.memory_limit) }}
+            cpu: {{ my.field.cpu_limit }}
+            memory: {{ my.field.memory_limit }}
           requests:
-            cpu: {{ val.sidecar_cpu_request | default(default.cpu_request) }}
-            memory: {{ val.sidecar_memory_request | default(default.memory_request) }}
+            cpu: {{ my.field.cpu_request }}
+            memory: {{ my.field.memory_request }}

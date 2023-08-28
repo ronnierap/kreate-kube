@@ -5,7 +5,7 @@ metadata:
   name: {{ my.name }}
 spec:
   # This can be set from python code
-  minAvailable: {{ default.minAvailable }}
+  minAvailable: {{ my.field.minAvailable }}
   selector:
     matchLabels:
       app: {{ app.appname }}

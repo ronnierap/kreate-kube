@@ -5,8 +5,8 @@ kind: {{ my.kind }}
 metadata:
   name: {{ my.name }}
 spec:
-  replicas: {{ default.replicas }}
-  revisionHistoryLimit: {{ default.revisionHistoryLimit }}
+  replicas: {{ my.field.replicas }}
+  revisionHistoryLimit: {{ my.field.revisionHistoryLimit }}
   selector:
     matchLabels:
       app: {{ my.name }}
@@ -23,7 +23,7 @@ spec:
         {{ anno }}: {{ strukt.pod.annotations[anno] }}
         {% endfor %}
     spec:
-      restartPolicy: {{ default.restartPolicy }}
+      restartPolicy: {{ my.field.restartPolicy }}
       {% if "serviceAccount" in val %}
       serviceAccount: {{ val.serviceAccount }}
       {% endif %}
@@ -31,17 +31,17 @@ spec:
       serviceAccountName: {{ val.serviceAccountName }}
       {% endif %}
       {% if "serviceName" in default %}
-      serviceName: "" #{{ default.serviceName | default("") }}  # Only for StatefulSet
+      serviceName: "" #{{ my.field.serviceName | default("") }}  # Only for StatefulSet
       {% endif %}
       {% if default.terminationGracePeriodSeconds %}
-      terminationGracePeriodSeconds: {{ default.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ my.field.terminationGracePeriodSeconds }}
       {% endif %}
 
       containers:
-      - name: {{ default.container_name }}
-        image: {{ default.image_repo }}/{{ default.image_name }}:{{ default.image_version }}
+      - name: {{ my.field.container_name }}
+        image: {{ my.field.image_repo }}/{{ my.field.image_name }}:{{ my.field.image_version }}
         {% if default.imagePullPolicy %}
-        imagePullPolicy: {{ default.imagePullPolicy }}
+        imagePullPolicy: {{ my.field.imagePullPolicy }}
         {% endif %}
         envFrom:
         - secretRef:
@@ -53,12 +53,12 @@ spec:
             name: {{ cm }}
         {% endfor %}
         ports:
-        - containerPort: {{ default.containerPort }}
-          protocol: {{ default.protocol }}
+        - containerPort: {{ my.field.containerPort }}
+          protocol: {{ my.field.protocol }}
         resources:
           limits:
-            cpu: {{ val.cpu_limit | default(default.cpu_limit) }}
-            memory: {{ val.memory_limit | default(default.memory_limit) }}
+            cpu: {{ my.field.cpu_limit }}
+            memory: {{ my.field.memory_limit }}
           requests:
-            cpu: {{ val.cpu_request | default(default.cpu_request) }}
-            memory: {{ val.memory_request | default(default.memory_request) }}
+            cpu: {{ my.field.cpu_request }}
+            memory: {{ my.field.memory_request }}

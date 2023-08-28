@@ -7,32 +7,32 @@ spec:
   template:
     spec:
       containers:
-      - name: {{ default.container_name }}
+      - name: {{ my.field.container_name }}
         startupProbe:
-          initialDelaySeconds: {{ default.startup_initialDelaySeconds }}
-          periodSeconds: {{ default.startup_periodSeconds }}
-          timeoutSeconds: {{ default.startup_timeoutSeconds }}
-          successThreshold: {{ default.startup_successThreshold }}
-          failureThreshold: {{ default.startup_failureThreshold }}
+          initialDelaySeconds: {{ my.field.startup_initialDelaySeconds }}
+          periodSeconds: {{ my.field.startup_periodSeconds }}
+          timeoutSeconds: {{ my.field.startup_timeoutSeconds }}
+          successThreshold: {{ my.field.startup_successThreshold }}
+          failureThreshold: {{ my.field.startup_failureThreshold }}
           httpGet:
-            scheme: {{ default.startup_scheme }}
-            path: {{ default.startup_path or default.probe_path }}
-            port: {{ default.startup_port }}
+            scheme: {{ my.field.startup_scheme }}
+            path: {{ my.field.startup_path or default.probe_path }}
+            port: {{ my.field.startup_port }}
         readinessProbe:
-          periodSeconds: {{ default.readiness_periodSeconds }}
-          timeoutSeconds: {{ default.readiness_timeoutSeconds }}
-          failureThreshold: {{ default.readiness_failureThreshold }}
-          successThreshold: {{ default.readiness_successThreshold }}
+          periodSeconds: {{ my.field.readiness_periodSeconds }}
+          timeoutSeconds: {{ my.field.readiness_timeoutSeconds }}
+          failureThreshold: {{ my.field.readiness_failureThreshold }}
+          successThreshold: {{ my.field.readiness_successThreshold }}
           httpGet:
-            scheme: {{ default.readiness_scheme }}
-            path: {{ default.readiness_path or default.probe_path }}
-            port: {{ default.readiness_port }}
+            scheme: {{ my.field.readiness_scheme }}
+            path: {{ my.field.readiness_path or default.probe_path }}
+            port: {{ my.field.readiness_port }}
         livenessProbe:
-          periodSeconds: {{ default.liveness_periodSeconds }}
-          timeoutSeconds: {{ default.liveness_timeoutSeconds }}
-          failureThreshold: {{ default.liveness_failureThreshold }}
-          successThreshold: {{ default.liveness_successThreshold }}
+          periodSeconds: {{ my.field.liveness_periodSeconds }}
+          timeoutSeconds: {{ my.field.liveness_timeoutSeconds }}
+          failureThreshold: {{ my.field.liveness_failureThreshold }}
+          successThreshold: {{ my.field.liveness_successThreshold }}
           httpGet:
-            scheme: {{ default.liveness_scheme }}
-            path: {{ default.liveness_path or default.probe_path }}
-            port: {{ default.liveness_port }}
+            scheme: {{ my.field.liveness_scheme }}
+            path: {{ my.field.liveness_path or default.probe_path }}
+            port: {{ my.field.liveness_port }}

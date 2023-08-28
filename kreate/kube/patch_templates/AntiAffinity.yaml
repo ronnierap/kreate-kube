@@ -11,7 +11,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
-                  - key: {{ default.selector_key }}
+                  - key: {{ my.field.selector_key }}
                     operator: In
                     values:
                       - {{ app.appname }}

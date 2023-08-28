@@ -4,34 +4,29 @@ default:
   generic:
     container_name: app
     service_port: 8080
-    container_port: 8080
-    replicas: {{ val.replicas | default(1) }}
-    image_repo: {{ val.image_repo }}
+    container_port: 8080  # TODO: chose this
+    containerPort: 8080   # TODO: or chose this
+    replicas: 1
     image_name: {{ konfig.appname }}.app
-    image_version: {{ val.image_version }}
-    project: {{ val.project }}
-
-    cpu_limit:    {{ val.cpu_limit | default(1) }}
-    cpu_request:  {{ val.cpu_request | default(1) }}
-    memory_limit:    {{ val.memory_limit | default("512M") }}
-    memory_request:  {{ val.memory_request | default("512M") }}
+    restartPolicy: "" # if not specfied explicetly defaults to Always
+    imagePullPolicy: Always
+    runAsUser: 1000
+    runAsGroup: 1000
+    cpu_limit:   1
+    cpu_request: 1
+    memory_limit:   "512M"
+    memory_request: "512M"
 
   AntiAffinity:
     selector_key: app
 
   CronJob:
-    imagePullPolicy: Always
-    concurrencyPolicy: Allow
     successfulJobsHistoryLimit: 3
-    runAsUser: 1000
-    runAsGroup: 1000
+    concurrencyPolicy: Allow
 
   Deployment:
-    imagePullPolicy: Always
-    containerPort: 8080
     protocol: TCP
     revisionHistoryLimit: 1
-    restartPolicy: "" # if not specfied explicetly defaults to Always
     terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
 
   HorizontalPodAutoscaler:
@@ -69,7 +64,7 @@ default:
     liveness_port: 8080
 
   Ingress:
-    service: {{ val.appname }}-service
+    service: {{ konfig.appname }}-service
 
   KubernetesAnnotations:
     component: webservice
@@ -79,22 +74,10 @@ default:
     minAvailable: 1
 
   StatefulSet:
-    imagePullPolicy: Always
-    containerPort: 8080
     protocol: TCP
     revisionHistoryLimit: 1
-    restartPolicy: "" # if not specfied explicetly defaults to Always
     terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
 
   SidecarContainer:
-    imagePullPolicy: Always
     containerPort: 8888  # different from 8080
     protocol: TCP
-    runAsUser: 1000
-    #revisionHistoryLimit: 1
-    #restartPolicy: "" # if not specfied explicetly defaults to Always
-    #terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
-    cpu_limit:    {{ val.cpu_limit | default(1) }}
-    cpu_request:  {{ val.cpu_request | default(1) }}
-    memory_limit:    {{ val.memory_limit | default("512M") }}
-    memory_request:  {{ val.memory_request | default("512M") }}

@@ -1,6 +1,7 @@
 import logging
 from collections.abc import Mapping
 import os
+from typing import Any
 
 from ._core import DeepChain, wrap
 from ._jinyaml import FileLocation, yaml_dump, yaml_parse, load_jinja_data
@@ -23,6 +24,7 @@ class Komponent:
         self.shortname = shortname or "main"
         self.strukture = self._calc_strukture()
         self.skip = self.strukture.get("ignore", False)
+        self.field = Field(self)
         name = (self.strukture.get("name", None)
             or app.komponent_naming_convention(self.kind, self.shortname)
             or self.calc_name()
@@ -133,6 +135,27 @@ class Komponent:
     @property
     def filename(self):
         return f"{self.kind.lower()}-{self.shortname}.yaml"
+
+    def _field(self, fieldname: str):
+        if fieldname in self.strukture:
+            return self.strukture[fieldname]
+        if fieldname in self.app.konfig.values:
+            return self.app.konfig.values[fieldname]
+        if fieldname in self.strukture.get("default", {}):
+            return self.strukture["default"][fieldname]
+        # The following might not be needed using Deepchain anyway
+        if fieldname in self.strukture.get("default", {}).get("generic",{}):
+            return self.strukture["default"]["generic"][fieldname]
+        raise ValueError(f"Unknown field {fieldname} in {self}")
+
+
+class Field:
+    def __init__(self, komp: Komponent) -> None:
+        self._komp = komp
+
+    def __getattr__(self, __name: str) -> Any:
+        return self._komp._field(__name)
+
 
 
 class JinjaKomponent(Komponent):
