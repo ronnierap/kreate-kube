@@ -13,9 +13,13 @@ class App:
         self.env = konfig.env
         self.konfig = konfig
         self.komponents = []
+        self.komponent_naming_convention = self.komponent_naming
         self._kinds = {}
         self.aliases = {}
         self.strukture = konfig.calc_strukture()
+
+    def komponent_naming(self, kind: str, shortname: str) -> str:
+        return None
 
     def add_alias(self, kind: str, *aliases: str) -> None:
         if kind in self.aliases:

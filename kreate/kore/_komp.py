@@ -23,7 +23,10 @@ class Komponent:
         self.shortname = shortname or "main"
         self.strukture = self._calc_strukture()
         self.skip = self.strukture.get("ignore", False)
-        name = self.strukture.get("name", None) or self.calc_name()
+        name = (self.strukture.get("name", None)
+            or app.komponent_naming_convention(self.kind, self.shortname)
+            or self.calc_name()
+        )
         self.name = name.lower()
         if self.skip:
             # do not load the template (strukture might be missing)
