@@ -15,7 +15,7 @@ metadata:
     #app.kubernetes.io/name: {{ app.appname }}
 spec:
   rules:
-    - host: {{ strukt.host }}
+    - host: {{ my.field.host }}
       http:
         paths:
           - pathType: Prefix
