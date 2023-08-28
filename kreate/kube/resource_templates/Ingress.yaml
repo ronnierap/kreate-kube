@@ -24,4 +24,4 @@ spec:
               service:
                 name: {{ my.field.service }}
                 port:
-                  number: {{ my.field.container_port }}
+                  number: {{ my.field.containerPort }}
