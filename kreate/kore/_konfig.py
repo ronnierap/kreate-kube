@@ -72,10 +72,10 @@ class Konfig:
                 files = [file]
             else:
                 logger.info(f"no {key} files found")
-
         for fname in files:
             val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), dict_)
-            dict_.update(val_yaml)
+            if val_yaml:  # it can be empty
+                dict_.update(val_yaml)
 
     def _load_strukture_files(self):
         logger.debug("loading strukture files")
