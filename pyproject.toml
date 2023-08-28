@@ -27,7 +27,7 @@ includes = ["kreate/"]
 "Bug Tracker" = "https://github.com/MarkHooijkaas/kreate-kube/issues"
 
 [project.scripts]
-kreate = "kreate.kube.__main__:main"
+kreate-kube = "kreate.kube.__main__:main"
 
 
 [build-system]
