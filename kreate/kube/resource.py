@@ -147,6 +147,11 @@ class ConfigMap(Resource):
         # We can not use self.yaml.data, since data is a field in UserDict
         self.yaml["data"][name] = value
 
+    def var(self, varname: str):
+        value = self.strukture.vars[varname]
+        if not isinstance(value, str):
+            value = self.app.konfig.values.get("vars",{}).get(varname, None)
+        return value
 
 class Ingress(Resource):
     def nginx_annon(self, name: str, val: str) -> None:
