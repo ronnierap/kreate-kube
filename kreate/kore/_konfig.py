@@ -7,7 +7,7 @@ from jinja2 import filters
 from pathlib import Path
 
 
-from ._core import DeepChain
+from ._core import DeepChain, deep_update
 from ._jinyaml import load_jinyaml, FileLocation
 
 
@@ -47,7 +47,7 @@ class Konfig:
         self.yaml = load_jinyaml(
             FileLocation(self.filename, dir="."), {"function": self.functions}
         )
-        self.values.update(self.yaml.get("app", {}))
+        deep_update(self.values, self.yaml.get("app", {}))
         self.appname = self.values["appname"]
         self.env = self.values["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
@@ -73,7 +73,7 @@ class Konfig:
         for fname in files:
             val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), dict_)
             if val_yaml:  # it can be empty
-                dict_.update(val_yaml)
+                deep_update(dict_, val_yaml)
 
     def _load_strukture_files(self):
         logger.debug("loading strukture files")

@@ -5,6 +5,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def deep_update(target, other):
+    for k, v in other.items():
+        if isinstance(v, Mapping):
+            target[k] = deep_update(target.get(k, {}), v)
+        else:
+            target[k] = v
+    return target
+
 class DictWrapper(UserDict):
     def __init__(self, dict):
         # do not copy the original dict as the normal UserDict does
