@@ -8,7 +8,7 @@ spec:
   template:
     spec:
       containers:
-      - name: {{ strukt.container | default(default.container_name) }}
+      - name: {{ strukt.container or default.container_name }}
         volumeMounts:
           {% for path in (strukt.files or []) %}
          - mountPath: {{ path }}
