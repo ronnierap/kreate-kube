@@ -90,6 +90,7 @@ default:
     imagePullPolicy: Always
     containerPort: 8888  # different from 8080
     protocol: TCP
+    runAsUser: 1000
     #revisionHistoryLimit: 1
     #restartPolicy: "" # if not specfied explicetly defaults to Always
     #terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30

@@ -26,6 +26,8 @@ spec:
       restartPolicy: {{ default.restartPolicy }}
       {% if "serviceAccount" in val %}
       serviceAccount: {{ val.serviceAccount }}
+      {% endif %}
+      {% if "serviceAccountName" in val %}
       serviceAccountName: {{ val.serviceAccountName }}
       {% endif %}
       {% if "serviceName" in default %}
