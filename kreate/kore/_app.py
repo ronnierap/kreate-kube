@@ -77,7 +77,9 @@ class App:
     def kreate_komponents_from_strukture(self):
         for kind in sorted(self.strukture.keys()):
             if kind in self.kind_classes:
-                for shortname in sorted(self.strukture[kind].keys()):
+                strukt = self.strukture.get(kind, None)
+                strukt = strukt or { "main": {}}
+                for shortname in sorted(strukt.keys()):
                     logger.debug(f"kreating komponent {kind}.{shortname}")
                     self.kreate_komponent(kind, shortname)
             elif kind != "default":
