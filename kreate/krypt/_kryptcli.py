@@ -14,6 +14,21 @@ class KryptCli(KoreCli):
     def __init__(self):
         jinja2.filters.FILTERS["dekrypt"] = krypt_functions.dekrypt_str
         super().__init__()
+        self.add_krypt_options()
+        self.add_krypt_subcommands()
+
+    def add_krypt_options(self):
+        self.cli.add_argument(
+            "--testdummy", action="store_true",
+            help="do not dekrypt values"
+        )
+
+    def process_main_options(self, args):
+        super().process_main_options(args)
+        if args.testdummy:
+            krypt_functions._dekrypt_testdummy = True
+
+    def add_krypt_subcommands(self):
         self.add_subcommand(
             dekyaml,
             [argument("-f", "--file", help="yaml file to enkrypt")],
