@@ -178,7 +178,7 @@ class JinYamlKomponent(JinjaKomponent):
     def aktivate(self):
         vars = self._template_vars()
         self.data = load_jinja_data(self.template, vars)
-        self.yaml = wrap(yaml_parse(self.data))
+        self.yaml = wrap(yaml_parse(self.data, self.template))
         self.invoke_options()
         self.add_additions()
         self.remove_deletions()

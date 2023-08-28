@@ -96,8 +96,12 @@ def load_jinyaml(file_loc: FileLocation, vars: Mapping) -> Mapping:
     return yaml_parser.load(load_jinja_data(file_loc=file_loc, vars=vars))
 
 
-def yaml_parse(data):
-    return yaml_parser.load(data)
+def yaml_parse(data, loc: FileLocation = None):
+    try:
+        return yaml_parser.load(data)
+    except:
+        logger.error(f"Error parsing {loc or ''}\n"+data)
+        raise
 
 
 def yaml_dump(data, file):

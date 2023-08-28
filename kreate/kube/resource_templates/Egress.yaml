@@ -10,11 +10,17 @@ spec:
   policyTypes:
     - Egress
   egress:
+    {% if strukt.cidr_list == "allow-all" %}
+    - {}
+    {% else %}
+    {% for port in "{}".format(strukt.port).split(",") %}
     {% for addr in strukt.cidr_list.split(",") %}
     - to:
         - ipBlock:
             cidr: {{ addr }}
       ports:
-        - port: {{ strukt.port }}
+        - port: {{ port }}
           protocol: TCP
     {% endfor %}
+    {% endfor %}
+    {% endif %}

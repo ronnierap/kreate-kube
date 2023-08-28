@@ -151,5 +151,5 @@ class KubeKonfig(KryptKonfig):
                 prefix = "dekrypted " + prefix
                 data = krypt_functions.dekrypt_str(data)
             with open(f"{self.target_dir}/{target_subdir}/{name}", "w") as f:
-                logger.info(f"kreating file {key}/{name} from {prefix}")
+                logger.info(f"kreating file {key}/{name} from {prefix}") # TODO: log earlier
                 f.write(data)
