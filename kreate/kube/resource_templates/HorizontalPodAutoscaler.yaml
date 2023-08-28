@@ -8,8 +8,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ app.appname }}
-  minReplicas: {{ strukt.minReplicas }}
-  maxReplicas: {{ strukt.maxReplicas }}
+  minReplicas: {{ my.field.minReplicas }}
+  maxReplicas: {{ my.field.maxReplicas }}
   metrics:
   - type: Resource
     resource:

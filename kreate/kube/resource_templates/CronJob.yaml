@@ -46,7 +46,7 @@ spec:
               {% endfor %}
             securityContext:
               runAsNonRoot: true
-              runAsUser: {{ my.field.runAsUser}}
+              runAsUser: {{ my.field.runAsUser }}
               runAsGroup: {{ my.field.runAsGroup }}
             command: "/bin/sh"
             args:

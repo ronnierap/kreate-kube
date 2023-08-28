@@ -80,10 +80,7 @@ Egress:
     cidr_list: {{ val.xyz_egress_cidr_list }}
     port: {{ val.xyz_egress_port | default(8443) }}
 
-HorizontalPodAutoscaler:
-  main:
-    minReplicas: {{ val.minReplicas | default(1) }}
-    maxReplicas: {{ val.maxReplicas | default(3) }}
+HorizontalPodAutoscaler: {}
 
 Ingress:
   root:
