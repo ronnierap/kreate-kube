@@ -20,112 +20,13 @@ metadata:
 apiVersion: v1
 data:
   application.properties: This is a demo file
-  default-values.yaml: |
-    # this is a default file. It does not define any toplevel Objects
-
-    default:
-      generic:
-        container_name: app
-        service_port: 8080
-        container_port: 8080
-        replicas: {{ val.replicas | default(1) }}
-        image_repo: {{ val.image_repo }}
-        image_name: {{ konfig.appname }}.app
-        image_version: {{ val.image_version }}
-        project: {{ val.project }}
-
-        cpu_limit:    {{ val.cpu_limit | default(1) }}
-        cpu_request:  {{ val.cpu_request | default(1) }}
-        memory_limit:    {{ val.memory_limit | default("512M") }}
-        memory_request:  {{ val.memory_request | default("512M") }}
-
-      AntiAffinity:
-        selector_key: app
-
-      CronJob:
-        imagePullPolicy: Always
-        concurrencyPolicy: Allow
-        successfulJobsHistoryLimit: 3
-        runAsUser: 1000
-        runAsGroup: 1000
-
-      Deployment:
-        imagePullPolicy: Always
-        containerPort: 8080
-        protocol: TCP
-        revisionHistoryLimit: 1
-        restartPolicy: "" # if not specfied explicetly defaults to Always
-        terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
-
-      HorizontalPodAutoscaler:
-        minReplicas: 1
-        maxReplicas: 3
-        cpu_averageUtilization: 70
-        memory_averageUtilization: 70
-
-      HttpProbes:
-        probe_path: /actuator/info
-
-        startup_initialDelaySeconds: 10
-        startup_periodSeconds: 2
-        startup_timeoutSeconds: 1
-        startup_successThreshold: 1
-        startup_failureThreshold: 30
-        startup_scheme: HTTP
-        startup_path: "" # use probe_path
-        startup_port: 8080
-
-        readiness_periodSeconds: 2
-        readiness_timeoutSeconds: 1
-        readiness_successThreshold: 1
-        readiness_failureThreshold: 1
-        readiness_scheme: HTTP
-        readiness_path: "" # use probe_path
-        readiness_port: 8080
-
-        liveness_periodSeconds: 2
-        liveness_timeoutSeconds: 1
-        liveness_successThreshold: 1
-        liveness_failureThreshold: 3
-        liveness_scheme: HTTP
-        liveness_path: "" # use probe_path
-        liveness_port: 8080
-
-      Ingress:
-        service: {{ val.appname }}-service
-
-      KubernetesAnnotations:
-        component: webservice
-        managed_by: kustomize
-
-      PodDisruptionBudget:
-        minAvailable: 1
-
-      StatefulSet:
-        imagePullPolicy: Always
-        containerPort: 8080
-        protocol: TCP
-        revisionHistoryLimit: 1
-        restartPolicy: "" # if not specfied explicetly defaults to Always
-        terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
-
-      SidecarContainer:
-        imagePullPolicy: Always
-        containerPort: 8888  # different from 8080
-        protocol: TCP
-        runAsUser: 1000
-        #revisionHistoryLimit: 1
-        #restartPolicy: "" # if not specfied explicetly defaults to Always
-        #terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
-        cpu_limit:    {{ val.cpu_limit | default(1) }}
-        cpu_request:  {{ val.cpu_request | default(1) }}
-        memory_limit:    {{ val.memory_limit | default("512M") }}
-        memory_request:  {{ val.memory_request | default("512M") }}
+  some-file-from-package: |
+    # Just a package with templates
 kind: ConfigMap
 metadata:
   labels:
     config-map: demo-files
-  name: demo-files-bctgh9ct66
+  name: demo-files-bkmdbg75kc
   namespace: demo-dev
 ---
 apiVersion: v1
@@ -338,7 +239,7 @@ spec:
         secret:
           secretName: demo-secret-files
       - configMap:
-          name: demo-files-bctgh9ct66
+          name: demo-files-bkmdbg75kc
         name: demo-files
       - configMap:
           name: demo-extra-files-hmm7226mdf

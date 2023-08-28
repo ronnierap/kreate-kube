@@ -16,8 +16,8 @@ kopy_files:
   - name: application.properties
     template: True
   - name: environment.properties
-  - name: default-values.yaml
-    from: py:kreate.kube.other_templates:kube-defaults.yaml
+  - name: some-file-from-package
+    from: py:kreate.kube.other_templates:__init__.py
 kopy_secret_files:
   - name: credential.properties
     dekrypt: True

@@ -113,7 +113,7 @@ Kustomization:
       demo-files:
         files:
           - files/application.properties
-          - files/default-values.yaml
+          - files/some-file-from-package
       demo-extra-files:
         files:
           - files/environment.properties
