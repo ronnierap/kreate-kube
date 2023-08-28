@@ -11,7 +11,6 @@ from ._kubeconfig import kreate_kubeconfig
 logger = logging.getLogger(__name__)
 
 
-
 class KubeCli(krypt.KryptCli):
     def __init__(self):
         super().__init__()
@@ -36,14 +35,15 @@ class KubeCli(krypt.KryptCli):
             default=None,
         )
         cmd = self.add_subcommand(kubeconfig, [], aliases=["kc"])
-        cmd.add_argument("-f", "--force",
+        cmd.add_argument(
+            "-f",
+            "--force",
             help="overwrite existing file",
-            action="store_true"
+            action="store_true",
         )
 
     def get_packages(self):
         return ["kreate-kube"]
-
 
     def _kreate_konfig(self, filename: str) -> KubeKonfig:
         return KubeKonfig(filename)
@@ -96,7 +96,7 @@ def apply(cli: KubeCli) -> None:
     app = kreate_files(cli)
     cmd = (
         f"kustomize build {app.konfig.target_dir} "
-        f"| kubectl apply --dry-run -f - "
+        "| kubectl apply --dry-run -f - "
     )
     logger.info(f"running: {cmd}")
     os.system(cmd)

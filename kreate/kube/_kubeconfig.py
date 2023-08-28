@@ -41,7 +41,7 @@ def kreate_kubeconfig(konfig: Konfig, force=False):
         else:
             raise FileExistsError(
                 f"kubeconfig file {filename} already exists "
-                f"use --force option to overwrite"
+                "use --force option to overwrite"
             )
     else:
         logging.info(f"writing new {filename}")

@@ -24,7 +24,6 @@ def argument(*name_or_flags, **kwargs):
     return (list(name_or_flags), kwargs)
 
 
-
 class KoreCli:
     def __init__(self):
         self._konfig = None
@@ -32,7 +31,10 @@ class KoreCli:
         self.epilog = "subcommands:\n"
         self.cli = argparse.ArgumentParser(
             prog="kreate",
-            usage="kreate [optional arguments] [<subcommand>] [subcommand options]",
+            usage=(
+                "kreate [optional arguments] [<subcommand>] [subcommand"
+                " options]"
+            ),
             description=(
                 "kreates files for deploying applications on kubernetes"
             ),
@@ -42,7 +44,7 @@ class KoreCli:
             # title="subcmd",
             # description="valid subcommands",
             dest="subcommand",
-            metavar="see subcommands"
+            metavar="see subcommands",
         )
         self.add_subcommands()
 
@@ -82,12 +84,20 @@ class KoreCli:
         # subcommand: view_strukture
         cmd = self.add_subcommand(view_strukture, [], aliases=["vs"])
         cmd.add_argument(
-            "-k", "--komp", help="komponent to show", action="store", default=None
+            "-k",
+            "--komp",
+            help="komponent to show",
+            action="store",
+            default=None,
         )
         # subcommand: view defaults
         cmd = self.add_subcommand(view_defaults, [], aliases=["vd"])
         cmd.add_argument(
-            "-k", "--komp", help="komponent to show", action="store", default=None
+            "-k",
+            "--komp",
+            help="komponent to show",
+            action="store",
+            default=None,
         )
         # subcommand: view_values
         cmd = self.add_subcommand(view_values, [], aliases=["vv"])
@@ -113,7 +123,7 @@ class KoreCli:
         parent = parent or self.subparsers
         alias0 = aliases[0] if aliases else ""
         self.epilog += (
-            f"  {func.__name__:14}    {alias0 :3}" f" {func.__doc__ or ''} \n"
+            f"  {func.__name__:14}    {alias0 :3} {func.__doc__ or ''} \n"
         )
         parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__
@@ -141,7 +151,7 @@ class KoreCli:
             if _jinyaml._current_jinja_file:
                 lineno = jinja2_template_error_lineno()
                 print(
-                    f"while processing template "
+                    "while processing template "
                     f"{_jinyaml._current_jinja_file}:{lineno}"
                 )
         finally:
@@ -154,7 +164,7 @@ class KoreCli:
                     if os.path.exists(secrets_dir):
                         logger.info(
                             f"removing {secrets_dir}, "
-                            f"use --keep-secrets or -K option to keep it"
+                            "use --keep-secrets or -K option to keep it"
                         )
                         shutil.rmtree(secrets_dir)
 
@@ -163,23 +173,39 @@ class KoreCli:
 
     def add_main_options(self):
         self.cli.add_argument(
-            "-k", "--konf", action="store", default=".",
-            help="konfig file or directory to use (default=.)"
+            "-k",
+            "--konf",
+            action="store",
+            default=".",
+            help="konfig file or directory to use (default=.)",
         )
-        self.cli.add_argument("-v", "--verbose", action="count", default=0,
-            help="output more details (inluding stacktrace) -vv even more"
+        self.cli.add_argument(
+            "-v",
+            "--verbose",
+            action="count",
+            default=0,
+            help="output more details (inluding stacktrace) -vv even more",
         )
-        self.cli.add_argument("-w", "--warn", action="store_true",
-            help="only output warnings"
+        self.cli.add_argument(
+            "-w", "--warn", action="store_true", help="only output warnings"
         )
-        self.cli.add_argument("-q", "--quiet", action="store_true",
-            help="do not output any info, just essential output"
+        self.cli.add_argument(
+            "-q",
+            "--quiet",
+            action="store_true",
+            help="do not output any info, just essential output",
         )
-        self.cli.add_argument("-K", "--keep-secrets", action="store_true",
-            help="do not remove secrets dirs"
+        self.cli.add_argument(
+            "-K",
+            "--keep-secrets",
+            action="store_true",
+            help="do not remove secrets dirs",
         )
-        self.cli.add_argument("-R", "--skip-requires", action="store_true",
-            help="do not check if required dependency versions are installed"
+        self.cli.add_argument(
+            "-R",
+            "--skip-requires",
+            action="store_true",
+            help="do not check if required dependency versions are installed",
         )
 
     def process_main_options(self, args):
@@ -195,7 +221,6 @@ class KoreCli:
         else:
             logging.basicConfig(format="%(message)s", level=logging.INFO)
         self.konfig_filename = args.konf
-
 
 
 def view_strukture(cli: KoreCli):
@@ -217,7 +242,10 @@ def view_template(cli: KoreCli):
     app: JinjaApp = cli._kreate_app()
     template = cli.args.template
     if template:
-        if template not in app.kind_templates or template not in app.kind_classes:
+        if (
+            template not in app.kind_templates
+            or template not in app.kind_classes
+        ):
             logger.warn(f"Unknown template kind {template}")
             return
         if not cli.args.quiet:

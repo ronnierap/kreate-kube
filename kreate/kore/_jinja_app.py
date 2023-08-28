@@ -34,9 +34,7 @@ class JinjaApp(App):
                     f"using existing class {cls.__name__}"
                 )
             else:
-                logger.debug(
-                    f"overriding template {kind} using " f"default class"
-                )
+                logger.debug(f"overriding template {kind} using default class")
         filename = filename or f"{kind}.yaml"
         loc = FileLocation(
             filename=filename, package=package, dir=self.konfig.dir

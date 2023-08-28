@@ -100,7 +100,7 @@ def yaml_parse(data, loc: FileLocation = None):
     try:
         return yaml_parser.load(data)
     except:
-        logger.error(f"Error parsing {loc or ''}\n"+data)
+        logger.error(f"Error parsing {loc or ''}\n" + data)
         raise
 
 

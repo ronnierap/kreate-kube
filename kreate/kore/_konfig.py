@@ -23,7 +23,6 @@ def b64encode(value: str) -> str:
         return ""
 
 
-
 def get_class(name: str):
     module_name = name.rsplit(".", 1)[0]
     class_name = name.rsplit(".", 1)[1]
@@ -112,14 +111,16 @@ class Konfig:
             reqs.append(f"{pckg}{version}")
         return reqs
 
-
     def check_requires(self):
         error = False
         for line in self.get_requires():
             try:
                 logger.info(f"checking requirement {line}")
                 pkg_resources.require(line)
-            except (pkg_resources.VersionConflict, pkg_resources.DistributionNotFound)  as e:
+            except (
+                pkg_resources.VersionConflict,
+                pkg_resources.DistributionNotFound,
+            ) as e:
                 logger.warn(e)
                 error = True
         return error

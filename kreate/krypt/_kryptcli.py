@@ -19,8 +19,7 @@ class KryptCli(KoreCli):
 
     def add_krypt_options(self):
         self.cli.add_argument(
-            "--testdummy", action="store_true",
-            help="do not dekrypt values"
+            "--testdummy", action="store_true", help="do not dekrypt values"
         )
 
     def process_main_options(self, args):
@@ -61,7 +60,7 @@ class KryptCli(KoreCli):
         )
 
     def _kreate_konfig(self, filename: str) -> KryptKonfig:
-         return KryptKonfig()
+        return KryptKonfig()
 
 
 def dekyaml(cli: KryptCli):
@@ -77,7 +76,7 @@ def dekyaml(cli: KryptCli):
 
 def dekstr(cli: KryptCli):
     """dekrypt string value"""
-    cli.konfig()   # init konfig to set the secret value
+    cli.konfig()  # init konfig to set the secret value
     value = cli.args.str
     if not value:
         if not cli.args.quiet:
@@ -88,7 +87,7 @@ def dekstr(cli: KryptCli):
 
 def dekfile(cli: KryptCli):
     "dekrypt an entire file"
-    cli.konfig()   # init konfig to set the secret value
+    cli.konfig()  # init konfig to set the secret value
     filename = cli.args.file
     krypt_functions.dekrypt_file(filename)
 
