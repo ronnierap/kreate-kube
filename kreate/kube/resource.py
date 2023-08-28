@@ -93,11 +93,15 @@ class Egress(Resource):
         return f"{self.app.appname}-egress-to-{self.shortname}"
 
     def cidr_list(self) -> list:
-        r = self._field("cidr_list")
+        r = self._field("cidr_list", "")
+        if not r:
+            r = self._field("cidr", "")
         return str(r).split(",") if r else []
 
     def port_list(self) -> list:
-        r = self._field("port_list")
+        r = self._field("port_list", "")
+        if not r:
+            r = self._field("port", "")
         return str(r).split(",") if r else []
 
 

@@ -136,7 +136,7 @@ class Komponent:
     def filename(self):
         return f"{self.kind.lower()}-{self.shortname}.yaml"
 
-    def _field(self, fieldname: str):
+    def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
         if (self.shortname in self.app.konfig.values
@@ -150,6 +150,8 @@ class Komponent:
         # The following might not be needed using Deepchain anyway
         if fieldname in self.strukture.get("default", {}).get("generic",{}):
             return self.strukture["default"]["generic"][fieldname]
+        if default is not None:
+            return default
         raise ValueError(f"Unknown field {fieldname} in {self}")
 
 

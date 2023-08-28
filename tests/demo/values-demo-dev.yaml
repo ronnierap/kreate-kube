@@ -10,8 +10,8 @@ ingress_host_external: api.kisst.org
 ingress_host_internal: private.kisst.org
 
 db:
-  cidr_list: 1.2.3.4/32
-  port_list: 8123
+  cidr: 1.2.3.4/32
+  port: 8123
 
 redis:
   url: https://redis.kisst.org:6379
