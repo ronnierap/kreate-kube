@@ -49,6 +49,8 @@ class KoreCli:
         if not self._konfig:
             self._konfig = self._kreate_konfig(self.konfig_filename)
             self._tune_konfig()
+            if not self.args.skip_requires:
+                self._konfig.check_requires()
         return self._konfig
 
     def app(self):
@@ -139,7 +141,7 @@ class KoreCli:
                     f"{_jinyaml._current_jinja_file}:{lineno}"
                 )
         finally:
-            if not self.args.keepsecrets:
+            if not self.args.keep_secrets:
                 if self._konfig:
                     # konfig was kreated so secrets might need to be cleaned
                     konfig = self.konfig()
@@ -157,12 +159,24 @@ class KoreCli:
 
     def add_main_options(self):
         self.cli.add_argument(
-            "-a", "--konfig", action="store", default="konfig.yaml"
+            "-k", "--konf", action="store", default=".",
+            help="konfig file or directory to use (default=.)"
         )
-        self.cli.add_argument("-v", "--verbose", action="count", default=0)
-        self.cli.add_argument("-w", "--warn", action="store_true")
-        self.cli.add_argument("-q", "--quiet", action="store_true")
-        self.cli.add_argument("-K", "--keepsecrets", action="store_true")
+        self.cli.add_argument("-v", "--verbose", action="count", default=0,
+            help="output more details (inluding stacktrace) -vv even more"
+        )
+        self.cli.add_argument("-w", "--warn", action="store_true",
+            help="only output warnings"
+        )
+        self.cli.add_argument("-q", "--quiet", action="store_true",
+            help="do not output any info, just essential output"
+        )
+        self.cli.add_argument("-K", "--keep-secrets", action="store_true",
+            help="do not remove secrets dirs"
+        )
+        self.cli.add_argument("-R", "--skip-requires", action="store_true",
+            help="do not check if required dependency versions are installed"
+        )
 
     def process_main_options(self, args):
         if args.verbose >= 2:
@@ -176,7 +190,7 @@ class KoreCli:
             logging.basicConfig(format="%(message)s", level=logging.ERROR)
         else:
             logging.basicConfig(format="%(message)s", level=logging.INFO)
-        self.konfig_filename = args.konfig
+        self.konfig_filename = args.konf
 
 
 

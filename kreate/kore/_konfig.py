@@ -52,7 +52,6 @@ class Konfig:
         self.appname = self.values["appname"]
         self.env = self.values["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
-        self.check_requires()
         self.load()
 
     def _add_jinja_filter(self, name, func):
