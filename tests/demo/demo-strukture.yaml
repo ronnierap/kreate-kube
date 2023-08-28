@@ -74,7 +74,7 @@ Egress:
   db:
     #name: demo-egress-to-db
     cidr_list: {{ val.db.cidr }}
-    #port_list: 1521
+    port_list: 1521
   xyz:
     cidr_list: {{ val.xyz.cidr_list }}
     port_list: {{ val.xyz.port_list | default(8443) }}
