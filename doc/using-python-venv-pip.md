@@ -179,4 +179,31 @@ Successfully installed kreate-kube-0.3.0
 
 
 ## Advanced scenarios
-The setup above describes a
+The setup above describes a normal workflow that should work in general.
+If you are more experienced with `venv` and `pip`, you might try variations.
+One tool that people seem to like `pipenv`, but the Python toolset is changing at the moment.
+
+Another variation might be to just create one venv per `kreate-kube`  version that you want to use.
+Especially if all your projects use the same version, this can make life easier.
+In this example you would create 2 venv's.
+One for `kreate-kube` version 0.3.0 and one for 0.4.0.
+You place these venv's in a easy to find location, instead of each project's topdir.
+
+You can then activate the venv with the version you need, and use that for all projects.
+```bash
+$ mkdir venvs
+$ python3 -m venv ~/venvs/kreate-0.3.0
+$ python3 -m venv ~/venvs/kreate-0.4.0
+
+$ source ~/venvs/kreate-0.3.0/bin/activate
+(kreate-0.3.0) $ pip install kreate-kube==0.3.0
+...
+(kreate-0.3.0) $ deactivate
+
+$ source ~/venvs/kreate-0.4.0/bin/activate
+(kreate-0.4.0) $ pip install kreate-kube==0.4.0
+...
+(kreate-0.4.0) $ deactivate
+```
+The nice thing about this setup is that the prompt shows which venv you are using.
+Of course you need to make sure you use the correct version of kreate in each venv.
