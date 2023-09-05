@@ -1,12 +1,34 @@
 inklude:
-- shared-values.yaml
-- values-{{val.appname}}-{{val.env}}.yaml
-- secrets-{{val.appname}}-{{val.env}}.yaml
+- repo:shared_konfig:shared-values.yaml
+- values-{{konf.val.appname}}-{{konf.val.env}}.yaml
+- dekrypt:repo:test:secrets-{{konf.val.appname}}-{{konf.val.env}}.yaml
 strukture:
-  - {{val.appname}}-strukture.yaml
-  - override-{{val.appname}}-{{val.env}}.yaml
+  - {{konf.val.appname}}-strukture.yaml
+  - override-{{konf.val.appname}}-{{konf.val.env}}.yaml
 templates:
   MyUdpService: ./templates/MyUdpService.yaml
   Service: ./templates/MyUdpService.yaml   # Override existing Service template
 patch_templates:
   ElasticLogging: ./templates/ElasticLogging.yaml
+
+
+repo:
+  kool_templates:
+    url: https://github.com/MarkHooijkaas/kool_templates/archive/{{konf.repo.kool_templates.version}}.zip
+    type: zip
+
+  shared_templates:
+    authenticate:
+      basic: True
+      usr_env_var: BITBUCKET_USR
+      psw_env_var: BITBUCKET_PSW
+    url: https://bitbucket.company.org/rest/api/latest/projects/some-project/repos/shared_templates/archive?at={{konf.repo.shared_templates.version}}&format=zip
+    type: zip
+
+  shared_konfig:
+    authenticate:
+      basic: True
+      usr_env_var: BITBUCKET_USR
+      psw_env_var: BITBUCKET_PSW
+    url: https://bitbucket.company.org/rest/api/latest/projects/some-project/repos/shared_konfig/archive?at={{konf.repo.shared_konfig.version}}&format=zip
+    type: zip

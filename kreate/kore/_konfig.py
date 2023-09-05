@@ -8,7 +8,8 @@ from pathlib import Path
 
 
 from ._core import DeepChain, deep_update
-from ._jinyaml import load_jinyaml, FileLocation
+from ._repo import FileGetter
+from ._jinyaml import render_jinyaml, FileLocation
 
 
 logger = logging.getLogger(__name__)
@@ -42,9 +43,9 @@ class Konfig:
         self._default_strukture_files = []
         self.dekrypt_func = None
         self._add_jinja_filter("b64encode", b64encode)
-        self.yaml = load_jinyaml(
-            FileLocation(self.filename, dir="."), {"function": self.functions}
-        )
+        self.file_getter = FileGetter(self)
+        data, dir = self.file_getter.get_data(self.filename, ".")
+        self.yaml = render_jinyaml(data, {"function": self.functions})
         self.appname = self.yaml["val"]["appname"]
         self.env = self.yaml["val"]["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
@@ -78,7 +79,11 @@ class Konfig:
                 count += 1
                 already_inkluded.add(fname)
                 logger.info(f"inkluding {fname}")
-                val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), self.yaml)
+                # TODO: use dirname
+                data, dirname = self.file_getter.get_data(fname, dir=self.dir)
+                val_yaml = render_jinyaml(data,
+                    {"konf": self.yaml, "function": self.functions}
+                )
                 if val_yaml:  # it can be empty
                     deep_update(self.yaml, val_yaml)
         logger.debug(f"inkluded {count} new files")
@@ -94,7 +99,8 @@ class Konfig:
         return result
 
     def _load_strukture_file(self, filename):
-        return load_jinyaml(FileLocation(filename, dir=self.dir), self.yaml)
+        data, dirname = self.file_getter.get_data(filename, self.dir)
+        return render_jinyaml(data, self.yaml)  # TODO: dir=self.dir
 
     def calc_strukture(self):
         if not self._strukt_cache:

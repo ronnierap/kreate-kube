@@ -1,12 +1,14 @@
-{% set appname = "demo" %}  # reuse the appname in rest of this file
-{% set env = "dev" %}       # reuse the env in rest of this file
 val:
-  appname: {{ appname }}
-  env: {{ env }}
+  appname: demo
+  env: dev
   team: myteam
   image_version: v1.3.4
-requires:
+require:
   kreate-kube: ==0.3.0
+repo:
+  kool_templates: { version: v1.3 }
+  shared_konfig: { version: v3.2 }
+  shared_templates: { version: v1.1 }
 kopy_files:
   - name: application.properties
     template: True
@@ -16,9 +18,5 @@ kopy_files:
 kopy_secret_files:
   - name: credential.properties
     dekrypt: True
-
-# key the enkryption key for the DEV environment
-#krypt_key: {{ function.getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
-
 inklude:
 - framework.konf

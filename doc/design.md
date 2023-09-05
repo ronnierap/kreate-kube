@@ -73,29 +73,26 @@ secret-files
 
 ## konfig structure
 ```
-app:
+val:
   appname: demo
   env: dev
   team: knights
   image_version: 4.0.1
   namespace: demo-dev
 inklude:
-  - framework:init-dev.konf
-requires:
+  - framework/init-dev.konf
+require:
   kreate-kube: 0.4.0
   shared_templates: v1.3
   shared_konfig: v1.4
-templates:
-  kool_templates:/kool_templates.konf
-  shared_templates:/shared_templates.konf
 
 
 # These should be defined in inkludes
-vars:
+var:
   ... # from inklude file
-values:
+val:
   ... # from inklude file
-secrets:
+secret:
   ... # from inklude file
 files:
   default.conf: ./dev/files/default.conf
@@ -106,23 +103,29 @@ secret-files:
 
 # in framework/init-dev.konf
 # Note extra inkludes in a inklude need to add/rerun inklude...
+templates:
+  - repo:kool_templates:/kool_templates.konf
 inklude:
-  - shared_templates:shared_templates.konf
-  - shared_konfig:dev/shared_values-dev.konf
+  - repo:shared_templates:shared_templates.konf
+  - repo:shared_konfig:dev/shared_values-dev.konf
   - inklude_path:values-demo-dev.konf
   - inklude_path:vars-demo-dev.konf
   - inklude_path:secrets-demo-dev.konf
   - inklude_path:files-demo-dev.konf
 settings:
   inklude_path: .:./dev  # ./dev
-  sources:
-    kreate-kube: pip # cannot be installed, since python is already running
-    # an archive url for github
-    kool_templates: https://github.com/MarkHooijkaas/kool_templates/archive/{{requires.kool_templates}}.zip
-    # archive urls for company hosted bitbucket
+repo:
+  kool_templates:
+    url: https://github.com/MarkHooijkaas/kool_templates/archive/{{requires.kool_templates}}.zip
+    type: zip
 
-    shared_templates: https://{{USR}}:{{PSW}}@bitbucket.company.org/rest/api/latest/projects/{{BITBUCKET_PROJECT}}/repos/shared_templates/archive?at={{requires["shared_templates"]}}&format=zip
-    shared_konfig: https://{{USR}}:{{PSW}}@bitbucket.company.org/rest/api/latest/projects/{{BITBUCKET_PROJECT}}/repos/shared_konfig/archive?at={{requires.["shared_konfig"]}}&format=zip
+  shared_templates:
+    url: https://{{USR}}:{{PSW}}@bitbucket.company.org/rest/api/latest/projects/{{BITBUCKET_PROJECT}}/repos/shared_templates/archive?at={{requires["shared_templates"]}}&format=zip
+    type: zip
+
+  shared_konfig:
+    url: https://{{USR}}:{{PSW}}@bitbucket.company.org/rest/api/latest/projects/{{BITBUCKET_PROJECT}}/repos/shared_konfig/archive?at={{requires.["shared_konfig"]}}&format=zip
+    typ: zip
 
 ```
 template data:

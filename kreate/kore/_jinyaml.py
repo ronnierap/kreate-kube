@@ -80,14 +80,18 @@ def raise_error_if_none(thing):
 # wit filename and linenumber
 #jinja2_env = jinja2.Environment(finalize=my_finalize)
 
-def load_jinja_data(file_loc: FileLocation, vars: Mapping):
+def load_jinja_data(file_loc: FileLocation, vars: Mapping) -> str:
     global _current_jinja_file
     # we remember the file that jinja is parsing for better error messages
     # Not sure if there is a better way to do this currently
     _current_jinja_file = file_loc.filename
     filedata = load_data(file_loc=file_loc)
+    return render_jinja(filedata, vars)
+
+def render_jinja(data, vars: Mapping) -> str:
+    global _current_jinja_file
     tmpl = jinja2.Template(
-        filedata,
+        data,
         undefined=jinja2.StrictUndefined,
         finalize=raise_error_if_none,
         trim_blocks=True,
@@ -97,6 +101,10 @@ def load_jinja_data(file_loc: FileLocation, vars: Mapping):
     _current_jinja_file = None
     return result
 
+def render_jinyaml(data: str,  vars: Mapping) -> Mapping:
+    return yaml_parser.load(render_jinja(data, vars=vars))
+
+
 
 def load_yaml(file_loc: FileLocation) -> Mapping:
     return yaml_parser.load(load_data(file_loc=file_loc))
@@ -104,6 +112,7 @@ def load_yaml(file_loc: FileLocation) -> Mapping:
 
 def load_jinyaml(file_loc: FileLocation, vars: Mapping) -> Mapping:
     return yaml_parser.load(load_jinja_data(file_loc=file_loc, vars=vars))
+
 
 
 def yaml_parse(data, loc: FileLocation = None):

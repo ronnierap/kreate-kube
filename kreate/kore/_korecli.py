@@ -300,6 +300,7 @@ def requirements(cli: KoreCli):
     konfig: Konfig = cli.konfig()
     for line in konfig.get_requires():
         print(line)
+    DeepChain(konfig.yaml.get("repo",{})).pprint()
 
 
 def version(cli: KoreCli):
