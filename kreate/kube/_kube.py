@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class KubeApp(JinjaApp):
     def __init__(self, konfig: Konfig):
         super().__init__(konfig)
-        self.namespace = konfig.values.get(
+        self.namespace = konfig.yaml["values"].get(
             "namespace", f"{self.appname}-{self.env}"
         )
 
@@ -76,34 +76,12 @@ class KubeApp(JinjaApp):
 
 class KubeKonfig(KryptKonfig):
     def load(self):
-        if "values" not in self.yaml:
-            logger.debug("adding default values file(s)")
-            self.yaml["values"] = self.default_values_files()
-        if "secrets" not in self.yaml:
-            logger.debug("adding default secrets file(s)")
-            self.yaml["secrets"] = self.default_secrets_files()
-        if "strukture" not in self.yaml:
-            logger.debug("adding default strukture file(s)")
-            self.yaml["strukture"] = self.default_strukture_files()
         if "krypt_key" not in self.yaml:
             psw = self.default_krypt_key()
             if not psw:
                 logger.warning(f"no dekrypt key provided")
             self.yaml["krypt_key"] = psw
         super().load()
-
-    def default_values_files(self):
-        return [f"values-{self.appname}-{self.env}.yaml"]
-
-    def default_secrets_files(self):
-        # if an application does not have any secrets, the files can be specified as
-        # secrets: []
-        # alternatively we could build a check to only include
-        # the file below if it exists
-        return [f"secrets-{self.appname}-{self.env}.yaml"]
-
-    def default_strukture_files(self):
-        return [f"{self.appname}-strukture.yaml"]
 
     def default_krypt_key(self):
         env_varname = self.default_krypt_key_env_var()
@@ -138,8 +116,8 @@ class KubeKonfig(KryptKonfig):
             if template:
                 vars = {
                     "konfig": self,
-                    "val": self.values,
-                    "secret": self.secrets,
+                    "val": self.yaml["values"],
+                    "secret": self.yaml["secrets"],
                 }
                 logger.debug(f"rendering template {from_}")
                 prefix = "rendered template " + from_

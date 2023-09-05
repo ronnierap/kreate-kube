@@ -276,7 +276,7 @@ def view_template(cli: KoreCli):
 def view_values(cli: KoreCli):
     """view the application values"""
     konfig: Konfig = cli.konfig()
-    for k, v in konfig.values.items():
+    for k, v in konfig.yaml["values"].items():
         print(f"{k}: {v}")
 
 

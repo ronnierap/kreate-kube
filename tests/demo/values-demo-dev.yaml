@@ -1,33 +1,34 @@
-# This file should just provide basic values, no nested hierarchy
-project: kreate-demo
+# This file should just provide basic values
+values:
+  project: kreate-demo
 
-probe_path: /demo/actuator/info
-image_repo: https://repo.kisst.org
-service_port: 8080
-container_port: 8080
+  probe_path: /demo/actuator/info
+  image_repo: https://repo.kisst.org
+  service_port: 8080
+  container_port: 8080
 
-ingress_host_external: api.kisst.org
-ingress_host_internal: private.kisst.org
+  ingress_host_external: api.kisst.org
+  ingress_host_internal: private.kisst.org
 
-db:
-  cidr: 1.2.3.4/32
-  port: 8123
+  db:
+    cidr: 1.2.3.4/32
+    port: 8123
 
-redis:
-  url: https://redis.kisst.org:6379
-  cidr_list: dummy
-  #egress_port: 6379
+  redis:
+    url: https://redis.kisst.org:6379
+    cidr_list: dummy
+    #egress_port: 6379
 
-xyz:
-  cidr_list: dummy
-  port_list: 1234
+  xyz:
+    cidr_list: dummy
+    port_list: 1234
 
-# do not override cpu_limit
-cpu_request: "50m" # extra small for dev environment
+  # do not override cpu_limit
+  cpu_request: "50m" # extra small for dev environment
 
-serviceaccount_role: some-role-dev
-root_whitelist: 10.20.30.40
-replicas: 3
+  serviceaccount_role: some-role-dev
+  root_whitelist: 10.20.30.40
+  replicas: 3
 
 vars:
   ORACLE_URL: localhost:1521

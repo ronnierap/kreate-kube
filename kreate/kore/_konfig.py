@@ -37,9 +37,7 @@ class Konfig:
             filename += "/konfig.yaml"
         self.dir = os.path.dirname(filename) or "."
         self.filename = filename
-        self.values = {}
         self.functions = {"getenv": os.getenv}
-        self.secrets = {}
         self._strukt_cache = None
         self._default_strukture_files = []
         self.dekrypt_func = None
@@ -47,9 +45,8 @@ class Konfig:
         self.yaml = load_jinyaml(
             FileLocation(self.filename, dir="."), {"function": self.functions}
         )
-        deep_update(self.values, self.yaml.get("app", {}))
-        self.appname = self.values["appname"]
-        self.env = self.values["env"]
+        self.appname = self.yaml["values"]["appname"]
+        self.env = self.yaml["values"]["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
         self.load()
 
@@ -58,24 +55,6 @@ class Konfig:
 
     def load(self):
         self.load_all_inkludes()
-        self._load_files("values", self.values)
-        self._load_files("secrets", self.secrets)
-
-    def _load_files(self, key, dict_):
-        logger.debug(f"loading {key} files")
-        files = self.yaml.get(key, [])
-        if not files:
-            file = f"{key}-{self.appname}-{self.env}.yaml"
-            if os.path.exists(f"{self.dir}/{file}"):
-                logger.debug(f"adding standard {key} file {file}")
-                files = [file]
-            else:
-                logger.info(f"no {key} files found")
-        for fname in files:
-            val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), dict_)
-            if val_yaml:  # it can be empty
-                deep_update(dict_, val_yaml)
-
 
     def load_all_inkludes(self):
         logger.debug("loading inklude files")
@@ -111,9 +90,9 @@ class Konfig:
     def _load_strukture_file(self, filename):
         vars = {
             "konfig": self,
-            "val": self.values,
-            "var": self.values.get("vars",{}),
-            "secret": self.secrets,
+            "val": self.yaml.get("values", {}),
+            "var": self.yaml.get("vars", {}),
+            "secret": self.yaml.get("secrets", {}),
             "function": self.functions,
         }
         return load_jinyaml(FileLocation(filename, dir=self.dir), vars)

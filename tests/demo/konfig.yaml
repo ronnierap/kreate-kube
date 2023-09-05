@@ -1,17 +1,12 @@
 {% set appname = "demo" %}  # reuse the appname in rest of this file
 {% set env = "dev" %}       # reuse the env in rest of this file
-app:
+values:
   appname: {{ appname }}
   env: {{ env }}
   team: myteam
   image_version: v1.3.4
 requires:
   kreate-kube: ==0.3.0
-values:
-  - shared-values.yaml
-  - values-{{appname}}-{{env}}.yaml
-#secrets:
-#  - secrets-{{appname}}-{{env}}.yaml
 kopy_files:
   - name: application.properties
     template: True
@@ -27,12 +22,3 @@ kopy_secret_files:
 
 inklude:
 - framework.konf
-
-strukture:
-  - {{appname}}-strukture.yaml
-  - override-{{appname}}-{{env}}.yaml
-templates:
-  MyUdpService: ./templates/MyUdpService.yaml
-  Service: ./templates/MyUdpService.yaml   # Override existing Service template
-patch_templates:
-  ElasticLogging: ./templates/ElasticLogging.yaml

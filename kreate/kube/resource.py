@@ -137,20 +137,12 @@ class ConfigMap(Resource):
     def calc_name(self):
         return f"{self.app.appname}-{self.shortname}"
 
-    # @property
-    # def filename(self) -> str:
-    #    return super().filename
-
-    def add_var(self, name, value=None):
-        if value is None:
-            value = self.app.konfig.values[name]
-        # We can not use self.yaml.data, since data is a field in UserDict
-        self.yaml["data"][name] = value
-
     def var(self, varname: str):
         value = self.strukture.vars[varname]
         if not isinstance(value, str):
-            value = self.app.konfig.values.get("vars",{}).get(varname, None)
+            value = self.app.konfig.yaml.get("vars",{}).get(varname, None)
+        if value is None:
+            raise ValueError(f"var {varname} should not be None")
         return value
 
 class Ingress(Resource):
