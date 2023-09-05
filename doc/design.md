@@ -71,35 +71,67 @@ secret-files
   - cert.key
 ```
 
-## config structure
+## konfig structure
 ```
-trigger: cron?, service, queue
-replicas: fixed, hpa, stateful
-ingress:
-  root:
-    context-root: "/foo"
-    basic-auth:
-      auth-file: "secrets/auth"
-  api:
-    read-timeout: 300  # On this environment it is even slower
-egress:
-  db:
-    hosts: {{ shared.oracle.hosts }}
-    port: 1521
-  redis: None?
-  xyz:
-    hosts: {{ shared.xyz.hosts }}
-    port: 8080
+app:
+  appname: demo
+  env: dev
+  team: knights
+  image_version: 4.0.1
+  namespace: demo-dev
+inklude:
+  - framework:init-dev.konf
+requires:
+  kreate-kube: 0.4.0
+  shared_templates: v1.3
+  shared_konfig: v1.4
+templates:
+  kool_templates:/kool_templates.konf
+  shared_templates:/shared_templates.konf
+
+
+# These should be defined in inkludes
 vars:
-  ENV: {{ app.env }}
-  DB_URL: {{ oracle_cn('db_svc123') }}
-  DB_SCHEMA: 'my_schema'
-  DB_USR: 'my_usr'
-  DB_PSW: {{ dekrypt(secrets.db_psw) }}
-  XYZ_URL: {{ shared.xyz.url }}
+  ... # from inklude file
+values:
+  ... # from inklude file
+secrets:
+  ... # from inklude file
+files:
+  default.conf: ./dev/files/default.conf
+  logback.xml: shared_konfig:/generic-logback.xml
+secret-files:
+  private.key: dekrypt:shared_konfig:/dev/secret-files/private.key.encrypted
+
+
+# in framework/init-dev.konf
+# Note extra inkludes in a inklude need to add/rerun inklude...
+inklude:
+  - shared_templates:shared_templates.konf
+  - shared_konfig:dev/shared_values-dev.konf
+  - inklude_path:values-demo-dev.konf
+  - inklude_path:vars-demo-dev.konf
+  - inklude_path:secrets-demo-dev.konf
+  - inklude_path:files-demo-dev.konf
+settings:
+  inklude_path: .:./dev  # ./dev
+  sources:
+    kreate-kube: pip # cannot be installed, since python is already running
+    # an archive url for github
+    kool_templates: https://github.com/MarkHooijkaas/kool_templates/archive/{{requires.kool_templates}}.zip
+    # archive urls for company hosted bitbucket
+
+    shared_templates: https://{{USR}}:{{PSW}}@bitbucket.company.org/rest/api/latest/projects/{{BITBUCKET_PROJECT}}/repos/shared_templates/archive?at={{requires["shared_templates"]}}&format=zip
+    shared_konfig: https://{{USR}}:{{PSW}}@bitbucket.company.org/rest/api/latest/projects/{{BITBUCKET_PROJECT}}/repos/shared_konfig/archive?at={{requires.["shared_konfig"]}}&format=zip
+
 ```
 template data:
-- app?
-- vars
-- shared
--
+- app
+- var
+- value
+- secret
+- my
+  - konfig
+  - app
+  - vars
+  - values
