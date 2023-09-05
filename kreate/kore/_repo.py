@@ -24,31 +24,31 @@ class FileGetter:
            dekrypt = True
            file = file[8:]
         if file.startswith("repo:"):
-            data, basedir = self.load_repo_data(file[5:])
+            data = self.load_repo_data(file[5:])
         elif file.startswith("py:"):
-            data, basedir = self.load_package_data(file[3:])
+            data = self.load_package_data(file[3:])
         else:
-            data, basedir = self.load_file_data(file, dir=dir)
+            data = self.load_file_data(file, dir=dir)
         if dekrypt:
             logger.warning(f"dekrypt not implemented for {orig_file}")
-        return data, basedir
+        return data
 
-    def load_file_data(self, filename: str, dir: str) -> (str, str):
+    def load_file_data(self, filename: str, dir: str) -> str:
         logger.debug(f"loading file {filename} ")
         p = Path(dir, filename)
-        return p.read_text(), p.parent
+        return p.read_text()
 
-    def load_repo_data(self, filename: str) -> (str, str):
+    def load_repo_data(self, filename: str) -> str:
         repo = filename.split(":")[0]
         filename = filename[len(repo)+1:]
         logger.warning(f"loading file {filename} from repo {repo} NOT implemented")
         p = Path(self.konfig.dir, filename)
-        return p.read_text(), p.parent
+        return p.read_text()
 
-    def load_package_data(self, filename: str) -> (str, str):
+    def load_package_data(self, filename: str) -> str:
         package_name = filename.split(":")[0]
         filename = filename[len(package_name)+1:]
         package = importlib.import_module(package_name)
         logger.debug(f"loading file {filename} from package {package_name}")
         data = pkgutil.get_data(package.__package__, filename)
-        return data.decode("utf-8"), "TODO"
+        return data.decode("utf-8")

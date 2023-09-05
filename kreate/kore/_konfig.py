@@ -44,7 +44,7 @@ class Konfig:
         self.dekrypt_func = None
         self._add_jinja_filter("b64encode", b64encode)
         self.file_getter = FileGetter(self)
-        data, dir = self.file_getter.get_data(self.filename, ".")
+        data = self.file_getter.get_data(self.filename, ".")
         self.yaml = render_jinyaml(data, {"function": self.functions})
         self.appname = self.yaml["val"]["appname"]
         self.env = self.yaml["val"]["env"]
@@ -80,7 +80,7 @@ class Konfig:
                 already_inkluded.add(fname)
                 logger.info(f"inkluding {fname}")
                 # TODO: use dirname
-                data, dirname = self.file_getter.get_data(fname, dir=self.dir)
+                data = self.file_getter.get_data(fname, dir=self.dir)
                 val_yaml = render_jinyaml(data,
                     {"konf": self.yaml, "function": self.functions}
                 )
@@ -99,7 +99,7 @@ class Konfig:
         return result
 
     def _load_strukture_file(self, filename):
-        data, dirname = self.file_getter.get_data(filename, self.dir)
+        data = self.file_getter.get_data(filename, self.dir)
         return render_jinyaml(data, self.yaml)  # TODO: dir=self.dir
 
     def calc_strukture(self):
