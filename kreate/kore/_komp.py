@@ -247,3 +247,9 @@ class JinYamlKomponent(JinjaKomponent):
         removals = self.strukture.get("remove", [])
         for path in removals:
             self.yaml._del_path(path)
+
+    def optional(self, fieldname: str) -> str:
+        if fieldname not in self.field:
+            return ""
+        val = self._field(fieldname)
+        return f"{fieldname}: {val}"

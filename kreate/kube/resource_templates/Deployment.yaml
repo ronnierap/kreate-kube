@@ -24,18 +24,10 @@ spec:
         {% endfor %}
     spec:
       restartPolicy: {{ my.field.restartPolicy }}
-      {% if "serviceAccount" in my.field  %}
-      serviceAccount: {{ my.field.serviceAccount }}
-      {% endif %}
-      {% if "serviceAccountName" in my.field %}
-      serviceAccountName: {{ my.field.serviceAccountName }}
-      {% endif %}
-      {% if "serviceName" in default %}
-      serviceName: "" #{{ my.field.serviceName | default("") }}  # Only for StatefulSet
-      {% endif %}
-      {% if default.terminationGracePeriodSeconds %}
-      terminationGracePeriodSeconds: {{ my.field.terminationGracePeriodSeconds }}
-      {% endif %}
+      {{ my.optional("serviceAccount") }}
+      {{ my.optional("serviceAccountName") }}
+      {{ my.optional("serviceName") }}
+      {{ my.optional("terminationGracePeriodSeconds") }}
 
       containers:
       - name: {{ my.field.container_name }}
