@@ -154,6 +154,16 @@ class Komponent:
             return default
         raise ValueError(f"Unknown field {fieldname} in {self}")
 
+    def _contains_field(self, key) -> bool:
+        if key in self.strukture:
+            return True
+        if key in self.app.konfig.yaml["val"]:
+            return True
+        #result.update(self.app.konfig.yaml["val"][self.shortname])
+        if  key in self.app.konfig.yaml["val"]:
+            return True
+        return False
+
 
 class Field:
     def __init__(self, komp: Komponent) -> None:
@@ -162,7 +172,8 @@ class Field:
     def __getattr__(self, __name: str) -> Any:
         return self._komp._field(__name)
 
-
+    def __contains__(self, key):
+        return self._komp._contains_field(key)
 
 class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""

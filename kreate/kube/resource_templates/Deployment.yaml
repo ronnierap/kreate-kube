@@ -24,10 +24,10 @@ spec:
         {% endfor %}
     spec:
       restartPolicy: {{ my.field.restartPolicy }}
-      {% if "serviceAccount" in val %}
+      {% if "serviceAccount" in my.field  %}
       serviceAccount: {{ my.field.serviceAccount }}
       {% endif %}
-      {% if "serviceAccountName" in val %}
+      {% if "serviceAccountName" in my.field %}
       serviceAccountName: {{ my.field.serviceAccountName }}
       {% endif %}
       {% if "serviceName" in default %}
