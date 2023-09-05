@@ -9,9 +9,7 @@ spec:
       containers:
       - name: {{ my.shortname }}
         image: {{ strukt.image }}
-        {% if default.imagePullPolicy %}
-        imagePullPolicy: {{ my.field.imagePullPolicy }}
-        {% endif %}
+        {{ my.optional("imagePullPolicy") }}
         securityContext:
           runAsUser: {{ my.field.runAsUser }}
         envFrom:

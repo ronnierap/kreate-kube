@@ -32,9 +32,7 @@ spec:
       containers:
       - name: {{ my.field.container_name }}
         image: {{ my.field.image_repo }}/{{ my.field.image_name }}:{{ my.field.image_version }}
-        {% if default.imagePullPolicy %}
-        imagePullPolicy: {{ my.field.imagePullPolicy }}
-        {% endif %}
+        {{ my.optional("imagePullPolicy") }}
         envFrom:
         - secretRef:
         {% for secr in strukt.get("secret-vars",[]) %}
