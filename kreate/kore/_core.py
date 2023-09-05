@@ -18,7 +18,8 @@ def deep_update(target, other):
             if k not in target:
                 target[k] = list(v)  # use a copy
             elif isinstance(target[k], Sequence):
-                target[k].append(v)
+                for item in v:
+                    target[k].append(item)
             else:
                 raise ValueError(f"trying to merge key {k} sequence {v} into non-sequence {target[k]}")
         else:
