@@ -8,6 +8,7 @@ import inspect
 from jinja2 import TemplateError
 from sys import exc_info
 
+from ._core import DeepChain
 from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp
@@ -113,6 +114,8 @@ class KoreCli:
         # subcommand: view_konfig
         cmd = self.add_subcommand(view_konfig, [], aliases=["vk"])
         cmd.add_argument("-k", "--kind", action="store", default=None)
+        cmd.add_argument("-o", "--orig", action="store_true",
+                help="view in original format")
         # subcommand: requirements
         cmd = self.add_subcommand(requirements, [], aliases=["rq"])
 
@@ -285,7 +288,11 @@ def view_konfig(cli: KoreCli):
     konfig: Konfig = cli.konfig()
     if "krypt_key" in konfig.yaml:
         konfig.yaml["krypt_key"] = "censored"
-    yaml_dump(konfig.yaml, sys.stdout)
+    if cli.args.orig:
+        yaml_dump(konfig.yaml, sys.stdout)
+    else:
+        DeepChain(konfig.yaml).pprint()
+
 
 
 def requirements(cli: KoreCli):
