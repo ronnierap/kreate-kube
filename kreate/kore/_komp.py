@@ -211,10 +211,10 @@ class JinjaKomponent(Komponent):
             "default": self.strukture.default,
             "app": self.app,
             "my": self,
-            "val": self.app.konfig.yaml.get("val", {}),
-            "var": self.app.konfig.yaml.get("var", {}),
-            "secret": self.app.konfig.yaml.get("secret", {}),
-            "function": self.app.konfig.functions,
+            #"val": self.app.konfig.yaml.get("val", {}),
+            #"var": self.app.konfig.yaml.get("var", {}),
+            #"secret": self.app.konfig.yaml.get("secret", {}),
+            #"function": self.app.konfig.functions,
         }
 
 
