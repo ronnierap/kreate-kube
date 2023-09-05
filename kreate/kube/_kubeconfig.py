@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 # Note the KubeKonfig class is totally unrelated to the
 # kubeconfig file
 def kreate_kubeconfig(konfig: Konfig, force=False):
-    cluster_name = konfig.yaml["values"].get("kubeconfig_cluster_name", None)
+    cluster_name = konfig.yaml["val"].get("kubeconfig_cluster_name", None)
     if not cluster_name:
         cluster_name = f"{konfig.env}-cluster"
-    user_name = konfig.yaml["values"].get("kubeconfig_cluster_user_name", None)
+    user_name = konfig.yaml["val"].get("kubeconfig_cluster_user_name", None)
     if not user_name:
         user_name = f"kreate-user-{konfig.env}"
     context_name = konfig.env
@@ -28,7 +28,7 @@ def kreate_kubeconfig(konfig: Konfig, force=False):
         "context_name": context_name,
         "api_token": api_token,
     }
-    vars = {"konfig": konfig, "my": my, "val": konfig.yaml["values"]}
+    vars = {"konfig": konfig, "my": my, "val": konfig.yaml["val"]}
     loc = _jinyaml.FileLocation("kubeconfig.yaml", package=other_templates)
     data = _jinyaml.load_jinja_data(loc, vars)
     filename = os.getenv("KUBECONFIG")

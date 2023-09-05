@@ -94,7 +94,7 @@ class Kustomization(JinYamlKomponent):
     def var(self, cm: str, varname: str):
         value = self.strukture.configmaps[cm].vars[varname]
         if not isinstance(value, str):
-            value = self.app.konfig.yaml.get("vars",{}).get(varname, None)
+            value = self.app.konfig.yaml.get("var",{}).get(varname, None)
         if value is None:
             raise ValueError(f"var {varname} should not be None")
         return value

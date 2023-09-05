@@ -1,11 +1,14 @@
 # This file should just provide basic values
-values:
+val:
   project: kreate-demo
 
   probe_path: /demo/actuator/info
   image_repo: https://repo.kisst.org
   service_port: 8080
   container_port: 8080
+
+  serviceAccount: some-svc-account
+  serviceAccountName: some-svc-account-name
 
   ingress_host_external: api.kisst.org
   ingress_host_internal: private.kisst.org
@@ -30,7 +33,7 @@ values:
   root_whitelist: 10.20.30.40
   replicas: 3
 
-vars:
+var:
   ORACLE_URL: localhost:1521
   ORACLE_SCHEMA: demo_schema_dev
   ORACLE_USR: demo_usr_DEV

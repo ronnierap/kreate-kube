@@ -1,10 +1,10 @@
 inklude:
 - shared-values.yaml
-- values-{{values.appname}}-{{values.env}}.yaml
-- secrets-{{values.appname}}-{{values.env}}.yaml
+- values-{{val.appname}}-{{val.env}}.yaml
+- secrets-{{val.appname}}-{{val.env}}.yaml
 strukture:
-  - {{values.appname}}-strukture.yaml
-  - override-{{values.appname}}-{{values.env}}.yaml
+  - {{val.appname}}-strukture.yaml
+  - override-{{val.appname}}-{{val.env}}.yaml
 templates:
   MyUdpService: ./templates/MyUdpService.yaml
   Service: ./templates/MyUdpService.yaml   # Override existing Service template

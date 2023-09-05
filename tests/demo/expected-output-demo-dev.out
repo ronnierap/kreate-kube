@@ -234,6 +234,8 @@ spec:
         - mountPath: /home/spring/environment.properties
           name: demo-extra-files
           subPath: environment.properties
+      serviceAccount: some-svc-account
+      serviceAccountName: some-svc-account-name
       volumes:
       - name: demo-secret-files
         secret:
@@ -290,6 +292,8 @@ spec:
           requests:
             cpu: 50m
             memory: 512M
+      serviceAccount: some-svc-account
+      serviceAccountName: some-svc-account-name
 ---
 apiVersion: batch/v1
 kind: CronJob

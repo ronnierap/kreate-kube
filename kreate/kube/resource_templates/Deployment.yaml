@@ -25,10 +25,10 @@ spec:
     spec:
       restartPolicy: {{ my.field.restartPolicy }}
       {% if "serviceAccount" in val %}
-      serviceAccount: {{ val.serviceAccount }}
+      serviceAccount: {{ my.field.serviceAccount }}
       {% endif %}
       {% if "serviceAccountName" in val %}
-      serviceAccountName: {{ val.serviceAccountName }}
+      serviceAccountName: {{ my.field.serviceAccountName }}
       {% endif %}
       {% if "serviceName" in default %}
       serviceName: "" #{{ my.field.serviceName | default("") }}  # Only for StatefulSet

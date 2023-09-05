@@ -45,10 +45,16 @@ class Konfig:
         self.yaml = load_jinyaml(
             FileLocation(self.filename, dir="."), {"function": self.functions}
         )
-        self.appname = self.yaml["values"]["appname"]
-        self.env = self.yaml["values"]["env"]
+        self.appname = self.yaml["val"]["appname"]
+        self.env = self.yaml["val"]["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
         self.load()
+
+    def __getattr__(self, attr):
+        if attr not in self.yaml:
+            raise AttributeError(f"could not find attribute {attr} in {self}")
+        else:
+            return self.yaml[attr]
 
     def _add_jinja_filter(self, name, func):
         filters.FILTERS[name] = func
@@ -88,14 +94,7 @@ class Konfig:
         return result
 
     def _load_strukture_file(self, filename):
-        vars = {
-            "konfig": self,
-            "val": self.yaml.get("values", {}),
-            "var": self.yaml.get("vars", {}),
-            "secret": self.yaml.get("secrets", {}),
-            "function": self.functions,
-        }
-        return load_jinyaml(FileLocation(filename, dir=self.dir), vars)
+        return load_jinyaml(FileLocation(filename, dir=self.dir), self.yaml)
 
     def calc_strukture(self):
         if not self._strukt_cache:

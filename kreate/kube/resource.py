@@ -117,7 +117,7 @@ class Secret(Resource):
 
     @property
     def dirname(self):
-        return "secrets"
+        return "secret"
 
 
 class SecretBasicAuth(Secret):
@@ -140,7 +140,7 @@ class ConfigMap(Resource):
     def var(self, varname: str):
         value = self.strukture.vars[varname]
         if not isinstance(value, str):
-            value = self.app.konfig.yaml.get("vars",{}).get(varname, None)
+            value = self.app.konfig.yaml.get("var",{}).get(varname, None)
         if value is None:
             raise ValueError(f"var {varname} should not be None")
         return value

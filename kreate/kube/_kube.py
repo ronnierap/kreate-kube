@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class KubeApp(JinjaApp):
     def __init__(self, konfig: Konfig):
         super().__init__(konfig)
-        self.namespace = konfig.yaml["values"].get(
+        self.namespace = konfig.yaml["val"].get(
             "namespace", f"{self.appname}-{self.env}"
         )
 
@@ -116,8 +116,8 @@ class KubeKonfig(KryptKonfig):
             if template:
                 vars = {
                     "konfig": self,
-                    "val": self.yaml["values"],
-                    "secret": self.yaml["secrets"],
+                    "val": self.yaml["val"],
+                    "secret": self.yaml["secret"],
                 }
                 logger.debug(f"rendering template {from_}")
                 prefix = "rendered template " + from_

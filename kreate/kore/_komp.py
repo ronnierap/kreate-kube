@@ -139,12 +139,12 @@ class Komponent:
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
-        if (self.shortname in self.app.konfig.yaml["values"]
-            and fieldname in self.app.konfig.yaml["values"][self.shortname]
+        if (self.shortname in self.app.konfig.yaml["val"]
+            and fieldname in self.app.konfig.yaml["val"][self.shortname]
         ):
-            return self.app.konfig.yaml["values"][self.shortname][fieldname]
-        if fieldname in self.app.konfig.yaml["values"]:
-            return self.app.konfig.yaml["values"][fieldname]
+            return self.app.konfig.yaml["val"][self.shortname][fieldname]
+        if fieldname in self.app.konfig.yaml["val"]:
+            return self.app.konfig.yaml["val"][fieldname]
         if fieldname in self.strukture.get("default", {}):
             return self.strukture["default"][fieldname]
         # The following might not be needed using Deepchain anyway
@@ -200,9 +200,9 @@ class JinjaKomponent(Komponent):
             "default": self.strukture.default,
             "app": self.app,
             "my": self,
-            "val": self.app.konfig.yaml.get("values", {}),
-            "var": self.app.konfig.yaml.get("vars", {}),
-            "secret": self.app.konfig.yaml.get("secrets", {}),
+            "val": self.app.konfig.yaml.get("val", {}),
+            "var": self.app.konfig.yaml.get("var", {}),
+            "secret": self.app.konfig.yaml.get("secret", {}),
             "function": self.app.konfig.functions,
         }
 
