@@ -1,0 +1,3 @@
+inklude:
+- values-{{app.appname}}-{{app.env}}.yaml
+- secrets-{{app.appname}}-{{app.env}}.yaml

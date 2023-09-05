@@ -57,6 +57,7 @@ class Konfig:
         filters.FILTERS[name] = func
 
     def load(self):
+        self.load_all_inkludes()
         self._load_files("values", self.values)
         self._load_files("secrets", self.secrets)
 
@@ -74,6 +75,29 @@ class Konfig:
             val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), dict_)
             if val_yaml:  # it can be empty
                 deep_update(dict_, val_yaml)
+
+
+    def load_all_inkludes(self):
+        logger.debug("loading inklude files")
+        already_inkluded = set()
+        inkludes = self.yaml.get("inklude", [])
+        # keep loading inkludes until all is done
+        while self.load_inkludes(inkludes, already_inkluded) > 0:
+            # possible new inkludes are added
+            inkludes = self.yaml.get("inklude", [])
+
+    def load_inkludes(self, inkludes: list, already_inkluded: set) -> int:
+        count = 0
+        for fname in inkludes:
+            if fname not in already_inkluded:
+                count += 1
+                already_inkluded.add(fname)
+                logger.info(f"inkluding {fname}")
+                val_yaml = load_jinyaml(FileLocation(fname, dir=self.dir), self.yaml)
+                if val_yaml:  # it can be empty
+                    deep_update(self.yaml, val_yaml)
+        logger.debug(f"inkluded {count} new files")
+        return count
 
     def _load_strukture_files(self):
         logger.debug("loading strukture files")

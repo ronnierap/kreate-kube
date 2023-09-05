@@ -25,6 +25,9 @@ kopy_secret_files:
 # key the enkryption key for the DEV environment
 #krypt_key: {{ function.getenv("KREATE_KRYPT_KEY_"+env.upper()) }}
 
+inklude:
+- framework.konf
+
 strukture:
   - {{appname}}-strukture.yaml
   - override-{{appname}}-{{env}}.yaml
