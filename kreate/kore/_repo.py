@@ -1,7 +1,9 @@
 from typing import Mapping
-#import requests
+import requests
 import zipfile
 import io
+import os
+import re
 import pkgutil
 import logging
 import importlib
@@ -30,7 +32,7 @@ class FileGetter:
         else:
             data = self.load_file_data(file, dir=dir)
         if dekrypt:
-            logger.warning(f"dekrypt not implemented for {orig_file}")
+            logger.warning(f"WARNING: dekrypt not implemented for {orig_file}")
         return data
 
     def load_file_data(self, filename: str, dir: str) -> str:
@@ -40,8 +42,8 @@ class FileGetter:
 
     def load_repo_data(self, filename: str) -> str:
         repo = filename.split(":")[0]
+        dir = self.repo_dir(repo)
         filename = filename[len(repo)+1:]
-        logger.warning(f"loading file {filename} from repo {repo} NOT implemented")
         p = Path(self.konfig.dir, filename)
         return p.read_text()
 
@@ -52,3 +54,47 @@ class FileGetter:
         logger.debug(f"loading file {filename} from package {package_name}")
         data = pkgutil.get_data(package.__package__, filename)
         return data.decode("utf-8")
+
+    def repo_dir(self, repo_name: str) -> Path:
+        cache_dir = os.getenv("KREATE_REPO_CACHE_DIR")
+        if not cache_dir:
+            cache_dir = Path.home() / ".cache/kreate/repo"
+        repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
+        version = repo_konf.get("version", None)
+        if not version:
+            raise ValueError(f"no version specified for repo {repo_name}")
+        repo_dir = cache_dir / f"{repo_name}-{version}"
+        if not repo_dir.exists():
+            self.download_repo(repo_name, version, repo_dir)
+        if not repo_dir.is_dir():
+            raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
+        return repo_dir
+
+    def download_repo(self, repo_name: str, version: str, repo_dir: Path):
+        repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
+        url : str = repo_konf.get("url")
+        url.replace("{version}", version)
+        logger.info(f"downloading {repo_name}-{version} from {url}")
+        #req = requests.get(url)
+        #z = zipfile.ZipFile(io.BytesIO(req.content))
+        z = zipfile.ZipFile("0.3.0.zip","r")
+        repo_dir.mkdir(parents=True)
+        unzip(z, repo_dir, skip_levels=3, select_regexp=".*_templates/.*yaml")
+
+def unzip(zfile: zipfile.ZipFile, repo_dir: Path, skip_levels: int = 0, select_regexp : str = None):
+    if skip_levels == 0 and not select_regexp:
+        zfile.extractall(repo_dir)
+        return
+    for fname in zfile.namelist():
+        newname = "/".join(fname.split("/")[skip_levels:])
+        if (re.match(select_regexp, fname)):
+            newpath = repo_dir / newname
+            if fname.endswith("/"):
+                logger.info(f"extracting dir  {newname}")
+                newpath.mkdir(parents=True, exist_ok=True)
+            else:
+                logger.info(f"extracting file {newname}")
+                newpath.parent.mkdir(parents=True, exist_ok=True)
+                newpath.write_bytes(zfile.read(fname))
+        else:
+            logger.debug(f"skipping not selected {fname} ")
