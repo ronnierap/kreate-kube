@@ -40,13 +40,6 @@ class FileGetter:
         p = Path(dir, filename)
         return p.read_text()
 
-    def load_repo_data(self, filename: str) -> str:
-        repo = filename.split(":")[0]
-        dir = self.repo_dir(repo)
-        filename = filename[len(repo)+1:]
-        p = Path(self.konfig.dir, filename)
-        return p.read_text()
-
     def load_package_data(self, filename: str) -> str:
         package_name = filename.split(":")[0]
         filename = filename[len(package_name)+1:]
@@ -54,6 +47,13 @@ class FileGetter:
         logger.debug(f"loading file {filename} from package {package_name}")
         data = pkgutil.get_data(package.__package__, filename)
         return data.decode("utf-8")
+
+    def load_repo_data(self, filename: str) -> str:
+        repo = filename.split(":")[0]
+        dir = self.repo_dir(repo)
+        filename = filename[len(repo)+1:]
+        p = Path(dir, filename)
+        return p.read_text()
 
     def repo_dir(self, repo_name: str) -> Path:
         cache_dir = os.getenv("KREATE_REPO_CACHE_DIR")
@@ -73,11 +73,10 @@ class FileGetter:
     def download_repo(self, repo_name: str, version: str, repo_dir: Path):
         repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
         url : str = repo_konf.get("url")
-        url.replace("{version}", version)
+        url = url.replace("{version}", version)
         logger.info(f"downloading {repo_name}-{version} from {url}")
-        #req = requests.get(url)
-        #z = zipfile.ZipFile(io.BytesIO(req.content))
-        z = zipfile.ZipFile("0.3.0.zip","r")
+        req = requests.get(url)
+        z = zipfile.ZipFile(io.BytesIO(req.content))
         repo_dir.mkdir(parents=True)
         unzip(z, repo_dir, skip_levels=3, select_regexp=".*_templates/.*yaml")
 

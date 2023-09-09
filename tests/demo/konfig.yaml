@@ -6,9 +6,7 @@ val:
 require:
   kreate-kube: ==0.3.0
 repo:
-  kool_templates: { version: 0.3.0 }
-  shared_konfig: { version: 0.3.0 }
-  shared_templates: { version: v1.1 }
+  shared_konfig: { version: 0.4.0 }
 kopy_files:
   - name: application.properties
     template: True
