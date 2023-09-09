@@ -56,29 +56,72 @@ class FileGetter:
         return p.read_text()
 
     def repo_dir(self, repo_name: str) -> Path:
+        repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
+        if repo_konf.get("type",None) == "local-dir":
+            # special case, does not cache dir
+            repo_dir = self.local_dir_repo()
+        else:
+            repo_dir = self.download_repo(repo_name)
+        if not repo_dir.is_dir():
+            # add other assertions, or better error message?
+            raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
+        return repo_dir
+
+    def local_dir_repo(self, repo_konf: Mapping):
+        dir = repo_konf["dir"]
+        version = repo_konf.get("version", None)
+        if version:
+            dir = dir.replace("version", version)
+        return Path(dir)
+
+    def download_repo(self, repo_name: str):
         cache_dir = os.getenv("KREATE_REPO_CACHE_DIR")
         if not cache_dir:
             cache_dir = Path.home() / ".cache/kreate/repo"
         repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
         version = repo_konf.get("version", None)
-        if not version:
-            raise ValueError(f"no version specified for repo {repo_name}")
-        repo_dir = cache_dir / f"{repo_name}-{version}"
-        if not repo_dir.exists():
-            self.download_repo(repo_name, version, repo_dir)
-        if not repo_dir.is_dir():
-            raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
+        if version:
+            repo_dir = cache_dir / f"{repo_name}-{version}"
+        else:
+            repo_dir = cache_dir / f"{repo_name}"
+        if repo_dir.exists():
+            # nothing needs to be downloaded, maybe extra checks needed?
+            return repo_dir
+        type = repo_konf.get("type", "url-zip")
+        if type == "url-zip":
+            data = self.url_data(repo_dir, repo_konf, version)
+            self.unzip_data(repo_dir, repo_konf, data)
+        elif type == "local-zip":
+            data = self.local_path_data(repo_dir, repo_konf, version)
+            self.unzip_data(repo_dir, repo_konf, data)
+        else:
+            raise ValueError(f"Unknow repo type {type} for repo {repo_name}")
         return repo_dir
 
-    def download_repo(self, repo_name: str, version: str, repo_dir: Path):
-        repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
+    def url_data(self, repo_dir, repo_konf, version):
         url : str = repo_konf.get("url")
-        url = url.replace("{version}", version)
-        logger.info(f"downloading {repo_name}-{version} from {url}")
+        if version:
+            url = url.replace("{version}", version)
+        logger.info(f"downloading {repo_dir} from {url}")
         req = requests.get(url)
-        z = zipfile.ZipFile(io.BytesIO(req.content))
+        return req.content
+
+    def local_path_data(self, repo_dir, repo_konf, version):
+        path : str = repo_konf.get("path")
+        if version:
+            path = path.replace("{version}", version)
+        logger.info(f"unzipping {repo_dir} from {path}")
+        return Path(path).read_bytes()
+
+    def unzip_data(self, repo_dir: str, repo_konf: Mapping, data) -> None:
+        z = zipfile.ZipFile(io.BytesIO(data))
+        skip_levels  = repo_konf.get("skip_levels", 0)
+        print(skip_levels)
+        regexp = repo_konf.get("select_regexp", "")
         repo_dir.mkdir(parents=True)
-        unzip(z, repo_dir, skip_levels=3, select_regexp=".*_templates/.*yaml")
+        unzip(z, repo_dir, skip_levels=skip_levels, select_regexp=regexp)
+
+
 
 def unzip(zfile: zipfile.ZipFile, repo_dir: Path, skip_levels: int = 0, select_regexp : str = None):
     if skip_levels == 0 and not select_regexp:

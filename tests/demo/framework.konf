@@ -1,5 +1,6 @@
 inklude:
-- repo:shared_konfig:shared-values.yaml
+#- repo:shared_github:shared-values.konf
+- repo:shared_local:shared-local.konf
 - shared-values.yaml
 - values-{{konf.val.appname}}-{{konf.val.env}}.yaml
 - dekrypt:secrets-{{konf.val.appname}}-{{konf.val.env}}.yaml
@@ -14,18 +15,23 @@ patch_templates:
 
 
 repo:
-  kool_templates:
-    url: https://github.com/MarkHooijkaas/kool_templates/archive/{version}.zip
-    type: zip
+  shared_local:
+    path: tests/shared-local.zip
+    skip_levels: 2
+    type: local-zip
+
+  shared_github:
+    url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip
+    skip_levels: 3
+    select_regexp: "shared-.*"
 
   shared_templates:
-    authenticate:
-      basic: True
-      usr_env_var: BITBUCKET_USR
-      psw_env_var: BITBUCKET_PSW
-    url: https://bitbucket.company.org/rest/api/latest/projects/some-project/repos/shared_templates/archive?at={version}&format=zip
-    type: zip
-
-  shared_konfig:
+    #authenticate:
+    #  basic: True
+    #  usr_env_var: BITBUCKET_USR
+    #  psw_env_var: BITBUCKET_PSW
+    #url: https://bitbucket.company.org/rest/api/latest/projects/some-project/repos/shared_templates/archive?at={version}&format=zip
     url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip
-    type: zip
+    type: url-zip
+    skip_levels: 2
+    select_regexp: ".*_templates/.*yaml"
