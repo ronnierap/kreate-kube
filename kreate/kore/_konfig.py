@@ -5,7 +5,7 @@ import base64
 import pkg_resources
 from jinja2 import filters
 from pathlib import Path
-
+from typing import List, Set
 
 from ._core import DeepChain, deep_update
 from ._repo import FileGetter
@@ -72,7 +72,10 @@ class Konfig:
             # possible new inkludes are added
             inkludes = self.yaml.get("inklude", [])
 
-    def load_inkludes(self, inkludes: list, already_inkluded: set) -> int:
+    def load_inkludes(self,
+        inkludes: List[str],
+        already_inkluded: Set[str]
+    ) -> int:
         count = 0
         for fname in inkludes:
             if fname not in already_inkluded:
@@ -80,10 +83,13 @@ class Konfig:
                 already_inkluded.add(fname)
                 logger.info(f"inkluding {fname}")
                 # TODO: use dirname
-                data = self.file_getter.get_data(fname, dir=self.dir)
-                val_yaml = render_jinyaml(data,
-                    {"konf": self.yaml, "function": self.functions}
+                data = self.file_getter.get_data(
+                    fname, dir=self.dir
                 )
+                val_yaml = render_jinyaml(data, {
+                    "konf": self.yaml,
+                    "function": self.functions
+                })
                 if val_yaml:  # it can be empty
                     deep_update(self.yaml, val_yaml)
         logger.debug(f"inkluded {count} new files")
