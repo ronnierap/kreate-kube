@@ -286,8 +286,6 @@ def view_values(cli: KoreCli):
 def view_konfig(cli: KoreCli):
     """view the application konfig file (with defaults)"""
     konfig: Konfig = cli.konfig()
-    if "krypt_key" in konfig.yaml:
-        konfig.yaml["krypt_key"] = "censored"
     if cli.args.orig:
         yaml_dump(konfig.yaml, sys.stdout)
     else:
