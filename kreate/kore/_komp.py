@@ -155,14 +155,11 @@ class Komponent:
         raise ValueError(f"Unknown field {fieldname} in {self}")
 
     def _contains_field(self, key) -> bool:
-        if key in self.strukture:
-            return True
-        if key in self.app.konfig.yaml["val"]:
-            return True
-        #result.update(self.app.konfig.yaml["val"][self.shortname])
-        if  key in self.app.konfig.yaml["val"]:
-            return True
-        return False
+        # TODO: better Marker default
+        marker = "dummy-marker"
+        if self._field(key, marker) == marker:
+            return False
+        return True
 
 
 class Field:

@@ -2,6 +2,8 @@ default:
   Deployment:
     cpu_limit:   500m
     cpu_request: 100m
+  generic:
+    imagePullPolicy: Always
 
 CronJob:
   main:
