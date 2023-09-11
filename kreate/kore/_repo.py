@@ -129,7 +129,7 @@ def unzip(zfile: zipfile.ZipFile, repo_dir: Path, skip_levels: int = 0, select_r
         return
     for fname in zfile.namelist():
         newname = "/".join(fname.split("/")[skip_levels:])
-        if (re.match(select_regexp, fname)):
+        if newname and re.match(select_regexp, newname):
             newpath = repo_dir / newname
             if fname.endswith("/"):
                 logger.info(f"extracting dir  {newname}")
