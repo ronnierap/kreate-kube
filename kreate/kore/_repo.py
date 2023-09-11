@@ -1,5 +1,6 @@
 from typing import Mapping
 import requests
+import requests.auth
 import zipfile
 import io
 import os
@@ -92,6 +93,9 @@ class FileGetter:
         if type == "url-zip":
             data = self.url_data(repo_dir, repo_konf, version)
             self.unzip_data(repo_dir, repo_konf, data)
+        elif type == "bitbucket-zip":
+            data = self.bitbucket_data(repo_dir, repo_konf, version)
+            self.unzip_data(repo_dir, repo_konf, data)
         elif type == "local-zip":
             data = self.local_path_data(repo_dir, repo_konf, version)
             self.unzip_data(repo_dir, repo_konf, data)
@@ -101,11 +105,27 @@ class FileGetter:
 
     def url_data(self, repo_dir, repo_konf, version):
         url : str = repo_konf.get("url")
+        auth = None
+        if repo_konf.get("basic_auth", {}):
+            usr_env_var = repo_konf["basic_auth"]["usr_env_var"]
+            psw_env_var = repo_konf["basic_auth"]["psw_env_var"]
+            usr = os.getenv(usr_env_var)
+            psw = os.getenv(psw_env_var)
+            auth = requests.auth.HTTPBasicAuth(usr, psw)
         if version:
             url = url.replace("{version}", version)
         logger.info(f"downloading {repo_dir} from {url}")
-        req = requests.get(url)
-        return req.content
+        response = requests.get(url, auth=auth)
+        if response.status_code >= 300:
+            raise IOError(f"status {response.status_code} while downloading {url} with message {response.content}")
+        return response.content
+
+    def bitbucket_data(self, repo_dir, repo_konf, version):
+        if version == "master":
+            version = f"refs/heads/{version}"
+        else:
+            version = f"refs/tags/{version}"
+        return self.url_data(repo_dir, repo_konf, version)
 
     def local_path_data(self, repo_dir, repo_konf, version):
         path : str = repo_konf.get("path")
