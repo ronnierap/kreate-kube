@@ -1,4 +1,5 @@
 import logging
+import os
 
 from ..kore import Konfig, App
 from ..kore._konfig import b64encode
@@ -9,11 +10,28 @@ logger = logging.getLogger(__name__)
 
 
 class KryptKonfig(Konfig):
-    def __init__(self, filename: str = None):
-        super().__init__(filename=filename)
-        self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
-        krypt_key = self.yaml.get("krypt_key", "no-krypt-key-defined")
+    def load(self):
+        # before loading further konfig, set the krypt_key
+        krypt_key = self.default_krypt_key()
         krypt_functions._krypt_key = b64encode(krypt_key)
+        self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
+        super().load()
+
+    def dekrypt_bytes(self, b: bytes) -> bytes:
+        return krypt_functions.dekrypt_bytes(b)
+
+    def default_krypt_key(self):
+        env_varname = self.default_krypt_key_env_var()
+        logger.debug(f"getting dekrypt key from {env_varname}")
+        psw = os.getenv(env_varname)
+        if not psw:
+            logger.warning(
+                f"no dekrypt key given in environment var {env_varname}"
+            )
+        return psw
+
+    def default_krypt_key_env_var(self):
+        return "KREATE_KRYPT_KEY_" + self.env.upper()
 
 
 class KryptApp(App):

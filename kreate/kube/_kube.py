@@ -75,27 +75,6 @@ class KubeApp(JinjaApp):
 
 
 class KubeKonfig(KryptKonfig):
-    def load(self):
-        if "krypt_key" not in self.yaml:
-            psw = self.default_krypt_key()
-            if not psw:
-                logger.warning(f"no dekrypt key provided")
-            self.yaml["krypt_key"] = psw
-        super().load()
-
-    def default_krypt_key(self):
-        env_varname = self.default_krypt_key_env_var()
-        logger.debug(f"getting dekrypt key from {env_varname}")
-        psw = os.getenv(env_varname)
-        if not psw:
-            logger.warning(
-                f"no dekrypt key given in environment var {env_varname}"
-            )
-        return psw
-
-    def default_krypt_key_env_var(self):
-        return "KREATE_KRYPT_KEY_" + self.env.upper()
-
     def kopy_files(self, key, target_subdir, dekrypt_default=False):
         file_list = self.yaml.get("kopy_" + key, [])
         if not file_list:

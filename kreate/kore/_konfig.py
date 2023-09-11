@@ -139,3 +139,6 @@ class Konfig:
                 logger.warn(e)
                 error = True
         return error
+
+    def dekrypt_bytes(b: bytes) -> bytes:
+        raise NotImplementedError("dekrypt_bytes not implemented")

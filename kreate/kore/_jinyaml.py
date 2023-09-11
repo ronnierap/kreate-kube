@@ -90,6 +90,8 @@ def load_jinja_data(file_loc: FileLocation, vars: Mapping) -> str:
 
 def render_jinja(data, vars: Mapping) -> str:
     global _current_jinja_file
+    if isinstance(data, bytes):
+        data = data.decode()
     tmpl = jinja2.Template(
         data,
         undefined=jinja2.StrictUndefined,

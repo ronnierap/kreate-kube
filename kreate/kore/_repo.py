@@ -32,7 +32,8 @@ class FileGetter:
         else:
             data = self.load_file_data(file, dir=dir)
         if dekrypt:
-            logger.warning(f"WARNING: dekrypt not implemented for {orig_file}")
+            logger.debug(f"dekrypting {file}")
+            data = self.konfig.dekrypt_bytes(data)
         return data
 
     def load_file_data(self, filename: str, dir: str) -> str:

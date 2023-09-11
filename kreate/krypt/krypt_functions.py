@@ -15,6 +15,12 @@ def dekrypt_str(value):
         return f"testdummy-{value[len(value)//2-4:len(value)//2+4]}"
     return fernet.decrypt(value.encode("ascii")).decode("ascii")
 
+def dekrypt_bytes(value: bytes) -> bytes:
+    fernet = Fernet(_krypt_key)
+    if _dekrypt_testdummy:
+        return f"testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+    return fernet.decrypt(value)
+
 
 def dekrypt_file(filename):
     fernet = Fernet(_krypt_key)

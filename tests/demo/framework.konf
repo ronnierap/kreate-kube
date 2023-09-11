@@ -3,7 +3,8 @@ inklude:
 - repo:shared_local:shared-local.konf
 - shared-values.yaml
 - values-{{konf.val.appname}}-{{konf.val.env}}.yaml
-- dekrypt:secrets-{{konf.val.appname}}-{{konf.val.env}}.yaml
+- secrets-{{konf.val.appname}}-{{konf.val.env}}.yaml
+- dekrypt:shared-secret.konf.encrypted
 strukture:
   - {{konf.val.appname}}-strukture.yaml
   - override-{{konf.val.appname}}-{{konf.val.env}}.yaml
