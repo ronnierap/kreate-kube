@@ -26,7 +26,7 @@ class Komponent:
         self.skip = self.strukture.get("ignore", False)
         self.field = Field(self)
         name = (self.strukture.get("name", None)
-            or app.komponent_naming_convention(self.kind, self.shortname)
+            or app.komponent_naming(self.kind, self.shortname)
             or self.calc_name()
         )
         self.name = name.lower()
