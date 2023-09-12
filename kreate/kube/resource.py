@@ -127,7 +127,7 @@ class SecretBasicAuth(Secret):
     def users(self):
         result = []
         for usr in self.strukture.users:
-            entry = dekrypt_str(self.app.konfig.secrets[usr])
+            entry = dekrypt_str(self.app.konfig.secret[usr])
             result.append(f"{usr}:{entry}")
         result.append("")  # for the final newline
         return "\n".join(result)
