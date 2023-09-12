@@ -151,6 +151,9 @@ class KoreCli:
                 traceback.print_exc()
             else:
                 print(f"{type(e).__name__}: {e}")
+                for line in traceback.format_exc().splitlines():
+                    if 'File "<template>"' in line:
+                        print(line)
             if _jinyaml._current_jinja_file:
                 lineno = jinja2_template_error_lineno()
                 print(
