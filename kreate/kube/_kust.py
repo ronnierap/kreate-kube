@@ -7,7 +7,7 @@ from . import KubeApp
 from . import other_templates
 from . import patch_templates
 from .patch import EgressLabels
-from .patch import Patch
+from .patch import Patch, MultiPatch
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ class KustApp(KubeApp):
     def __init__(self, konfig: Konfig):
         super().__init__(konfig)
         self.register_templates_from_konfig("patch_templates", Patch)
+        self.register_templates_from_konfig("multi_patches", MultiPatch)
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
