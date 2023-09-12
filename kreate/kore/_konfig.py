@@ -70,7 +70,6 @@ class Konfig:
     def load_data(self, fname:str) -> str:
         return self.file_getter.get_data(fname, dir=self.dir)
 
-
     def load(self):
         self.load_all_inkludes()
 

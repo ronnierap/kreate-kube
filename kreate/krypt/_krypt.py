@@ -37,7 +37,6 @@ class KryptKonfig(Konfig):
 
     def default_krypt_key_env_var(self):
         varname = self.yaml.get("krypt_key_varname", None)
-        print(varname)
         return varname or "KREATE_KRYPT_KEY_" + self.env.upper()
 
 

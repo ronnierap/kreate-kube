@@ -4,7 +4,8 @@ inklude:
 - shared-values.yaml
 - values-{{konf.val.appname}}-{{konf.val.env}}.yaml
 - secrets-{{konf.val.appname}}-{{konf.val.env}}.yaml
-- dekrypt:shared-secret.konf.encrypted
+#TODO: enkrypted konfig is not supported. Too many issues
+#- dekrypt:shared-secret.konf.encrypted
 strukture:
   - {{konf.val.appname}}-strukture.yaml
   - override-{{konf.val.appname}}-{{konf.val.env}}.yaml
