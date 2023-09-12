@@ -75,6 +75,5 @@ class MultiPatch(Patch):
         self, res: Resource, shortname, kind, template=None
     ):
         patches = res.app.konfig.yaml["multi_patches"][kind]
-        print(kind, patches)
         for patch_name in patches:
             res.app.kreate_patch(res, patch_name, "main")
