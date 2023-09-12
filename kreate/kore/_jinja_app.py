@@ -36,6 +36,8 @@ class JinjaApp(App):
             else:
                 logger.debug(f"overriding template {kind} using default class")
         filename = filename or f"{kind}.yaml"
+        if package:
+            filename = f"py:{package.__name__}:{filename}"
         loc = FileLocation(
             filename=filename, package=package, dir=self.konfig.dir
         )

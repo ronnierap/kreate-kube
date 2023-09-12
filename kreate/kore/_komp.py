@@ -4,7 +4,7 @@ import os
 from typing import Any
 
 from ._core import DeepChain, wrap
-from ._jinyaml import FileLocation, yaml_dump, yaml_parse, load_jinja_data
+from ._jinyaml import FileLocation, yaml_dump, yaml_parse, render_jinja
 from ._app import App
 
 logger = logging.getLogger(__name__)
@@ -188,7 +188,9 @@ class JinjaKomponent(Komponent):
 
     def aktivate(self):
         vars = self._template_vars()
-        self.data = load_jinja_data(self.template, vars)
+        content = self.app.konfig.load_data(self.template.filename)
+        self.data = render_jinja(content, vars)
+        #self.data = load_jinja_data(self.template, vars)
         self.invoke_options()
 
     def kreate_file(self) -> None:
@@ -218,7 +220,8 @@ class JinjaKomponent(Komponent):
 class JinYamlKomponent(JinjaKomponent):
     def aktivate(self):
         vars = self._template_vars()
-        self.data = load_jinja_data(self.template, vars)
+        content = self.app.konfig.load_data(self.template.filename)
+        self.data = render_jinja(content, vars)
         self.yaml = wrap(yaml_parse(self.data, self.template))
         self.invoke_options()
         self.add_additions()
