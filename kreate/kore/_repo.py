@@ -38,7 +38,7 @@ class FileGetter:
         return data
 
     def load_file_data(self, filename: str, dir: str) -> str:
-        logger.debug(f"loading file {filename} ")
+        logger.info(f"loading file {filename} ")
         p = Path(dir, filename)
         return p.read_text()
 
@@ -46,7 +46,7 @@ class FileGetter:
         package_name = filename.split(":")[0]
         filename = filename[len(package_name)+1:]
         package = importlib.import_module(package_name)
-        logger.debug(f"loading file {filename} from package {package_name}")
+        logger.info(f"loading file {filename} from package {package_name}")
         data = pkgutil.get_data(package.__package__, filename)
         return data.decode("utf-8")
 
@@ -137,7 +137,6 @@ class FileGetter:
     def unzip_data(self, repo_dir: str, repo_konf: Mapping, data) -> None:
         z = zipfile.ZipFile(io.BytesIO(data))
         skip_levels  = repo_konf.get("skip_levels", 0)
-        print(skip_levels)
         regexp = repo_konf.get("select_regexp", "")
         repo_dir.mkdir(parents=True)
         unzip(z, repo_dir, skip_levels=skip_levels, select_regexp=regexp)
