@@ -38,14 +38,14 @@ class Konfig:
             filename += "/konfig.yaml"
         self.dir = os.path.dirname(filename) or "."
         self.filename = filename
-        self.functions = {"getenv": os.getenv}
+        #self.functions = {"getenv": os.getenv}
         self._strukt_cache = None
         self._default_strukture_files = []
         self.dekrypt_func = None
         self._add_jinja_filter("b64encode", b64encode)
         self.file_getter = FileGetter(self)
         data = self.file_getter.get_data(self.filename, ".")
-        self.yaml = render_jinyaml(data, {"function": self.functions})
+        self.yaml = render_jinyaml(data, {}) #{"function": self.functions})
         self.appname = self.yaml["val"]["appname"]
         self.env = self.yaml["val"]["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
@@ -56,6 +56,13 @@ class Konfig:
             raise AttributeError(f"could not find attribute {attr} in {self}")
         else:
             return self.yaml[attr]
+
+    def _jinja_context(self):
+        result = {"konf": self, "appname": self.appname, "env": self.env}
+        for k in self.yaml.keys():
+            v = self.yaml[k]
+            result[k] = v
+        return result
 
     def _add_jinja_filter(self, name, func):
         filters.FILTERS[name] = func
@@ -86,10 +93,11 @@ class Konfig:
                 data = self.file_getter.get_data(
                     fname, dir=self.dir
                 )
-                val_yaml = render_jinyaml(data, {
-                    "konf": self.yaml,
-                    "function": self.functions
-                })
+                val_yaml = render_jinyaml(data, self._jinja_context() )
+                #{
+                #    "konf": self.yaml,
+                #    "function": self.functions
+                #})
                 if val_yaml:  # it can be empty
                     deep_update(self.yaml, val_yaml)
         logger.debug(f"inkluded {count} new files")

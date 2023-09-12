@@ -14,7 +14,7 @@ class KryptKonfig(Konfig):
         # before loading further konfig, set the krypt_key
         krypt_key = self.default_krypt_key()
         krypt_functions._krypt_key = b64encode(krypt_key)
-        self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
+        #self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
         # Hack to disable testdummy when loading konfig inkludes....
         # TODO: how to censor such secrets?
         tmp = krypt_functions._dekrypt_testdummy
