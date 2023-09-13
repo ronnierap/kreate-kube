@@ -120,8 +120,10 @@ class FileGetter:
             raise IOError(f"status {response.status_code} while downloading {url} with message {response.content}")
         return response.content
 
-    def bitbucket_data(self, repo_dir, repo_konf, version):
-        if version == "master":
+    def bitbucket_data(self, repo_dir, repo_konf, version: str):
+        if version.startswith("branch-"):
+            version = version[7:]
+            logger.warning(f"Using branch {version} as version is not recommended, use a tag instead")
             version = f"refs/heads/{version}"
         else:
             version = f"refs/tags/{version}"
