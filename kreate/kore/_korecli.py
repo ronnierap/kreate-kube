@@ -9,6 +9,8 @@ from jinja2 import TemplateError
 from sys import exc_info
 
 from ._core import DeepChain
+from ._repo import clear_cache
+
 from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp
@@ -80,6 +82,8 @@ class KoreCli:
         self._app.aktivate()
 
     def add_subcommands(self):
+        self.add_subcommand(clear_repo_cache, [], aliases=["cc"])
+
         # subcommand: version
         self.add_subcommand(version, [], aliases=["vr"])
         # subcommand: view_strukture
@@ -126,7 +130,7 @@ class KoreCli:
         parent = parent or self.subparsers
         alias0 = aliases[0] if aliases else ""
         self.epilog += (
-            f"  {func.__name__:14}    {alias0 :3} {func.__doc__ or ''} \n"
+            f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
         )
         parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__
@@ -228,6 +232,9 @@ class KoreCli:
             logging.basicConfig(format="%(message)s", level=logging.INFO)
         self.konfig_filename = args.konf
 
+def clear_repo_cache(cli: KoreCli):
+    """clear the repo cache"""
+    clear_cache()
 
 def view_strukture(cli: KoreCli):
     """view the application strukture"""

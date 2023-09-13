@@ -6,6 +6,7 @@ import io
 import os
 import re
 import pkgutil
+import shutil
 import logging
 import importlib
 from pathlib import Path
@@ -14,6 +15,16 @@ from ._core import deep_update, DeepChain
 
 logger = logging.getLogger(__name__)
 
+
+def cache_dir():
+    cache_dir = os.getenv("KREATE_REPO_CACHE_DIR")
+    if not cache_dir:
+        cache_dir = Path.home() / ".cache/kreate/repo"
+    return cache_dir
+
+def clear_cache():
+    logger.info(f"removing repo cache dir {cache_dir()}")
+    shutil.rmtree(cache_dir())
 
 class FileGetter:
     def __init__(self, konfig):
@@ -77,15 +88,12 @@ class FileGetter:
         return Path(dir)
 
     def download_repo(self, repo_name: str):
-        cache_dir = os.getenv("KREATE_REPO_CACHE_DIR")
-        if not cache_dir:
-            cache_dir = Path.home() / ".cache/kreate/repo"
         repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
         version = repo_konf.get("version", None)
         if version:
-            repo_dir = cache_dir / f"{repo_name}-{version}"
+            repo_dir = cache_dir() / f"{repo_name}-{version}"
         else:
-            repo_dir = cache_dir / f"{repo_name}"
+            repo_dir = cache_dir() / f"{repo_name}"
         if repo_dir.exists():
             # nothing needs to be downloaded, maybe extra checks needed?
             return repo_dir
