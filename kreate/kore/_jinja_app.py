@@ -18,8 +18,8 @@ class JinjaApp(App):
         self.strukture = konfig.calc_strukture()
 
     def register_templates_from_konfig(self, value_key: str, cls=None):
-        for key in self.konfig.yaml.get(value_key, []):
-            templ = self.konfig.yaml[value_key][key]
+        for key in self.konfig.yaml.get("system",{}).get(value_key, []):
+            templ = self.konfig.yaml["system"][value_key][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ, cls=cls)
 

@@ -18,7 +18,7 @@ class App:
         self.strukture = konfig.calc_strukture()
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
-        naming =  self.konfig.yaml.get("naming", {})
+        naming =  self.konfig.yaml.get("system", {}).get("naming", {})
         formatstr : str = naming.get(kind, None)
         if formatstr:
             return formatstr.format(

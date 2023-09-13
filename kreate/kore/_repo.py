@@ -12,6 +12,8 @@ import importlib
 from pathlib import Path
 from ._core import deep_update, DeepChain
 #from ..krypt import KryptKonfig, krypt_functions
+from ._jinyaml import yaml_dump
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +71,7 @@ class FileGetter:
         return p.read_text()
 
     def repo_dir(self, repo_name: str) -> Path:
-        repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
+        repo_konf = self.konfig.yaml["system"]["repo"].get(repo_name, {})
         if repo_konf.get("type",None) == "local-dir":
             # special case, does not cache dir
             repo_dir = self.local_dir_repo()
@@ -88,7 +90,7 @@ class FileGetter:
         return Path(dir)
 
     def download_repo(self, repo_name: str):
-        repo_konf = self.konfig.yaml["repo"].get(repo_name, {})
+        repo_konf = self.konfig.yaml["system"]["repo"].get(repo_name, {})
         version = repo_konf.get("version", None)
         if version:
             repo_dir = cache_dir() / f"{repo_name}-{version}"
