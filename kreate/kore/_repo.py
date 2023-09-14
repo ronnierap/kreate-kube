@@ -74,7 +74,7 @@ class FileGetter:
         repo_konf = self.konfig.yaml["system"]["repo"].get(repo_name, {})
         if repo_konf.get("type",None) == "local-dir":
             # special case, does not cache dir
-            repo_dir = self.local_dir_repo()
+            repo_dir = self.local_dir_repo(repo_konf)
         else:
             repo_dir = self.download_repo(repo_name)
         if not repo_dir.is_dir():
@@ -84,6 +84,8 @@ class FileGetter:
 
     def local_dir_repo(self, repo_konf: Mapping):
         dir = repo_konf["dir"]
+        # TODO: this is not relative to dir of konf file
+        # not sure what is best
         version = repo_konf.get("version", None)
         if version:
             dir = dir.replace("version", version)
