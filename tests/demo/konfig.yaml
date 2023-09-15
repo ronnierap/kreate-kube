@@ -3,10 +3,8 @@ val:
   env: dev
   team: myteam
   image_version: v1.3.4
-require:
-  kreate-kube: ==0.3.0
-repo:
-  shared_github: { version: master }
+version:
+  shared_github: master
 kopy_files:
   - name: application.properties
     template: True

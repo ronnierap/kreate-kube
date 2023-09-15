@@ -9,31 +9,30 @@ inklude:
 strukture:
   - {{konf.val.appname}}-strukture.yaml
   - override-{{konf.val.appname}}-{{konf.val.env}}.yaml
-templates:
-  MyUdpService: ./templates/MyUdpService.yaml
-  Service: ./templates/MyUdpService.yaml   # Override existing Service template
-patch_templates:
-  ElasticLogging: ./templates/ElasticLogging.yaml
 
-
-repo:
-  shared_local:
-    path: tests/shared-local.zip
-    skip_levels: 2
-    type: local-zip
-
-  shared_github:
-    url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip
-    skip_levels: 3
-    select_regexp: "shared-.*"
-
-  shared_templates:
-    #authenticate:
-    #  basic: True
-    #  usr_env_var: BITBUCKET_USR
-    #  psw_env_var: BITBUCKET_PSW
-    #url: https://bitbucket.company.org/rest/api/latest/projects/some-project/repos/shared_templates/archive?at={version}&format=zip
-    url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip
-    type: url-zip
-    skip_levels: 2
-    select_regexp: ".*_templates/.*yaml"
+system:
+  templates:
+    MyUdpService: ./templates/MyUdpService.yaml
+    Service: ./templates/MyUdpService.yaml   # Override existing Service template
+  patch_templates:
+    ElasticLogging: ./templates/ElasticLogging.yaml
+  repo:
+    shared_local:
+      path: tests/shared-local.zip
+      skip_levels: 2
+      type: local-zip
+    shared_github:
+      version: {{ version.shared_github | default("v1.0") }}
+      url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip
+      skip_levels: 3
+      select_regexp: "shared-.*"
+    shared_templates:
+      #authenticate:
+      #  basic: True
+      #  usr_env_var: BITBUCKET_USR
+      #  psw_env_var: BITBUCKET_PSW
+      #url: https://bitbucket.company.org/rest/api/latest/projects/some-project/repos/shared_templates/archive?at={version}&format=zip
+      url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip
+      type: url-zip
+      skip_levels: 2
+      select_regexp: ".*_templates/.*yaml"
