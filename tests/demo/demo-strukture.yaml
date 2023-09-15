@@ -110,11 +110,11 @@ Kustomization:
           ORACLE_SCHEMA: {{ var.ORACLE_SCHEMA }}
       demo-files:
         files:
-          - files/application.properties
-          - files/some-file-from-package
+          - application.properties
+          - some-file-from-package
       demo-extra-files:
         files:
-          - files/environment.properties
+          - environment.properties
     secrets:
       demo-secrets-from-kustomize:
         vars:
@@ -122,7 +122,7 @@ Kustomization:
           DB_PSW: {{ secret.DB_PSW | dekrypt }}
       demo-secret-files-from-kustomize:
         files:
-          - secrets/files/credential.properties
+          - credential.properties
 
 MyUdpService:
   main:
@@ -141,7 +141,7 @@ Secret:
       DB_PSW: {{ secret.DB_PSW | dekrypt }}
   secret-files:
     files:
-    - secrets/files/credential.properties
+    - credential.properties
 
 Service:
   main:

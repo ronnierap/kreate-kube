@@ -53,6 +53,8 @@ class FileGetter:
         data = self.get_data(loc)
         dir = target.parent
         dir.mkdir(parents=True, exist_ok=True)
+        if isinstance(data, bytes):
+            data=data.decode()
         target.write_text(data)
 
     def load_file_data(self, filename: str, dir: str) -> str:

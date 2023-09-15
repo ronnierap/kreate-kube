@@ -5,14 +5,10 @@ val:
   image_version: v1.3.4
 version:
   shared_github: master
-kopy_files:
-  - name: application.properties
-    template: True
-  - name: environment.properties
-  - name: some-file-from-package
-    from: py:kreate.kube.other_templates:__init__.py
-kopy_secret_files:
-  - name: credential.properties
-    dekrypt: True
+file:
+  application.properties: tests/demo/files/application.properties
+  environment.properties: tests/demo/files/environment.properties
+  some-file-from-package: py:kreate.kube.other_templates:__init__.py
+  credential.properties:  dekrypt:tests/demo/secret_files/credential.properties.encrypted
 inklude:
 - framework.konf

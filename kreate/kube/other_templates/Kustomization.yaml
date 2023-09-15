@@ -48,7 +48,7 @@ secretGenerator:
   {% if strukt.secrets[cm].get("files",{}) %}
   files:
     {% for filename in strukt.secrets[cm].get("files",[]) %}
-     - {{ filename }}
+     - {{ my.kopy_file(filename) }}
     {% endfor %}
   {% endif %}
 {% endfor %}

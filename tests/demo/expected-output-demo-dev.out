@@ -19,14 +19,15 @@ metadata:
 ---
 apiVersion: v1
 data:
-  application.properties: This is a demo file
+  application.properties: |
+    This is a demo file
   some-file-from-package: |
     # Just a package with templates
 kind: ConfigMap
 metadata:
   labels:
     config-map: demo-files
-  name: demo-files-bkmdbg75kc
+  name: demo-files-b52b4hc7tf
   namespace: demo-dev
 ---
 apiVersion: v1
@@ -241,7 +242,7 @@ spec:
         secret:
           secretName: demo-secret-files
       - configMap:
-          name: demo-files-bkmdbg75kc
+          name: demo-files-b52b4hc7tf
         name: demo-files
       - configMap:
           name: demo-extra-files-hmm7226mdf
