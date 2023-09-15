@@ -126,37 +126,35 @@ The file can contain several other things as well:
 
 Below is a simple but typical example.
 ```
-{% set appname = "demo" %} # reuse the appname in rest of this file
-{% set env = "acc" %}      # reuse the env in rest of this file
-values:
-  vars:
-    appname: {{ appname }}
-    env: {{ env }}
-    team: knights
-    project: kreate-kube-demo
-    image_version: 2.0.2
-  files:
-    - values-{{appname}}-{{env}}.yaml
-secrets:
-  files:
-    - secrets-{{appname}}-{{env}}.yaml
-
-strukture_files:
-  - {{appname}}-strukture.yaml
+appname: demo
+env: dev
+team: knights
+val:
+  project: kreate-kube-demo
+  image_version: 2.0.2
+inklude:
+  - values-demo-dev.yaml
+  - secrets-demo-dev.yaml
+strukture:
+  - demo-strukture.yaml
 ```
-Note: In a future version, the value-files, secrets-files and strukture_files might use sane defaults
-(as allready shown using `{{ appname }}` and `{{ env }}`), so these section might be omitted in the future
 
 ## Versions of kreate-kube
 At this moment there are not many versions of kreate-kube:
 - `0.1.0`  This version was incomplete and does not work when installed from Pypi
 - `0.2.0`  This was the first functional version
-- `0.3.0`  This is the current version, and adds many backward incompatible changes
+- `0.3.0`
   - use of a more flat `konfig.yaml`, with a main `app` section
   - support for default files to simplify `konfig.yaml`
   - rename of several patches to remove `Patch` suffix, and not start with a verb
   - many improvements and cleanup changes
-
+- `0.4.0`  This is the current version, and adds many backward incompatible changes
+  - use repo's for
+    *  inkludes of konf files
+    *  strukture files
+    *  deployment files
+  -  much flatter konfig structure with val, var, secret and system
+  -  many other improvements
 It is expected that new versions will come out regulary:
 - fixing bugs
 - enhancing command line interface
