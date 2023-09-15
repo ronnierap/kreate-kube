@@ -104,16 +104,32 @@ class Egress(Resource):
             r = self._field("port", "")
         return str(r).split(",") if r else []
 
+class ConfigMap(Resource):
+    def calc_name(self):
+        return f"{self.app.appname}-{self.shortname}"
 
+    def var(self, varname: str):
+        value = self.strukture.vars[varname]
+        if not isinstance(value, str):
+            value = self.app.konfig.yaml.get("var",{}).get(varname, None)
+        if value is None:
+            raise ValueError(f"var {varname} should not be None")
+        return value
+
+    def file_data(self, filename: str) -> str:
+        location : str = self.app.konfig.yaml["file"][filename]
+        return self.app.konfig.file_getter.get_data(location)
+
+# TODO: maybe inherict from ConfigMap
 class Secret(Resource):
-    def load_some_file(self, filename: str) -> str:
-        with open(f"{self.app.konfig.target_dir}/{filename}") as f:
-            return f.read()
-
     def calc_name(self):
         if self.shortname == "main":
             return f"{self.app.appname}-secrets"
         return f"{self.app.appname}-{self.shortname}"
+
+    def file_data(self, filename: str) -> str:
+        location : str = self.app.konfig.yaml["file"][filename]
+        return self.app.konfig.file_getter.get_data(location)
 
     @property
     def dirname(self):
@@ -132,18 +148,6 @@ class SecretBasicAuth(Secret):
         result.append("")  # for the final newline
         return "\n".join(result)
 
-
-class ConfigMap(Resource):
-    def calc_name(self):
-        return f"{self.app.appname}-{self.shortname}"
-
-    def var(self, varname: str):
-        value = self.strukture.vars[varname]
-        if not isinstance(value, str):
-            value = self.app.konfig.yaml.get("var",{}).get(varname, None)
-        if value is None:
-            raise ValueError(f"var {varname} should not be None")
-        return value
 
 class Ingress(Resource):
     def nginx_annon(self, name: str, val: str) -> None:

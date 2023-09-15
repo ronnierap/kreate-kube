@@ -59,56 +59,7 @@ class KubeApp(JinjaApp):
     def _default_template_class(self):
         return resource.Resource
 
-    def aktivate(self):
-        self.kopy_files()
-        super().aktivate()
-
-    def kopy_files(self):
-        target_dir = self.konfig.target_dir
-        if os.path.exists(target_dir) and os.path.isdir(target_dir):
-            logger.info(f"removing target directory {target_dir}")
-            shutil.rmtree(target_dir)
-        self.konfig.kopy_files("files", "files")
-        self.konfig.kopy_files(
-            "secret_files", "secrets/files", dekrypt_default=True
-        )
 
 
 class KubeKonfig(KryptKonfig):
-    def kopy_files(self, key, target_subdir, dekrypt_default=False):
-        file_list = self.yaml.get("kopy_" + key, [])
-        if not file_list:
-            return
-        os.makedirs(f"{self.target_dir}/{target_subdir}", exist_ok=True)
-        for file in file_list:
-            dekrypt = file.get("dekrypt", dekrypt_default)
-            name = file.get("name", None)
-            if not name:
-                raise ValueError(
-                    f"file in konfig {key}should have name {file}"
-                )
-            from_ = file.get(
-                "from", f"{key}/{name}" + (".encrypted" if dekrypt else "")
-            )
-            template = file.get("template", False)
-            loc = _jinyaml.FileLocation(from_, dir=self.dir)
-            if template:
-                vars = {
-                    "konfig": self,
-                    "val": self.yaml["val"],
-                    "secret": self.yaml["secret"],
-                }
-                logger.debug(f"rendering template {from_}")
-                prefix = "rendered template " + from_
-                data = _jinyaml.load_jinja_data(loc, vars)
-            else:
-                prefix = from_
-                data = _jinyaml.load_data(loc)
-            if dekrypt:
-                prefix = "dekrypted " + prefix
-                data = krypt_functions.dekrypt_str(data)
-            with open(f"{self.target_dir}/{target_subdir}/{name}", "w") as f:
-                logger.info(
-                    f"kreating file {key}/{name} from {prefix}"
-                )  # TODO: log earlier
-                f.write(data)
+    pass
