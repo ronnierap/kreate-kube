@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class KryptKonfig(Konfig):
     def load(self):
         # before loading further konfig, set the krypt_key
-        #self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
+        # self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
         # Hack to disable testdummy when loading konfig inkludes....
         # TODO: how to censor such secrets?
         tmp = krypt_functions._dekrypt_testdummy
@@ -30,9 +30,7 @@ class KryptKonfig(Konfig):
         logger.debug(f"getting dekrypt key from {env_varname}")
         psw = os.getenv(env_varname)
         if not psw:
-            logger.warning(
-                f"no dekrypt key given in environment var {env_varname}"
-            )
+            logger.warning(f"no dekrypt key given in environment var {env_varname}")
         return psw
 
     def default_krypt_key_env_var(self):

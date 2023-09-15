@@ -28,9 +28,7 @@ class KustApp(KubeApp):
         self.register_patch_file("KubernetesAnnotations")
         self.register_patch_file("SidecarContainer")
 
-    def register_patch_class(
-        self: str, cls: str, aliases=None, package=None
-    ) -> None:
+    def register_patch_class(self: str, cls: str, aliases=None, package=None) -> None:
         package = package or patch_templates
         super().register_template_class(
             cls,
@@ -67,9 +65,7 @@ class KustApp(KubeApp):
         if issubclass(cls, Patch):
             cls(res, shortname, kind, template=templ)
         else:
-            raise TypeError(
-                f"class for {kind}.{shortname} is not a Patch but {cls}"
-            )
+            raise TypeError(f"class for {kind}.{shortname} is not a Patch but {cls}")
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
@@ -85,9 +81,7 @@ class KustApp(KubeApp):
 
 class Kustomization(JinYamlKomponent):
     def resources(self):
-        return [
-            res for res in self.app.komponents if isinstance(res, Resource)
-        ]
+        return [res for res in self.app.komponents if isinstance(res, Resource)]
 
     def patches(self):
         return [res for res in self.app.komponents if isinstance(res, Patch)]
@@ -95,22 +89,21 @@ class Kustomization(JinYamlKomponent):
     def var(self, cm: str, varname: str):
         value = self.strukture.configmaps[cm].vars[varname]
         if not isinstance(value, str):
-            value = self.app.konfig.yaml.get("var",{}).get(varname, None)
+            value = self.app.konfig.yaml.get("var", {}).get(varname, None)
         if value is None:
             raise ValueError(f"var {varname} should not be None")
         return value
 
     def kopy_file(self, filename: str) -> str:
-        location : str = self.app.konfig.yaml["file"][filename]
+        location: str = self.app.konfig.yaml["file"][filename]
         if location.startswith("dekrypt:"):
             target = self.app.konfig.target_path / "secrets" / "files" / filename
             result = "secrets/files/" + filename
         else:
-            target = self.app.konfig.target_path /  "files" / filename
+            target = self.app.konfig.target_path / "files" / filename
             result = "files/" + filename
         self.app.konfig.file_getter.kopy_file(location, target)
         return result
-
 
     @property
     def filename(self):

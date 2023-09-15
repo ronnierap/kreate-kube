@@ -24,10 +24,7 @@ class FileLocation(
 
     def __repr__(self):
         if self.package:
-            return (
-                f"FileLocation({self.filename}"
-                f" @package:{self.package.__name__})"
-            )
+            return f"FileLocation({self.filename}" f" @package:{self.package.__name__})"
         return f"FileLocation({self.filename} @dir {self.dir})"
 
 
@@ -60,9 +57,7 @@ def load_data(file_loc: FileLocation):
         package = importlib.import_module(package_name)
         return pkgutil.get_data(package.__package__, filename).decode("utf-8")
     elif package:
-        logger.debug(
-            f"loading file {filename} from package {package.__name__}"
-        )
+        logger.debug(f"loading file {filename} from package {package.__name__}")
         return pkgutil.get_data(package.__package__, filename).decode("utf-8")
     else:
         dirname = dirname or "."
@@ -70,15 +65,18 @@ def load_data(file_loc: FileLocation):
         with open(f"{dirname}/{filename}") as f:
             return f.read()
 
+
 def raise_error_if_none(thing):
     if thing is None:
         # would be nice if we could include context
         raise ValueError("should not be None")
     return thing
 
+
 # TODO: maybe an Environment will give better error messages
 # wit filename and linenumber
-#jinja2_env = jinja2.Environment(finalize=my_finalize)
+# jinja2_env = jinja2.Environment(finalize=my_finalize)
+
 
 def load_jinja_data(file_loc: FileLocation, vars: Mapping) -> str:
     global _current_jinja_file
@@ -87,6 +85,7 @@ def load_jinja_data(file_loc: FileLocation, vars: Mapping) -> str:
     _current_jinja_file = file_loc.filename
     filedata = load_data(file_loc=file_loc)
     return render_jinja(filedata, vars)
+
 
 def render_jinja(data, vars: Mapping) -> str:
     global _current_jinja_file
@@ -103,9 +102,9 @@ def render_jinja(data, vars: Mapping) -> str:
     _current_jinja_file = None
     return result
 
-def render_jinyaml(data: str,  vars: Mapping) -> Mapping:
-    return yaml_parser.load(render_jinja(data, vars=vars))
 
+def render_jinyaml(data: str, vars: Mapping) -> Mapping:
+    return yaml_parser.load(render_jinja(data, vars=vars))
 
 
 def load_yaml(file_loc: FileLocation) -> Mapping:
@@ -114,7 +113,6 @@ def load_yaml(file_loc: FileLocation) -> Mapping:
 
 def load_jinyaml(file_loc: FileLocation, vars: Mapping) -> Mapping:
     return yaml_parser.load(load_jinja_data(file_loc=file_loc, vars=vars))
-
 
 
 def yaml_parse(data, loc: FileLocation = None):

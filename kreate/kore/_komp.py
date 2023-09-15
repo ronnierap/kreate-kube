@@ -25,7 +25,8 @@ class Komponent:
         self.strukture = self._calc_strukture()
         self.skip = self.strukture.get("ignore", False)
         self.field = Field(self)
-        name = (self.strukture.get("name", None)
+        name = (
+            self.strukture.get("name", None)
             or app.komponent_naming(self.kind, self.shortname)
             or self.calc_name()
         )
@@ -79,9 +80,7 @@ class Komponent:
         if typename in strukt and self.shortname in strukt[typename]:
             logger.debug(f"using named strukture {typename}.{self.shortname}")
             return self.app.strukture[typename][self.shortname]
-        logger.debug(
-            f"could not find strukture for {typename}.{self.shortname}"
-        )
+        logger.debug(f"could not find strukture for {typename}.{self.shortname}")
         return {}
 
     def kreate_file(self) -> None:
@@ -116,14 +115,11 @@ class Komponent:
                         getattr(self, key)(val)
                     elif isinstance(val, int):
                         logger.debug(
-                            f"invoking {self} option {key}"
-                            f" with int parameter {val}"
+                            f"invoking {self} option {key}" f" with int parameter {val}"
                         )
                         getattr(self, key)(int(val))
                     else:
-                        logger.warn(
-                            f"option map {opt} for {self.name} not supported"
-                        )
+                        logger.warn(f"option map {opt} for {self.name} not supported")
 
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")
@@ -139,7 +135,8 @@ class Komponent:
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
-        if (self.shortname in self.app.konfig.yaml["val"]
+        if (
+            self.shortname in self.app.konfig.yaml["val"]
             and fieldname in self.app.konfig.yaml["val"][self.shortname]
         ):
             return self.app.konfig.yaml["val"][self.shortname][fieldname]
@@ -148,7 +145,7 @@ class Komponent:
         if fieldname in self.strukture.get("default", {}):
             return self.strukture["default"][fieldname]
         # The following might not be needed using Deepchain anyway
-        if fieldname in self.strukture.get("default", {}).get("generic",{}):
+        if fieldname in self.strukture.get("default", {}).get("generic", {}):
             return self.strukture["default"]["generic"][fieldname]
         if default is not None:
             return default
@@ -172,6 +169,7 @@ class Field:
     def __contains__(self, key):
         return self._komp._contains_field(key)
 
+
 class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""
 
@@ -190,7 +188,7 @@ class JinjaKomponent(Komponent):
         vars = self._template_vars()
         content = self.app.konfig.load_data(self.template.filename)
         self.data = render_jinja(content, vars)
-        #self.data = load_jinja_data(self.template, vars)
+        # self.data = load_jinja_data(self.template, vars)
         self.invoke_options()
 
     def kreate_file(self) -> None:
@@ -210,10 +208,10 @@ class JinjaKomponent(Komponent):
             "default": self.strukture.default,
             "app": self.app,
             "my": self,
-            #"val": self.app.konfig.yaml.get("val", {}),
-            #"var": self.app.konfig.yaml.get("var", {}),
-            #"secret": self.app.konfig.yaml.get("secret", {}),
-            #"function": self.app.konfig.functions,
+            # "val": self.app.konfig.yaml.get("val", {}),
+            # "var": self.app.konfig.yaml.get("var", {}),
+            # "secret": self.app.konfig.yaml.get("secret", {}),
+            # "function": self.app.konfig.functions,
         }
 
 

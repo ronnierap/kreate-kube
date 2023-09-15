@@ -18,13 +18,11 @@ class App:
         self.strukture = konfig.calc_strukture()
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
-        naming =  self.konfig.yaml.get("system", {}).get("naming", {})
-        formatstr : str = naming.get(kind, None)
+        naming = self.konfig.yaml.get("system", {}).get("naming", {})
+        formatstr: str = naming.get(kind, None)
         if formatstr:
             return formatstr.format(
-                kind=kind,
-                shortname=shortname,
-                appname=self.appname
+                kind=kind, shortname=shortname, appname=self.appname
             )
         return None
 
@@ -58,9 +56,7 @@ class App:
         return self._kinds.get(attr, None)
 
     def kreate_komponent(self, kind: str, shortname: str = None):
-        raise NotImplementedError(
-            f"can not create komponent for {kind}.{shortname}"
-        )
+        raise NotImplementedError(f"can not create komponent for {kind}.{shortname}")
 
     def aktivate(self):
         for komp in self.komponents:
@@ -72,9 +68,7 @@ class App:
         for komp in self.komponents:
             if komp.filename:
                 if komp.dirname:
-                    logger.info(
-                        f"kreating file {komp.dirname}/{komp.filename}"
-                    )
+                    logger.info(f"kreating file {komp.dirname}/{komp.filename}")
                 else:
                     logger.info(f"kreating file {komp.filename}")
                 komp.kreate_file()
@@ -85,7 +79,7 @@ class App:
         for kind in sorted(self.strukture.keys()):
             if kind in self.kind_classes:
                 strukt = self.strukture.get(kind, None)
-                strukt = strukt or { "main": {}}
+                strukt = strukt or {"main": {}}
                 for shortname in sorted(strukt.keys()):
                     logger.debug(f"kreating komponent {kind}.{shortname}")
                     self.kreate_komponent(kind, shortname)

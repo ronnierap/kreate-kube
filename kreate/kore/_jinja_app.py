@@ -18,7 +18,7 @@ class JinjaApp(App):
         self.strukture = konfig.calc_strukture()
 
     def register_templates_from_konfig(self, value_key: str, cls=None):
-        for key in self.konfig.yaml.get("system",{}).get(value_key, []):
+        for key in self.konfig.yaml.get("system", {}).get(value_key, []):
             templ = self.konfig.yaml["system"][value_key][key]
             logger.info(f"adding custom template {key}: {templ}")
             self.register_template_file(key, filename=templ, cls=cls)
@@ -38,9 +38,7 @@ class JinjaApp(App):
         filename = filename or f"{kind}.yaml"
         if package:
             filename = f"py:{package.__name__}:{filename}"
-        loc = FileLocation(
-            filename=filename, package=package, dir=self.konfig.dir
-        )
+        loc = FileLocation(filename=filename, package=package, dir=self.konfig.dir)
         logger.debug(f"registering template {kind}: {loc}")
         cls = cls or self._default_template_class()
         if cls is None:
@@ -75,8 +73,6 @@ class JinjaApp(App):
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if inspect.isclass(cls):
-            return cls(
-                app=self, kind=kind, shortname=shortname, template=templ
-            )
+            return cls(app=self, kind=kind, shortname=shortname, template=templ)
         else:
             raise ValueError(f"Unknown template type {type(cls)}, {cls}")

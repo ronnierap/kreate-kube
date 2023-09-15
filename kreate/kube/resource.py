@@ -39,9 +39,7 @@ class Resource(JinYamlKomponent):
         for key in self.strukture.get("annotations", {}):
             if "annotations" not in self.yaml.metadata:
                 self.yaml.metadata.annotations = {}
-            self.yaml.metadata.annotations[key] = self.strukture.annotations[
-                key
-            ]
+            self.yaml.metadata.annotations[key] = self.strukture.annotations[key]
         for key in self.strukture.get("labels", {}):
             if "labels" not in self.yaml.metadata:
                 self.yaml.metadata.labels = {}
@@ -104,6 +102,7 @@ class Egress(Resource):
             r = self._field("port", "")
         return str(r).split(",") if r else []
 
+
 class ConfigMap(Resource):
     def calc_name(self):
         return f"{self.app.appname}-{self.shortname}"
@@ -111,14 +110,15 @@ class ConfigMap(Resource):
     def var(self, varname: str):
         value = self.strukture.vars[varname]
         if not isinstance(value, str):
-            value = self.app.konfig.yaml.get("var",{}).get(varname, None)
+            value = self.app.konfig.yaml.get("var", {}).get(varname, None)
         if value is None:
             raise ValueError(f"var {varname} should not be None")
         return value
 
     def file_data(self, filename: str) -> str:
-        location : str = self.app.konfig.yaml["file"][filename]
+        location: str = self.app.konfig.yaml["file"][filename]
         return self.app.konfig.file_getter.get_data(location)
+
 
 # TODO: maybe inherict from ConfigMap
 class Secret(Resource):
@@ -128,7 +128,7 @@ class Secret(Resource):
         return f"{self.app.appname}-{self.shortname}"
 
     def file_data(self, filename: str) -> str:
-        location : str = self.app.konfig.yaml["file"][filename]
+        location: str = self.app.konfig.yaml["file"][filename]
         return self.app.konfig.file_getter.get_data(location)
 
     @property

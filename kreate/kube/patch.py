@@ -70,10 +70,9 @@ class EgressLabels(Patch):
     def egresses(self):
         return [k for k in self.app.komponents if isinstance(k, Egress)]
 
+
 class MultiPatch(Patch):
-    def __init__(
-        self, res: Resource, shortname, kind, template=None
-    ):
+    def __init__(self, res: Resource, shortname, kind, template=None):
         patches = res.app.konfig.yaml["system"]["multi_patches"][kind]
         for patch_name in patches:
             res.app.kreate_patch(res, patch_name, "main")

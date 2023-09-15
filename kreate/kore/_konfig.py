@@ -68,7 +68,7 @@ class Konfig:
     def _add_jinja_filter(self, name, func):
         filters.FILTERS[name] = func
 
-    def load_data(self, fname:str) -> str:
+    def load_data(self, fname: str) -> str:
         return self.file_getter.get_data(fname, dir=self.dir)
 
     def load(self):
@@ -83,23 +83,20 @@ class Konfig:
             # possible new inkludes are added
             inkludes = self.yaml.get("inklude", [])
 
-    def load_inkludes(self,
-        inkludes: List[str],
-        already_inkluded: Set[str]
-    ) -> int:
+    def load_inkludes(self, inkludes: List[str], already_inkluded: Set[str]) -> int:
         count = 0
         for fname in inkludes:
             if fname == "STOP":
-               logger.debug(f"inkluded {count} new files")
-               logger.info(f"stopping inkluding any more files")
-               return 0
+                logger.debug(f"inkluded {count} new files")
+                logger.info(f"stopping inkluding any more files")
+                return 0
             if fname not in already_inkluded:
                 count += 1
                 already_inkluded.add(fname)
                 logger.info(f"inkluding {fname}")
                 # TODO: use dirname
                 data = self.load_data(fname)
-                val_yaml = render_jinyaml(data, self._jinja_context() )
+                val_yaml = render_jinyaml(data, self._jinja_context())
                 if val_yaml:  # it can be empty
                     deep_update(self.yaml, val_yaml)
         logger.debug(f"inkluded {count} new files")

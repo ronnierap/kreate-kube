@@ -11,7 +11,8 @@ import logging
 import importlib
 from pathlib import Path
 from ._core import deep_update, DeepChain
-#from ..krypt import KryptKonfig, krypt_functions
+
+# from ..krypt import KryptKonfig, krypt_functions
 from ._jinyaml import yaml_dump
 import sys
 
@@ -24,9 +25,11 @@ def cache_dir():
         cache_dir = Path.home() / ".cache/kreate/repo"
     return cache_dir
 
+
 def clear_cache():
     logger.info(f"removing repo cache dir {cache_dir()}")
     shutil.rmtree(cache_dir())
+
 
 class FileGetter:
     def __init__(self, konfig):
@@ -36,8 +39,8 @@ class FileGetter:
     def get_data(self, file: str, dir=".") -> str:
         dekrypt = False
         if file.startswith("dekrypt:"):
-           dekrypt = True
-           file = file[8:]
+            dekrypt = True
+            file = file[8:]
         if file.startswith("repo:"):
             data = self.load_repo_data(file[5:])
         elif file.startswith("py:"):
@@ -56,7 +59,7 @@ class FileGetter:
         dir = target.parent
         dir.mkdir(parents=True, exist_ok=True)
         if isinstance(data, bytes):
-            data=data.decode()
+            data = data.decode()
         target.write_text(data)
 
     def load_file_data(self, filename: str, dir: str) -> str:
@@ -66,7 +69,7 @@ class FileGetter:
 
     def load_package_data(self, filename: str) -> str:
         package_name = filename.split(":")[0]
-        filename = filename[len(package_name)+1:]
+        filename = filename[len(package_name) + 1 :]
         package = importlib.import_module(package_name)
         logger.info(f"loading file {filename} from package {package_name}")
         data = pkgutil.get_data(package.__package__, filename)
@@ -75,13 +78,13 @@ class FileGetter:
     def load_repo_data(self, filename: str) -> str:
         repo = filename.split(":")[0]
         dir = self.repo_dir(repo)
-        filename = filename[len(repo)+1:]
+        filename = filename[len(repo) + 1 :]
         p = Path(dir, filename)
         return p.read_text()
 
     def repo_dir(self, repo_name: str) -> Path:
         repo_konf = self.konfig.yaml["system"]["repo"].get(repo_name, {})
-        if repo_konf.get("type",None) == "local-dir":
+        if repo_konf.get("type", None) == "local-dir":
             # special case, does not cache dir
             repo_dir = self.local_dir_repo(repo_konf)
         else:
@@ -125,7 +128,7 @@ class FileGetter:
         return repo_dir
 
     def url_data(self, repo_dir, repo_konf, version):
-        url : str = repo_konf.get("url")
+        url: str = repo_konf.get("url")
         auth = None
         if repo_konf.get("basic_auth", {}):
             usr_env_var = repo_konf["basic_auth"]["usr_env_var"]
@@ -138,20 +141,24 @@ class FileGetter:
         logger.info(f"downloading {repo_dir} from {url}")
         response = requests.get(url, auth=auth)
         if response.status_code >= 300:
-            raise IOError(f"status {response.status_code} while downloading {url} with message {response.content}")
+            raise IOError(
+                f"status {response.status_code} while downloading {url} with message {response.content}"
+            )
         return response.content
 
     def bitbucket_data(self, repo_dir, repo_konf, version: str):
         if version.startswith("branch-"):
             version = version[7:]
-            logger.warning(f"Using branch {version} as version is not recommended, use a tag instead")
+            logger.warning(
+                f"Using branch {version} as version is not recommended, use a tag instead"
+            )
             version = f"refs/heads/{version}"
         else:
             version = f"refs/tags/{version}"
         return self.url_data(repo_dir, repo_konf, version)
 
     def local_path_data(self, repo_dir, repo_konf, version):
-        path : str = repo_konf.get("path")
+        path: str = repo_konf.get("path")
         if version:
             path = path.replace("{version}", version)
         logger.info(f"unzipping {repo_dir} from {path}")
@@ -159,14 +166,18 @@ class FileGetter:
 
     def unzip_data(self, repo_dir: str, repo_konf: Mapping, data) -> None:
         z = zipfile.ZipFile(io.BytesIO(data))
-        skip_levels  = repo_konf.get("skip_levels", 0)
+        skip_levels = repo_konf.get("skip_levels", 0)
         regexp = repo_konf.get("select_regexp", "")
         repo_dir.mkdir(parents=True)
         unzip(z, repo_dir, skip_levels=skip_levels, select_regexp=regexp)
 
 
-
-def unzip(zfile: zipfile.ZipFile, repo_dir: Path, skip_levels: int = 0, select_regexp : str = None):
+def unzip(
+    zfile: zipfile.ZipFile,
+    repo_dir: Path,
+    skip_levels: int = 0,
+    select_regexp: str = None,
+):
     if skip_levels == 0 and not select_regexp:
         zfile.extractall(repo_dir)
         return

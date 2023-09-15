@@ -35,12 +35,9 @@ class KoreCli:
         self.cli = argparse.ArgumentParser(
             prog="kreate",
             usage=(
-                "kreate [optional arguments] [<subcommand>] [subcommand"
-                " options]"
+                "kreate [optional arguments] [<subcommand>] [subcommand" " options]"
             ),
-            description=(
-                "kreates files for deploying applications on kubernetes"
-            ),
+            description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
         self.subparsers = self.cli.add_subparsers(
@@ -118,8 +115,9 @@ class KoreCli:
         # subcommand: view_konfig
         cmd = self.add_subcommand(view_konfig, [], aliases=["vk"])
         cmd.add_argument("-k", "--kind", action="store", default=None)
-        cmd.add_argument("-o", "--orig", action="store_true",
-                help="view in original format")
+        cmd.add_argument(
+            "-o", "--orig", action="store_true", help="view in original format"
+        )
         # subcommand: requirements
         cmd = self.add_subcommand(requirements, [], aliases=["rq"])
 
@@ -129,9 +127,7 @@ class KoreCli:
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
         alias0 = aliases[0] if aliases else ""
-        self.epilog += (
-            f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
-        )
+        self.epilog += f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
         parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__
         )
@@ -232,9 +228,11 @@ class KoreCli:
             logging.basicConfig(format="%(message)s", level=logging.INFO)
         self.konfig_filename = args.konf
 
+
 def clear_repo_cache(cli: KoreCli):
     """clear the repo cache"""
     clear_cache()
+
 
 def view_strukture(cli: KoreCli):
     """view the application strukture"""
@@ -255,10 +253,7 @@ def view_template(cli: KoreCli):
     app: JinjaApp = cli._kreate_app()
     template = cli.args.template
     if template:
-        if (
-            template not in app.kind_templates
-            or template not in app.kind_classes
-        ):
+        if template not in app.kind_templates or template not in app.kind_classes:
             logger.warn(f"Unknown template kind {template}")
             return
         if not cli.args.quiet:
@@ -302,13 +297,12 @@ def view_konfig(cli: KoreCli):
         DeepChain(konfig.yaml).pprint()
 
 
-
 def requirements(cli: KoreCli):
     """view the listed requirements"""
     konfig: Konfig = cli.konfig()
     for line in konfig.get_requires():
         print(line)
-    DeepChain(konfig.yaml.get("repo",{})).pprint()
+    DeepChain(konfig.yaml.get("repo", {})).pprint()
 
 
 def version(cli: KoreCli):
