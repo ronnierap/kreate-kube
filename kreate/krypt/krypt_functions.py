@@ -1,4 +1,3 @@
-from ruamel.yaml import YAML
 from cryptography.fernet import Fernet
 import logging
 
@@ -53,38 +52,25 @@ def enkrypt_file(filename):
         f.write(fernet._encrypt_from_parts(data.encode("ascii"), 0, part))
 
 
-def change_yaml_comments(
-    filename: str, func, from_: str, to_: str, dir: str = None
-):
+def change_lines(filename: str, func, from_: str, to_: str, dir: str = None):
     dir = dir or "."
-    yaml_parser = YAML()
-    yaml_parser.width = 4096  # prevent line wrapping
-    yaml_parser.preserve_quotes = True
     with open(f"{dir}/{filename}") as f:
-        data = f.read()
-    yaml = yaml_parser.load(data)
-    ca = yaml.ca
-    for key in yaml:
-        if key in ca.items:  # and len(ca.items[key])>2:
-            item = yaml[key]
-            comment = ca.items[key][2]
-            if from_ in comment.value:
-                comment.column = 0
-                comment.value = " " + comment.value.replace(from_, to_, 1)
-                yaml[key] = func(item)
-                logger.info(f"{to_} {key}")
-
-    with open(f"{dir}/{filename}", "wb") as f:
-        yaml_parser.dump(yaml, f)
+        lines = f.readlines()
+    for idx, line in enumerate(lines):
+        line = line.rstrip()
+        if line.endswith(from_):
+            line = line[:-len(from_)]
+            value = line.rsplit(":", 1)[1].strip()
+            start = line.rsplit(":", 1)[0]
+            value = func(value)
+            lines[idx] = f"{start}: {value}  {to_}\n"
+    with open(f"{dir}/{filename}", "w") as f:
+        f.writelines(lines)
 
 
-def dekrypt_yaml(filename: str, dir: str = None):
-    change_yaml_comments(
-        filename, dekrypt_str, "enkrypted", "dekrypted", dir=dir
-    )
+def dekrypt_lines(filename: str, dir: str = None):
+    change_lines(filename, dekrypt_str, "# enkrypted", "# dekrypted", dir=dir)
 
 
-def enkrypt_yaml(filename: str, dir: str = None):
-    change_yaml_comments(
-        filename, enkrypt_str, "dekrypted", "enkrypted", dir=dir
-    )
+def enkrypt_lines(filename: str, dir: str = None):
+    change_lines(filename, enkrypt_str, "# dekrypted", "# enkrypted", dir=dir)

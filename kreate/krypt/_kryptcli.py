@@ -29,9 +29,9 @@ class KryptCli(KoreCli):
 
     def add_krypt_subcommands(self):
         self.add_subcommand(
-            dekyaml,
+            dek_lines,
             [argument("-f", "--file", help="yaml file to enkrypt")],
-            aliases=["dy"],
+            aliases=["dl"],
         )
         self.add_subcommand(
             dekstr,
@@ -44,9 +44,9 @@ class KryptCli(KoreCli):
             aliases=["df"],
         )
         self.add_subcommand(
-            enkyaml,
-            [argument("-f", "--file", help="yaml filename to enkrypt")],
-            aliases=["ey"],
+            enk_lines,
+            [argument("-f", "--file", help="filename to enkrypt")],
+            aliases=["el"],
         )
         self.add_subcommand(
             enkfile,
@@ -63,15 +63,14 @@ class KryptCli(KoreCli):
         return KryptKonfig()
 
 
-def dekyaml(cli: KryptCli):
-    """dekrypt values in a yaml file"""
+def dek_lines(cli: KryptCli):
+    """dekrypt lines in a text file"""
     konfig: Konfig = cli.konfig()
-
     filename = (
         cli.args.file
         or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
     )
-    krypt_functions.dekrypt_yaml(filename, ".")
+    krypt_functions.dekrypt_lines(filename, ".")
 
 
 def dekstr(cli: KryptCli):
@@ -92,14 +91,14 @@ def dekfile(cli: KryptCli):
     krypt_functions.dekrypt_file(filename)
 
 
-def enkyaml(cli: KryptCli):
-    "enkrypt values in a yaml file"
+def enk_lines(cli: KryptCli):
+    "enkrypt lines in a text file"
     konfig: Konfig = cli.konfig()
     filename = (
         cli.args.file
         or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
     )
-    krypt_functions.enkrypt_yaml(filename, ".")
+    krypt_functions.enkrypt_lines(filename, ".")
 
 
 def enkfile(cli: KryptCli):
