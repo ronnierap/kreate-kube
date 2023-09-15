@@ -1,7 +1,7 @@
+appname: demo
+env: dev
+team: myteam
 val:
-  appname: demo
-  env: dev
-  team: myteam
   image_version: v1.3.4
 version:
   shared_github: master

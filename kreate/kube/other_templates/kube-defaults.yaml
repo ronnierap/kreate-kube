@@ -6,7 +6,7 @@ default:
     servicePort: 8080
     containerPort: 8080
     replicas: 1
-    image_name: {{ val.appname }}.app
+    image_name: {{ appname }}.app
     restartPolicy: "" # if not specfied explicetly defaults to Always
     imagePullPolicy: Always
     runAsUser: 1000
@@ -63,7 +63,7 @@ default:
     liveness_port: 8080
 
   Ingress:
-    service: {{ val.appname }}-service
+    service: {{ appname }}-service
 
   KubernetesAnnotations:
     component: webservice

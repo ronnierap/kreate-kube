@@ -49,8 +49,8 @@ class Konfig:
         self.file_getter = FileGetter(self)
         data = self.file_getter.get_data(self.filename, ".")
         self.yaml = render_jinyaml(data, {}) #{"function": self.functions})
-        self.appname = self.yaml["val"]["appname"]
-        self.env = self.yaml["val"]["env"]
+        self.appname = self.yaml["appname"]
+        self.env = self.yaml["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
         self.target_path = Path(self.target_dir)
         self.load()

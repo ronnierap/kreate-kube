@@ -104,7 +104,7 @@ Kustomization:
     configmaps:
       demo-vars:
         vars:
-          ENV: {{ val.env }}
+          ENV: {{ env }}
           ORACLE_URL: {}
           ORACLE_USR: {}
           ORACLE_SCHEMA: {{ var.ORACLE_SCHEMA }}
