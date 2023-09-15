@@ -49,6 +49,7 @@ class Konfig:
         self.appname = self.yaml["val"]["appname"]
         self.env = self.yaml["val"]["env"]
         self.target_dir = f"./build/{self.appname}-{self.env}"
+        self.target_path = Path(self.target_dir)
         self.load()
 
     def __getattr__(self, attr):
