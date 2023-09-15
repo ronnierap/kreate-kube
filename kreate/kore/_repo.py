@@ -42,6 +42,8 @@ class FileGetter:
             data = self.load_repo_data(file[5:])
         elif file.startswith("py:"):
             data = self.load_package_data(file[3:])
+        elif file.startswith("konf:"):
+            data = self.load_file_data(file[5:], dir=self.konfig.dir)
         else:
             data = self.load_file_data(file, dir=dir)
         if dekrypt:
