@@ -41,19 +41,16 @@ class Konfig:
             filename += "/konfig.yaml"
         self.dir = os.path.dirname(filename) or "."
         self.filename = filename
-        #self.functions = {"getenv": os.getenv}
         self._strukt_cache = None
         self._default_strukture_files = []
         self.dekrypt_func = None
         self._add_jinja_filter("b64encode", b64encode)
         self.file_getter = FileGetter(self)
         data = self.file_getter.get_data(self.filename, ".")
-        self.yaml = render_jinyaml(data, {}) #{"function": self.functions})
-        self.appname = self.yaml["appname"]
-        self.env = self.yaml["env"]
-        self.target_dir = f"./build/{self.appname}-{self.env}"
-        self.target_path = Path(self.target_dir)
+        self.yaml = render_jinyaml(data, {})
         self.load()
+        self.target_dir = self.yaml.get("system", {}).get("target_dir", "build")
+        self.target_path = Path(self.target_dir)
 
     def __getattr__(self, attr):
         if attr not in self.yaml:

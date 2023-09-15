@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class App:
     def __init__(self, konfig: Konfig):
-        self.appname = konfig.appname
+        self.appname = konfig.yaml["appname"]
         self.env = konfig.env
         self.konfig = konfig
         self.komponents = []
