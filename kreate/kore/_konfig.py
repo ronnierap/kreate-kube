@@ -17,8 +17,11 @@ logger = logging.getLogger(__name__)
 
 def b64encode(value: str) -> str:
     if value:
-        res = base64.b64encode(value.encode("ascii"))
-        return res.decode("ascii")
+        if isinstance(value, bytes):
+            res = base64.b64encode(value)
+        else:
+            res = base64.b64encode(value.encode())
+        return res.decode()
     else:
         logger.warning("empty value to b64encode")
         return ""
