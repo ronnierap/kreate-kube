@@ -100,6 +100,18 @@ class Kustomization(JinYamlKomponent):
             raise ValueError(f"var {varname} should not be None")
         return value
 
+    def kopy_file(self, filename: str) -> str:
+        location : str = self.app.konfig.yaml["file"][filename]
+        if location.startswith("dekrypt:"):
+            target = self.app.konfig.target_path / "secrets" / "files" / filename
+            result = "secrets/files/" + filename
+        else:
+            target = self.app.konfig.target_path /  "files" / filename
+            result = "files/" + filename
+        self.app.konfig.file_getter.kopy_file(location, target)
+        return result
+
+
     @property
     def filename(self):
         return "kustomization.yaml"

@@ -32,10 +32,9 @@ class FileGetter:
     def __init__(self, konfig):
         self.konfig = konfig
 
+    # TODO: make text and bytes variants
     def get_data(self, file: str, dir=".") -> str:
-        orig_file =file
         dekrypt = False
-
         if file.startswith("dekrypt:"):
            dekrypt = True
            file = file[8:]
@@ -49,6 +48,12 @@ class FileGetter:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
         return data
+
+    def kopy_file(self, loc: str, target: Path) -> None:
+        data = self.get_data(loc)
+        dir = target.parent
+        dir.mkdir(parents=True, exist_ok=True)
+        target.write_text(data)
 
     def load_file_data(self, filename: str, dir: str) -> str:
         logger.info(f"loading file {filename} ")
