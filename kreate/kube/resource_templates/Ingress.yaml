@@ -6,7 +6,7 @@ metadata:
   {% if "nginx_snippets" in strukt %}
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-    {% for line in strukt.nginx_snippets %}
+    {% for line in strukt.get("nginx_snippets", []) %}
       {{line}}
     {% endfor %}
   {% else %}

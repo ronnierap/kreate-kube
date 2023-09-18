@@ -1,7 +1,7 @@
 import os
 import logging
 
-from ._core import DictWrapper
+from ._core import wrap
 from ._konfig import Konfig
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ class App:
         self.komponents = []
         self._kinds = {}
         self.aliases = {}
-        self.strukture = konfig.calc_strukture()
+        self.strukture = wrap(konfig.calc_strukture())
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
         naming = self.konfig.yaml.get("system", {}).get("naming", {})
@@ -43,7 +43,7 @@ class App:
             self.komponents.append(res)
         map = self._kinds.get(res.kind, None)
         if map is None:
-            map = DictWrapper({})
+            map = wrap({})
             self.get_aliases(res.kind)
             for alias in self.get_aliases(res.kind):
                 self._kinds[alias] = map

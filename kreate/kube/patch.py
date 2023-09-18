@@ -1,7 +1,7 @@
 import logging
 
 from ..kore import FileLocation
-from ..kore import DeepChain
+from ..kore import deep_update
 from ..kore import JinYamlKomponent
 from .resource import Resource, Egress
 
@@ -62,7 +62,7 @@ class Patch(JinYamlKomponent):
             # The embedded_strukture is first,
             # since the root_strukture will contain all default values
             embedded_strukture = tar_struk[typename][self.shortname]
-            return DeepChain(embedded_strukture, root_strukture)
+            deep_update(root_strukture, embedded_strukture)
         return root_strukture
 
 

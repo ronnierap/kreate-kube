@@ -5,7 +5,7 @@ metadata:
   name: {{ my.name }}
 spec:
   endpoints:
-  {% for ep in strukt.endpoints %}
+  {% for ep in strukt.get("endpoints", []) %}
   - interval: {{ ep.interval | default('15s', true) }}
     path: {{ ep.path }}
     port: {{ ep.port | default('http', true) }}

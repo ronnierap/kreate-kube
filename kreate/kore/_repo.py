@@ -10,11 +10,7 @@ import shutil
 import logging
 import importlib
 from pathlib import Path
-from ._core import deep_update, DeepChain
-
 # from ..krypt import KryptKonfig, krypt_functions
-from ._jinyaml import yaml_dump
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +59,7 @@ class FileGetter:
         target.write_text(data)
 
     def load_file_data(self, filename: str, dir: str) -> str:
-        logger.info(f"loading file {filename} ")
+        logger.debug(f"loading file {filename} ")
         p = Path(dir, filename)
         return p.read_text()
 
@@ -71,7 +67,7 @@ class FileGetter:
         package_name = filename.split(":")[0]
         filename = filename[len(package_name) + 1 :]
         package = importlib.import_module(package_name)
-        logger.info(f"loading file {filename} from package {package_name}")
+        logger.debug(f"loading file {filename} from package {package_name}")
         data = pkgutil.get_data(package.__package__, filename)
         return data.decode("utf-8")
 

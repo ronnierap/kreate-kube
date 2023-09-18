@@ -3,7 +3,7 @@ from collections.abc import Mapping
 import os
 from typing import Any
 
-from ._core import DeepChain, wrap
+from ._core import  wrap, deep_update
 from ._jinyaml import FileLocation, yaml_dump, yaml_parse, render_jinja
 from ._app import App
 
@@ -22,7 +22,7 @@ class Komponent:
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
-        self.strukture = self._calc_strukture()
+        self.strukture = wrap(self._calc_strukture())
         self.skip = self.strukture.get("ignore", False)
         self.field = Field(self)
         name = (
@@ -52,13 +52,11 @@ class Komponent:
         return f"{self.app.appname}-{self.kind}-{self.shortname}"
 
     def _calc_strukture(self):
-        strukt = self._find_strukture()
-        defaults = self._find_defaults()
-        return DeepChain(
-            strukt,
-            {"default": defaults},
-            {"default": self._find_generic_defaults()},
-        )
+        strukt = {}
+        deep_update(strukt, {"default": self._find_generic_defaults()})
+        deep_update(strukt, {"default": self._find_defaults()})
+        deep_update(strukt, self._find_strukture())
+        return strukt
 
     def _find_defaults(self):
         strukt = self.app.strukture if self.app else {}
@@ -144,7 +142,6 @@ class Komponent:
             return self.app.konfig.yaml["val"][fieldname]
         if fieldname in self.strukture.get("default", {}):
             return self.strukture["default"][fieldname]
-        # The following might not be needed using Deepchain anyway
         if fieldname in self.strukture.get("default", {}).get("generic", {}):
             return self.strukture["default"]["generic"][fieldname]
         if default is not None:

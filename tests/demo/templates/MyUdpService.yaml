@@ -11,7 +11,7 @@ spec:
   selector:
     app: {{ app.appname }}
   ports:
-{% for port in (strukt.ports or [{"name": "http"}] ) %}
+{% for port in strukt.get("ports", [{"name": "http"}]) %}
   - protocol: UDP
     port: {{ port.port | default(default.servicePort) }}
     targetPort: {{ port.targetPort | default(default.containerPort) }}

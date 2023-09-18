@@ -15,7 +15,6 @@ class JinjaApp(App):
         self.kind_classes = {}
         self.register_std_templates()
         self.register_templates_from_konfig("templates")
-        self.strukture = konfig.calc_strukture()
 
     def register_templates_from_konfig(self, value_key: str, cls=None):
         for key in self.konfig.yaml.get("system", {}).get(value_key, []):

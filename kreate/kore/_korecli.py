@@ -8,7 +8,7 @@ import inspect
 from jinja2 import TemplateError
 from sys import exc_info
 
-from ._core import DeepChain
+from ._core import pprint_map
 from ._repo import clear_cache
 
 from . import _jinyaml
@@ -237,13 +237,13 @@ def clear_repo_cache(cli: KoreCli):
 def view_strukture(cli: KoreCli):
     """view the application strukture"""
     konfig: Konfig = cli.konfig()
-    konfig.calc_strukture().pprint(field=cli.args.komp)
+    pprint_map(konfig.calc_strukture(), field=cli.args.komp)
 
 
 def view_defaults(cli: KoreCli):
     """view the application strukture defaults"""
     konfig: Konfig = cli.konfig()
-    konfig.calc_strukture().default.pprint(field=cli.args.komp)
+    pprint_map(konfig.calc_strukture().default, field=cli.args.komp)
 
 
 def view_template(cli: KoreCli):
@@ -294,7 +294,7 @@ def view_konfig(cli: KoreCli):
     if cli.args.orig:
         yaml_dump(konfig.yaml, sys.stdout)
     else:
-        DeepChain(konfig.yaml).pprint()
+        pprint_map(konfig.yaml)
 
 
 def requirements(cli: KoreCli):
@@ -302,7 +302,7 @@ def requirements(cli: KoreCli):
     konfig: Konfig = cli.konfig()
     for line in konfig.get_requires():
         print(line)
-    DeepChain(konfig.yaml.get("repo", {})).pprint()
+    pprint_map(konfig.yaml.get("repo", {}))
 
 
 def version(cli: KoreCli):

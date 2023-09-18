@@ -10,14 +10,14 @@ spec:
       containers:
       - name: {{ my.field.container_name }}
         volumeMounts:
-          {% for path in (strukt.files or []) %}
+          {% for path in strukt.get("files", []) %}
          - mountPath: {{ path }}
            name: {{ my.shortname }}
            subPath: {{ path.split("/")[-1] }}
           {% endfor %}
       volumes:
       - name: {{ my.shortname }}
-        {% if strukt.secret %}
+        {% if "secret" in strukt and strukt.secret %}
         secret:
           secretName: {{ my.shortname }}
         {% else %}

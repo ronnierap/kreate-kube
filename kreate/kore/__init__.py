@@ -4,7 +4,7 @@ from ._jinja_app import JinjaApp
 from ._korecli import KoreCli
 from ._komp import Komponent, JinYamlKomponent, JinjaKomponent
 from ._jinyaml import FileLocation
-from ._core import DeepChain, wrap, DictWrapper
+from ._core import deep_update, wrap, DictWrapper
 
 __all__ = [
     "Konfig",
@@ -15,7 +15,7 @@ __all__ = [
     "JinjaKomponent",
     "JinYamlKomponent",
     "FileLocation",
-    "DeepChain",
     "wrap",
+    "deep_update"
     "DictWrapper",
 ]
