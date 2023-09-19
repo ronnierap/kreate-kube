@@ -59,7 +59,7 @@ class KryptCli(KoreCli):
             aliases=["es"],
         )
 
-    def _kreate_konfig(self, filename: str) -> KryptKonfig:
+    def kreate_konfig(self, filename: str) -> KryptKonfig:
         return KryptKonfig()
 
 

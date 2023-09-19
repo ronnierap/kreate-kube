@@ -9,16 +9,11 @@ This is an example how to do that
 ## kreate-demo.py
 ```
 #!/usr/bin/env python3
+from kreate.kube import KubeCli, KustApp
 
-from kreate.kube import KubeCli
+class DemoStruktApp(KustApp):
+    def tune_komponents(self) -> None:
+        self.deployment.main.label("this-is-added", "by-script")
 
-
-class DemoStruktCli(KubeCli):
-    def _tune_app(self) -> None:
-        self._app.kreate_komponents_from_strukture()
-        self._app.aktivate()
-        self._app.depl.main.label("this-is-added", "by-script")
-
-
-DemoStruktCli().run()
+KubeCli(app_class=DemoStruktApp).run()
 ```

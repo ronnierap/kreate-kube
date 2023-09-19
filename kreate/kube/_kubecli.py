@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class KubeCli(krypt.KryptCli):
-    def __init__(self):
+    def __init__(self, *, app_class=KustApp):
         super().__init__()
+        self._app_class = app_class
         self.add_subcommand(files, [], aliases=["f"])
         self.add_subcommand(build, [], aliases=["b"])
         self.add_subcommand(diff, [], aliases=["d"])
@@ -45,14 +46,11 @@ class KubeCli(krypt.KryptCli):
     def get_packages(self):
         return ["kreate-kube"]
 
-    def _kreate_konfig(self, filename: str) -> KubeKonfig:
+    def kreate_konfig(self, filename: str) -> KubeKonfig:
         return KubeKonfig(filename)
 
-    def _kreate_app(self) -> KustApp:
-        return KustApp(self.konfig())
-
-    def _tune_konfig(self):
-        super()._tune_konfig()
+    def kreate_app(self) -> KustApp:
+        return self._app_class(self.konfig())
 
     def default_command(self):
         files(self)
@@ -60,6 +58,8 @@ class KubeCli(krypt.KryptCli):
 
 def kreate_files(cli: KubeCli) -> KustApp:
     app: App = cli.app()
+    app.kreate_komponents()
+    app.aktivate_komponents()
     app.kreate_files()
     return app
 

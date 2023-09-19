@@ -10,6 +10,17 @@ logger = logging.getLogger(__name__)
 
 
 class App:
+    """
+    An App is a container of komponents
+    These components are kreated from a strukture file, but may also
+    be kreated manually in a script using the kreate_komponent method.
+
+    The general flow is as follows:
+      app = SomeApp(konfig)   # loads the strukture from the konfig
+      app.kreate_komponents() # from_strukture or from script
+      app.tune_komponents()   # render the templates for each komponent
+      app.kreate_file()       # write the rendered template to a file
+    """
     def __init__(self, konfig: Konfig):
         self.appname = konfig.yaml["appname"]
         self.env = konfig.env
@@ -91,10 +102,17 @@ class App:
             f"can not create komponent for {kind}.{shortname}"
         )
 
-    def aktivate(self):
+    def kreate_komponents(self):
+        self.kreate_komponents_from_strukture()
+
+    def tune_komponents(self):
+        pass
+
+    def aktivate_komponents(self):
         for komp in self.komponents:
             logger.debug(f"aktivating {komp.kind}.{komp.shortname}")
             komp.aktivate()
+        self.tune_komponents()
 
     def kreate_files(self):
         os.makedirs(self.konfig.target_dir, exist_ok=True)

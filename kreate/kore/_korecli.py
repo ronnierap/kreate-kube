@@ -52,34 +52,26 @@ class KoreCli:
         self.add_subcommands()
 
     def get_packages(self):
+        """a list of packages that are shown in the version command"""
         return []
 
     def konfig(self):
         if not self._konfig:
-            self._konfig = self._kreate_konfig(self.konfig_filename)
-            self._tune_konfig()
+            self._konfig = self.kreate_konfig(self.konfig_filename)
             if not self.args.skip_requires:
                 self._konfig.check_requires()
         return self._konfig
 
     def app(self):
         if not self._app:
-            self._app = self._kreate_app()
-            self._tune_app()
+            self._app = self.kreate_app()
         return self._app
 
-    def _kreate_konfig(self, filename: str) -> Konfig:
+    def kreate_konfig(self, filename: str) -> Konfig:
         return Konfig(filename)
 
-    def _kreate_app(self) -> App:
+    def kreate_app(self) -> App:
         return App(self.konfig())
-
-    def _tune_konfig(self) -> None:
-        pass
-
-    def _tune_app(self) -> None:
-        self._app.kreate_komponents_from_strukture()
-        self._app.aktivate()
 
     def add_subcommands(self):
         self.add_subcommand(clear_repo_cache, [], aliases=["cc"])
