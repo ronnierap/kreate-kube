@@ -16,7 +16,6 @@ class App:
         self.konfig = konfig
         self.komponents = []
         self._kinds = {}
-        self.aliases = {}
         self._strukt_dict = konfig.load_konfig_strukture_files()
         self.load_all_use_items()
         self.strukture = wrap(self._strukt_dict)
@@ -54,28 +53,13 @@ class App:
             )
         return None
 
-    def add_alias(self, kind: str, *aliases: str) -> None:
-        if kind in self.aliases:
-            self.aliases[kind].append(aliases)
-        else:
-            self.aliases[kind] = list(aliases)
-
-    def get_aliases(self, kind: str):
-        result = [kind, kind.lower()]
-        if kind in self.aliases:
-            result.append(*self.aliases[kind])
-        return result
-
     def add(self, res) -> None:
         if not res.skip:
             self.komponents.append(res)
-        map = self._kinds.get(res.kind, None)
+        map = self._kinds.get(res.kind.lower(), None)
         if map is None:
             map = wrap({})
-            self.get_aliases(res.kind)
-            for alias in self.get_aliases(res.kind):
-                self._kinds[alias] = map
-
+            self._kinds[res.kind.lower()] = map
         map[res.shortname] = res
 
     def __getattr__(self, attr):
@@ -111,5 +95,5 @@ class App:
                 for shortname in sorted(strukt.keys()):
                     logger.debug(f"kreating komponent {kind}.{shortname}")
                     self.kreate_komponent(kind, shortname)
-            elif kind != "default":
+            elif kind != "default" and kind != "use":
                 logger.warning(f"Unknown toplevel komponent {kind}")

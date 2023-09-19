@@ -32,7 +32,7 @@ def kreate_app_from_script(konfig: kreate.kube.KubeKonfig) -> kreate.kube.KustAp
     app.kreate_komponent("MyUdpService", "main")
     app.kreate_komponent("CronJob", "main")
     app.kreate_komponent("StatefulSet", "main")
-    app.kreate_patch(app.depl.main, "HttpProbes")
+    app.kreate_patch(app.deployment.main, "HttpProbes")
     app.kreate_patch(depl, "AntiAffinity")
     # Add the next two in alphabetical order, to be predictable
     app.kreate_patch(depl, "VolumeMounts", "demo-extra-files")
@@ -41,8 +41,8 @@ def kreate_app_from_script(konfig: kreate.kube.KubeKonfig) -> kreate.kube.KustAp
     app.kreate_patch(depl, "KubernetesAnnotations")
     app.kreate_patch(depl, "ElasticLogging")
     app.kreate_patch(depl, "EgressLabels")
-    app.kreate_patch(app.StatefulSet.main, "KubernetesAnnotations")
-    app.kreate_patch(app.StatefulSet.main, "ElasticLogging")
+    app.kreate_patch(app.statefulset.main, "KubernetesAnnotations")
+    app.kreate_patch(app.statefulset.main, "ElasticLogging")
 
     app.aktivate()
 

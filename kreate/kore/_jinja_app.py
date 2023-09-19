@@ -23,7 +23,7 @@ class JinjaApp(App):
             self.register_template_file(key, filename=templ, cls=cls)
 
     def register_template(
-        self, kind: str, cls=None, filename=None, aliases=None, package=None
+        self, kind: str, cls=None, filename=None, package=None
     ):
         if kind in self.kind_templates:
             if cls is None:
@@ -44,25 +44,23 @@ class JinjaApp(App):
             raise ValueError(f"No class specified for template {kind}: {loc}")
         self.kind_templates[kind] = loc
         self.kind_classes[kind] = cls
-        if aliases:
-            self.add_alias(kind, aliases)
 
     def _default_template_class(self):
         return None
 
     def register_template_class(
-        self: str, cls, filename=None, aliases=None, package=None
+        self: str, cls, filename=None, package=None
     ):
         kind = cls.__name__
         self.register_template(
-            kind, cls, filename=filename, aliases=aliases, package=package
+            kind, cls, filename=filename, package=package
         )
 
     def register_template_file(
-        self, kind: str, cls=None, filename=None, aliases=None, package=None
+        self, kind: str, cls=None, filename=None, package=None
     ):
         self.register_template(
-            kind, cls, filename=filename, aliases=aliases, package=package
+            kind, cls, filename=filename, package=package
         )
 
     def register_std_templates(self) -> None:

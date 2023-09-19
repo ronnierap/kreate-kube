@@ -12,7 +12,7 @@ class DemoStruktCli(KubeCli):
     def _tune_app(self) -> None:
         self._app.kreate_komponents_from_strukture()
         self._app.aktivate()
-        self._app.depl.main.label("this-is-added", "by-script")
+        self._app.deployment.main.label("this-is-added", "by-script")
 
 
 DemoStruktCli().run()

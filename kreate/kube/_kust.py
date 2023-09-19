@@ -28,24 +28,22 @@ class KustApp(KubeApp):
         self.register_patch_file("KubernetesAnnotations")
         self.register_patch_file("SidecarContainer")
 
-    def register_patch_class(self: str, cls: str, aliases=None, package=None) -> None:
+    def register_patch_class(self: str, cls: str, package=None) -> None:
         package = package or patch_templates
         super().register_template_class(
             cls,
             filename=None,
-            aliases=aliases,
             package=patch_templates,
         )
 
     def register_patch_file(
         self,
         kind: str = None,
-        aliases=None,
         package=None,
     ) -> None:
         package = package or patch_templates
         super().register_template_file(
-            kind=kind, cls=Patch, aliases=aliases, package=package
+            kind=kind, cls=Patch, package=package
         )
 
     def kreate_komponents_from_strukture(self):
