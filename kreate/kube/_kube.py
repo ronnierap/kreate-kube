@@ -1,8 +1,7 @@
 import logging
 from typing import List
 from ..kore import JinjaApp, Konfig
-from ..krypt import KryptKonfig, krypt_functions
-from ..kore import _jinyaml
+from ..krypt import KryptKonfig
 from . import resource, resource_templates
 
 logger = logging.getLogger(__name__)

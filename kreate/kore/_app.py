@@ -71,14 +71,14 @@ class App:
             )
         return None
 
-    def add(self, res) -> None:
-        if not res.skip:
-            self.komponents.append(res)
-        map = self._kinds.get(res.kind.lower(), None)
+    def add_komponent(self, komp) -> None:
+        if not komp.skip:
+            self.komponents.append(komp)
+        map = self._kinds.get(komp.kind.lower(), None)
         if map is None:
             map = wrap({})
-            self._kinds[res.kind.lower()] = map
-        map[res.shortname] = res
+            self._kinds[komp.kind.lower()] = map
+        map[komp.shortname] = komp
 
     def __getattr__(self, attr):
         if attr in self.__dict__ or attr == "_dict":

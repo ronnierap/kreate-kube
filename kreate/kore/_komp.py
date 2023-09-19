@@ -38,7 +38,7 @@ class Komponent:
             logger.debug(f"adding  {self.kind}.{self.shortname}")
         if not self.app:
             raise ValueError("Komponent {self.name} has no application")
-        self.app.add(self)
+        self.app.add_komponent(self)
 
     def aktivate(self):
         pass
