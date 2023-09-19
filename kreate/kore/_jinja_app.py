@@ -37,9 +37,7 @@ class JinjaApp(App):
         filename = filename or f"{kind}.yaml"
         if package:
             filename = f"py:{package.__name__}:{filename}"
-        loc = FileLocation(
-            filename=filename, package=package, dir=self.konfig.dir
-        )
+        loc = FileLocation(filename=filename, dir=self.konfig.dir)
         logger.debug(f"registering template {kind}: {loc}")
         cls = cls or self._default_template_class()
         if cls is None:
