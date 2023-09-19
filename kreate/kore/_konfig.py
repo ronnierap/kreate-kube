@@ -104,11 +104,11 @@ class Konfig:
 
     def _load_strukture_files(self):
         logger.debug("loading strukture files")
-        result = []
+        result = {}
         files = self._default_strukture_files
         files.extend(self.yaml.get("strukture", []))
         for fname in files:
-            result.append(self._load_strukture_file(fname))
+            deep_update(result, self._load_strukture_file(fname))
         return result
 
     def _load_strukture_file(self, filename):
@@ -118,10 +118,7 @@ class Konfig:
 
     def calc_strukture(self):
         if not self._strukt_cache:
-            dicts = self._load_strukture_files()
-            result = {}
-            for d in dicts:
-                deep_update(result, d)
+            result = self._load_strukture_files()
             self._strukt_cache = wrap(result)
         return self._strukt_cache
 
