@@ -3,8 +3,10 @@ a chain of maps where an attribute will be checked in any of the maps
 """
 
 from collections.abc import Mapping
-#TODO: this might be better for the isinstance check
-#from typing import Mapping
+
+# TODO: this might be better for the isinstance check
+# from typing import Mapping
+
 
 class DeepChain(Mapping):
     def __init__(self, *maps: Mapping):

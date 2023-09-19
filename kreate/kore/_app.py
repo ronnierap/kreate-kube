@@ -37,7 +37,6 @@ class App:
         data = self.konfig.load_repo_file(filename)
         return render_jinyaml(data, self.konfig.yaml)  # TODO: dir=self.dir
 
-
     def load_all_use_items(self):
         logger.debug("loading use files")
         already_loaded = set()
@@ -47,7 +46,9 @@ class App:
             # possible new use items are added
             to_load = self._strukt_dict.get("use", [])
 
-    def load_use_items(self, to_load: List[str], already_loaded: Set[str]) -> int:
+    def load_use_items(
+        self, to_load: List[str], already_loaded: Set[str]
+    ) -> int:
         count = 0
         for fname in to_load:
             if fname in already_loaded:
@@ -86,7 +87,9 @@ class App:
         return self._kinds.get(attr, None)
 
     def kreate_komponent(self, kind: str, shortname: str = None):
-        raise NotImplementedError(f"can not create komponent for {kind}.{shortname}")
+        raise NotImplementedError(
+            f"can not create komponent for {kind}.{shortname}"
+        )
 
     def aktivate(self):
         for komp in self.komponents:
@@ -98,7 +101,9 @@ class App:
         for komp in self.komponents:
             if komp.filename:
                 if komp.dirname:
-                    logger.info(f"kreating file {komp.dirname}/{komp.filename}")
+                    logger.info(
+                        f"kreating file {komp.dirname}/{komp.filename}"
+                    )
                 else:
                     logger.info(f"kreating file {komp.filename}")
                 komp.kreate_file()

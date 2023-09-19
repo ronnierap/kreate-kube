@@ -37,7 +37,9 @@ class JinjaApp(App):
         filename = filename or f"{kind}.yaml"
         if package:
             filename = f"py:{package.__name__}:{filename}"
-        loc = FileLocation(filename=filename, package=package, dir=self.konfig.dir)
+        loc = FileLocation(
+            filename=filename, package=package, dir=self.konfig.dir
+        )
         logger.debug(f"registering template {kind}: {loc}")
         cls = cls or self._default_template_class()
         if cls is None:
@@ -48,20 +50,14 @@ class JinjaApp(App):
     def _default_template_class(self):
         return None
 
-    def register_template_class(
-        self: str, cls, filename=None, package=None
-    ):
+    def register_template_class(self: str, cls, filename=None, package=None):
         kind = cls.__name__
-        self.register_template(
-            kind, cls, filename=filename, package=package
-        )
+        self.register_template(kind, cls, filename=filename, package=package)
 
     def register_template_file(
         self, kind: str, cls=None, filename=None, package=None
     ):
-        self.register_template(
-            kind, cls, filename=filename, package=package
-        )
+        self.register_template(kind, cls, filename=filename, package=package)
 
     def register_std_templates(self) -> None:
         pass
@@ -70,6 +66,8 @@ class JinjaApp(App):
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if inspect.isclass(cls):
-            return cls(app=self, kind=kind, shortname=shortname, template=templ)
+            return cls(
+                app=self, kind=kind, shortname=shortname, template=templ
+            )
         else:
             raise ValueError(f"Unknown template type {type(cls)}, {cls}")

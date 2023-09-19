@@ -16,6 +16,6 @@ __all__ = [
     "JinYamlKomponent",
     "FileLocation",
     "wrap",
-    "deep_update"
+    "deep_update",
     "DictWrapper",
 ]

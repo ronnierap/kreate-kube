@@ -47,7 +47,9 @@ class Konfig:
         data = self.file_getter.get_data(self.filename, ".")
         self.yaml = render_jinyaml(data, {})
         self.load()
-        self.target_dir = self.yaml.get("system", {}).get("target_dir", "build")
+        self.target_dir = self.yaml.get("system", {}).get(
+            "target_dir", "build"
+        )
         self.target_path = Path(self.target_dir)
 
     def __getattr__(self, attr):
@@ -81,7 +83,9 @@ class Konfig:
             # possible new inkludes are added
             inkludes = self.yaml.get("inklude", [])
 
-    def load_inkludes(self, inkludes: List[str], already_inkluded: Set[str]) -> int:
+    def load_inkludes(
+        self, inkludes: List[str], already_inkluded: Set[str]
+    ) -> int:
         count = 0
         for fname in inkludes:
             if fname == "STOP":

@@ -3,7 +3,7 @@ from collections.abc import Mapping
 import os
 from typing import Any
 
-from ._core import  wrap, deep_update
+from ._core import wrap, deep_update
 from ._jinyaml import FileLocation, yaml_dump, yaml_parse, render_jinja
 from ._app import App
 
@@ -78,7 +78,9 @@ class Komponent:
         if typename in strukt and self.shortname in strukt[typename]:
             logger.debug(f"using named strukture {typename}.{self.shortname}")
             return self.app.strukture[typename][self.shortname]
-        logger.debug(f"could not find strukture for {typename}.{self.shortname}")
+        logger.debug(
+            f"could not find strukture for {typename}.{self.shortname}"
+        )
         return {}
 
     def kreate_file(self) -> None:
@@ -113,11 +115,14 @@ class Komponent:
                         getattr(self, key)(val)
                     elif isinstance(val, int):
                         logger.debug(
-                            f"invoking {self} option {key}" f" with int parameter {val}"
+                            f"invoking {self} option {key}"
+                            f" with int parameter {val}"
                         )
                         getattr(self, key)(int(val))
                     else:
-                        logger.warn(f"option map {opt} for {self.name} not supported")
+                        logger.warn(
+                            f"option map {opt} for {self.name} not supported"
+                        )
 
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")

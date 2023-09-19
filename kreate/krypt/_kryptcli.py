@@ -67,7 +67,8 @@ def dek_lines(cli: KryptCli):
     """dekrypt lines in a text file"""
     konfig: Konfig = cli.konfig()
     filename = (
-        cli.args.file or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
+        cli.args.file
+        or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
     )
     krypt_functions.dekrypt_lines(filename, ".")
 
@@ -94,7 +95,8 @@ def enk_lines(cli: KryptCli):
     "enkrypt lines in a text file"
     konfig: Konfig = cli.konfig()
     filename = (
-        cli.args.file or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
+        cli.args.file
+        or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
     )
     krypt_functions.enkrypt_lines(filename, ".")
 

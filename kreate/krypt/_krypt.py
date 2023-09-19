@@ -30,7 +30,9 @@ class KryptKonfig(Konfig):
         logger.debug(f"getting dekrypt key from {env_varname}")
         psw = os.getenv(env_varname)
         if not psw:
-            logger.warning(f"no dekrypt key given in environment var {env_varname}")
+            logger.warning(
+                f"no dekrypt key given in environment var {env_varname}"
+            )
         return psw
 
     def default_krypt_key_env_var(self):

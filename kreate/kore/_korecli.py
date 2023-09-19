@@ -35,9 +35,12 @@ class KoreCli:
         self.cli = argparse.ArgumentParser(
             prog="kreate",
             usage=(
-                "kreate [optional arguments] [<subcommand>] [subcommand" " options]"
+                "kreate [optional arguments] [<subcommand>] [subcommand"
+                " options]"
             ),
-            description=("kreates files for deploying applications on kubernetes"),
+            description=(
+                "kreates files for deploying applications on kubernetes"
+            ),
             formatter_class=argparse.RawTextHelpFormatter,
         )
         self.subparsers = self.cli.add_subparsers(
@@ -127,7 +130,9 @@ class KoreCli:
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
         alias0 = aliases[0] if aliases else ""
-        self.epilog += f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
+        self.epilog += (
+            f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
+        )
         parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__
         )
@@ -253,7 +258,10 @@ def view_template(cli: KoreCli):
     app: JinjaApp = cli._kreate_app()
     template = cli.args.template
     if template:
-        if template not in app.kind_templates or template not in app.kind_classes:
+        if (
+            template not in app.kind_templates
+            or template not in app.kind_classes
+        ):
             logger.warn(f"Unknown template kind {template}")
             return
         if not cli.args.quiet:

@@ -24,7 +24,8 @@ def deep_update(target: Mapping, other: Mapping) -> None:
                     target[k].append(item)
             else:
                 raise ValueError(
-                    f"trying to merge key {k} sequence {v} into non-sequence {target[k]}"
+                    f"trying to merge key {k} sequence {v}"
+                    f" into non-sequence {target[k]}"
                 )
         else:
             target[k] = v
@@ -39,7 +40,6 @@ class DictWrapper(UserDict):
 
     def __getattr__(self, attr):
         if attr not in self.data:
-            #return None
             raise AttributeError(f"could not find attribute {attr} in {self}")
         else:
             return wrap(self.data[attr])

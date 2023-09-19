@@ -41,7 +41,9 @@ def enkrypt_str(value):
     fernet = _get_key()
     part = b"\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa"
     # use the parts to prevent changes if secret was not changed
-    return fernet._encrypt_from_parts(value.encode("ascii"), 0, part).decode("ascii")
+    return fernet._encrypt_from_parts(value.encode("ascii"), 0, part).decode(
+        "ascii"
+    )
 
 
 def enkrypt_file(filename):

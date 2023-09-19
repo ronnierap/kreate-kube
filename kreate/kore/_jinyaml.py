@@ -24,7 +24,10 @@ class FileLocation(
 
     def __repr__(self):
         if self.package:
-            return f"FileLocation({self.filename}" f" @package:{self.package.__name__})"
+            return (
+                f"FileLocation({self.filename}"
+                f" @package:{self.package.__name__})"
+            )
         return f"FileLocation({self.filename} @dir {self.dir})"
 
 
@@ -57,7 +60,9 @@ def load_data(file_loc: FileLocation):
         package = importlib.import_module(package_name)
         return pkgutil.get_data(package.__package__, filename).decode("utf-8")
     elif package:
-        logger.debug(f"loading file {filename} from package {package.__name__}")
+        logger.debug(
+            f"loading file {filename} from package {package.__name__}"
+        )
         return pkgutil.get_data(package.__package__, filename).decode("utf-8")
     else:
         dirname = dirname or "."

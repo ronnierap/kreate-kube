@@ -14,7 +14,6 @@ class KubeApp(JinjaApp):
             "namespace", f"{self.appname}-{self.env}"
         )
 
-
     def default_strukture_files(self) -> List[str]:
         result = super().default_strukture_files()
         result.append("py:kreate.kube.other_templates:kube-defaults.yaml")
@@ -37,7 +36,7 @@ class KubeApp(JinjaApp):
         self.register_resource_file("CronJob")
         self.register_resource_file("StatefulSet", filename="Deployment.yaml")
 
-    def register_resource_class(self: str, cls,  package=None) -> None:
+    def register_resource_class(self: str, cls, package=None) -> None:
         package = package or resource_templates
         super().register_template_class(
             cls,
@@ -52,9 +51,7 @@ class KubeApp(JinjaApp):
         package=None,
     ) -> None:
         package = package or resource_templates
-        super().register_template_file(
-            cls, filename=filename, package=package
-        )
+        super().register_template_file(cls, filename=filename, package=package)
 
     def _default_template_class(self):
         return resource.Resource

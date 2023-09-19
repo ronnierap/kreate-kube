@@ -54,7 +54,6 @@ class KubeCli(krypt.KryptCli):
     def _tune_konfig(self):
         super()._tune_konfig()
 
-
     def default_command(self):
         files(self)
 
@@ -92,7 +91,10 @@ def diff(cli: KubeCli) -> None:
 def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
     app = kreate_files(cli)
-    cmd = f"kustomize build {app.konfig.target_dir} " "| kubectl apply --dry-run -f - "
+    cmd = (
+        f"kustomize build {app.konfig.target_dir} "
+        "| kubectl apply --dry-run -f - "
+    )
     logger.info(f"running: {cmd}")
     os.system(cmd)
 

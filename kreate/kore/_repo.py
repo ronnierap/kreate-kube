@@ -10,6 +10,7 @@ import shutil
 import logging
 import importlib
 from pathlib import Path
+
 # from ..krypt import KryptKonfig, krypt_functions
 
 logger = logging.getLogger(__name__)
@@ -87,7 +88,9 @@ class FileGetter:
             repo_dir = self.download_repo(repo_name)
         if not repo_dir.is_dir():
             # add other assertions, or better error message?
-            raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
+            raise FileExistsError(
+                f"repo dir {repo_dir} exists, but is not a directory"
+            )
         return repo_dir
 
     def local_dir_repo(self, repo_konf: Mapping):
