@@ -233,14 +233,14 @@ def clear_repo_cache(cli: KoreCli):
 
 def view_strukture(cli: KoreCli):
     """view the application strukture"""
-    konfig: Konfig = cli.konfig()
-    pprint_map(konfig.calc_strukture(), field=cli.args.komp)
+    app: App = cli.kreate_app()
+    pprint_map(app.strukture, field=cli.args.komp)
 
 
 def view_defaults(cli: KoreCli):
     """view the application strukture defaults"""
-    konfig: Konfig = cli.konfig()
-    pprint_map(konfig.calc_strukture().default, field=cli.args.komp)
+    app: App = cli.kreate_app()
+    pprint_map(app.strukture.default, field=cli.args.komp)
 
 
 def view_template(cli: KoreCli):
