@@ -1,0 +1,5 @@
+Egress:
+  db:
+    #name: demo-egress-to-db
+    cidr_list: {{ val.db.cidr }}
+    port_list: 1521

@@ -1,0 +1,3 @@
+Egress:
+  redis:
+    port_list: 6379

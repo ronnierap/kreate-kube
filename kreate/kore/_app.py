@@ -1,8 +1,10 @@
 import os
 import logging
+from typing import List, Set
 
-from ._core import wrap
+from ._core import wrap, deep_update
 from ._konfig import Konfig
+from ._jinyaml import render_jinyaml
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +17,33 @@ class App:
         self.komponents = []
         self._kinds = {}
         self.aliases = {}
-        self.strukture = wrap(konfig.calc_strukture())
+        self._strukt_dict = konfig.load_konfig_strukture_files()
+        self.load_all_use_items()
+        self.strukture = wrap(self._strukt_dict)
+
+    def load_all_use_items(self):
+        logger.debug("loading use files")
+        already_loaded = set()
+        to_load = self._strukt_dict.get("use", [])
+        # keep loading until all is done
+        while self.load_use_items(to_load, already_loaded) > 0:
+            # possible new use items are added
+            to_load = self._strukt_dict.get("use", [])
+
+    def load_use_items(self, to_load: List[str], already_loaded: Set[str]) -> int:
+        count = 0
+        for fname in to_load:
+            if fname in already_loaded:
+                continue
+            count += 1
+            already_loaded.add(fname)
+            logger.info(f"using {fname}")
+            data = self.konfig.load_data(fname)
+            val_yaml = render_jinyaml(data, self.konfig.yaml)
+            if val_yaml:  # it can be empty
+                deep_update(self._strukt_dict, val_yaml)
+        logger.debug(f"loaded {count} new use files")
+        return count
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
         naming = self.konfig.yaml.get("system", {}).get("naming", {})

@@ -7,9 +7,9 @@ from jinja2 import filters
 from pathlib import Path
 from typing import List, Set
 
-from ._core import deep_update, wrap
+from ._core import deep_update
 from ._repo import FileGetter
-from ._jinyaml import render_jinyaml, FileLocation
+from ._jinyaml import render_jinyaml
 
 
 logger = logging.getLogger(__name__)
@@ -102,7 +102,7 @@ class Konfig:
         logger.debug(f"inkluded {count} new files")
         return count
 
-    def _load_strukture_files(self):
+    def load_konfig_strukture_files(self):
         logger.debug("loading strukture files")
         result = {}
         files = self._default_strukture_files
@@ -115,12 +115,6 @@ class Konfig:
         logger.info(f"loading strukt file {filename}")
         data = self.file_getter.get_data(filename, self.dir)
         return render_jinyaml(data, self.yaml)  # TODO: dir=self.dir
-
-    def calc_strukture(self):
-        if not self._strukt_cache:
-            result = self._load_strukture_files()
-            self._strukt_cache = wrap(result)
-        return self._strukt_cache
 
     def get_requires(self):
         reqs = []

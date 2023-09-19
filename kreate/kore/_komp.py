@@ -185,8 +185,6 @@ class JinjaKomponent(Komponent):
         vars = self._template_vars()
         content = self.app.konfig.load_data(self.template.filename)
         self.data = render_jinja(content, vars)
-        # self.data = load_jinja_data(self.template, vars)
-        #self.invoke_options()
 
     def kreate_file(self) -> None:
         filename = self.filename
@@ -205,10 +203,6 @@ class JinjaKomponent(Komponent):
             "default": self.strukture.default,
             "app": self.app,
             "my": self,
-            # "val": self.app.konfig.yaml.get("val", {}),
-            # "var": self.app.konfig.yaml.get("var", {}),
-            # "secret": self.app.konfig.yaml.get("secret", {}),
-            # "function": self.app.konfig.functions,
         }
 
 
@@ -219,8 +213,6 @@ class JinYamlKomponent(JinjaKomponent):
         self.invoke_options()
         self.add_additions()
         self.remove_deletions()
-
-
 
     def kreate_file(self) -> None:
         filename = self.filename
