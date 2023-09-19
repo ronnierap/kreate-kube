@@ -1,6 +1,5 @@
-import os
-import shutil
 import logging
+from typing import List
 from ..kore import JinjaApp, Konfig
 from ..krypt import KryptKonfig, krypt_functions
 from ..kore import _jinyaml
@@ -15,6 +14,12 @@ class KubeApp(JinjaApp):
         self.namespace = konfig.yaml["val"].get(
             "namespace", f"{self.appname}-{self.env}"
         )
+
+
+    def default_strukture_files(self) -> List[str]:
+        result = super().default_strukture_files()
+        result.append("py:kreate.kube.other_templates:kube-defaults.yaml")
+        return result
 
     def register_std_templates(self) -> None:
         super().register_std_templates()

@@ -41,8 +41,6 @@ class Konfig:
             filename += "/konfig.yaml"
         self.dir = os.path.dirname(filename) or "."
         self.filename = filename
-        self._strukt_cache = None
-        self._default_strukture_files = []
         self.dekrypt_func = None
         self._add_jinja_filter("b64encode", b64encode)
         self.file_getter = FileGetter(self)
@@ -68,7 +66,7 @@ class Konfig:
     def _add_jinja_filter(self, name, func):
         filters.FILTERS[name] = func
 
-    def load_data(self, fname: str) -> str:
+    def load_repo_file(self, fname: str) -> str:
         return self.file_getter.get_data(fname, dir=self.dir)
 
     def load(self):
@@ -95,26 +93,12 @@ class Konfig:
                 already_inkluded.add(fname)
                 logger.info(f"inkluding {fname}")
                 # TODO: use dirname
-                data = self.load_data(fname)
+                data = self.load_repo_file(fname)
                 val_yaml = render_jinyaml(data, self._jinja_context())
                 if val_yaml:  # it can be empty
                     deep_update(self.yaml, val_yaml)
         logger.debug(f"inkluded {count} new files")
         return count
-
-    def load_konfig_strukture_files(self):
-        logger.debug("loading strukture files")
-        result = {}
-        files = self._default_strukture_files
-        files.extend(self.yaml.get("strukture", []))
-        for fname in files:
-            deep_update(result, self._load_strukture_file(fname))
-        return result
-
-    def _load_strukture_file(self, filename):
-        logger.info(f"loading strukt file {filename}")
-        data = self.file_getter.get_data(filename, self.dir)
-        return render_jinyaml(data, self.yaml)  # TODO: dir=self.dir
 
     def get_requires(self):
         reqs = []

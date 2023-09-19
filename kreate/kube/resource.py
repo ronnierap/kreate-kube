@@ -117,7 +117,7 @@ class ConfigMap(Resource):
 
     def file_data(self, filename: str) -> str:
         location: str = self.app.konfig.yaml["file"][filename]
-        return self.app.konfig.file_getter.get_data(location)
+        return self.app.konfig.load_repo_file(location)
 
 
 # TODO: maybe inherict from ConfigMap
@@ -129,7 +129,7 @@ class Secret(Resource):
 
     def file_data(self, filename: str) -> str:
         location: str = self.app.konfig.yaml["file"][filename]
-        return self.app.konfig.file_getter.get_data(location)
+        return self.app.konfig.load_repo_file(location)
 
     @property
     def dirname(self):

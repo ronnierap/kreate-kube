@@ -16,9 +16,27 @@ class App:
         self.konfig = konfig
         self.komponents = []
         self._kinds = {}
-        self._strukt_dict = konfig.load_konfig_strukture_files()
+        self._strukt_dict = self.load_konfig_strukture_files()
         self.load_all_use_items()
         self.strukture = wrap(self._strukt_dict)
+
+    def default_strukture_files(self) -> List[str]:
+        return []
+
+    def load_konfig_strukture_files(self):
+        logger.debug("loading strukture files")
+        result = {}
+        files = self.default_strukture_files()
+        files.extend(self.konfig.yaml.get("strukture", []))
+        for fname in files:
+            deep_update(result, self._load_strukture_file(fname))
+        return result
+
+    def _load_strukture_file(self, filename):
+        logger.info(f"loading strukt file {filename}")
+        data = self.konfig.load_repo_file(filename)
+        return render_jinyaml(data, self.konfig.yaml)  # TODO: dir=self.dir
+
 
     def load_all_use_items(self):
         logger.debug("loading use files")
@@ -37,7 +55,7 @@ class App:
             count += 1
             already_loaded.add(fname)
             logger.info(f"using {fname}")
-            data = self.konfig.load_data(fname)
+            data = self.konfig.load_repo_file(fname)
             val_yaml = render_jinyaml(data, self.konfig.yaml)
             if val_yaml:  # it can be empty
                 deep_update(self._strukt_dict, val_yaml)

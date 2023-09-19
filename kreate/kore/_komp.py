@@ -183,7 +183,7 @@ class JinjaKomponent(Komponent):
 
     def aktivate(self):
         vars = self._template_vars()
-        content = self.app.konfig.load_data(self.template.filename)
+        content = self.app.konfig.load_repo_file(self.template.filename)
         self.data = render_jinja(content, vars)
 
     def kreate_file(self) -> None:

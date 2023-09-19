@@ -53,9 +53,7 @@ class KubeCli(krypt.KryptCli):
 
     def _tune_konfig(self):
         super()._tune_konfig()
-        self._konfig._default_strukture_files.append(
-            "py:kreate.kube.other_templates:kube-defaults.yaml"
-        )
+
 
     def default_command(self):
         files(self)
