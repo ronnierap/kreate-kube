@@ -18,7 +18,7 @@ class JinYaml:
     def add_jinja_filter(self, name, func):
         jinja2.filters.FILTERS[name] = func
 
-    def render_jinja(self, filename:str, vars: Mapping) -> str:
+    def render_jinja(self, filename: str, vars: Mapping) -> str:
         data = self.konfig.load_repo_file(filename)
         if isinstance(data, bytes):
             data = data.decode()
@@ -30,9 +30,8 @@ class JinYaml:
             lstrip_blocks=True,
         )
         try:
-            return  tmpl.render(vars)
+            return tmpl.render(vars)
         except:
-
             logger.error(f"Error when rendering {filename}")
             raise
 

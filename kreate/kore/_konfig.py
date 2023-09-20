@@ -11,6 +11,7 @@ from ._jinyaml import JinYaml
 
 logger = logging.getLogger(__name__)
 
+
 class Konfig:
     def __init__(self, filename: str = None):
         filename = filename or "konfig.yaml"

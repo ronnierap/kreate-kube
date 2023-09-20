@@ -39,7 +39,9 @@ class JinjaApp(App):
         logger.debug(f"registering template {kind}: {filename}")
         cls = cls or self._default_template_class()
         if cls is None:
-            raise ValueError(f"No class specified for template {kind}: {filename}")
+            raise ValueError(
+                f"No class specified for template {kind}: {filename}"
+            )
         self.kind_templates[kind] = filename
         self.kind_classes[kind] = cls
 
