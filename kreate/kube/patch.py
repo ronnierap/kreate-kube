@@ -1,6 +1,5 @@
 import logging
 
-from ..kore import FileLocation
 from ..kore import deep_update
 from ..kore import JinYamlKomponent
 from .resource import Resource, Egress
@@ -15,20 +14,9 @@ __all__ = [
 
 
 class Patch(JinYamlKomponent):
-    def __init__(
-        self,
-        target: Resource,
-        shortname: str = None,
-        kind: str = None,
-        template: FileLocation = None,
-    ):
+    def __init__(self, target: Resource, shortname: str, kind: str):
         self.target = target
-        super().__init__(
-            target.app,
-            shortname=shortname,
-            kind=kind,
-            template=template,
-        )
+        super().__init__(target.app, shortname=shortname, kind=kind)
 
     def __str__(self):
         return (

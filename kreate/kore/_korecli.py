@@ -5,8 +5,6 @@ import argparse
 import logging
 import traceback
 import inspect
-from jinja2 import TemplateError
-from sys import exc_info
 
 from ._core import pprint_map
 from ._repo import clear_cache
@@ -14,7 +12,6 @@ from ._repo import clear_cache
 from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp
-from ._jinyaml import load_data, yaml_dump
 import importlib.metadata
 
 logger = logging.getLogger(__name__)
@@ -148,15 +145,6 @@ class KoreCli:
                 traceback.print_exc()
             else:
                 print(f"{type(e).__name__}: {e}")
-                for line in traceback.format_exc().splitlines():
-                    if 'File "<template>"' in line:
-                        print(line)
-            if _jinyaml._current_jinja_file:
-                lineno = jinja2_template_error_lineno()
-                print(
-                    "while processing template "
-                    f"{_jinyaml._current_jinja_file}:{lineno}"
-                )
         finally:
             if not self.args.keep_secrets:
                 if self._konfig:
@@ -268,7 +256,9 @@ def view_template(cli: KoreCli):
                 print(inspect.cleandoc(app.kind_classes[template].__doc__))
                 print("==========================")
         if app.kind_templates[template].filename != "NoTemplate":
-            print(load_data(app.kind_templates[template]))
+            tmpl = app.kind_templates[template]
+            tmpl_text = app.konfig.file_getter.get_data(tmpl)
+            print(tmpl_text)
     else:
         for template in app.kind_templates:
             if template in app.kind_templates and template in app.kind_classes:
@@ -292,7 +282,7 @@ def view_konfig(cli: KoreCli):
     """view the application konfig file (with defaults)"""
     konfig: Konfig = cli.konfig()
     if cli.args.orig:
-        yaml_dump(konfig.yaml, sys.stdout)
+        konfig.jinyaml.dump(konfig.yaml, sys.stdout)
     else:
         pprint_map(konfig.yaml)
 
@@ -313,17 +303,3 @@ def version(cli: KoreCli):
         except importlib.metadata.PackageNotFoundError:
             version = "Unknown"
         print(f"{pckg}: {version}")
-
-
-def jinja2_template_error_lineno():
-    type, value, tb = exc_info()
-    if not issubclass(type, TemplateError):
-        return None
-    if hasattr(value, "lineno"):
-        # in case of TemplateSyntaxError
-        return value.lineno
-    while tb:
-        # print(tb.tb_frame.f_code.co_filename, tb.tb_lineno)
-        if tb.tb_frame.f_code.co_filename == "<template>":
-            return tb.tb_lineno
-        tb = tb.tb_next

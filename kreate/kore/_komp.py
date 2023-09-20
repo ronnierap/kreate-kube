@@ -4,7 +4,6 @@ import os
 from typing import Any
 
 from ._core import wrap, deep_update
-from ._jinyaml import FileLocation, yaml_dump, yaml_parse, render_jinja
 from ._app import App
 
 logger = logging.getLogger(__name__)
@@ -175,21 +174,17 @@ class Field:
 class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""
 
-    def __init__(
-        self,
-        app: App,
-        shortname: str = None,
-        kind: str = None,
-        template: FileLocation = None,
-    ):
+    def __init__(self, app: App, shortname: str = None, kind: str = None):
+        if kind is None:
+            kind = self.__class__.__name__
+        if shortname is None:
+            shortname = "main"
         super().__init__(app, shortname, kind)
-        template = template or self.app.kind_templates[self.kind]
-        self.template = template
+        self.template = self.app.kind_templates[self.kind]
 
     def aktivate(self):
         vars = self._template_vars()
-        content = self.app.konfig.load_repo_file(self.template.filename)
-        self.data = render_jinja(content, vars)
+        self.data = self.app.konfig.jinyaml.render_jinja(self.template, vars)
 
     def kreate_file(self) -> None:
         filename = self.filename
@@ -213,8 +208,8 @@ class JinjaKomponent(Komponent):
 
 class JinYamlKomponent(JinjaKomponent):
     def aktivate(self):
-        super().aktivate()
-        self.yaml = wrap(yaml_parse(self.data, self.template))
+        vars = self._template_vars()
+        self.yaml = wrap(self.app.konfig.jinyaml.render(self.template, vars))
         self.invoke_options()
         self.add_additions()
         self.remove_deletions()
@@ -228,7 +223,7 @@ class JinYamlKomponent(JinjaKomponent):
                 dir = self.app.konfig.target_dir
             os.makedirs(dir, exist_ok=True)
             with open(f"{dir}/{filename}", "wb") as f:
-                yaml_dump(self.yaml.data, f)
+                self.app.konfig.jinyaml.dump(self.yaml.data, f)
 
     def add_additions(self):
         additions = self.strukture.get("add", {})

@@ -1,7 +1,6 @@
 import os
 import logging
 from ..kore import Konfig
-from ..kore import _jinyaml
 from . import other_templates
 
 logger = logging.getLogger(__name__)
@@ -29,8 +28,8 @@ def kreate_kubeconfig(konfig: Konfig, force=False):
         "api_token": api_token,
     }
     vars = {"konfig": konfig, "my": my, "val": konfig.yaml["val"]}
-    loc = _jinyaml.FileLocation("kubeconfig.yaml", package=other_templates)
-    data = _jinyaml.load_jinja_data(loc, vars)
+    loc = "py:kreate.kube.other_templates:kubeconfig.yaml"
+    data = konfig.jinyaml.render(loc, vars)
     filename = os.getenv("KUBECONFIG")
     if not filename:
         filename = f"{konfig.target_dir}/secrets/kubeconfig"

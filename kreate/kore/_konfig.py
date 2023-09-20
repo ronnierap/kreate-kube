@@ -1,52 +1,30 @@
 import os
 import logging
-import importlib
-import base64
 import pkg_resources
-from jinja2 import filters
 from pathlib import Path
 from typing import List, Set
 
 from ._core import deep_update
 from ._repo import FileGetter
-from ._jinyaml import render_jinyaml
+from ._jinyaml import JinYaml
 
 
 logger = logging.getLogger(__name__)
-
-
-def b64encode(value: str) -> str:
-    if value:
-        if isinstance(value, bytes):
-            res = base64.b64encode(value)
-        else:
-            res = base64.b64encode(value.encode())
-        return res.decode()
-    else:
-        logger.warning("empty value to b64encode")
-        return ""
-
-
-def get_class(name: str):
-    module_name = name.rsplit(".", 1)[0]
-    class_name = name.rsplit(".", 1)[1]
-    module = importlib.import_module(module_name)
-    return getattr(module, class_name)
-
 
 class Konfig:
     def __init__(self, filename: str = None):
         filename = filename or "konfig.yaml"
         if os.path.isdir(filename):
             filename += "/konfig.yaml"
-        self.dir = os.path.dirname(filename) or "."
         self.filename = filename
         self.dekrypt_func = None
-        self._add_jinja_filter("b64encode", b64encode)
-        self.file_getter = FileGetter(self)
-        data = self.file_getter.get_data(self.filename, ".")
-        self.yaml = render_jinyaml(data, {})
-        self.load()
+        self.jinyaml = JinYaml(self)
+        self.dir = Path(os.path.dirname(filename))
+        filename = os.path.basename(filename)
+        self.file_getter = FileGetter(self, self.dir)
+        self.yaml = self.jinyaml.render(filename, {})
+        self.load_all_inkludes()
+        # TODO: move to app and only use target_path
         self.target_dir = self.yaml.get("system", {}).get(
             "target_dir", "build"
         )
@@ -65,14 +43,8 @@ class Konfig:
             result[k] = v
         return result
 
-    def _add_jinja_filter(self, name, func):
-        filters.FILTERS[name] = func
-
     def load_repo_file(self, fname: str) -> str:
-        return self.file_getter.get_data(fname, dir=self.dir)
-
-    def load(self):
-        self.load_all_inkludes()
+        return self.file_getter.get_data(fname)
 
     def load_all_inkludes(self):
         logger.debug("loading inklude files")
@@ -97,8 +69,8 @@ class Konfig:
                 already_inkluded.add(fname)
                 logger.info(f"inkluding {fname}")
                 # TODO: use dirname
-                data = self.load_repo_file(fname)
-                val_yaml = render_jinyaml(data, self._jinja_context())
+                context = self._jinja_context()
+                val_yaml = self.jinyaml.render(fname, context)
                 if val_yaml:  # it can be empty
                     deep_update(self.yaml, val_yaml)
         logger.debug(f"inkluded {count} new files")

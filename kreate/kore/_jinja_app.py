@@ -1,7 +1,6 @@
 import inspect
 import logging
 
-from ._jinyaml import FileLocation
 from ._konfig import Konfig
 from ._app import App
 
@@ -37,12 +36,11 @@ class JinjaApp(App):
         filename = filename or f"{kind}.yaml"
         if package:
             filename = f"py:{package.__name__}:{filename}"
-        loc = FileLocation(filename=filename, dir=self.konfig.dir)
-        logger.debug(f"registering template {kind}: {loc}")
+        logger.debug(f"registering template {kind}: {filename}")
         cls = cls or self._default_template_class()
         if cls is None:
-            raise ValueError(f"No class specified for template {kind}: {loc}")
-        self.kind_templates[kind] = loc
+            raise ValueError(f"No class specified for template {kind}: {filename}")
+        self.kind_templates[kind] = filename
         self.kind_classes[kind] = cls
 
     def _default_template_class(self):
@@ -64,8 +62,6 @@ class JinjaApp(App):
         cls = self.kind_classes[kind]
         templ = self.kind_templates[kind]
         if inspect.isclass(cls):
-            return cls(
-                app=self, kind=kind, shortname=shortname, template=templ
-            )
+            return cls(app=self, kind=kind, shortname=shortname)
         else:
             raise ValueError(f"Unknown template type {type(cls)}, {cls}")

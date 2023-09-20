@@ -1,26 +1,26 @@
 import logging
 import os
+import base64
 
 from ..kore import Konfig, App
-from ..kore._konfig import b64encode
-
 from . import krypt_functions
 
 logger = logging.getLogger(__name__)
 
 
 class KryptKonfig(Konfig):
-    def load(self):
+    def load_all_inkludes(self):
         # before loading further konfig, set the krypt_key
         # self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
         # Hack to disable testdummy when loading konfig inkludes....
         # TODO: how to censor such secrets?
+        # TOOD: this should be some separate init function
         tmp = krypt_functions._dekrypt_testdummy
         krypt_functions._dekrypt_testdummy = False
-        super().load()
+        super().load_all_inkludes()
         krypt_functions._dekrypt_testdummy = tmp
-        krypt_key = self.default_krypt_key()
-        krypt_functions._krypt_key = b64encode(krypt_key)
+        krypt_key = self.default_krypt_key().encode()
+        krypt_functions._krypt_key = base64.b64encode(krypt_key).decode()
 
     def dekrypt_bytes(self, b: bytes) -> bytes:
         return krypt_functions.dekrypt_bytes(b)

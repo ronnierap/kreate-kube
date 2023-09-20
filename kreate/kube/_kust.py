@@ -57,9 +57,8 @@ class KustApp(KubeApp):
         shortname: str = None,
     ) -> None:
         cls = self.kind_classes[kind]
-        templ = self.kind_templates[kind]
         if issubclass(cls, Patch):
-            cls(res, shortname, kind, template=templ)
+            cls(res, shortname, kind)
         else:
             raise TypeError(
                 f"class for {kind}.{shortname} is not a Patch but {cls}"

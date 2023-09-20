@@ -4,7 +4,6 @@ from typing import List, Set
 
 from ._core import wrap, deep_update
 from ._konfig import Konfig
-from ._jinyaml import render_jinyaml
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +44,7 @@ class App:
 
     def _load_strukture_file(self, filename):
         logger.info(f"loading strukt file {filename}")
-        data = self.konfig.load_repo_file(filename)
-        return render_jinyaml(data, self.konfig.yaml)  # TODO: dir=self.dir
+        return self.konfig.jinyaml.render(filename, self.konfig.yaml)
 
     def load_all_use_items(self):
         logger.debug("loading use files")
@@ -67,8 +65,7 @@ class App:
             count += 1
             already_loaded.add(fname)
             logger.info(f"using {fname}")
-            data = self.konfig.load_repo_file(fname)
-            val_yaml = render_jinyaml(data, self.konfig.yaml)
+            val_yaml = self.konfig.jinyaml.render(fname, self.konfig.yaml)
             if val_yaml:  # it can be empty
                 deep_update(self._strukt_dict, val_yaml)
         logger.debug(f"loaded {count} new use files")

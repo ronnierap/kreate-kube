@@ -29,11 +29,12 @@ def clear_cache():
 
 
 class FileGetter:
-    def __init__(self, konfig):
+    def __init__(self, konfig, dir: str):
         self.konfig = konfig
+        self.dir = Path(dir)
 
     # TODO: make text and bytes variants
-    def get_data(self, file: str, dir=".") -> str:
+    def get_data(self, file: str) -> str:
         dekrypt = False
         if file.startswith("dekrypt:"):
             dekrypt = True
@@ -43,9 +44,9 @@ class FileGetter:
         elif file.startswith("py:"):
             data = self.load_package_data(file[3:])
         elif file.startswith("konf:"):
-            data = self.load_file_data(file[5:], dir=self.konfig.dir)
+            data = self.load_file_data(file[5:])
         else:
-            data = self.load_file_data(file, dir=dir)
+            data = self.load_file_data(file)
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
@@ -59,10 +60,10 @@ class FileGetter:
             data = data.decode()
         target.write_text(data)
 
-    def load_file_data(self, filename: str, dir: str) -> str:
+    def load_file_data(self, filename: str) -> str:
         logger.debug(f"loading file {filename} ")
-        p = Path(dir, filename)
-        return p.read_text()
+        path = self.dir / filename
+        return path.read_text()
 
     def load_package_data(self, filename: str) -> str:
         package_name = filename.split(":")[0]
