@@ -45,6 +45,12 @@ class FileGetter:
             data = self.load_package_data(file[3:])
         elif file.startswith("konf:"):
             data = self.load_file_data(file[5:])
+        elif file.startswith("./"):
+            data = self.load_file_data(file)
+        elif file.startswith("../"):
+            data = self.load_file_data(file)
+        elif re.match("\w\w+:", file):
+            data = self.load_repo_data(file)
         else:
             data = self.load_file_data(file)
         if dekrypt:
