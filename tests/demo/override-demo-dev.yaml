@@ -1,6 +1,6 @@
-
-Egress:
-  redis:
-    ignore: True  # redis is local in dev environment
-  xyz:
-    ignore: True
+strukt:
+  Egress:
+    redis:
+      ignore: True  # redis is local in dev environment
+    xyz:
+      ignore: True

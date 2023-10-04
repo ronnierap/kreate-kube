@@ -21,7 +21,8 @@ class Komponent:
         self.app = app
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
-        self.strukture = wrap(self._calc_strukture())
+        self.strukture = wrap(self._find_strukture())
+        self.defaults = self._calc_defaults()
         self.skip = self.strukture.get("ignore", False)
         self.field = Field(self)
         name = (
@@ -50,25 +51,24 @@ class Komponent:
             return f"{self.app.appname}-{self.kind}"
         return f"{self.app.appname}-{self.kind}-{self.shortname}"
 
-    def _calc_strukture(self):
-        strukt = {}
-        deep_update(strukt, {"default": self._find_generic_defaults()})
-        deep_update(strukt, {"default": self._find_defaults()})
-        deep_update(strukt, self._find_strukture())
-        return strukt
+    def _calc_defaults(self):
+        defaults = {}
+        deep_update(defaults, self._find_generic_defaults())
+        deep_update(defaults, self._find_defaults())
+        return defaults
 
     def _find_defaults(self):
-        strukt = self.app.strukture if self.app else {}
-        if self.kind in strukt.get("default", {}):
+        konfig = self.app.konfig if self.app else {}
+        if self.kind in konfig.get("default", {}):
             logger.debug(f"using defaults for {self.kind}")
-            return self.app.strukture.default[self.kind]
+            return konfig.get("default")[self.kind]
         return {}
 
     def _find_generic_defaults(self):
-        strukt = self.app.strukture if self.app else {}
-        if "generic" in strukt.get("default", {}):
+        konfig = self.app.konfig if self.app else {}
+        if "generic" in konfig.get("default", {}):
             logger.debug("using generic defaults")
-            return self.app.strukture.default["generic"]
+            return konfig.get("default")["generic"]
         return {}
 
     def _find_strukture(self):
@@ -144,10 +144,8 @@ class Komponent:
             return self.app.konfig.yaml["val"][self.shortname][fieldname]
         if fieldname in self.app.konfig.yaml["val"]:
             return self.app.konfig.yaml["val"][fieldname]
-        if fieldname in self.strukture.get("default", {}):
-            return self.strukture["default"][fieldname]
-        if fieldname in self.strukture.get("default", {}).get("generic", {}):
-            return self.strukture["default"]["generic"][fieldname]
+        if fieldname in self.defaults:
+            return self.defaults[fieldname]
         if default is not None:
             return default
         raise ValueError(f"Unknown field {fieldname} in {self}")
@@ -200,7 +198,7 @@ class JinjaKomponent(Komponent):
     def _template_vars(self):
         return {
             "strukt": self.strukture,
-            "default": self.strukture.default,
+            "default": self.defaults,
             "app": self.app,
             "my": self,
         }

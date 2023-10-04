@@ -3,14 +3,20 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+_konfig  = None
 _krypt_key = None
 _dekrypt_testdummy = False
 
 
 def _get_key():
+    global _krypt_key
     if not _krypt_key:
-        raise ValueError("_krypt_key is empty")
+        global _konfig
+        if not _konfig:
+            raise ValueError("No konfig tosearch for _krypt_key")
+        _krypt_key = _konfig.get_krypt_key()
+        if not _krypt_key:
+            raise ValueError("_krypt_key is empty")
     return Fernet(_krypt_key)
 
 

@@ -27,50 +27,7 @@ class App:
         self.konfig = konfig
         self.komponents = []
         self._kinds = {}
-        self._strukt_dict = self.load_konfig_strukture_files()
-        self.load_all_use_items()
-        self.strukture = wrap(self._strukt_dict)
-
-    def default_strukture_files(self) -> List[str]:
-        return []
-
-    def load_konfig_strukture_files(self):
-        logger.debug("loading strukture files")
-        result = {}
-        files = self.default_strukture_files()
-        files.extend(self.konfig.yaml.get("strukture", []))
-        for fname in files:
-            deep_update(result, self._load_strukture_file(fname))
-        return result
-
-    def _load_strukture_file(self, filename):
-        logger.info(f"loading strukt file {filename}")
-        return self.konfig.jinyaml.render(filename, self.konfig.yaml)
-
-    def load_all_use_items(self):
-        logger.debug("loading use files")
-        already_loaded = set()
-        to_load = self._strukt_dict.get("use", [])
-        # keep loading until all is done
-        while self.load_use_items(to_load, already_loaded) > 0:
-            # possible new use items are added
-            to_load = self._strukt_dict.get("use", [])
-
-    def load_use_items(
-        self, to_load: List[str], already_loaded: Set[str]
-    ) -> int:
-        count = 0
-        for fname in to_load:
-            if fname in already_loaded:
-                continue
-            count += 1
-            already_loaded.add(fname)
-            logger.info(f"using {fname}")
-            val_yaml = self.konfig.jinyaml.render(fname, self.konfig.yaml)
-            if val_yaml:  # it can be empty
-                deep_update(self._strukt_dict, val_yaml)
-        logger.debug(f"loaded {count} new use files")
-        return count
+        self.strukture = wrap(konfig.yaml.get("strukt"))
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
         naming = self.konfig.yaml.get("system", {}).get("naming", {})

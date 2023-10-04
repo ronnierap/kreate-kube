@@ -9,21 +9,16 @@ logger = logging.getLogger(__name__)
 
 
 class KryptKonfig(Konfig):
-    def load_all_inkludes(self):
-        # before loading further konfig, set the krypt_key
-        # self.functions.update({"dekrypt": krypt_functions.dekrypt_str})
-        # Hack to disable testdummy when loading konfig inkludes....
-        # TODO: how to censor such secrets?
-        # TOOD: this should be some separate init function
-        tmp = krypt_functions._dekrypt_testdummy
-        krypt_functions._dekrypt_testdummy = False
-        super().load_all_inkludes()
-        krypt_functions._dekrypt_testdummy = tmp
-        krypt_key = self.default_krypt_key().encode()
-        krypt_functions._krypt_key = base64.b64encode(krypt_key).decode()
+    def __init__(self, filename: str = None):
+        krypt_functions._konfig = self
+        super().__init__(filename=filename)
 
     def dekrypt_bytes(self, b: bytes) -> bytes:
         return krypt_functions.dekrypt_bytes(b)
+
+    def get_krypt_key(self):
+        krypt_key = self.default_krypt_key().encode()
+        return base64.b64encode(krypt_key).decode()
 
     def default_krypt_key(self):
         env_varname = self.default_krypt_key_env_var()

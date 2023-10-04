@@ -1,14 +1,12 @@
 inklude:
+- py:kreate.kube.other_templates:kube-defaults.yaml
 - repo:shared_github:shared-values.konf
 - repo:shared_local:shared-local.konf
 - shared-values.yaml
 - values-{{appname}}-{{env}}.yaml
 - secrets-{{appname}}-{{env}}.yaml
-#TODO: enkrypted konfig is not supported. Too many issues
-#- dekrypt:shared-secret.konf.encrypted
-strukture:
-  - {{appname}}-strukture.yaml
-  - override-{{appname}}-{{env}}.yaml
+- {{appname}}-strukture.yaml
+- override-{{appname}}-{{env}}.yaml
 
 system:
   templates:

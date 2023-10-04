@@ -5,163 +5,164 @@ default:
   generic:
     imagePullPolicy: Always
 
-CronJob:
-  main:
-    vars:
-    - demo-vars
-    secret-vars:
-    - demo-secrets
-    command: "echo Starting; do-some-job; echo done"
-    schedule: 0 2 * * ?
+strukt:
+  CronJob:
+    main:
+      vars:
+      - demo-vars
+      secret-vars:
+      - demo-secrets
+      command: "echo Starting; do-some-job; echo done"
+      schedule: 0 2 * * ?
 
-Deployment:
-  main:
-    vars:
-    - demo-vars
-    secret-vars:
-    - demo-secrets
-    volumes:
-    - demo-files:
-        files:
-        - /home/spring/application.properties
-        - /home/spring/logback.xml
-    - demo-secret-files:
-        type: secret
-        files:
-        - /home/spring/credential.properties
-    pod:
-      annotations:
-        some-demo-annotation: just-for-fun
-    patches:
-      AntiAffinity: {}
-      HttpProbes:
-        main:
-          startupProbe:
-            failureThreshold: 120
-      ElasticLogging: {}
-      EgressLabels: {}
-      KubernetesAnnotations: {}
-      VolumeMounts:
+  Deployment:
+    main:
+      vars:
+      - demo-vars
+      secret-vars:
+      - demo-secrets
+      volumes:
+      - demo-files:
+          files:
+          - /home/spring/application.properties
+          - /home/spring/logback.xml
+      - demo-secret-files:
+          type: secret
+          files:
+          - /home/spring/credential.properties
+      pod:
+        annotations:
+          some-demo-annotation: just-for-fun
+      patches:
+        AntiAffinity: {}
+        HttpProbes:
+          main:
+            startupProbe:
+              failureThreshold: 120
+        ElasticLogging: {}
+        EgressLabels: {}
+        KubernetesAnnotations: {}
+        VolumeMounts:
+          demo-files:
+            files:
+              - /home/spring/application.properties
+              - /home/spring/logback.xml
+          demo-extra-files:
+            files:
+              - /home/spring/environment.properties
+          demo-secret-files:
+            secret: True
+            files:
+              - /home/spring/credential.properties
+
+  StatefulSet:
+    main:
+      add:
+        spec.template:
+          serviceName: jantje
+          klaas: pietje
+        some.long.and.very.long.strange.dummy: value
+      remove:
+        - spec.template.spec.containers.imagePullPolicy
+        #- spec.template.metadata.annotations.co_dot_elastic_dot_logs/exclude_lines
+        - some.long.and # remove the strange long thingy
+      patches:
+        ElasticLogging: {}
+        KubernetesAnnotations: {}
+
+  use:
+  - shared/redis.yaml
+  - shared/db.yaml
+
+  Egress:
+    redis:
+      port_list: 6379
+    db:
+      #name: demo-egress-to-db
+      cidr_list: {{ val.db.cidr }}
+      port_list: 1521
+    xyz:
+      cidr_list: {{ val.xyz.cidr_list }}
+      port_list: {{ val.xyz.port_list | default(8443) }}
+
+  HorizontalPodAutoscaler: {}
+
+  Ingress:
+    root:
+      host: {{ val.ingress_host_internal}}
+      path: /
+      options:
+        - sticky
+        - basic_auth
+        - read_timeout: 100
+        - whitelist: {{ val.root_whitelist }}
+      labels:
+        dummy: jan
+    api:
+      host: {{ val.ingress_host_internal}}
+      path: /api
+
+
+  Kustomization:
+    main:
+      configmaps:
+        demo-vars:
+          vars:
+            ENV: {{ env }}
+            ORACLE_URL: {}
+            ORACLE_USR: {}
+            ORACLE_SCHEMA: {{ var.ORACLE_SCHEMA }}
         demo-files:
           files:
-            - /home/spring/application.properties
-            - /home/spring/logback.xml
+            - application.properties
+            - some-file-from-package
         demo-extra-files:
           files:
-            - /home/spring/environment.properties
-        demo-secret-files:
-          secret: True
+            - environment.properties
+      secrets:
+        demo-secrets-from-kustomize:
+          vars:
+            DB_USR: {{ secret.DB_USR }}
+            DB_PSW: {{ secret.DB_PSW | dekrypt }}
+        demo-secret-files-from-kustomize:
           files:
-            - /home/spring/credential.properties
+            - credential.properties
 
-StatefulSet:
-  main:
-    add:
-      spec.template:
-        serviceName: jantje
-        klaas: pietje
-      some.long.and.very.long.strange.dummy: value
-    remove:
-      - spec.template.spec.containers.imagePullPolicy
-      #- spec.template.metadata.annotations.co_dot_elastic_dot_logs/exclude_lines
-      - some.long.and # remove the strange long thingy
-    patches:
-      ElasticLogging: {}
-      KubernetesAnnotations: {}
+  MyUdpService:
+    main:
+      name: demo-udp-service
 
-use:
-- shared/redis.yaml
-- shared/db.yaml
+  PodDisruptionBudget:
+    main:
+      name: demo-pdb
+      labels:
+        testje: test
 
-Egress:
-  redis:
-    port_list: 6379
-  db:
-    #name: demo-egress-to-db
-    cidr_list: {{ val.db.cidr }}
-    port_list: 1521
-  xyz:
-    cidr_list: {{ val.xyz.cidr_list }}
-    port_list: {{ val.xyz.port_list | default(8443) }}
+  Secret:
+    main:
+      vars:
+        DB_USR: {{ secret.DB_USR }}
+        DB_PSW: {{ secret.DB_PSW | dekrypt }}
+    secret-files:
+      files:
+      - credential.properties
 
-HorizontalPodAutoscaler: {}
+  Service:
+    main:
+      options:
+        - headless
+    https:
+      ports:
+        - port: 443
+          targetPort: 443
+          name: https
 
-Ingress:
-  root:
-    host: {{ val.ingress_host_internal}}
-    path: /
-    options:
-      - sticky
-      - basic_auth
-      - read_timeout: 100
-      - whitelist: {{ val.root_whitelist }}
-    labels:
-      dummy: jan
-  api:
-    host: {{ val.ingress_host_internal}}
-    path: /api
+  ServiceAccount:
+    main:
+      role: {{ val.serviceaccount_role }}
 
-
-Kustomization:
-  main:
-    configmaps:
-      demo-vars:
-        vars:
-          ENV: {{ env }}
-          ORACLE_URL: {}
-          ORACLE_USR: {}
-          ORACLE_SCHEMA: {{ var.ORACLE_SCHEMA }}
-      demo-files:
-        files:
-          - application.properties
-          - some-file-from-package
-      demo-extra-files:
-        files:
-          - environment.properties
-    secrets:
-      demo-secrets-from-kustomize:
-        vars:
-          DB_USR: {{ secret.DB_USR }}
-          DB_PSW: {{ secret.DB_PSW | dekrypt }}
-      demo-secret-files-from-kustomize:
-        files:
-          - credential.properties
-
-MyUdpService:
-  main:
-    name: demo-udp-service
-
-PodDisruptionBudget:
-  main:
-    name: demo-pdb
-    labels:
-      testje: test
-
-Secret:
-  main:
-    vars:
-      DB_USR: {{ secret.DB_USR }}
-      DB_PSW: {{ secret.DB_PSW | dekrypt }}
-  secret-files:
-    files:
-    - credential.properties
-
-Service:
-  main:
-    options:
-      - headless
-  https:
-    ports:
-      - port: 443
-        targetPort: 443
-        name: https
-
-ServiceAccount:
-  main:
-    role: {{ val.serviceaccount_role }}
-
-ServiceMonitor:
-  main:
-    endpoints:
-      - interval: 20s
-        path: /actuator/prometheus
+  ServiceMonitor:
+    main:
+      endpoints:
+        - interval: 20s
+          path: /actuator/prometheus

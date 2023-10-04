@@ -32,6 +32,8 @@ class Konfig:
         self.target_path = Path(self.target_dir)
 
     def __getattr__(self, attr):
+        if attr == "get":
+            return self.yaml.get
         if attr not in self.yaml:
             raise AttributeError(f"could not find attribute {attr} in {self}")
         else:
