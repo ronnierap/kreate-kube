@@ -4,7 +4,7 @@ import pkg_resources
 from pathlib import Path
 from typing import List, Set
 
-from ._core import deep_update
+from ._core import deep_update, wrap
 from ._repo import FileGetter
 from ._jinyaml import JinYaml
 
@@ -23,7 +23,7 @@ class Konfig:
         self.dir = Path(os.path.dirname(filename))
         filename = os.path.basename(filename)
         self.file_getter = FileGetter(self, self.dir)
-        self.yaml = self.jinyaml.render(filename, {})
+        self.yaml = wrap(self.jinyaml.render(filename, {}))
         self.load_all_inkludes()
         # TODO: move to app and only use target_path
         self.target_dir = self.yaml.get("system", {}).get(
