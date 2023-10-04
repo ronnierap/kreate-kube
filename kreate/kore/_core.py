@@ -5,13 +5,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def deep_update(target: Mapping, other: Mapping) -> None:
+def deep_update(target: Mapping, other: Mapping, overwrite=True) -> None:
     for k, v in other.items():
         if isinstance(v, Mapping):
             if k not in target:
                 target[k] = dict(v)  # use a copy
             elif isinstance(target[k], Mapping):
-                deep_update(target[k], v)
+                deep_update(target[k], v, overwrite=overwrite)
             else:
                 raise ValueError(
                     f"trying to merge key {k} map {v} into non-map {target[k]}"
@@ -28,7 +28,8 @@ def deep_update(target: Mapping, other: Mapping) -> None:
                     f" into non-sequence {target[k]}"
                 )
         else:
-            target[k] = v
+            if overwrite or k not in target:
+                target[k] = v
 
 
 class DictWrapper(UserDict):
