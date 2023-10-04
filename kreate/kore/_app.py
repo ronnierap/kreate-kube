@@ -22,8 +22,8 @@ class App:
     """
 
     def __init__(self, konfig: Konfig):
-        self.appname = konfig.yaml["appname"]
-        self.env = konfig.env
+        self.appname = konfig.get_path("app.appname")
+        self.env = konfig.get_path("app.env")
         self.konfig = konfig
         self.komponents = []
         self._kinds = {}

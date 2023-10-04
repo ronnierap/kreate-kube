@@ -199,6 +199,7 @@ class JinjaKomponent(Komponent):
         return {
             "strukt": self.strukture,
             "default": self.defaults,
+            "konf": self.app.konfig,
             "app": self.app,
             "my": self,
         }

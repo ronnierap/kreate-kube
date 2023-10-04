@@ -31,6 +31,9 @@ class Konfig:
         )
         self.target_path = Path(self.target_dir)
 
+    #def __iter__(self):
+    #    return iter(self.yaml.keys())
+
     def __getattr__(self, attr):
         if attr == "get":
             return self.yaml.get
@@ -39,8 +42,11 @@ class Konfig:
         else:
             return self.yaml[attr]
 
+    def get_path(self, path: str, default=None):
+        return self.yaml._get_path(path, default=default)
+
     def _jinja_context(self):
-        result = {"konf": self, "appname": self.appname, "env": self.env}
+        result = {} #"konf": self, "appname": self.appname, "env": self.env}
         for k in self.yaml.keys():
             v = self.yaml[k]
             result[k] = v

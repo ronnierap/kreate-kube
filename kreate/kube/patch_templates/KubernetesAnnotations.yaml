@@ -9,7 +9,7 @@ spec:
     metadata:
       annotations:
         app.kubernetes.io/name: {{ my.target.name }}
-        app.kubernetes.io/version: "{{ my.field.image_version }}"
+        app.kubernetes.io/version: "{{ konf.app.image_version }}"
         app.kubernetes.io/component: {{ my.field.component }}
         app.kubernetes.io/part-of: {{ my.field.project }}
         app.kubernetes.io/managed-by: {{ my.field.managed_by }}

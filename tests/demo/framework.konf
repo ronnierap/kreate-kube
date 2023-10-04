@@ -3,10 +3,10 @@ inklude:
 - repo:shared_github:shared-values.konf
 - repo:shared_local:shared-local.konf
 - shared-values.yaml
-- values-{{appname}}-{{env}}.yaml
-- secrets-{{appname}}-{{env}}.yaml
-- {{appname}}-strukture.yaml
-- override-{{appname}}-{{env}}.yaml
+- values-{{app.appname}}-{{app.env}}.yaml
+- secrets-{{app.appname}}-{{app.env}}.yaml
+- {{app.appname}}-strukture.yaml
+- override-{{app.appname}}-{{app.env}}.yaml
 
 system:
   templates:

@@ -31,7 +31,7 @@ spec:
 
       containers:
       - name: {{ my.field.container_name }}
-        image: {{ my.field.image_repo }}/{{ my.field.image_name }}:{{ my.field.image_version }}
+        image: {{ my.field.image_repo }}/{{ my.field.image_name }}:{{ konf.app.image_version }}
         {{ my.optional("imagePullPolicy") }}
         envFrom:
         - secretRef:

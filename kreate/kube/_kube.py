@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class KubeApp(JinjaApp):
     def __init__(self, konfig: Konfig):
         super().__init__(konfig)
-        self.namespace = konfig.yaml["val"].get(
+        self.namespace = konfig.yaml["app"].get(
             "namespace", f"{self.appname}-{self.env}"
         )
 

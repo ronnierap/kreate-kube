@@ -15,7 +15,7 @@ spec:
           labels: {}
           annotations:
             app.kubernetes.io/name: {{ my.name }}
-            app.kubernetes.io/version: "{{ my.field.image_version }}"
+            app.kubernetes.io/version: "{{ konf.app.image_version }}"
             app.kubernetes.io/component: cronjob
             app.kubernetes.io/part-of: {{ my.field.project }}
             app.kubernetes.io/managed-by: kustomize
@@ -26,7 +26,7 @@ spec:
           containers:
       containers:
           - name: {{ my.field.container_name }}
-            image: {{ my.field.image_repo }}/{{ my.field.image_name }}:{{ my.field.image_version }}
+            image: {{ my.field.image_repo }}/{{ my.field.image_name }}:{{ konf.app.image_version }}
             imagePullPolicy: {{ my.field.imagePullPolicy }}
             resources:
               limits:
