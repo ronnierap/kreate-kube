@@ -75,26 +75,13 @@ class KoreCli:
 
         # subcommand: version
         self.add_subcommand(version, [], aliases=["vr"])
-        # subcommand: view_strukture
-        cmd = self.add_subcommand(view_strukture, [], aliases=["vs"])
+        # subcommand: view
+        cmd = self.add_subcommand(view, [], aliases=["v"])
+        cmd.add_argument("key", help="key(s) to show", action="store", nargs="*")
         cmd.add_argument(
-            "-k",
-            "--komp",
-            help="komponent to show",
-            action="store",
-            default=None,
+            "-o", "--orig", action="store_true", help="view in original format"
         )
-        # subcommand: view defaults
-        cmd = self.add_subcommand(view_defaults, [], aliases=["vd"])
-        cmd.add_argument(
-            "-k",
-            "--komp",
-            help="komponent to show",
-            action="store",
-            default=None,
-        )
-        # subcommand: view_values
-        cmd = self.add_subcommand(view_values, [], aliases=["vv"])
+
         # subcommand: view_template
         cmd = self.add_subcommand(view_template, [], aliases=["vt"])
         cmd.add_argument(
@@ -103,12 +90,6 @@ class KoreCli:
             help="template to show",
             action="store",
             default=None,
-        )
-        # subcommand: view_konfig
-        cmd = self.add_subcommand(view_konfig, [], aliases=["vk"])
-        cmd.add_argument("-k", "--kind", action="store", default=None)
-        cmd.add_argument(
-            "-o", "--orig", action="store_true", help="view in original format"
         )
         # subcommand: requirements
         cmd = self.add_subcommand(requirements, [], aliases=["rq"])
@@ -219,18 +200,6 @@ def clear_repo_cache(cli: KoreCli):
     clear_cache()
 
 
-def view_strukture(cli: KoreCli):
-    """view the application strukture"""
-    app: App = cli.kreate_app()
-    pprint_map(app.strukture, field=cli.args.komp)
-
-
-def view_defaults(cli: KoreCli):
-    """view the application strukture defaults"""
-    app: App = cli.kreate_app()
-    pprint_map(app.strukture.default, field=cli.args.komp)
-
-
 def view_template(cli: KoreCli):
     """view the template for a specific kind"""
     # we call the kreate_app method and not the convenience app()
@@ -270,21 +239,23 @@ def view_template(cli: KoreCli):
             else:
                 logger.debug("skipping kind")
 
-
-def view_values(cli: KoreCli):
-    """view the application values"""
+def view(cli: KoreCli):
+    """view the entire konfig or subkey(s)"""
     konfig: Konfig = cli.konfig()
-    for k, v in konfig.yaml["val"].items():
-        print(f"{k}: {v}")
-
-
-def view_konfig(cli: KoreCli):
-    """view the application konfig file (with defaults)"""
-    konfig: Konfig = cli.konfig()
-    if cli.args.orig:
-        konfig.jinyaml.dump(konfig.yaml, sys.stdout)
+    if cli.args.key:
+        for k in cli.args.key:
+            result = konfig.yaml._get_path(k)
+            if isinstance(result, str):
+                print(f"{k} = {result}")
+            else:
+                print(k+":")
+                pprint_map(result, indent="  ")
     else:
-        pprint_map(konfig.yaml)
+        # TODO: how would orig work fir subkey
+        if cli.args.orig:
+            konfig.jinyaml.dump(konfig.yaml, sys.stdout)
+        else:
+            pprint_map(konfig.yaml)
 
 
 def requirements(cli: KoreCli):
