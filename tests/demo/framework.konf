@@ -10,10 +10,16 @@ inklude:
 
 system:
   templates:
-    MyUdpService: ./templates/MyUdpService.yaml
-    Service: ./templates/MyUdpService.yaml   # Override existing Service template
-  patch_templates:
-    ElasticLogging: ./templates/ElasticLogging.yaml
+    MyUdpService:
+      class: kreate.kube.resource.Resource
+      template: ./templates/MyUdpService.yaml
+    # Override existing Service template
+    Service:
+      class: kreate.kube.resource.Service
+      template: ./templates/MyUdpService.yaml
+    ElasticLogging:
+      class: kreate.kube.patch.Patch
+      template: ./templates/ElasticLogging.yaml
   repo:
     shared_local:
       path: tests/shared-local.zip

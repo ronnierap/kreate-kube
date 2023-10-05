@@ -6,6 +6,13 @@ from ._app import App
 
 logger = logging.getLogger(__name__)
 
+def load_class(name):
+    components = name.split('.')
+    mod = __import__(components[0])
+    for comp in components[1:-1]:
+        mod = getattr(mod, comp)
+    return getattr(mod, components[-1])
+
 
 class JinjaApp(App):
     def __init__(self, konfig: Konfig):
@@ -13,13 +20,18 @@ class JinjaApp(App):
         self.kind_templates = {}
         self.kind_classes = {}
         self.register_std_templates()
-        self.register_templates_from_konfig("templates")
+        self.register_templates_from_konfig()
 
-    def register_templates_from_konfig(self, value_key: str, cls=None):
-        for key in self.konfig.yaml.get("system", {}).get(value_key, []):
-            templ = self.konfig.yaml["system"][value_key][key]
-            logger.info(f"adding custom template {key}: {templ}")
-            self.register_template_file(key, filename=templ, cls=cls)
+    def register_templates_from_konfig(self):
+        templates = self.konfig.yaml._get_path("system.templates", {})
+        for key, _def in templates.items():
+            logger.info(f"adding custom template {key}")
+            self.register_template_path(key, _def["class"], _def["template"])
+
+    def register_template_path(self, kind:str, clsname:str, path:str) -> None:
+        self.kind_templates[kind] = path
+        self.kind_classes[kind] = load_class(clsname)
+
 
     def register_template(
         self, kind: str, cls=None, filename=None, package=None

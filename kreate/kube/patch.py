@@ -61,6 +61,6 @@ class EgressLabels(Patch):
 
 class MultiPatch(Patch):
     def __init__(self, res: Resource, shortname, kind, template=None):
-        patches = res.app.konfig.yaml["system"]["multi_patches"][kind]
+        patches = res.app.konfig.yaml["system"]["templates"][kind]["template"]
         for patch_name in patches:
             res.app.kreate_patch(res, patch_name, "main")

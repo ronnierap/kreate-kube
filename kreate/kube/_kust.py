@@ -13,11 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class KustApp(KubeApp):
-    def __init__(self, konfig: Konfig):
-        super().__init__(konfig)
-        self.register_templates_from_konfig("patch_templates", Patch)
-        self.register_templates_from_konfig("multi_patches", MultiPatch)
-
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=other_templates)
