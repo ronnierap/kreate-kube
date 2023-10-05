@@ -34,7 +34,7 @@ class JinjaApp(App):
 
 
     def register_template(
-        self, kind: str, cls=None, filename=None, package=None
+        self, kind: str, cls, filename=None, package=None
     ):
         if kind in self.kind_templates:
             if cls is None:
@@ -49,16 +49,12 @@ class JinjaApp(App):
         if package:
             filename = f"py:{package.__name__}:{filename}"
         logger.debug(f"registering template {kind}: {filename}")
-        cls = cls or self._default_template_class()
         if cls is None:
             raise ValueError(
                 f"No class specified for template {kind}: {filename}"
             )
         self.kind_templates[kind] = filename
         self.kind_classes[kind] = cls
-
-    def _default_template_class(self):
-        return None
 
     def register_template_class(self: str, cls, filename=None, package=None):
         kind = cls.__name__

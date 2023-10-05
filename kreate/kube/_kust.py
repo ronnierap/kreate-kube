@@ -16,27 +16,15 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_template_class(Kustomization, package=other_templates)
-        self.register_patch_class(EgressLabels)
+        self.register_template_class(EgressLabels, package=patch_templates)
         self.register_patch_file("AntiAffinity")
         self.register_patch_file("HttpProbes")
         self.register_patch_file("VolumeMounts")
         self.register_patch_file("KubernetesAnnotations")
         self.register_patch_file("SidecarContainer")
 
-    def register_patch_class(self: str, cls: str, package=None) -> None:
-        package = package or patch_templates
-        super().register_template_class(
-            cls,
-            filename=None,
-            package=patch_templates,
-        )
-
-    def register_patch_file(
-        self,
-        kind: str = None,
-        package=None,
-    ) -> None:
-        package = package or patch_templates
+    def register_patch_file(self, kind: str = None) -> None:
+        package = patch_templates
         super().register_template_file(kind=kind, cls=Patch, package=package)
 
     def kreate_komponents_from_strukture(self):
