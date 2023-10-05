@@ -122,7 +122,6 @@ class ConfigMap(Resource):
         return self.app.konfig.load_repo_file(location)
 
 
-# TODO: maybe inherict from ConfigMap
 class Secret(Resource):
     def calc_name(self):
         if self.shortname == "main":
