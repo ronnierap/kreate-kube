@@ -128,12 +128,15 @@ def wrap(obj):
     return obj
 
 
-def pprint_map(map, indent="", field=None):
+def pprint_map(map, indent=""):
     indent_step = "  "
-    if field:
-        print(f"{field}:")
-        indent = indent + indent_step
-        map = map.get(field, {})
+    if isinstance(map, str):
+        print(f"{indent}{map}")
+        return
+    elif isinstance(map, Sequence):
+        for v in map:
+            print(f"{indent}- {v}")
+        return
     for key in sorted(map.keys()):
         val = map.get(key, None)
         if isinstance(val, Mapping):

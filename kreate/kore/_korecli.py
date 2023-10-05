@@ -246,7 +246,7 @@ def view(cli: KoreCli):
         for k in cli.args.key:
             result = konfig.yaml._get_path(k)
             if isinstance(result, str):
-                print(f"{k} = {result}")
+                print(f"{k}: {result}")
             else:
                 print(k+":")
                 pprint_map(result, indent="  ")
