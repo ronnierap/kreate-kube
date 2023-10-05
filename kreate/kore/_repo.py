@@ -36,6 +36,10 @@ class FileGetter:
     # TODO: make text and bytes variants
     def get_data(self, file: str) -> str:
         dekrypt = False
+        optional = False
+        if file.startswith("optional:"):
+            optional = True
+            file = file[9:]
         if file.startswith("dekrypt:"):
             dekrypt = True
             file = file[8:]
@@ -53,6 +57,8 @@ class FileGetter:
             data = self.load_repo_data(file)
         else:
             data = self.load_file_data(file)
+        if optional and data is None:
+            return ""
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
@@ -69,6 +75,8 @@ class FileGetter:
     def load_file_data(self, filename: str) -> str:
         logger.debug(f"loading file {filename} ")
         path = self.dir / filename
+        if not path.exists():
+            return None
         return path.read_text()
 
     def load_package_data(self, filename: str) -> str:
@@ -84,6 +92,8 @@ class FileGetter:
         dir = self.repo_dir(repo)
         filename = filename[len(repo) + 1 :]
         p = Path(dir, filename)
+        if not p.exists():
+            return None
         return p.read_text()
 
     def repo_dir(self, repo_name: str) -> Path:
