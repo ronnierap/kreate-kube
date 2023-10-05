@@ -85,11 +85,7 @@ class Konfig:
         context = self._jinja_context()
         val_yaml = self.jinyaml.render(fname, context)
         if val_yaml:  # it can be empty
-            overwrite = True
-            if val_yaml.get("_do_not_overwrite"):
-                overwrite = False
-                #del(val_yaml._do_not_overwrite)
-            deep_update(self.yaml, val_yaml, overwrite=overwrite)
+            deep_update(self.yaml, val_yaml)
 
     def get_requires(self):
         reqs = []
