@@ -25,11 +25,6 @@ class Konfig:
         self.file_getter = FileGetter(self, self.dir)
         self.yaml = wrap(self.jinyaml.render(filename, {}))
         self.load_all_inkludes()
-        # TODO: move to app and only use target_path
-        self.target_dir = self.yaml.get("system", {}).get(
-            "target_dir", "build"
-        )
-        self.target_path = Path(self.target_dir)
 
     #def __iter__(self):
     #    return iter(self.yaml.keys())

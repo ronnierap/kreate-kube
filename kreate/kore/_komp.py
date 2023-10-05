@@ -166,9 +166,9 @@ class JinjaKomponent(Komponent):
         filename = self.filename
         if filename:
             if self.dirname:
-                dir = f"{self.app.konfig.target_dir}/{self.dirname}"
+                dir = f"{self.app.target_dir}/{self.dirname}"
             else:
-                dir = self.app.konfig.target_dir
+                dir = self.app.target_dir
             os.makedirs(dir, exist_ok=True)
             with open(f"{dir}/{filename}", "wb") as f:
                 f.write(self.data)
@@ -193,9 +193,9 @@ class JinYamlKomponent(JinjaKomponent):
         filename = self.filename
         if filename:
             if self.dirname:
-                dir = f"{self.app.konfig.target_dir}/{self.dirname}"
+                dir = f"{self.app.target_dir}/{self.dirname}"
             else:
-                dir = self.app.konfig.target_dir
+                dir = self.app.target_dir
             os.makedirs(dir, exist_ok=True)
             with open(f"{dir}/{filename}", "wb") as f:
                 self.app.konfig.jinyaml.dump(self.yaml.data, f)

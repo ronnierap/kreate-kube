@@ -1,6 +1,7 @@
 import os
 import logging
 from typing import List, Set
+from pathlib import Path
 
 from ._core import wrap, deep_update
 from ._konfig import Konfig
@@ -28,6 +29,10 @@ class App:
         self.komponents = []
         self._kinds = {}
         self.strukture = wrap(konfig.yaml.get("strukt"))
+        self.target_dir = self.konfig.yaml.get("system", {}).get(
+            "target_dir", "build"
+        )
+        self.target_path = Path(self.target_dir)
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
         naming = self.konfig.yaml.get("system", {}).get("naming", {})
@@ -70,7 +75,7 @@ class App:
         self.tune_komponents()
 
     def kreate_files(self):
-        os.makedirs(self.konfig.target_dir, exist_ok=True)
+        os.makedirs(self.target_dir, exist_ok=True)
         for komp in self.komponents:
             if komp.filename:
                 if komp.dirname:
