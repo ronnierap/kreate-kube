@@ -14,11 +14,6 @@ class KubeApp(JinjaApp):
             "namespace", f"{self.appname}-{self.env}"
         )
 
-    def default_strukture_files(self) -> List[str]:
-        result = super().default_strukture_files()
-        result.append("py:kreate.kube.other_templates:kube-defaults.yaml")
-        return result
-
     def register_std_templates(self) -> None:
         super().register_std_templates()
         self.register_resource_class(resource.Service)
