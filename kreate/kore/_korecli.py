@@ -78,9 +78,6 @@ class KoreCli:
         # subcommand: view
         cmd = self.add_subcommand(view, [], aliases=["v"])
         cmd.add_argument("key", help="key(s) to show", action="store", nargs="*")
-        cmd.add_argument(
-            "-o", "--orig", action="store_true", help="view in original format"
-        )
 
         # subcommand: view_template
         cmd = self.add_subcommand(view_template, [], aliases=["vt"])
@@ -252,11 +249,7 @@ def view(cli: KoreCli):
                 print(k+":")
                 pprint_map(result, indent="  ")
     else:
-        # TODO: how would orig work fir subkey
-        if cli.args.orig:
-            konfig.jinyaml.dump(konfig.yaml, sys.stdout)
-        else:
-            pprint_map(konfig.yaml)
+        pprint_map(konfig.yaml)
 
 
 def requirements(cli: KoreCli):
