@@ -13,7 +13,7 @@ spec:
   ports:
 {% for port in strukt.get("ports", [{"name": "http"}]) %}
   - protocol: UDP
-    port: {{ port.port | default(default.servicePort) }}
-    targetPort: {{ port.targetPort | default(default.containerPort) }}
+    port: {{ port.port | default(my.field.servicePort) }}
+    targetPort: {{ port.targetPort | default(my.field.containerPort) }}
     name: {{ port.name | default("http") }}
 {% endfor %}

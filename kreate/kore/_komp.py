@@ -1,6 +1,8 @@
 import logging
-from collections.abc import Mapping
 import os
+import jinja2
+
+from collections.abc import Mapping
 from typing import Any
 
 from ._core import wrap, deep_update
@@ -22,7 +24,6 @@ class Komponent:
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         self.strukture = wrap(self._find_strukture())
-        self.defaults = self._calc_defaults()
         self.skip = self.strukture.get("ignore", False)
         self.field = Field(self)
         name = (
@@ -50,26 +51,6 @@ class Komponent:
         if self.shortname == "main":
             return f"{self.app.appname}-{self.kind}"
         return f"{self.app.appname}-{self.kind}-{self.shortname}"
-
-    def _calc_defaults(self):
-        defaults = {}
-        deep_update(defaults, self._find_generic_defaults())
-        deep_update(defaults, self._find_defaults())
-        return defaults
-
-    def _find_defaults(self):
-        konfig = self.app.konfig if self.app else {}
-        if self.kind in konfig.get("val", {}):
-            logger.debug(f"using defaults for {self.kind}")
-            return konfig.get("val")[self.kind]
-        return {}
-
-    def _find_generic_defaults(self):
-        konfig = self.app.konfig if self.app else {}
-        if "generic" in konfig.get("val", {}):
-            logger.debug("using generic defaults")
-            return konfig.get("val")["generic"]
-        return {}
 
     def _find_strukture(self):
         typename = self.kind
@@ -137,23 +118,20 @@ class Komponent:
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
-        if (
-            self.shortname in self.app.konfig.yaml["val"]
-            and fieldname in self.app.konfig.yaml["val"][self.shortname]
-        ):
-            return self.app.konfig.yaml["val"][self.shortname][fieldname]
-        if fieldname in self.app.konfig.yaml["val"]:
-            return self.app.konfig.yaml["val"][fieldname]
-        if fieldname in self.defaults:
-            return self.defaults[fieldname]
+        val = wrap(self.app.konfig.yaml["val"])
+        result = val._get_path(f"{self.shortname}.{fieldname}")
+        result = result if result is not None else val._get_path(fieldname)
+        result = result if result is not None else val._get_path(f"{self.kind}.{fieldname}")
+        result = result if result is not None else val._get_path(f"generic.{fieldname}")
+        if result is not None:
+            return result
         if default is not None:
             return default
-        raise ValueError(f"Unknown field {fieldname} in {self}")
+        raise jinja2.exceptions.UndefinedError(f"Unknown field {fieldname} in {self}")
 
     def _contains_field(self, key) -> bool:
-        # TODO: better Marker default
-        marker = "dummy-marker"
-        if self._field(key, marker) == marker:
+        marker = object()
+        if self._field(key, marker) is marker:
             return False
         return True
 
@@ -198,7 +176,6 @@ class JinjaKomponent(Komponent):
     def _template_vars(self):
         return {
             "strukt": self.strukture,
-            "default": self.defaults,
             "app": self.app,
             "my": self,
         }
