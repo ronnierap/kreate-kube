@@ -76,14 +76,20 @@ class Konfig:
             if fname not in already_inkluded:
                 count += 1
                 already_inkluded.add(fname)
-                logger.info(f"inkluding {fname}")
-                # TODO: use dirname
-                context = self._jinja_context()
-                val_yaml = self.jinyaml.render(fname, context)
-                if val_yaml:  # it can be empty
-                    deep_update(self.yaml, val_yaml)
+                self.load_inklude(fname)
         logger.debug(f"inkluded {count} new files")
         return count
+
+    def load_inklude(self, fname:str):
+        logger.info(f"inkluding {fname}")
+        context = self._jinja_context()
+        val_yaml = self.jinyaml.render(fname, context)
+        if val_yaml:  # it can be empty
+            overwrite = True
+            if val_yaml.get("_do_not_overwrite"):
+                overwrite = False
+                #del(val_yaml._do_not_overwrite)
+            deep_update(self.yaml, val_yaml, overwrite=overwrite)
 
     def get_requires(self):
         reqs = []

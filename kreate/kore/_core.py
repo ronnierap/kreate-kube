@@ -6,6 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 def deep_update(target: Mapping, other: Mapping, overwrite=True) -> None:
+    if other.get("_do_not_overwrite", False):
+        overwrite = False
     for k, v in other.items():
         if isinstance(v, Mapping):
             if k not in target:
@@ -29,7 +31,9 @@ def deep_update(target: Mapping, other: Mapping, overwrite=True) -> None:
                 )
         else:
             if overwrite or k not in target:
-                target[k] = v
+                # this key is special, should find better way
+                if k != "_do_not_overwrite":
+                    target[k] = v
 
 
 class DictWrapper(UserDict):
