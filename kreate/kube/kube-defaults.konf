@@ -1,6 +1,6 @@
 # this is a default file. It does not define any toplevel Objects
 
-default:
+val:
   generic:
     container_name: app
     servicePort: 8080

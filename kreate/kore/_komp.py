@@ -59,16 +59,16 @@ class Komponent:
 
     def _find_defaults(self):
         konfig = self.app.konfig if self.app else {}
-        if self.kind in konfig.get("default", {}):
+        if self.kind in konfig.get("val", {}):
             logger.debug(f"using defaults for {self.kind}")
-            return konfig.get("default")[self.kind]
+            return konfig.get("val")[self.kind]
         return {}
 
     def _find_generic_defaults(self):
         konfig = self.app.konfig if self.app else {}
-        if "generic" in konfig.get("default", {}):
+        if "generic" in konfig.get("val", {}):
             logger.debug("using generic defaults")
-            return konfig.get("default")["generic"]
+            return konfig.get("val")["generic"]
         return {}
 
     def _find_strukture(self):
