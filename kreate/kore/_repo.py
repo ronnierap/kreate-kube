@@ -33,7 +33,6 @@ class FileGetter:
         self.konfig = konfig
         self.dir = Path(dir)
 
-    # TODO: make text and bytes variants
     def get_data(self, file: str) -> str:
         dekrypt = False
         optional = False
