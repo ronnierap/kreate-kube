@@ -145,7 +145,7 @@ class SecretBasicAuth(Secret):
     def users(self):
         result = []
         for usr in self.strukture.get("users", []):
-            entry = dekrypt_str(self.app.konfig.secret[usr])
+            entry = dekrypt_str(self.app.konfig.secret.basic_auth[usr])
             result.append(f"{usr}:{entry}")
         result.append("")  # for the final newline
         return "\n".join(result)
