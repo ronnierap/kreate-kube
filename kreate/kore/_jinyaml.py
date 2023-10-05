@@ -42,6 +42,10 @@ class JinYaml:
             if not found:
                 logger.error(f"Error when rendering {filename}, {e}")
             raise
+        except Exception as e:
+            logger.error(f"ERROR when parsing {filename}")
+            raise
+
 
     def render(self, fname: str, vars: Mapping) -> Mapping:
         text = self.render_jinja(fname, vars)
