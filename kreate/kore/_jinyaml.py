@@ -12,23 +12,25 @@ logger = logging.getLogger(__name__)
 class JinYaml:
     def __init__(self, konfig) -> None:
         self.konfig = konfig
-        self.yaml_parser = YAML()
-        self.add_jinja_filter("b64encode", b64encode)
-
-    def add_jinja_filter(self, name, func):
-        jinja2.filters.FILTERS[name] = func
-
-    def render_jinja(self, filename: str, vars: Mapping) -> str:
-        data = self.konfig.load_repo_file(filename)
-        if isinstance(data, bytes):
-            data = data.decode()
-        tmpl = jinja2.Template(
-            data,
+        self.env = jinja2.Environment(
             undefined=jinja2.StrictUndefined,
             finalize=raise_error_if_none,
             trim_blocks=True,
             lstrip_blocks=True,
         )
+        self.env.globals["konf"] = konfig
+        self.yaml_parser = YAML()
+        self.add_jinja_filter("b64encode", b64encode)
+
+    def add_jinja_filter(self, name, func):
+        self.env.filters[name] = func
+
+    def render_jinja(self, filename: str, vars: Mapping) -> str:
+        data = self.konfig.load_repo_file(filename)
+        if isinstance(data, bytes):
+            data = data.decode()
+        tmpl = self.env.from_string(data)
+
         try:
             return tmpl.render(vars)
         except:
