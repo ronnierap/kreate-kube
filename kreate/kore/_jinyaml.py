@@ -27,11 +27,20 @@ class JinYaml:
         self.env.filters[name] = func
 
     def render_jinja(self, filename: str, vars: Mapping) -> str:
-        tmpl = self.env.get_template(filename)
         try:
+            tmpl = self.env.get_template(filename)
             return tmpl.render(vars)
-        except:
-            logger.error(f"Error when rendering {filename}")
+        except jinja2.exceptions.TemplateSyntaxError as e:
+            logger.error(f"Syntax Error in jinja2 template {e.filename}:{e.lineno} {e.message}")
+            raise
+        except jinja2.exceptions.TemplateError as e:
+            found = False
+            for line in traceback.format_exc().splitlines():
+                if 'in top-level template code' in line:
+                    found = True
+                    logger.error(f"Error in {line.strip()}, {e}")
+            if not found:
+                logger.error(f"Error when rendering {filename}, {e}")
             raise
 
     def render(self, fname: str, vars: Mapping) -> Mapping:
@@ -63,23 +72,6 @@ def b64encode(value: str) -> str:
     else:
         logger.warning("empty value to b64encode")
         return ""
-
-
-def jinja2_template_error_lineno():
-    for line in traceback.format_exc().splitlines():
-        if 'File "<template>"' in line:
-            print(line)
-    type, value, tb = exc_info()
-    if not issubclass(type, jinja2.TemplateError):
-        return None
-    if hasattr(value, "lineno"):
-        # in case of TemplateSyntaxError
-        return value.lineno
-    while tb:
-        # print(tb.tb_frame.f_code.co_filename, tb.tb_lineno)
-        if tb.tb_frame.f_code.co_filename == "<template>":
-            return tb.tb_lineno
-        tb = tb.tb_next
 
 
 class RepoLoader(jinja2.BaseLoader):
