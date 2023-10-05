@@ -17,6 +17,7 @@ class JinYaml:
             finalize=raise_error_if_none,
             trim_blocks=True,
             lstrip_blocks=True,
+            loader=RepoLoader(konfig)
         )
         self.env.globals["konf"] = konfig
         self.yaml_parser = YAML()
@@ -26,11 +27,7 @@ class JinYaml:
         self.env.filters[name] = func
 
     def render_jinja(self, filename: str, vars: Mapping) -> str:
-        data = self.konfig.load_repo_file(filename)
-        if isinstance(data, bytes):
-            data = data.decode()
-        tmpl = self.env.from_string(data)
-
+        tmpl = self.env.get_template(filename)
         try:
             return tmpl.render(vars)
         except:
@@ -83,3 +80,14 @@ def jinja2_template_error_lineno():
         if tb.tb_frame.f_code.co_filename == "<template>":
             return tb.tb_lineno
         tb = tb.tb_next
+
+
+class RepoLoader(jinja2.BaseLoader):
+    def __init__(self, konfig):
+        self.konfig = konfig
+
+    def get_source(self, environment, filename):
+        data = self.konfig.load_repo_file(filename)
+        if isinstance(data, bytes):
+            data = data.decode()
+        return data, filename, lambda: True
