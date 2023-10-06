@@ -1,6 +1,7 @@
 import os
 import logging
 import pkg_resources
+import importlib.metadata
 from pathlib import Path
 from typing import List, Set
 
@@ -76,31 +77,26 @@ class Konfig:
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml)
 
-    def get_requires(self):
-        reqs = []
-        filename = f"{self.dir}/requirements.txt"
-        if os.path.exists(filename):
-            with open(filename) as f:
-                for line in f.readlines():
-                    reqs.append(line.strip())
-        for pckg in self.yaml.get("requires", {}).keys():
-            version = self.yaml["requires"][pckg]
-            reqs.append(f"{pckg}{version}")
-        return reqs
+    def get_kreate_version(self) -> str:
+        try:
+            return importlib.metadata.version("kreate-kube")
+        except importlib.metadata.PackageNotFoundError:
+            return "Unknown"
 
-    def check_requires(self):
-        error = False
-        for line in self.get_requires():
-            try:
-                logger.info(f"checking requirement {line}")
-                pkg_resources.require(line)
-            except (
-                pkg_resources.VersionConflict,
-                pkg_resources.DistributionNotFound,
-            ) as e:
-                logger.warn(e)
-                error = True
-        return error
+    def check_kreate_version(self, force: bool = False):
+        version = self.get_kreate_version()
+        dev_versions = [ "Unknown", "rc", "editable"]
+        if any(txt in version for txt in dev_versions) and not force:
+            logger.info(f"skipping check for development version {version}")
+            return
+        req_version : str = self.yaml._get_path("version.kreate_version", None)
+        if not req_version:
+            logger.info(f"skipping check since no kreate_version specified")
+            return
+        for v,r in zip(version.split("."), req_version.split(".")):
+            print(v,r)
+            if r != v and r != "*":
+                raise ValueError(f"kreate version {version} does not match required version {req_version}")
 
     def dekrypt_bytes(b: bytes) -> bytes:
         raise NotImplementedError("dekrypt_bytes not implemented")

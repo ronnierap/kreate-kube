@@ -4,6 +4,7 @@ app:
   team: myteam
   image_version: v1.3.4
 version:
+  kreate_version: 0.5.*
   shared_github: master
 file:
   application.properties: konf:files/application.properties

@@ -1,5 +1,4 @@
 import os
-import sys
 import shutil
 import argparse
 import logging
@@ -53,8 +52,9 @@ class KoreCli:
     def konfig(self):
         if not self._konfig:
             self._konfig = self.kreate_konfig(self.konfig_filename)
-            if not self.args.skip_requires:
-                self._konfig.check_requires()
+            if not self.args.skip_version_check:
+                force = self.args.force_version_check
+                self._konfig.check_kreate_version(force=force)
         return self._konfig
 
     def app(self):
@@ -86,8 +86,6 @@ class KoreCli:
             action="store",
             default=None,
         )
-        # subcommand: requirements
-        cmd = self.add_subcommand(requirements, [], aliases=["rq"])
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
@@ -180,10 +178,16 @@ class KoreCli:
             help="do not remove secrets dirs",
         )
         self.cli.add_argument(
-            "-R",
-            "--skip-requires",
+            "-C",
+            "--skip-version-check",
             action="store_true",
-            help="do not check if required dependency versions are installed",
+            help="do not check if required version of kreate is used",
+        )
+        self.cli.add_argument(
+            "-F",
+            "--force-version-check",
+            action="store_true",
+            help="force version check even if development version is detected",
         )
         self.cli.add_argument(
             "--no-dotenv",
@@ -261,14 +265,6 @@ def view(cli: KoreCli):
                 pprint_map(result, indent="  ")
     else:
         pprint_map(konfig.yaml)
-
-
-def requirements(cli: KoreCli):
-    """view the listed requirements"""
-    konfig: Konfig = cli.konfig()
-    for line in konfig.get_requires():
-        print(line)
-    pprint_map(konfig.yaml.get("repo", {}))
 
 
 def version(cli: KoreCli):
