@@ -48,6 +48,10 @@ class FileGetter:
             data = self.load_package_data(file[3:])
         elif file.startswith("konf:"):
             data = self.load_file_data(file[5:])
+        elif file.startswith("cwd:"):
+            data = self.load_file_data(Path.cwd() / file[4:])
+        elif file.startswith("home:"):
+            data = self.load_file_data(Path.home() / file[5:])
         elif file.startswith("./"):
             data = self.load_file_data(file)
         elif file.startswith("../"):
