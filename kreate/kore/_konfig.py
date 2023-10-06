@@ -62,10 +62,6 @@ class Konfig:
     def load_inkludes(self, inkludes: List[str], already_inkluded: Set[str]) -> int:
         count = 0
         for fname in inkludes:
-            if fname == "STOP":
-                logger.debug(f"inkluded {count} new files")
-                logger.info(f"stopping inkluding any more files")
-                return 0
             if fname not in already_inkluded:
                 count += 1
                 already_inkluded.add(fname)
