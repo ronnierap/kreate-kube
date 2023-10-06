@@ -196,17 +196,17 @@ class KoreCli:
         )
 
     def process_main_options(self, args):
-        if args.verbose >= 2:
+        if args.verbose >= 3:
             logging.basicConfig(level=logging.DEBUG)
-        elif args.verbose == 1:
+        elif args.verbose == 2:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)
-        elif args.warn:
-            logging.basicConfig(format="%(message)s", level=logging.WARN)
+        elif args.verbose == 1:
+            logging.basicConfig(format="%(message)s", level=logging.INFO)
         elif args.quiet:
             logging.basicConfig(format="%(message)s", level=logging.ERROR)
         else:
-            logging.basicConfig(format="%(message)s", level=logging.INFO)
+            logging.basicConfig(format="%(message)s", level=logging.WARN)
         self.konfig_filename = args.konf
 
 
