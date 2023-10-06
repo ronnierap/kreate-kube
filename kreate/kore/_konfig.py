@@ -93,8 +93,8 @@ class Konfig:
         if not req_version:
             logger.info(f"skipping check since no kreate_version specified")
             return
+        # TODO: use more versatile semver check
         for v,r in zip(version.split("."), req_version.split(".")):
-            print(v,r)
             if r != v and r != "*":
                 raise ValueError(f"kreate version {version} does not match required version {req_version}")
 
