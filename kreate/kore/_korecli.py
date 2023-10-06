@@ -251,12 +251,29 @@ def view_template(cli: KoreCli):
             else:
                 logger.debug("skipping kind")
 
+def view_aliases():
+    return {
+        "i": "inklude",
+        "s": "strukt",
+        "a": "app",
+        "ink": "inklude",
+        "sys": "system",
+        "ver": "version",
+        "kust": "strukt.Kustomization",
+        "depl": "strukt.Deployment",
+        "cron": "strukt.CronJob",
+        "ingr": "strukt.Ingress",
+        "egr": "strukt.Egress",
+        "svc": "strukt.Service",
+        "cm": "strukt.ConfigMap",
+    }
 
 def view(cli: KoreCli):
     """view the entire konfig or subkey(s)"""
     konfig: Konfig = cli.konfig()
     if cli.args.key:
         for k in cli.args.key:
+            k = view_aliases().get(k, k)
             result = konfig.yaml._get_path(k)
             if isinstance(result, str):
                 print(f"{k}: {result}")
