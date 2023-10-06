@@ -91,10 +91,7 @@ def diff(cli: KubeCli) -> None:
 def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
     app = kreate_files(cli)
-    cmd = (
-        f"kustomize build {app.target_dir} "
-        "| kubectl apply --dry-run -f - "
-    )
+    cmd = f"kustomize build {app.target_dir} " "| kubectl apply --dry-run -f - "
     logger.info(f"running: {cmd}")
     os.system(cmd)
 

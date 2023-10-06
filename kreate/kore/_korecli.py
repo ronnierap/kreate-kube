@@ -33,12 +33,9 @@ class KoreCli:
         self.cli = argparse.ArgumentParser(
             prog="kreate",
             usage=(
-                "kreate [optional arguments] [<subcommand>] [subcommand"
-                " options]"
+                "kreate [optional arguments] [<subcommand>] [subcommand" " options]"
             ),
-            description=(
-                "kreates files for deploying applications on kubernetes"
-            ),
+            description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
         self.subparsers = self.cli.add_subparsers(
@@ -98,9 +95,7 @@ class KoreCli:
     def add_subcommand(self, func, args=[], aliases=[], parent=None):
         parent = parent or self.subparsers
         alias0 = aliases[0] if aliases else ""
-        self.epilog += (
-            f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
-        )
+        self.epilog += f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
         parser = parent.add_parser(
             func.__name__, aliases=aliases, description=func.__doc__
         )
@@ -115,10 +110,10 @@ class KoreCli:
         try:
             dotenv.load_dotenv(".env")
         except Exception as e:
-            logger.error(f"ERROR loading .env file, "
-                         f"remove .env file or specify --no-dotenv")
+            logger.error(
+                f"ERROR loading .env file, " f"remove .env file or specify --no-dotenv"
+            )
             raise
-
 
     def run(self):
         self.cli.epilog = self.epilog + "\n"
@@ -223,10 +218,7 @@ def view_template(cli: KoreCli):
     app: JinjaApp = cli.kreate_app()
     template = cli.args.template
     if template:
-        if (
-            template not in app.kind_templates
-            or template not in app.kind_classes
-        ):
+        if template not in app.kind_templates or template not in app.kind_classes:
             logger.warn(f"Unknown template kind {template}")
             return
         if not cli.args.quiet:
@@ -255,6 +247,7 @@ def view_template(cli: KoreCli):
             else:
                 logger.debug("skipping kind")
 
+
 def view(cli: KoreCli):
     """view the entire konfig or subkey(s)"""
     konfig: Konfig = cli.konfig()
@@ -264,7 +257,7 @@ def view(cli: KoreCli):
             if isinstance(result, str):
                 print(f"{k}: {result}")
             else:
-                print(k+":")
+                print(k + ":")
                 pprint_map(result, indent="  ")
     else:
         pprint_map(konfig.yaml)

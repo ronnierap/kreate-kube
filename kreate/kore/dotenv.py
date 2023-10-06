@@ -8,6 +8,7 @@ this functionality
 import os
 from pathlib import Path
 
+
 def load_dotenv(path: str) -> None:
     if not Path(path).is_file():
         return

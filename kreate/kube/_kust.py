@@ -43,9 +43,7 @@ class KustApp(KubeApp):
         if issubclass(cls, Patch):
             cls(res, shortname, kind)
         else:
-            raise TypeError(
-                f"class for {kind}.{shortname} is not a Patch but {cls}"
-            )
+            raise TypeError(f"class for {kind}.{shortname} is not a Patch but {cls}")
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
@@ -61,9 +59,7 @@ class KustApp(KubeApp):
 
 class Kustomization(JinYamlKomponent):
     def resources(self):
-        return [
-            res for res in self.app.komponents if isinstance(res, Resource)
-        ]
+        return [res for res in self.app.komponents if isinstance(res, Resource)]
 
     def patches(self):
         return [res for res in self.app.komponents if isinstance(res, Patch)]
@@ -79,9 +75,7 @@ class Kustomization(JinYamlKomponent):
     def kopy_file(self, filename: str) -> str:
         location: str = self.app.konfig.yaml["file"][filename]
         if location.startswith("dekrypt:"):
-            target = (
-                self.app.target_path / "secrets" / "files" / filename
-            )
+            target = self.app.target_path / "secrets" / "files" / filename
             result = "secrets/files/" + filename
         else:
             target = self.app.target_path / "files" / filename

@@ -26,7 +26,7 @@ class Konfig:
         self.yaml = wrap(self.jinyaml.render(filename, {}))
         self.load_all_inkludes()
 
-    #def __iter__(self):
+    # def __iter__(self):
     #    return iter(self.yaml.keys())
 
     def __getattr__(self, attr):
@@ -41,7 +41,7 @@ class Konfig:
         return self.yaml._get_path(path, default=default)
 
     def _jinja_context(self):
-        result = {} #"konf": self, "appname": self.appname, "env": self.env}
+        result = {}  # "konf": self, "appname": self.appname, "env": self.env}
         for k in self.yaml.keys():
             v = self.yaml[k]
             result[k] = v
@@ -59,9 +59,7 @@ class Konfig:
             # possible new inkludes are added
             inkludes = self.yaml.get("inklude", [])
 
-    def load_inkludes(
-        self, inkludes: List[str], already_inkluded: Set[str]
-    ) -> int:
+    def load_inkludes(self, inkludes: List[str], already_inkluded: Set[str]) -> int:
         count = 0
         for fname in inkludes:
             if fname == "STOP":
@@ -75,7 +73,7 @@ class Konfig:
         logger.debug(f"inkluded {count} new files")
         return count
 
-    def load_inklude(self, fname:str):
+    def load_inklude(self, fname: str):
         logger.info(f"inkluding {fname}")
         context = self._jinja_context()
         val_yaml = self.jinyaml.render(fname, context)

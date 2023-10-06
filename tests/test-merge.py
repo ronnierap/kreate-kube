@@ -2,29 +2,23 @@
 from kreate._core import wrap, DeepChain, merge
 import copy
 
-a={
+a = {
     "a": 1,
     "b": {
         "b1": 1,
         "b2": 2,
-    }
-}
-
-
-b={
-    "b": {
-        "b2": 22,
-        "b3": 3
     },
-    "c": 33
 }
 
-wa=wrap(copy.deepcopy(a))
-wb=wrap(b)
 
-#print(wa)
-#print(wb)
-c=DeepChain(wb,wa)
+b = {"b": {"b2": 22, "b3": 3}, "c": 33}
+
+wa = wrap(copy.deepcopy(a))
+wb = wrap(b)
+
+# print(wa)
+# print(wb)
+c = DeepChain(wb, wa)
 print(c.keys())
 print(type(c.b))
 print(c.b)
@@ -40,13 +34,13 @@ for k in c.b.keys():
 
 print("\n\n\n")
 
-print (a)
-print (b)
-merge(a,b)
-print (a)
+print(a)
+print(b)
+merge(a, b)
+print(a)
 print("\n\n\n")
 
-print (wa)
-print (wb)
-merge(wa,wb)
-print (wb)
+print(wa)
+print(wb)
+merge(wa, wb)
+print(wb)

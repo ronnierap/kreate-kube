@@ -29,9 +29,7 @@ class App:
         self.komponents = []
         self._kinds = {}
         self.strukture = wrap(konfig.yaml.get("strukt"))
-        self.target_dir = self.konfig.yaml.get("system", {}).get(
-            "target_dir", "build"
-        )
+        self.target_dir = self.konfig.yaml.get("system", {}).get("target_dir", "build")
         self.target_path = Path(self.target_dir)
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
@@ -58,9 +56,7 @@ class App:
         return self._kinds.get(attr, None)
 
     def kreate_komponent(self, kind: str, shortname: str = None):
-        raise NotImplementedError(
-            f"can not create komponent for {kind}.{shortname}"
-        )
+        raise NotImplementedError(f"can not create komponent for {kind}.{shortname}")
 
     def kreate_komponents(self):
         self.kreate_komponents_from_strukture()
@@ -79,9 +75,7 @@ class App:
         for komp in self.komponents:
             if komp.filename:
                 if komp.dirname:
-                    logger.info(
-                        f"kreating file {komp.dirname}/{komp.filename}"
-                    )
+                    logger.info(f"kreating file {komp.dirname}/{komp.filename}")
                 else:
                     logger.info(f"kreating file {komp.filename}")
                 komp.kreate_file()

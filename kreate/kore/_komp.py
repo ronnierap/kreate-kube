@@ -58,9 +58,7 @@ class Komponent:
         if typename in strukt and self.shortname in strukt[typename]:
             logger.debug(f"using named strukture {typename}.{self.shortname}")
             return self.app.strukture[typename][self.shortname]
-        logger.debug(
-            f"could not find strukture for {typename}.{self.shortname}"
-        )
+        logger.debug(f"could not find strukture for {typename}.{self.shortname}")
         return {}
 
     def kreate_file(self) -> None:
@@ -95,14 +93,11 @@ class Komponent:
                         getattr(self, key)(val)
                     elif isinstance(val, int):
                         logger.debug(
-                            f"invoking {self} option {key}"
-                            f" with int parameter {val}"
+                            f"invoking {self} option {key}" f" with int parameter {val}"
                         )
                         getattr(self, key)(int(val))
                     else:
-                        logger.warn(
-                            f"option map {opt} for {self.name} not supported"
-                        )
+                        logger.warn(f"option map {opt} for {self.name} not supported")
 
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")
@@ -121,7 +116,9 @@ class Komponent:
         val = wrap(self.app.konfig.yaml["val"])
         result = val._get_path(f"{self.shortname}.{fieldname}")
         result = result if result is not None else val._get_path(fieldname)
-        result = result if result is not None else val._get_path(f"{self.kind}.{fieldname}")
+        result = (
+            result if result is not None else val._get_path(f"{self.kind}.{fieldname}")
+        )
         result = result if result is not None else val._get_path(f"generic.{fieldname}")
         if result is not None:
             return result

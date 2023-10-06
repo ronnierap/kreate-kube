@@ -39,9 +39,7 @@ class Resource(JinYamlKomponent):
         for key in self.strukture.get("annotations", {}):
             if "annotations" not in self.yaml.metadata:
                 self.yaml.metadata.annotations = {}
-            self.yaml.metadata.annotations[key] = self.strukture.annotations[
-                key
-            ]
+            self.yaml.metadata.annotations[key] = self.strukture.annotations[key]
         for key in self.strukture.get("labels", {}):
             if "labels" not in self.yaml.metadata:
                 self.yaml.metadata.labels = {}

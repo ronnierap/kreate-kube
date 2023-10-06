@@ -3,6 +3,7 @@ a chain of maps where an attribute will be checked in any of the maps
 """
 
 from collections.abc import Mapping
+
 # from typing import Mapping
 
 

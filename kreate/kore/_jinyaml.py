@@ -17,7 +17,7 @@ class JinYaml:
             finalize=raise_error_if_none,
             trim_blocks=True,
             lstrip_blocks=True,
-            loader=RepoLoader(konfig)
+            loader=RepoLoader(konfig),
         )
         self.env.globals["konf"] = konfig
         self.yaml_parser = YAML()
@@ -31,12 +31,14 @@ class JinYaml:
             tmpl = self.env.get_template(filename)
             return tmpl.render(vars)
         except jinja2.exceptions.TemplateSyntaxError as e:
-            logger.error(f"Syntax Error in jinja2 template {e.filename}:{e.lineno} {e.message}")
+            logger.error(
+                f"Syntax Error in jinja2 template {e.filename}:{e.lineno} {e.message}"
+            )
             raise
         except jinja2.exceptions.TemplateError as e:
             found = False
             for line in traceback.format_exc().splitlines():
-                if 'in top-level template code' in line:
+                if "in top-level template code" in line:
                     found = True
                     logger.error(f"Error in {line.strip()}, {e}")
             if not found:
@@ -45,7 +47,6 @@ class JinYaml:
         except Exception as e:
             logger.error(f"ERROR when parsing {filename}")
             raise
-
 
     def render(self, fname: str, vars: Mapping) -> Mapping:
         text = self.render_jinja(fname, vars)
