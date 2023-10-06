@@ -13,6 +13,7 @@ from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp
 import importlib.metadata
+import kreate.kore.dotenv as dotenv
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +109,17 @@ class KoreCli:
         parser.set_defaults(func=func)
         return parser
 
+    def load_dotenv(self) -> None:
+        if self.args.no_dotenv:
+            return
+        try:
+            dotenv.load_dotenv(".env")
+        except Exception as e:
+            logger.error(f"ERROR loading .env file, "
+                         f"remove .env file or specify --no-dotenv")
+            raise
+
+
     def run(self):
         self.cli.epilog = self.epilog + "\n"
         self.add_main_options()
@@ -115,6 +127,7 @@ class KoreCli:
         self.process_main_options(self.args)
         app = None
         try:
+            self.load_dotenv()
             if self.args.subcommand is None:
                 app = self.default_command()
             else:
@@ -176,6 +189,11 @@ class KoreCli:
             "--skip-requires",
             action="store_true",
             help="do not check if required dependency versions are installed",
+        )
+        self.cli.add_argument(
+            "--no-dotenv",
+            action="store_true",
+            help="do not load a .env file for working dir",
         )
 
     def process_main_options(self, args):
