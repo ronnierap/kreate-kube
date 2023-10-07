@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import argparse
 import logging
@@ -113,10 +114,26 @@ class KoreCli:
             )
             raise
 
+    def get_argv(self):
+        options = os.getenv("KREATE_OPTIONS")
+        if options:
+            result = [*options.split(), *sys.argv[1:]]
+            # options are not parsed yet, so use simple count to
+            # determine if it is debug level
+            vcount = 0
+            for opt in result:
+                vcount += 2 if opt.startswith("-vv") else 0
+                vcount += 1 if opt == "-v" else 0
+            if vcount >= 2:
+                print(f"DEBUG:prepending KREATE_OPTIONS to get {result}",
+                      file=sys.stderr)
+            return result
+        return sys.argv[1:]
+
     def run(self):
         self.cli.epilog = self.epilog + "\n"
         self.add_main_options()
-        self.args = self.cli.parse_args()
+        self.args = self.cli.parse_args(self.get_argv())
         self.process_main_options(self.args)
         app = None
         try:
