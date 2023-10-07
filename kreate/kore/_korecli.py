@@ -50,6 +50,13 @@ class KoreCli:
         """a list of packages that are shown in the version command"""
         return []
 
+    def calc_dict(self):
+        result = {}
+        for d in self.args.define:
+            k, v = d.split("=",1)
+            result[k] = v
+        return result
+
     def konfig(self):
         if not self._konfig:
             self._konfig = self.kreate_konfig(self.konfig_filename)
@@ -64,7 +71,7 @@ class KoreCli:
         return self._app
 
     def kreate_konfig(self, filename: str) -> Konfig:
-        return Konfig(filename)
+        return Konfig(filename, dict_ = self.calc_dict())
 
     def kreate_app(self) -> App:
         return App(self.konfig())
@@ -165,6 +172,14 @@ class KoreCli:
         version(self)
 
     def add_main_options(self):
+        self.cli.add_argument(
+            "-d",
+            "--define",
+            action="store",
+            nargs="*",
+            default=".",
+            help="konfig file or directory to use (default=.)",
+        )
         self.cli.add_argument(
             "-k",
             "--konf",
