@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class Konfig:
-    def __init__(self, filename: str = None, dict_: dict = None):
+    def __init__(self, filename: str = None, dict_: dict = None,
+                 inkludes=None):
         filename = filename or "konfig.yaml"
         if os.path.isdir(filename):
             filename += "/konfig.yaml"
@@ -24,10 +25,10 @@ class Konfig:
         self.dir = Path(os.path.dirname(filename))
         filename = os.path.basename(filename)
         self.file_getter = FileGetter(self, self.dir)
-        if dict_:
-            deep_update(dict_, self.jinyaml.render(filename, dict_))
-        else:
-            dict_ = self.jinyaml.render(filename, {})
+        dict_ = dict_ or {}
+        for ink in inkludes or []:
+            deep_update(dict_, self.jinyaml.render(ink, dict_))
+        deep_update(dict_, self.jinyaml.render(filename, dict_))
         self.yaml = wrap(dict_)
         self.load_all_inkludes()
 

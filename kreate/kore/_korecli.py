@@ -71,7 +71,7 @@ class KoreCli:
         return self._app
 
     def kreate_konfig(self, filename: str) -> Konfig:
-        return Konfig(filename, dict_ = self.calc_dict())
+        return Konfig(filename, dict_ = self.calc_dict(), inkludes=self.args.inklude)
 
     def kreate_app(self) -> App:
         return App(self.konfig())
@@ -177,7 +177,14 @@ class KoreCli:
             "--define",
             action="append",
             default=[],
-            help="konfig file or directory to use (default=.)",
+            help="define yame (toplevel) element",
+        )
+        self.cli.add_argument(
+            "-i",
+            "--inklude",
+            action="append",
+            default=[],
+            help="inklude extra files before parsing main konfig",
         )
         self.cli.add_argument(
             "-k",
