@@ -175,9 +175,8 @@ class KoreCli:
         self.cli.add_argument(
             "-d",
             "--define",
-            action="store",
-            nargs="*",
-            default=".",
+            action="append",
+            default=[],
             help="konfig file or directory to use (default=.)",
         )
         self.cli.add_argument(
