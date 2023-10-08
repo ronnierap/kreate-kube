@@ -126,16 +126,17 @@ The file can contain several other things as well:
 
 Below is a simple but typical example.
 ```
-appname: demo
-env: dev
-team: knights
+app:
+  appname: demo
+  env: dev
+  team: knights
 val:
   project: kreate-kube-demo
   image_version: 2.0.2
 inklude:
   - values-demo-dev.yaml
   - secrets-demo-dev.yaml
-strukture:
+strukt:
   - demo-strukture.yaml
 ```
 
@@ -172,32 +173,41 @@ In general you should specify a specific version of kreate with a `requirements.
 ## Help
 this is the output of the `kreate-kube --help` command
 ```
-$ kreate-kube --help
-usage: kreate-kube [optional arguments] [<subcommand>] [subcommand options]
+$ kreate --help
+usage: kreate [optional arguments] [<subcommand>] [subcommand options]
 
 kreates files for deploying applications on kubernetes
 
+positional arguments:
+  see subcommands
+
 optional arguments:
   -h, --help            show this help message and exit
+  --testdummy           do not dekrypt values
+  -d DEFINE, --define DEFINE
+                        define yame (toplevel) element
+  -i INKLUDE, --inklude INKLUDE
+                        inklude extra files before parsing main konfig
   -k KONF, --konf KONF  konfig file or directory to use (default=.)
   -v, --verbose         output more details (inluding stacktrace) -vv even more
   -w, --warn            only output warnings
   -q, --quiet           do not output any info, just essential output
   -K, --keep-secrets    do not remove secrets dirs
-  -R, --skip-requires   do not check if required dependency versions are installed
+  -C, --skip-version-check
+                        do not check if required version of kreate is used
+  -F, --force-version-check
+                        force version check even if development version is detected
+  --no-dotenv           do not load a .env file for working dir
 
 subcommands:
+  clear_repo_cache  cc  clear the repo cache
   version           vr  view the version
-  view_strukture    vs  view the application strukture
-  view_defaults     vd  view the application strukture defaults
-  view_values       vv  view the application values
+  view              v   view the entire konfig or subkey(s)
   view_template     vt  view the template for a specific kind
-  view_konfig       vk  view the application konfig file (with defaults)
-  requirements      rq  view the listed requirements
-  dekyaml           dy  dekrypt values in a yaml file
+  dek_lines         dl  dekrypt lines in a text file
   dekstr            ds  dekrypt string value
   dekfile           df  dekrypt an entire file
-  enkyaml           ey  enkrypt values in a yaml file
+  enk_lines         el  enkrypt lines in a text file
   enkfile           ef  enkrypt an entire file
   enkstr            es  enkrypt string value
   files             f   kreate all the files (default command)

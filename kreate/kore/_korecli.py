@@ -177,7 +177,7 @@ class KoreCli:
             "--define",
             action="append",
             default=[],
-            help="define yame (toplevel) element",
+            help="add yaml (toplevel) element to konfig file",
         )
         self.cli.add_argument(
             "-i",
