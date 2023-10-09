@@ -76,6 +76,8 @@ class DictWrapper(UserDict):
                 data[final_key].update(value)
             else:
                 data[final_key] = value
+        elif final_key == "[0]" and isinstance(data, Sequence):
+            deep_update(data[0], value)
         else:
             data[final_key] = value
 
