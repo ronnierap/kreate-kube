@@ -27,6 +27,7 @@ def argument(*name_or_flags, **kwargs):
 
 class KoreCli:
     def __init__(self):
+        self.load_dotenv()
         self._konfig = None
         self._app = None
         self.epilog = "subcommands:\n"
@@ -111,8 +112,12 @@ class KoreCli:
         return parser
 
     def load_dotenv(self) -> None:
-        if self.args.no_dotenv:
-            return
+        # Primitive way to check if to load ENV vars before parsing vars
+        # .env needs to be loaded before arg parsing, since it may
+        # contain KREATE_OPTIONS
+        for arg in sys.argv:
+            if arg == "--no-dotenv":
+                return
         try:
             dotenv.load_dotenv(".env")
         except Exception as e:
@@ -144,7 +149,6 @@ class KoreCli:
         self.process_main_options(self.args)
         app = None
         try:
-            self.load_dotenv()
             if self.args.subcommand is None:
                 app = self.default_command()
             else:
