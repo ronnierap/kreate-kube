@@ -35,6 +35,8 @@ class JinYaml:
                 f"Syntax Error in jinja2 template {e.filename}:{e.lineno} {e.message}"
             )
             raise
+        except TypeError:
+            raise ValueError(f"Problem loading jinja template {filename}")
         except jinja2.exceptions.TemplateError as e:
             found = False
             for line in traceback.format_exc().splitlines():
