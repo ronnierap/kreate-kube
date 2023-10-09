@@ -1,6 +1,6 @@
 import logging
 
-from ..kore import JinYamlKomponent
+from ..kore import JinYamlKomponent, deep_update, wrap
 from ..krypt.krypt_functions import dekrypt_str
 
 logger = logging.getLogger(__name__)
@@ -65,6 +65,17 @@ class Deployment(Resource):
         if self.shortname == "main":
             return self.app.appname
         return f"{self.app.appname}-{self.shortname}"
+
+    def aktivate(self):
+        super().aktivate()
+        self.add_container_additions()
+
+    def add_container_additions(self):
+        additions = self.strukture.get("add_to_container", {})
+        if additions:
+            container = wrap(self.yaml._get_path("spec.template.spec.containers")[0])
+            for path in additions:
+                container._set_path(path, additions[path])
 
     def pod_annotation(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.spec.template.metadata:
