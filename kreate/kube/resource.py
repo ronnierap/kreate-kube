@@ -68,14 +68,22 @@ class Deployment(Resource):
 
     def aktivate(self):
         super().aktivate()
-        self.add_container_additions()
+        self.add_container_items()
+        self.remove_container_items()
 
-    def add_container_additions(self):
+    def add_container_items(self):
         additions = self.strukture.get("add_to_container", {})
         if additions:
             container = wrap(self.yaml._get_path("spec.template.spec.containers")[0])
             for path in additions:
                 container._set_path(path, additions[path])
+
+    def remove_container_items(self):
+        additions = self.strukture.get("remove_from_container", {})
+        if additions:
+            container = wrap(self.yaml._get_path("spec.template.spec.containers")[0])
+            for path in additions:
+                container._del_path(path)
 
     def pod_annotation(self, name: str, val: str) -> None:
         if "annotations" not in self.yaml.spec.template.metadata:
