@@ -26,6 +26,7 @@ class Konfig:
         filename = os.path.basename(filename)
         self.file_getter = FileGetter(self, self.dir)
         dict_ = dict_ or {}
+        deep_update(dict_, {"system": { "getenv":  os.getenv}})
         for ink in inkludes or []:
             deep_update(dict_, self.jinyaml.render(ink, dict_))
         deep_update(dict_, self.jinyaml.render(filename, dict_))
