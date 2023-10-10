@@ -228,9 +228,17 @@ class BitbucketZipRepo(BaseRepo):
 class BitbucketFileRepo(BitbucketZipRepo):
     def download(self):
         content = self.url_response().content
+        path = self.calc_repo_dir() / self.filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+
+    def calc_repo_dir(self) -> Path:
+        bitb_project = self.repo_konf.get("bitbucket_project")
+        bitb_repo = self.repo_konf.get("bitbucket_repo")
+        return cache_dir() / f"{self.repo_name}-{bitb_project}/{bitb_repo}/{self.version}"
 
     def calc_url(self) -> str:
-        return self._calc_url(f"/raw/{self.filename}")
+        return self._calc_url(f"raw/{self.filename}")
 
 def unzip(
     zfile: zipfile.ZipFile,
