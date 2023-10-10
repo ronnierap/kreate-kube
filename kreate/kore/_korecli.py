@@ -6,7 +6,7 @@ import logging
 import traceback
 import inspect
 
-from ._core import pprint_map
+from ._core import pprint_map, wrap
 from ._repo import clear_cache
 
 from . import _jinyaml
@@ -55,7 +55,7 @@ class KoreCli:
         result = {}
         for d in self.args.define:
             k, v = d.split("=",1)
-            result[k] = v
+            wrap(result).set(k, v)
         return result
 
     def konfig(self):
