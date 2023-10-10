@@ -64,7 +64,7 @@ class FileGetter:
                 logger.debug(f"ignoring optional file {orig_file}")
                 return ""
             else:
-                raise FileExistsError("non-optional file {orig_file} does not exist")
+                raise FileExistsError(f"non-optional file {orig_file} does not exist")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
@@ -206,35 +206,31 @@ class UrlZipRepo(BaseRepo):
 
 class BitbucketZipRepo(BaseRepo):
     def download(self):
-        if self.version.startswith("branch-"):
-            version = version[7:]
-            logger.warning(
-                f"Using branch {version} as version is not recommended, use a tag instead"
-            )
-            version = f"refs/heads/{version}"
-        else:
-            version = f"refs/tags/{version}"
-        url: str = self.repo_konf.get("url")
-        url = url.replace("{version}", version)
         data = self.url_response().content
         self.unzip_data(data)
 
+    def calc_url(self) -> str:
+        return self._calc_url("archive")
 
-class BitbucketFileRepo(BaseRepo):
-    def download(self, repo_dir, repo_konf, version: str, filename: str):
-        if version.startswith("branch-"):
-            version = version[7:]
+    def _calc_url(self, ext: str) -> str:
+        url = self.repo_konf.get("url", None)
+        url += f"/{ext}"
+        if self.version.startswith("branch-"):
+            version = self.version[7:]
             logger.warning(
                 f"Using branch {version} as version is not recommended, use a tag instead"
             )
-            version = f"refs/heads/{version}"
+            url += f"?at=refs/heads/{version}&format=zip"
         else:
-            version = f"refs/tags/{version}"
-        url: str = repo_konf.get("url")
-        url = url.replace("{version}", version)
-        url = url.replace("{filename}", filename)
-        content = self.url_response(url, repo_dir, repo_konf).content
+            url += f"at=refs/tags/{self.version}&format=zip"
+        return url
 
+class BitbucketFileRepo(BitbucketZipRepo):
+    def download(self):
+        content = self.url_response().content
+
+    def calc_url(self) -> str:
+        return self._calc_url(f"/raw/{self.filename}")
 
 def unzip(
     zfile: zipfile.ZipFile,
