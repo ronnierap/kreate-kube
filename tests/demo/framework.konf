@@ -30,6 +30,7 @@ system:
       url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip
       skip_levels: 3
       select_regexp: "shared-.*"
+      type: url-zip
     shared_templates:
       #authenticate:
       #  basic: True
