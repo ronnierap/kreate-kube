@@ -104,6 +104,12 @@ class DictWrapper(UserDict):
         else:
             logger.warn(f"non existent key {final_key} in del_path {path}")
 
+    def get(self, path: str, default=None):
+        return self._get_path(path, default)
+
+    def set(self, path: str, val):
+        return self._set_path(path, val)
+
     def _get_path(self, path: str, default=None):
         keys = path.split(".")
         data = self.data
