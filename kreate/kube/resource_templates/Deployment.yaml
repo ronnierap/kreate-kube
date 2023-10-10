@@ -40,10 +40,12 @@ spec:
             name: {{ secr }}
         {% endfor %}
 {% endif %}
+{% if strukt.get("vars",[]) %}
         - configMapRef:
         {% for cm in strukt.get("vars",[]) %}
             name: {{ cm }}
         {% endfor %}
+{% endif %}
         ports:
         - containerPort: {{ my.field.containerPort }}
           protocol: {{ my.field.protocol }}

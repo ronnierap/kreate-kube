@@ -278,10 +278,7 @@ spec:
     serviceName: jantje
     spec:
       containers:
-      - envFrom:
-        - secretRef: null
-        - configMapRef: null
-        image: https://repo.kisst.org/demo.app:v1.3.4
+      - image: https://repo.kisst.org/demo.app:v1.3.4
         name: app
         ports:
         - containerPort: 8080
