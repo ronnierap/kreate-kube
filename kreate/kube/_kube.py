@@ -2,7 +2,7 @@ import logging
 from typing import List
 from ..kore import JinjaApp, Konfig
 from ..krypt import KryptKonfig
-from . import resource, resource_templates
+from . import resource, templates
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +32,11 @@ class KubeApp(JinjaApp):
         self.register_resource_file("StatefulSet", filename="Deployment.yaml")
 
     def register_resource_class(self, cls) -> None:
-        package = resource_templates
+        package = templates
         super().register_template_class(cls, package=package)
 
     def register_resource_file(self, kind: str, filename: str = None) -> None:
-        package = resource_templates
+        package = templates
         cls = resource.Resource
         super().register_template_file(kind, cls, filename=filename, package=package)
 

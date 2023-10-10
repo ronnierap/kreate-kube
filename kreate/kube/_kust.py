@@ -1,13 +1,11 @@
 import logging
 
-from ..kore import Konfig, wrap
 from ..kore import JinYamlKomponent
 from .resource import Resource
 from . import KubeApp
-from . import other_templates
-from . import patch_templates
+from . import templates
 from .patch import EgressLabels
-from .patch import Patch, MultiPatch
+from .patch import Patch
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +13,8 @@ logger = logging.getLogger(__name__)
 class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
-        self.register_template_class(Kustomization, package=other_templates)
-        self.register_template_class(EgressLabels, package=patch_templates)
+        self.register_template_class(Kustomization, package=templates)
+        self.register_template_class(EgressLabels, package=templates)
         self.register_patch_file("AntiAffinity")
         self.register_patch_file("HttpProbes")
         self.register_patch_file("VolumeMounts")
@@ -24,7 +22,7 @@ class KustApp(KubeApp):
         self.register_patch_file("SidecarContainer")
 
     def register_patch_file(self, kind: str = None) -> None:
-        package = patch_templates
+        package = templates
         super().register_template_file(kind=kind, cls=Patch, package=package)
 
     def kreate_komponents_from_strukture(self):
