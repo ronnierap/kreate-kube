@@ -6,7 +6,6 @@ from .. import krypt
 from ..krypt import krypt_functions
 from ._kust import KustApp
 from ._kube import KubeKonfig
-from ._kubeconfig import kreate_kubeconfig
 
 logger = logging.getLogger(__name__)
 
@@ -34,13 +33,6 @@ class KubeCli(krypt.KryptCli):
             help="file with expected output of build",
             action="store",
             default=None,
-        )
-        cmd = self.add_subcommand(kubeconfig, [], aliases=["kc"])
-        cmd.add_argument(
-            "-f",
-            "--force",
-            help="overwrite existing file",
-            action="store_true",
         )
 
     def get_packages(self):
@@ -124,9 +116,3 @@ def testupdate(cli: KubeCli) -> None:
     cmd = f"kustomize build {app.target_dir} >{expected}"
     logger.info(f"running: {cmd}")
     os.system(cmd)
-
-
-def kubeconfig(cli: KubeCli):
-    """kreate a kubeconfig file from a template"""
-    konfig = cli.konfig()
-    kreate_kubeconfig(konfig, force=cli.args.force)

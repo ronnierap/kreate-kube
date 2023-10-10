@@ -194,3 +194,11 @@ class Ingress(Resource):
         self.nginx_annon("auth-type", "basic")
         self.nginx_annon("auth-secret", secret)
         self.nginx_annon("auth-realm", self.app.appname + "-realm")
+
+
+class KubeconfigFile(JinYamlKomponent):
+    @property
+    def filename(self):
+        if self.strukture.get("filename"):
+            return self.strukture.get("filename")
+        return "kubeconfig.yaml"
