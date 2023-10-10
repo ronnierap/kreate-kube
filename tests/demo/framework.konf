@@ -9,7 +9,7 @@ inklude:
 - override-{{app.appname}}-{{app.env}}.yaml
 
 system:
-  templates:
+  template:
     MyUdpService:
       class: kreate.kube.resource.Resource
       template: ./templates/MyUdpService.yaml

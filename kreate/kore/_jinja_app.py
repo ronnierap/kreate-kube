@@ -24,7 +24,7 @@ class JinjaApp(App):
         self.register_templates_from_konfig()
 
     def register_templates_from_konfig(self):
-        templates = self.konfig.yaml._get_path("system.templates", {})
+        templates = self.konfig.yaml.get("system.template", {})
         for key, _def in templates.items():
             logger.info(f"adding custom template {key}")
             self.register_template_path(key, _def["class"], _def["template"])
