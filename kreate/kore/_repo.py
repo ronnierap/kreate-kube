@@ -11,8 +11,6 @@ import logging
 import importlib
 from pathlib import Path
 
-# from ..krypt import KryptKonfig, krypt_functions
-
 logger = logging.getLogger(__name__)
 
 
@@ -34,6 +32,7 @@ class FileGetter:
         self.dir = Path(dir)
 
     def get_data(self, file: str) -> str:
+        orig_file = file
         dekrypt = False
         optional = False
         if file.startswith("optional:"):
@@ -60,8 +59,12 @@ class FileGetter:
             data = self.load_repo_data(file)
         else:
             data = self.load_file_data(file)
-        if optional and data is None:
-            return ""
+        if data is None:
+            if optional:
+                logger.debug(f"ignoring optional file {orig_file}")
+                return ""
+            else:
+                raise FileExistsError("non-optional file {orig_file} does not exist")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
@@ -91,79 +94,134 @@ class FileGetter:
         return data.decode("utf-8")
 
     def load_repo_data(self, filename: str) -> str:
-        repo = filename.split(":")[0]
-        dir = self.repo_dir(repo)
-        filename = filename[len(repo) + 1 :]
-        p = Path(dir, filename)
+        repo = self.get_repo(filename)
+        return repo.get_data()
+        #if not repo_dir.is_dir():
+        #    # add other assertions, or better error message?
+        #    raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
+        #p = Path(dir, filename)
+        #if not p.exists():
+        #    return None
+        #return p.read_text()
+
+    def get_repo(self, filename: str):
+        repo_name = filename.split(":")[0]
+        filename = filename[len(repo_name) + 1 :]
+        type = self.konfig.yaml.get(f"system.repo.{repo_name}.type", None)
+        if type == "url-zip":
+            return UrlZipRepo(self.konfig, repo_name, filename)
+        elif type == "local-dir":
+            return LocalDirRepo(self.konfig, repo_name, filename)
+        elif type == "local-zip":
+            return LocalZipRepo(self.konfig, repo_name, filename)
+        elif type == "bitbucket-zip":
+            return BitbucketZipRepo(self.konfig, repo_name, filename)
+        elif type == "bitbucket-file":
+            return BitbucketFileRepo(self.konfig, repo_name, filename)
+        else:
+            raise ValueError(f"Unknow repo type {type} for repo {repo_name}:{filename}")
+
+class BaseRepo:
+    def __init__(self, konfig, repo_name: str, filename: str):
+        self.konfig = konfig
+        self.repo_name = repo_name
+        self.filename = filename
+        self.repo_konf = konfig.yaml.get("system.repo." + repo_name, {})
+        self.version = self.repo_konf.get("version", None)
+        self.repo_dir = self.calc_repo_dir()
+
+    def get_data(self):
+        if not self.repo_dir.exists():
+            self.download()
+        if not self.repo_dir.is_dir():
+            # add other assertions, or better error message?
+            raise FileExistsError(f"repo dir {self.repo_dir} exists, but is not a directory")
+        p = self.repo_dir / self.filename
         if not p.exists():
-            return None
+            raise FileNotFoundError(f"could not find file {self.filename} in {self.repo_dir}")
         return p.read_text()
 
-    def repo_dir(self, repo_name: str) -> Path:
-        repo_konf = self.konfig.yaml["system"]["repo"].get(repo_name, {})
-        if repo_konf.get("type", None) == "local-dir":
-            # special case, does not cache dir
-            repo_dir = self.local_dir_repo(repo_konf)
-        else:
-            repo_dir = self.download_repo(repo_name)
-        if not repo_dir.is_dir():
-            # add other assertions, or better error message?
-            raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
-        return repo_dir
+    def download(self):
+        pass
 
-    def local_dir_repo(self, repo_konf: Mapping):
-        dir = repo_konf["dir"]
-        # TODO: this is not relative to dir of konf file
-        # not sure what is best
-        version = repo_konf.get("version", None)
-        if version:
-            dir = dir.replace("version", version)
-        return Path(dir)
-
-    def download_repo(self, repo_name: str):
-        repo_konf = self.konfig.yaml["system"]["repo"].get(repo_name, {})
-        version = repo_konf.get("version", None)
-        if version:
-            repo_dir = cache_dir() / f"{repo_name}-{version}"
+    def calc_repo_dir(self) -> Path:
+        if self.version:
+            return cache_dir() / f"{self.repo_name}-{self.version}"
         else:
-            repo_dir = cache_dir() / f"{repo_name}"
-        if repo_dir.exists():
-            # nothing needs to be downloaded, maybe extra checks needed?
-            return repo_dir
-        type = repo_konf.get("type", "url-zip")
-        if type == "url-zip":
-            data = self.url_data(repo_dir, repo_konf, version)
-            self.unzip_data(repo_dir, repo_konf, data)
-        elif type == "bitbucket-zip":
-            data = self.bitbucket_data(repo_dir, repo_konf, version)
-            self.unzip_data(repo_dir, repo_konf, data)
-        elif type == "local-zip":
-            data = self.local_path_data(repo_dir, repo_konf, version)
-            self.unzip_data(repo_dir, repo_konf, data)
-        else:
-            raise ValueError(f"Unknow repo type {type} for repo {repo_name}")
-        return repo_dir
+            return cache_dir() / f"{self.repo_name}"
 
-    def url_data(self, repo_dir, repo_konf, version):
-        url: str = repo_konf.get("url")
+    def calc_url(self):
+        url = self.repo_konf.get("url", None)
+        if self.version:
+            url = url.replace("{version}", self.version)
+        return url
+
+    def unzip_data(self, data) -> None:
+        z = zipfile.ZipFile(io.BytesIO(data))
+        skip_levels = self.repo_konf.get("skip_levels", 0)
+        regexp = self.repo_konf.get("select_regexp", "")
+        self.repo_dir.mkdir(parents=True)
+        unzip(z, self.repo_dir, skip_levels=skip_levels, select_regexp=regexp)
+
+    def url_response(self):
         auth = None
-        if repo_konf.get("basic_auth", {}):
-            usr_env_var = repo_konf["basic_auth"]["usr_env_var"]
-            psw_env_var = repo_konf["basic_auth"]["psw_env_var"]
+        if self.repo_konf.get("basic_auth", {}):
+            usr_env_var = self.repo_konf["basic_auth"]["usr_env_var"]
+            psw_env_var = self.repo_konf["basic_auth"]["psw_env_var"]
             usr = os.getenv(usr_env_var)
             psw = os.getenv(psw_env_var)
             auth = requests.auth.HTTPBasicAuth(usr, psw)
-        if version:
-            url = url.replace("{version}", version)
-        logger.info(f"downloading {repo_dir} from {url}")
+        url = self.calc_url()
+        logger.info(f"downloading {self.repo_dir} from {url}")
         response = requests.get(url, auth=auth)
         if response.status_code >= 300:
             raise IOError(
                 f"status {response.status_code} while downloading {url} with message {response.content}"
             )
-        return response.content
+        return response
 
-    def bitbucket_data(self, repo_dir, repo_konf, version: str):
+class LocalDirRepo(BaseRepo):
+    def calc_repo_dir(self):
+        dir: str = self.repo_konf.get("dir")
+        if self.version:
+            dir = dir.replace("{version}", self.version)
+        return Path(dir)
+
+
+class LocalZipRepo(BaseRepo):
+    def download(self):
+        path: str = self.repo_konf.get("path")
+        if self.version:
+            path = path.replace("{version}", self.version)
+        logger.info(f"unzipping {self.repo_dir} from {path}")
+        data = Path(path).read_bytes()
+        self.unzip_data(data)
+
+
+class UrlZipRepo(BaseRepo):
+    def download(self):
+            data = self.url_response().content
+            self.unzip_data(data)
+
+
+class BitbucketZipRepo(BaseRepo):
+    def download(self):
+        if self.version.startswith("branch-"):
+            version = version[7:]
+            logger.warning(
+                f"Using branch {version} as version is not recommended, use a tag instead"
+            )
+            version = f"refs/heads/{version}"
+        else:
+            version = f"refs/tags/{version}"
+        url: str = self.repo_konf.get("url")
+        url = url.replace("{version}", version)
+        data = self.url_response().content
+        self.unzip_data(data)
+
+
+class BitbucketFileRepo(BaseRepo):
+    def download(self, repo_dir, repo_konf, version: str, filename: str):
         if version.startswith("branch-"):
             version = version[7:]
             logger.warning(
@@ -172,36 +230,25 @@ class FileGetter:
             version = f"refs/heads/{version}"
         else:
             version = f"refs/tags/{version}"
-        return self.url_data(repo_dir, repo_konf, version)
-
-    def local_path_data(self, repo_dir, repo_konf, version):
-        path: str = repo_konf.get("path")
-        if version:
-            path = path.replace("{version}", version)
-        logger.info(f"unzipping {repo_dir} from {path}")
-        return Path(path).read_bytes()
-
-    def unzip_data(self, repo_dir: str, repo_konf: Mapping, data) -> None:
-        z = zipfile.ZipFile(io.BytesIO(data))
-        skip_levels = repo_konf.get("skip_levels", 0)
-        regexp = repo_konf.get("select_regexp", "")
-        repo_dir.mkdir(parents=True)
-        unzip(z, repo_dir, skip_levels=skip_levels, select_regexp=regexp)
+        url: str = repo_konf.get("url")
+        url = url.replace("{version}", version)
+        url = url.replace("{filename}", filename)
+        content = self.url_response(url, repo_dir, repo_konf).content
 
 
 def unzip(
     zfile: zipfile.ZipFile,
-    repo_dir: Path,
+    dir: Path,
     skip_levels: int = 0,
     select_regexp: str = None,
 ):
     if skip_levels == 0 and not select_regexp:
-        zfile.extractall(repo_dir)
+        zfile.extractall(dir)
         return
     for fname in zfile.namelist():
         newname = "/".join(fname.split("/")[skip_levels:])
         if newname and re.match(select_regexp, newname):
-            newpath = repo_dir / newname
+            newpath = dir / newname
             if fname.endswith("/"):
                 logger.info(f"extracting dir  {newname}")
                 newpath.mkdir(parents=True, exist_ok=True)
