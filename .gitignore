@@ -5,3 +5,4 @@ venv
 zzz-tmp
 dist
 .pdm-python
+.env
