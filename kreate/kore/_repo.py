@@ -210,24 +210,21 @@ class BitbucketZipRepo(BaseRepo):
         self.unzip_data(data)
 
     def calc_url(self) -> str:
-        return self._calc_url("archive")
+        return self._calc_url("archive", "&format=zip")
 
-    def _calc_url(self, ext: str) -> str:
+    def _calc_url(self, ext: str, format:str = "") -> str:
         url = self.repo_konf.get("url", None)
         url += f"/{ext}"
-        if self.version.startswith("branch:"):
+        if self.version.startswith("branch."):
             version = self.version[7:]
             logger.warning(
                 f"Using branch {version} as version is not recommended, use a tag instead"
             )
-            url += f"?at=refs/heads/{version}&format=zip"
+            url += f"?at=refs/heads/{version}" + format
         else:
-            url += f"?at=refs/tags/{self.version}&format=zip"
+            url += f"?at=refs/tags/{self.version}" + format
         bitbucket_project = self.repo_konf.get("bitbucket_project")
         bitbucket_repo = self.repo_konf.get("bitbucket_repo")
-        print(self.repo_konf)
-        print(bitbucket_project)
-        print(bitbucket_repo)
         if bitbucket_project:
             url = url.replace("{project}", bitbucket_project)
         if bitbucket_repo:
@@ -244,7 +241,8 @@ class BitbucketFileRepo(BitbucketZipRepo):
     def calc_repo_dir(self) -> Path:
         bitb_project = self.repo_konf.get("bitbucket_project")
         bitb_repo = self.repo_konf.get("bitbucket_repo")
-        return cache_dir() / f"{self.repo_name}-{bitb_project}/{bitb_repo}/{self.version}"
+        version = self.version.replace("/", "-")
+        return cache_dir() / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}"
 
     def calc_url(self) -> str:
         return self._calc_url(f"raw/{self.filename}")
