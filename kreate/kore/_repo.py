@@ -215,14 +215,23 @@ class BitbucketZipRepo(BaseRepo):
     def _calc_url(self, ext: str) -> str:
         url = self.repo_konf.get("url", None)
         url += f"/{ext}"
-        if self.version.startswith("branch-"):
+        if self.version.startswith("branch:"):
             version = self.version[7:]
             logger.warning(
                 f"Using branch {version} as version is not recommended, use a tag instead"
             )
             url += f"?at=refs/heads/{version}&format=zip"
         else:
-            url += f"at=refs/tags/{self.version}&format=zip"
+            url += f"?at=refs/tags/{self.version}&format=zip"
+        bitbucket_project = self.repo_konf.get("bitbucket_project")
+        bitbucket_repo = self.repo_konf.get("bitbucket_repo")
+        print(self.repo_konf)
+        print(bitbucket_project)
+        print(bitbucket_repo)
+        if bitbucket_project:
+            url = url.replace("{project}", bitbucket_project)
+        if bitbucket_repo:
+            url = url.replace("{repo}", bitbucket_repo)
         return url
 
 class BitbucketFileRepo(BitbucketZipRepo):
