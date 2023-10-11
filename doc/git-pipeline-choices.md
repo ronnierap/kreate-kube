@@ -6,7 +6,7 @@ that are triggered by git repositories
 We have several choices where to store the kreate konfig files for a specific application `<app>`.
 In this case we assume that the application source code is in a git repository called `<app>.app`.
 
-:
+Possibilites
 - `<app>.app` repository together with the application source code
 - `deploy-<app>` repository for all environments
 - `deploy-<app>-<env>` repository for all environments
@@ -24,12 +24,13 @@ docker image in that version
 
 The git repo layout would be something as follows (omitting all application source code)
 ### `<app>.app` repo:
-- src: *source code needed to build the application*
-- docker: *directory with information to build the docker image
+```
+- src:             source code needed to build the application*
+- docker:          directory with information to build the docker image
   - Dockerfile
   - Jenkinsfile-docker
   - ...
-- kreate: *all information needed to run kreate for all environments*
+- kreate:          all information needed to run kreate for all environments
   - framework/
     - Jenkinsfile-acc
     - Jenkinsfile-prd
@@ -43,6 +44,7 @@ The git repo layout would be something as follows (omitting all application sour
     - deploy-<app>-prd.konf
     - values-<app>-prd.konf
     - secrets-<app>-prd.konf
+```
 
 The difficulty with this approach might be
 - you need branches to signal when to deploy to an environment
@@ -71,12 +73,14 @@ Notes:
 In this case we might still put some kreate konfig in the app repository
 This will only be the generic konfig that should be identical for all environments
 This can be inkluded from other konfig's
+```
 - kreate/
   - <app>-strukt.konf
+```
 
 ### `deploy-<app>` repo:
 Most of the konfig we be in a separate git repository
-
+```
 - framework/
   - Jenkinsfile-acc
   - Jenkinsfile-prd
@@ -90,13 +94,16 @@ Most of the konfig we be in a separate git repository
   - values-<app>-prd.konf
   - secrets-<app>-prd.konf
   -
+```
 
 ## `deploy-<app>-<env>` repository for all environments
 ### `<app>.app` repo:
+```
 - kreate/
   - <app>-strukt.konf
-
+```
 ### `deploy-<app>-acc` repo:
+```
 - framework/
   - Jenkinsfile-acc
   - init-framework-1.0.konf
@@ -104,3 +111,4 @@ Most of the konfig we be in a separate git repository
 - values-<app>-acc.konf
 - secrets-<app>-acc.konf
 - <app>-strukt.konf *optional or from `<app>.app:kreate/<app>-strukt.konf`*
+```
