@@ -133,6 +133,8 @@ class ListWrapper(UserList):
 
 
 def wrap(obj):
+    if isinstance(obj, str):
+        return obj
     if isinstance(obj, Sequence) and not isinstance(obj, ListWrapper):
         return ListWrapper(obj)
     if isinstance(obj, Mapping) and not isinstance(obj, DictWrapper):
