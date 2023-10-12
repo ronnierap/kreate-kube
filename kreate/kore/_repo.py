@@ -1,4 +1,4 @@
-from typing import Mapping
+from typing import Mapping, Protocol
 import requests
 import requests.auth
 import zipfile
@@ -27,9 +27,28 @@ def clear_cache():
 
 
 class FileGetter:
-    def __init__(self, konfig, dir: str):
+    def __init__(self, konfig, dir: Path):
         self.konfig = konfig
-        self.dir = Path(dir)
+        self.dir = dir # Path(dir)
+        self.repo_prefixes = {
+            "konf:":  LocalDirRepo(dir),
+            "cwd:":   LocalDirRepo(Path.cwd()),
+            "home:":  LocalDirRepo(Path.home()),
+            "./":     LocalDirRepo(dir),
+            "../":    LocalDirRepo(dir.parent),
+            "py:": PythonPackageRepo(konfig, None)
+        }
+        self.repo_types = {
+            "url-zip:":  UrlZipRepo,
+            "local-dir:":  LocalKonfigRepo,
+            "local-zip:":  LocalZipRepo,
+            "bitbucket-zip:":  BitbucketZipRepo,
+            "bitbucket-file:":  BitbucketFileRepo,
+        }
+
+    def konfig_repos(self):
+        for repo in self.konfig.get_path("system.repo",[]):
+            self.repo_prefixes[repo + ":"] = self.get_repo(repo)
 
     def get_data(self, file: str) -> str:
         orig_file = file
@@ -41,22 +60,30 @@ class FileGetter:
         if file.startswith("dekrypt:"):
             dekrypt = True
             file = file[8:]
-        if file.startswith("repo:"):
-            data = self.load_repo_data(file[5:])
-        elif file.startswith("py:"):
-            data = self.load_package_data(file[3:])
-        elif file.startswith("konf:"):
-            data = self.load_file_data(file[5:])
-        elif file.startswith("cwd:"):
-            data = self.load_file_data(Path.cwd() / file[4:])
-        elif file.startswith("home:"):
-            data = self.load_file_data(Path.home() / file[5:])
-        elif file.startswith("./"):
-            data = self.load_file_data(file)
-        elif file.startswith("../"):
-            data = self.load_file_data(file)
-        elif re.match("\w\w+:", file):
-            data = self.load_repo_data(file)
+        repo = None
+        for prefix in self.repo_prefixes:
+            if file.startswith(prefix):
+                file = file[len(prefix):]
+                repo = self.repo_prefixes[prefix]
+        if repo:
+            data = repo.get_data(file, optional=optional)
+
+#        elif file.startswith("repo:"):
+#            data = self.load_repo_data(file[5:])
+#        elif file.startswith("py:"):
+#            data = self.load_package_data(file[3:])
+#        elif file.startswith("konf:"):
+#            data = self.load_file_data(file[5:])
+#        elif file.startswith("cwd:"):
+#            data = self.load_file_data(Path.cwd() / file[4:])
+#        elif file.startswith("home:"):
+#            data = self.load_file_data(Path.home() / file[5:])
+#        elif file.startswith("./"):
+#            data = self.load_file_data(file)
+#        elif file.startswith("../"):
+#            data = self.load_file_data(file)
+#        elif re.match("\w\w+:", file):
+#            data = self.load_repo_data(file)
         else:
             data = self.load_file_data(file)
         if data is None:
@@ -85,17 +112,11 @@ class FileGetter:
             return None
         return path.read_text()
 
-    def load_package_data(self, filename: str) -> str:
-        package_name = filename.split(":")[0]
-        filename = filename[len(package_name) + 1 :]
-        package = importlib.import_module(package_name)
-        logger.debug(f"loading file {filename} from package {package_name}")
-        data = pkgutil.get_data(package.__package__, filename)
-        return data.decode("utf-8")
 
-    def load_repo_data(self, filename: str) -> str:
-        repo = self.get_repo(filename)
-        return repo.get_data()
+
+    #def load_repo_data(self, filename: str) -> str:
+    #    repo = self.get_repo(filename)
+    #    return repo.get_data(filename, )
         #if not repo_dir.is_dir():
         #    # add other assertions, or better error message?
         #    raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
@@ -104,53 +125,83 @@ class FileGetter:
         #    return None
         #return p.read_text()
 
-    def get_repo(self, filename: str):
-        repo_name = filename.split(":")[0]
-        filename = filename[len(repo_name) + 1 :]
-        type = self.konfig.yaml.get(f"system.repo.{repo_name}.type", None)
+    def get_repo(self, repo_name: str):
+        type = self.konfig.get_path(f"system.repo.{repo_name}.type", None)
         if type == "url-zip":
-            return UrlZipRepo(self.konfig, repo_name, filename)
+            return UrlZipRepo(self.konfig, repo_name)
         elif type == "local-dir":
-            return LocalDirRepo(self.konfig, repo_name, filename)
+            return LocalKonfigRepo(self.konfig, repo_name)
         elif type == "local-zip":
-            return LocalZipRepo(self.konfig, repo_name, filename)
+            return LocalZipRepo(self.konfig, repo_name)
         elif type == "bitbucket-zip":
-            return BitbucketZipRepo(self.konfig, repo_name, filename)
+            return BitbucketZipRepo(self.konfig, repo_name)
         elif type == "bitbucket-file":
-            return BitbucketFileRepo(self.konfig, repo_name, filename)
+            return BitbucketFileRepo(self.konfig, repo_name)
         else:
-            raise ValueError(f"Unknow repo type {type} for repo {repo_name}:{filename}")
+            raise ValueError(f"Unknow repo type {type} for repo {repo_name}")
 
-class BaseRepo:
-    def __init__(self, konfig, repo_name: str, filename: str):
-        self.konfig = konfig
-        self.repo_name = repo_name
-        self.filename = filename
-        self.repo_konf = konfig.yaml.get("system.repo." + repo_name, {})
-        self.version = self.repo_konf.get("version", None)
-        self.repo_dir = self.calc_repo_dir()
+class Repo(Protocol):
+    def get_data(self, filename: str, optional: bool = False) -> str:
+        ...
 
-    def get_data(self):
-        if not self.repo_dir.exists():
-            self.download()
-        if not self.repo_dir.is_dir():
+class DirRepo(Repo):
+    def calc_dir(self):
+        raise NotImplementedError
+
+    def download(self, filename: str):
+        raise NotImplementedError
+
+    def get_data(self, filename: str, optional: bool = False):
+        dir = Path(self.calc_dir())
+        if not dir.exists():
+            self.download(filename)
+        if not dir.is_dir():
             # add other assertions, or better error message?
-            raise FileExistsError(f"repo dir {self.repo_dir} exists, but is not a directory")
-        p = self.repo_dir / self.filename
+            raise FileExistsError(f"repo dir {dir} exists, but is not a directory")
+        p = dir / filename
         if not p.exists():
-            raise FileNotFoundError(f"could not find file {self.filename} in {self.repo_dir}")
+            if optional:
+                return ""
+            raise FileNotFoundError(f"could not find file {filename} in {dir}")
         return p.read_text()
 
-    def download(self):
-        pass
+class LocalDirRepo(DirRepo):
+    def __init__(self, dir: Path):
+        self.dir = dir
 
-    def calc_repo_dir(self) -> Path:
+    def calc_dir(self):
+        return self.dir
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.dir})"
+
+class PythonPackageRepo(Repo):
+    def get_data(self, filename: str, optional: bool = False) -> str:
+        package_name = filename.split(":")[0]
+        filename = filename[len(package_name) + 1 :]
+        package = importlib.import_module(package_name)
+        logger.debug(f"loading file {filename} from package {package_name}")
+        data = pkgutil.get_data(package.__package__, filename)
+        return data.decode("utf-8")
+
+class KonfigRepo(DirRepo):
+    def __init__(self, konfig, repo_name:str):
+        self.konfig = konfig
+        self.repo_name = repo_name
+        self.repo_konf = konfig.get_path("system.repo." + repo_name, {})
+        self.version = self.repo_konf.get("version", None)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.repo_name}, version={self.version})"
+
+
+    def calc_dir(self) -> Path:
         if self.version:
             return cache_dir() / f"{self.repo_name}-{self.version}"
         else:
             return cache_dir() / f"{self.repo_name}"
 
-    def calc_url(self):
+    def calc_url(self, filename: str) -> str:
         url = self.repo_konf.get("url", None)
         if self.version:
             url = url.replace("{version}", self.version)
@@ -160,10 +211,10 @@ class BaseRepo:
         z = zipfile.ZipFile(io.BytesIO(data))
         skip_levels = self.repo_konf.get("skip_levels", 0)
         regexp = self.repo_konf.get("select_regexp", "")
-        self.repo_dir.mkdir(parents=True)
-        unzip(z, self.repo_dir, skip_levels=skip_levels, select_regexp=regexp)
+        self.calc_dir().mkdir(parents=True)
+        unzip(z, self.calc_dir(), skip_levels=skip_levels, select_regexp=regexp)
 
-    def url_response(self):
+    def url_response(self, filename: str):
         auth = None
         if self.repo_konf.get("basic_auth", {}):
             usr_env_var = self.repo_konf["basic_auth"]["usr_env_var"]
@@ -171,8 +222,8 @@ class BaseRepo:
             usr = os.getenv(usr_env_var)
             psw = os.getenv(psw_env_var)
             auth = requests.auth.HTTPBasicAuth(usr, psw)
-        url = self.calc_url()
-        logger.info(f"downloading {self.repo_dir} from {url}")
+        url = self.calc_url(filename)
+        logger.info(f"downloading {self.calc_dir()} from {url}")
         response = requests.get(url, auth=auth)
         if response.status_code >= 300:
             raise IOError(
@@ -180,16 +231,16 @@ class BaseRepo:
             )
         return response
 
-class LocalDirRepo(BaseRepo):
-    def calc_repo_dir(self):
+class LocalKonfigRepo(KonfigRepo):
+    def calc_dir(self):
         dir: str = self.repo_konf.get("dir")
         if self.version:
             dir = dir.replace("{version}", self.version)
         return Path(dir)
 
 
-class LocalZipRepo(BaseRepo):
-    def download(self):
+class LocalZipRepo(KonfigRepo):
+    def download(self, filename: str) -> None:
         path: str = self.repo_konf.get("path")
         if self.version:
             path = path.replace("{version}", self.version)
@@ -198,18 +249,18 @@ class LocalZipRepo(BaseRepo):
         self.unzip_data(data)
 
 
-class UrlZipRepo(BaseRepo):
-    def download(self):
-            data = self.url_response().content
+class UrlZipRepo(KonfigRepo):
+    def download(self, filename: str) -> None:
+            data = self.url_response(filename).content
             self.unzip_data(data)
 
 
-class BitbucketZipRepo(BaseRepo):
-    def download(self):
-        data = self.url_response().content
+class BitbucketZipRepo(KonfigRepo):
+    def download(self, filename: str) -> None:
+        data = self.url_response(filename).content
         self.unzip_data(data)
 
-    def calc_url(self) -> str:
+    def calc_url(self, filename: str) -> str:
         return self._calc_url("archive", "&format=zip")
 
     def _calc_url(self, ext: str, format:str = "") -> str:
@@ -232,20 +283,20 @@ class BitbucketZipRepo(BaseRepo):
         return url
 
 class BitbucketFileRepo(BitbucketZipRepo):
-    def download(self):
-        content = self.url_response().content
-        path = self.calc_repo_dir() / self.filename
+    def download(self, filename: str) -> None:
+        content = self.url_response(filename).content
+        path = self.calc_dir() / filename
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
 
-    def calc_repo_dir(self) -> Path:
+    def calc_url(self, filename: str) -> str:
         bitb_project = self.repo_konf.get("bitbucket_project")
         bitb_repo = self.repo_konf.get("bitbucket_repo")
         version = self.version.replace("/", "-")
         return cache_dir() / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}"
 
-    def calc_url(self) -> str:
-        return self._calc_url(f"raw/{self.filename}")
+    def calc_url(self, filename: str) -> str:
+        return self._calc_url(f"raw/{filename}")
 
 def unzip(
     zfile: zipfile.ZipFile,
