@@ -74,26 +74,22 @@ class Deployment(Resource):
     def add_container_items(self):
         additions = self.strukture.get("add_to_container", {})
         if additions:
-            container = wrap(self.yaml._get_path("spec.template.spec.containers")[0])
+            container = wrap(self.get_path("spec.template.spec.containers")[0])
             for path in additions:
                 container._set_path(path, additions[path])
 
     def remove_container_items(self):
         additions = self.strukture.get("remove_from_container", {})
         if additions:
-            container = wrap(self.yaml._get_path("spec.template.spec.containers")[0])
+            container = wrap(self.get_path("spec.template.spec.containers")[0])
             for path in additions:
                 container._del_path(path)
 
     def pod_annotation(self, name: str, val: str) -> None:
-        if "annotations" not in self.yaml.spec.template.metadata:
-            self.yaml.spec.template.metadata["annotations"] = {}
-        self.yaml.spec.template.metadata.annotations[name] = val
+        self.set_path(f"spec.template.metadata.annotations.{name}", val)
 
     def pod_label(self, name: str, val: str) -> None:
-        if "labels" not in self.yaml.spec.template.metadata:
-            self.yaml.spec.template.metadata["labels"] = {}
-        self.yaml.spec.template.metadata.labels[name] = val
+        self.set_path(f"spec.template.metadata.labels.{name}", val)
 
 
 class PodDisruptionBudget(Resource):
@@ -129,7 +125,7 @@ class ConfigMap(Resource):
     def var(self, varname: str):
         value = self.strukture.vars[varname]
         if not isinstance(value, str):
-            value = self.app.konfig.yaml.get("var", {}).get(varname, None)
+            value = self.app.konfig.get_path(f"var.{varname}", None)
         if value is None:
             raise ValueError(f"var {varname} should not be None")
         return value
@@ -161,7 +157,7 @@ class SecretBasicAuth(Secret):
     def users(self):
         result = []
         for usr in self.strukture.get("users", []):
-            entry = dekrypt_str(self.app.konfig.secret["basic_auth"][usr])
+            entry = dekrypt_str(self.app.konfig.get_path(f"secret.basic_auth.{usr}"))
             result.append(f"{usr}:{entry}")
         result.append("")  # for the final newline
         return "\n".join(result)

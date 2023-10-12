@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 class KubeApp(JinjaApp):
     def __init__(self, konfig: Konfig):
         super().__init__(konfig)
-        self.namespace = konfig.yaml["app"].get(
-            "namespace", f"{self.appname}-{self.env}"
+        self.namespace = konfig.get_path(
+            "app.namespace", f"{self.appname}-{self.env}"
         )
 
     def register_std_templates(self) -> None:

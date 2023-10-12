@@ -65,7 +65,7 @@ class Kustomization(JinYamlKomponent):
     def var(self, cm: str, varname: str):
         value = self.strukture.configmaps[cm]["vars"][varname]
         if not isinstance(value, str):
-            value = self.app.konfig.yaml.get("var", {}).get(varname, None)
+            value = self.app.konfig.get_path("var", {}).get(varname, None)
         if value is None:
             raise ValueError(f"var {varname} should not be None")
         return value
@@ -92,7 +92,7 @@ class Kustomization(JinYamlKomponent):
     def remove_vars(self):
         removals = self.strukture.get("remove_vars", {})
         for cm_to_remove in removals:
-            for cm in self.yaml.get("configMapGenerator",{}):
+            for cm in self.get_path("configMapGenerator",{}):
                 if cm["name"] == cm_to_remove:
                     for var in self.strukture["remove_vars"][cm_to_remove]:
                         found = False
