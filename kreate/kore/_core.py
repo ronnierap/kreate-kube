@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def deep_update(target: Mapping, other: Mapping, overwrite=True) -> None:
+def deep_update(target: Mapping, other: Mapping, overwrite=True, list_insert_index: dict = None) -> None:
     if other.get("_do_not_overwrite", False):
         overwrite = False
     for k, v in other.items():
@@ -22,8 +22,12 @@ def deep_update(target: Mapping, other: Mapping, overwrite=True) -> None:
             if k not in target:
                 target[k] = list(v)  # use a copy
             elif isinstance(target[k], Sequence) and not isinstance(target[k], str):
-                for item in v:
-                    target[k].append(item)
+                if list_insert_index and k in list_insert_index:
+                    idx = list_insert_index[k]
+                    target[k][idx:idx] = v
+                else:
+                    for item in v:
+                        target[k].append(item)
             else:
                 raise ValueError(
                     f"trying to merge key {k} sequence {v}"

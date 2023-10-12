@@ -64,21 +64,21 @@ class Konfig:
 
     def load_inkludes(self, inkludes: List[str], already_inkluded: Set[str]) -> int:
         count = 0
-        for fname in inkludes:
+        for idx, fname in enumerate(inkludes):
             if fname not in already_inkluded:
                 count += 1
                 already_inkluded.add(fname)
-                self.load_inklude(fname)
+                self.load_inklude(fname, idx)
         logger.debug(f"inkluded {count} new files")
         return count
 
-    def load_inklude(self, fname: str):
+    def load_inklude(self, fname: str, idx: int):
         logger.info(f"inkluding {fname}")
         self.file_getter.konfig_repos()
         context = self._jinja_context()
         val_yaml = self.jinyaml.render(fname, context)
         if val_yaml:  # it can be empty
-            deep_update(self.yaml, val_yaml)
+            deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx+1})
 
     def get_kreate_version(self) -> str:
         try:
