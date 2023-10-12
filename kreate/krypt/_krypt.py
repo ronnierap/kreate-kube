@@ -30,8 +30,8 @@ class KryptKonfig(Konfig):
         return psw
 
     def default_krypt_key_env_var(self):
-        varname = self.yaml.get("system", {}).get("krypt_key_varname", None)
-        env = self.yaml._get_path("app.env")
+        varname = self.get_path("system", {}).get("krypt_key_varname", None)
+        env = self.get_path("app.env")
         return varname or "KREATE_KRYPT_KEY_" + env.upper()
 
 
