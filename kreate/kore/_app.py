@@ -28,12 +28,12 @@ class App:
         self.konfig = konfig
         self.komponents = []
         self._kinds = {}
-        self.strukture = wrap(konfig.yaml.get("strukt"))
-        self.target_dir = self.konfig.yaml.get("system", {}).get("target_dir", "build")
+        self.strukture = wrap(konfig.get_path("strukt"))
+        self.target_dir = self.konfig.get_path("system.target_dir", "build")
         self.target_path = Path(self.target_dir)
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
-        naming = self.konfig.yaml.get("system", {}).get("naming", {})
+        naming = self.konfig.get_path("system.naming", {})
         formatstr: str = naming.get(kind, None)
         if formatstr:
             return formatstr.format(

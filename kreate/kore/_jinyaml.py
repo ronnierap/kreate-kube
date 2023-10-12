@@ -19,7 +19,7 @@ class JinYaml:
             lstrip_blocks=True,
             loader=RepoLoader(konfig),
         )
-        self.env.globals["konf"] = konfig
+        self.env.globals["konf"] = konfig.yaml
         self.yaml_parser = YAML()
         self.add_jinja_filter("b64encode", b64encode)
 

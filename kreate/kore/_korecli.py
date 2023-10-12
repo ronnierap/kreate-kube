@@ -314,7 +314,7 @@ def view(cli: KoreCli):
     if cli.args.key:
         for k in cli.args.key:
             k = view_aliases().get(k, k)
-            result = konfig.yaml._get_path(k)
+            result = konfig.get_path(k)
             if isinstance(result, str):
                 print(f"{k}: {result}")
             else:
