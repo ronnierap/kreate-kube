@@ -21,28 +21,24 @@ class Konfig:
             filename += "/konfig.yaml"
         self.filename = filename
         self.dekrypt_func = None
-        self.jinyaml = JinYaml(self)
         self.dir = Path(os.path.dirname(filename))
         filename = os.path.basename(filename)
-        self.file_getter = FileGetter(self, self.dir)
-        dict_ = dict_ or {}
+        self.dict_ = dict_ or {}
+        self.yaml = wrap(self.dict_)
+        self.jinyaml = JinYaml(self)
         deep_update(dict_, {"system": { "getenv":  os.getenv}})
+        self.file_getter = FileGetter(self, self.dir)
         for ink in inkludes or []:
-            deep_update(dict_, self.jinyaml.render(ink, dict_))
-        deep_update(dict_, self.jinyaml.render(filename, dict_))
-        self.yaml = wrap(dict_)
+            self.inklude(ink)
+        self.inklude(filename)
         self.load_all_inkludes()
 
-    # def __iter__(self):
-    #    return iter(self.yaml.keys())
+    def inklude(self, filename: str):
+        logger.info(f"pre_inkluding {filename}")
+        self.file_getter.konfig_repos()
+        content = self.jinyaml.render(filename, self.dict_)
+        deep_update(self.dict_, content)
 
-    def __getattr__(self, attr):
-        if attr == "get":
-            return self.yaml.get
-        if attr not in self.yaml:
-            raise AttributeError(f"could not find attribute {attr} in {self}")
-        else:
-            return self.yaml[attr]
 
     def get_path(self, path: str, default=None):
         return self.yaml._get_path(path, default=default)
@@ -60,11 +56,11 @@ class Konfig:
     def load_all_inkludes(self):
         logger.debug("loading inklude files")
         already_inkluded = set()
-        inkludes = self.yaml.get("inklude", [])
+        inkludes = self.get_path("inklude", [])
         # keep loading inkludes until all is done
         while self.load_inkludes(inkludes, already_inkluded) > 0:
             # possible new inkludes are added
-            inkludes = self.yaml.get("inklude", [])
+            inkludes = self.get_path("inklude", [])
 
     def load_inkludes(self, inkludes: List[str], already_inkluded: Set[str]) -> int:
         count = 0
@@ -78,6 +74,7 @@ class Konfig:
 
     def load_inklude(self, fname: str):
         logger.info(f"inkluding {fname}")
+        self.file_getter.konfig_repos()
         context = self._jinja_context()
         val_yaml = self.jinyaml.render(fname, context)
         if val_yaml:  # it can be empty
@@ -95,7 +92,7 @@ class Konfig:
         if any(txt in version for txt in dev_versions) and not force:
             logger.info(f"skipping check for development version {version}")
             return
-        req_version : str = self.yaml._get_path("version.kreate_version", None)
+        req_version : str = self.get_path("version.kreate_version", None)
         if not req_version:
             logger.info(f"skipping check since no kreate_version specified")
             return
