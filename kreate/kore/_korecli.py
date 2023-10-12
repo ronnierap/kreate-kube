@@ -147,12 +147,11 @@ class KoreCli:
         self.add_main_options()
         self.args = self.cli.parse_args(self.get_argv())
         self.process_main_options(self.args)
-        app = None
         try:
             if self.args.subcommand is None:
-                app = self.default_command()
+                self.default_command()
             else:
-                app = self.args.func(self)
+                self.args.func(self)
         except Exception as e:
             if self.args.verbose:
                 traceback.print_exc()
@@ -160,10 +159,9 @@ class KoreCli:
                 print(f"{type(e).__name__}: {e}")
         finally:
             if not self.args.keep_secrets:
-                if self._konfig:
+                if self._app:
                     # app was kreated so secrets might need to be cleaned
-                    app = self.app()
-                    dir = app.target_dir
+                    dir = self._app.target_dir
                     secrets_dir = f"{dir}/secrets"
                     if os.path.exists(secrets_dir):
                         logger.info(
