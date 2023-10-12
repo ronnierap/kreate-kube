@@ -20,6 +20,7 @@ app:
   appname: demo
   env: prd
   team: knights
+version:
   image_version: 2.0.4
 ```
 
