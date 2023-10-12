@@ -186,6 +186,13 @@ class JinYamlKomponent(JinjaKomponent):
         self.add_additions()
         self.remove_deletions()
 
+    def get_path(self, path: str, default=None):
+        return self.yaml._get_path(path, default=default)
+
+    def set_path(self, path: str, val):
+        return self.yaml._set_path(path, val)
+
+
     def kreate_file(self) -> None:
         filename = self.filename
         if filename:
