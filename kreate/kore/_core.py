@@ -21,7 +21,7 @@ def deep_update(target: Mapping, other: Mapping, overwrite=True) -> None:
         elif isinstance(v, Sequence) and not isinstance(v, str):
             if k not in target:
                 target[k] = list(v)  # use a copy
-            elif isinstance(target[k], Sequence):
+            elif isinstance(target[k], Sequence) and not isinstance(target[k], str):
                 for item in v:
                     target[k].append(item)
             else:
