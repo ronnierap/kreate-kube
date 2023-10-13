@@ -9,7 +9,7 @@ version:
 file:
   application.properties: konf:files/application.properties
   environment.properties: konf:files/environment.properties
-  some-file-from-package: py:kreate.kube.other_templates:__init__.py
+  some-file-from-package: py:kreate.kube.templates:__init__.py
   credential.properties:  dekrypt:konf:secret_files/credential.properties.encrypted
 inklude:
 - framework.konf

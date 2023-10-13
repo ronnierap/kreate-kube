@@ -148,9 +148,9 @@ strukt:
       - credential.properties
 
   Service:
-    main:
-      options:
-        - headless
+    add:
+      spec:
+        clusterIP: None
     https:
       ports:
         - port: 443

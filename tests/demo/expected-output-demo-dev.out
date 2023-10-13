@@ -22,12 +22,12 @@ data:
   application.properties: |
     This is a demo file
   some-file-from-package: |
-    # Just a package with templates
+    # Just a package with respurce templates
 kind: ConfigMap
 metadata:
   labels:
     config-map: demo-files
-  name: demo-files-b52b4hc7tf
+  name: demo-files-c7g5dbm562
   namespace: demo-dev
 ---
 apiVersion: v1
@@ -94,10 +94,9 @@ kind: Service
 metadata:
   labels:
     app: demo
-  name: demo-service
+  name: demo-service-add
   namespace: demo-dev
 spec:
-  clusterIP: None
   ports:
   - name: http
     port: 8080
@@ -242,7 +241,7 @@ spec:
         secret:
           secretName: demo-secret-files
       - configMap:
-          name: demo-files-b52b4hc7tf
+          name: demo-files-c7g5dbm562
         name: demo-files
       - configMap:
           name: demo-extra-files-hmm7226mdf

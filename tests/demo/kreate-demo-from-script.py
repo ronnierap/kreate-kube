@@ -21,9 +21,9 @@ class DemoScriptApp(KustApp):
         kreate.kube.resource.Egress(self, "xyz")
 
         depl = kreate.kube.resource.Deployment(self)
-        kreate.kube.resource.Service(self)
-        kreate.kube.resource.Service(self, "https")
-        kreate.kube.resource.PodDisruptionBudget(self)
+        self.kreate_komponent("Service", "main")
+        self.kreate_komponent("Service", "https")
+        self.kreate_komponent("PodDisruptionBudget", "main")
         kreate.kube.Kustomization(self)
         self.kreate_komponent("Secret", "main")
         self.kreate_komponent("Secret", "secret-files")
@@ -51,7 +51,6 @@ class DemoScriptApp(KustApp):
         self.ingress.root.whitelist("10.20.30.40")
         self.ingress.root.basic_auth()
         self.ingress.root.label("dummy", "jan")
-        self.service.main.headless()
         pdb = self.poddisruptionbudget.main
         pdb.yaml.spec.minAvailable = 2
         pdb.label("testje", "test")
