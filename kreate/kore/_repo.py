@@ -68,22 +68,6 @@ class FileGetter:
         if repo:
             data = repo.get_data(file, optional=optional)
 
-#        elif file.startswith("repo:"):
-#            data = self.load_repo_data(file[5:])
-#        elif file.startswith("py:"):
-#            data = self.load_package_data(file[3:])
-#        elif file.startswith("konf:"):
-#            data = self.load_file_data(file[5:])
-#        elif file.startswith("cwd:"):
-#            data = self.load_file_data(Path.cwd() / file[4:])
-#        elif file.startswith("home:"):
-#            data = self.load_file_data(Path.home() / file[5:])
-#        elif file.startswith("./"):
-#            data = self.load_file_data(file)
-#        elif file.startswith("../"):
-#            data = self.load_file_data(file)
-#        elif re.match("\w\w+:", file):
-#            data = self.load_repo_data(file)
         else:
             data = self.load_file_data(file)
         if data is None:
@@ -111,19 +95,6 @@ class FileGetter:
         if not path.exists():
             return None
         return path.read_text()
-
-
-
-    #def load_repo_data(self, filename: str) -> str:
-    #    repo = self.get_repo(filename)
-    #    return repo.get_data(filename, )
-        #if not repo_dir.is_dir():
-        #    # add other assertions, or better error message?
-        #    raise FileExistsError(f"repo dir {repo_dir} exists, but is not a directory")
-        #p = Path(dir, filename)
-        #if not p.exists():
-        #    return None
-        #return p.read_text()
 
     def get_repo(self, repo_name: str):
         type = self.konfig.get_path(f"system.repo.{repo_name}.type", None)
@@ -269,7 +240,7 @@ class BitbucketZipRepo(KonfigRepo):
         if self.version.startswith("branch."):
             version = self.version[7:]
             logger.warning(
-                f"Using branch {version} as version is not recommended, use a tag instead"
+                f"Using branch {version} for {self.repo_name} as version is not recommended, use a tag instead"
             )
             url += f"?at=refs/heads/{version}" + format
         else:
