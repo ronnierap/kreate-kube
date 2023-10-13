@@ -92,10 +92,6 @@ class Deployment(Resource):
         self.set_path(f"spec.template.metadata.labels.{name}", val)
 
 
-class PodDisruptionBudget(Resource):
-    pass
-
-
 class Service(Resource):
     def headless(self):
         self.yaml.spec.clusterIP = "None"

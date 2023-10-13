@@ -167,6 +167,9 @@ class KonfigRepo(DirRepo):
 
 
     def calc_dir(self) -> Path:
+        dir = self.repo_konf.get("cache_name")
+        if dir:
+            return cache_dir() / dir
         if self.version:
             return cache_dir() / f"{self.repo_name}-{self.version}"
         else:
