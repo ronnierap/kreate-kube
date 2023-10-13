@@ -92,11 +92,6 @@ class Deployment(Resource):
         self.set_path(f"spec.template.metadata.labels.{name}", val)
 
 
-class Service(Resource):
-    def headless(self):
-        self.yaml.spec.clusterIP = "None"
-
-
 class Egress(Resource):
     def calc_name(self):
         return f"{self.app.appname}-egress-to-{self.shortname}"

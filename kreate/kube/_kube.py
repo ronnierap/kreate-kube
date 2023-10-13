@@ -16,7 +16,6 @@ class KubeApp(JinjaApp):
 
     def register_std_templates(self) -> None:
         super().register_std_templates()
-        self.register_resource_class(resource.Service)
         self.register_resource_class(resource.Deployment)
         self.register_resource_class(resource.ConfigMap)
         self.register_resource_class(resource.Ingress)
@@ -24,6 +23,7 @@ class KubeApp(JinjaApp):
         self.register_resource_class(resource.SecretBasicAuth)
         self.register_resource_class(resource.Secret)
 
+        self.register_resource_file("Service")
         self.register_resource_file("PodDisruptionBudget")
         self.register_resource_file("HorizontalPodAutoscaler")
         self.register_resource_file("ServiceAccount")
