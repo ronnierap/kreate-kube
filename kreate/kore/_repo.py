@@ -218,7 +218,7 @@ class LocalZipRepo(KonfigRepo):
         path: str = self.repo_konf.get("path")
         if self.version:
             path = path.replace("{version}", self.version)
-        logger.info(f"unzipping {self.repo_dir} from {path}")
+        logger.info(f"unzipping {self.calc_dir()} from {path}")
         data = Path(path).read_bytes()
         self.unzip_data(data)
 
