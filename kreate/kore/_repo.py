@@ -1,4 +1,4 @@
-from typing import Mapping, Protocol
+from typing import Mapping, Protocol, Union
 import requests
 import requests.auth
 import zipfile
@@ -31,11 +31,11 @@ class FileGetter:
         self.konfig = konfig
         self.dir = dir # Path(dir)
         self.repo_prefixes = {
-            "konf:":  LocalDirRepo(dir),
-            "cwd:":   LocalDirRepo(Path.cwd()),
-            "home:":  LocalDirRepo(Path.home()),
-            "./":     LocalDirRepo(dir),
-            "../":    LocalDirRepo(dir.parent),
+            "konf:":  FixedDirRepo(dir),
+            "cwd:":   FixedDirRepo(Path.cwd()),
+            "home:":  FixedDirRepo(Path.home()),
+            "./":     FixedDirRepo(dir),
+            "../":    FixedDirRepo(dir.parent),
             "py:": PythonPackageRepo(konfig, None)
         }
         self.repo_types = {
@@ -115,9 +115,49 @@ class Repo(Protocol):
     def get_data(self, filename: str, optional: bool = False) -> str:
         ...
 
-class DirRepo(Repo):
-    def calc_dir(self):
-        raise NotImplementedError
+
+
+class PythonPackageRepo(Repo):
+    def get_data(self, filename: str, optional: bool = False) -> str:
+        package_name = filename.split(":")[0]
+        filename = filename[len(package_name) + 1 :]
+        package = importlib.import_module(package_name)
+        logger.debug(f"loading file {filename} from package {package_name}")
+        data = pkgutil.get_data(package.__package__, filename)
+        return data.decode("utf-8")
+
+
+class FixedDirRepo(Repo):
+    def __init__(self, dir: Union[Path, str]):
+        if isinstance(dir, str):
+            self.dir = Path(dir)
+        elif isinstance(dir, Path):
+            self.dir = dir
+        else:
+            raise TypeError(f"Unsupported type {type(dir)}")
+
+    def get_data(self, filename: str, optional: bool = False):
+        path = self.dir / filename
+        if not path.exists():
+            raise FileNotFoundError(f"could not find file {filename} in {dir}")
+        return path.read_text()
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.dir})"
+
+
+class KonfigRepo(Repo):
+    def __init__(self, konfig, repo_name:str):
+        self.konfig = konfig
+        self.repo_name = repo_name
+        self.repo_konf = konfig.get_path("system.repo." + repo_name, {})
+        self.version = self.get("version")
+
+    def get(self, attr):
+        return self.konfig.get_path(f"system.repo.{self.repo_name}.{attr}", {})
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.repo_name}, version={self.version})"
 
     def download(self, filename: str):
         raise NotImplementedError
@@ -135,36 +175,6 @@ class DirRepo(Repo):
                 return ""
             raise FileNotFoundError(f"could not find file {filename} in {dir}")
         return p.read_text()
-
-class LocalDirRepo(DirRepo):
-    def __init__(self, dir: Path):
-        self.dir = dir
-
-    def calc_dir(self):
-        return self.dir
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.dir})"
-
-class PythonPackageRepo(Repo):
-    def get_data(self, filename: str, optional: bool = False) -> str:
-        package_name = filename.split(":")[0]
-        filename = filename[len(package_name) + 1 :]
-        package = importlib.import_module(package_name)
-        logger.debug(f"loading file {filename} from package {package_name}")
-        data = pkgutil.get_data(package.__package__, filename)
-        return data.decode("utf-8")
-
-class KonfigRepo(DirRepo):
-    def __init__(self, konfig, repo_name:str):
-        self.konfig = konfig
-        self.repo_name = repo_name
-        self.repo_konf = konfig.get_path("system.repo." + repo_name, {})
-        self.version = self.repo_konf.get("version", None)
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.repo_name}, version={self.version})"
-
 
     def calc_dir(self) -> Path:
         dir = self.repo_konf.get("cache_name")
@@ -204,6 +214,7 @@ class KonfigRepo(DirRepo):
                 f"status {response.status_code} while downloading {url} with message {response.content}"
             )
         return response
+
 
 class LocalKonfigRepo(KonfigRepo):
     def calc_dir(self):
