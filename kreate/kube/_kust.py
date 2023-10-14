@@ -81,8 +81,7 @@ class Kustomization(JinYamlKomponent):
         self.app.konfig.file_getter.kopy_file(location, target)
         return result
 
-    @property
-    def filename(self):
+    def get_filename(self):
         return "kustomization.yaml"
 
     def aktivate(self):

@@ -29,8 +29,7 @@ class App:
         self.komponents = []
         self._kinds = {}
         self.strukture = wrap(konfig.get_path("strukt"))
-        self.target_dir = self.konfig.get_path("system.target_dir", "build")
-        self.target_path = Path(self.target_dir)
+        self.target_path = Path(konfig.get_path("system.target_dir", "build"))
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
         formatstr: str = self.konfig.get_path(
@@ -75,13 +74,10 @@ class App:
         self.tune_komponents()
 
     def kreate_files(self):
-        os.makedirs(self.target_dir, exist_ok=True)
+        os.makedirs(self.target_path, exist_ok=True)
         for komp in self.komponents:
-            if komp.filename:
-                if komp.dirname:
-                    logger.info(f"kreating file {komp.dirname}/{komp.filename}")
-                else:
-                    logger.info(f"kreating file {komp.filename}")
+            if komp.get_filename():
+                logger.info(f"kreating file {komp.get_filename()}")
                 komp.kreate_file()
             else:
                 logger.info(f"skipping file for {komp.kind}.{komp.shortname}")

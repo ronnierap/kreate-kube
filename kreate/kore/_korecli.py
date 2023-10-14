@@ -161,7 +161,7 @@ class KoreCli:
             if not self.args.keep_secrets:
                 if self._app:
                     # app was kreated so secrets might need to be cleaned
-                    dir = self._app.target_dir
+                    dir = self._app.target_path
                     secrets_dir = f"{dir}/secrets"
                     if os.path.exists(secrets_dir):
                         logger.info(

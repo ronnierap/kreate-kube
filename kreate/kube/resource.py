@@ -23,15 +23,8 @@ class Resource(JinYamlKomponent):
     def __str__(self):
         return f"<Resource {self.kind}.{self.shortname} {self.name}>"
 
-    @property
-    def dirname(self):
-        return "resources"
-
-    @property
-    def filename(self):
-        # prefix the file, because the name of a resource is not guaranteed
-        # to be unique
-        return f"{self.kind}-{self.name}.yaml"
+    def get_filename(self):
+        return f"resources/{self.kind}-{self.name}.yaml"
 
     def add_metadata(self):
         for key in self.strukture.get("annotations", {}):
@@ -134,9 +127,8 @@ class Secret(Resource):
         location: str = self.app.konfig.yaml["file"][filename]
         return self.app.konfig.load_repo_file(location)
 
-    @property
-    def dirname(self):
-        return "secret"
+    def get_filename(self):
+        return f"secrets/resources/{self.kind}-{self.name}.yaml"
 
 
 class SecretBasicAuth(Secret):
@@ -182,8 +174,7 @@ class Ingress(Resource):
 
 
 class KubeconfigFile(JinYamlKomponent):
-    @property
-    def filename(self):
+    def get_filename(self):
         if self.strukture.get("filename"):
             return self.strukture.get("filename")
         return "kubeconfig.yaml"

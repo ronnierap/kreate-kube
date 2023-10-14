@@ -102,12 +102,7 @@ class Komponent:
             else:
                 logger.warn(f"option {opt} for {self.name} not supported")
 
-    @property
-    def dirname(self):
-        return None
-
-    @property
-    def filename(self):
+    def get_filename(self):
         return f"{self.kind.lower()}-{self.shortname}.yaml"
 
     def _field(self, fieldname: str, default=None):
@@ -160,14 +155,11 @@ class JinjaKomponent(Komponent):
         self.data = self.app.konfig.jinyaml.render_jinja(self.template, vars)
 
     def kreate_file(self) -> None:
-        filename = self.filename
+        filename = self.get_filename()
         if filename:
-            if self.dirname:
-                dir = f"{self.app.target_dir}/{self.dirname}"
-            else:
-                dir = self.app.target_dir
-            os.makedirs(dir, exist_ok=True)
-            with open(f"{dir}/{filename}", "wb") as f:
+            path = self.app.target_path / filename
+            os.makedirs(path.parent, exist_ok=True)
+            with open(path, "w") as f:
                 f.write(self.data)
 
     def _template_vars(self):
@@ -194,14 +186,11 @@ class JinYamlKomponent(JinjaKomponent):
 
 
     def kreate_file(self) -> None:
-        filename = self.filename
+        filename = self.get_filename()
         if filename:
-            if self.dirname:
-                dir = f"{self.app.target_dir}/{self.dirname}"
-            else:
-                dir = self.app.target_dir
-            os.makedirs(dir, exist_ok=True)
-            with open(f"{dir}/{filename}", "wb") as f:
+            path = self.app.target_path / filename
+            os.makedirs(path.parent, exist_ok=True)
+            with open(path, "w") as f:
                 self.app.konfig.jinyaml.dump(self.yaml.data, f)
 
     def add_additions(self):

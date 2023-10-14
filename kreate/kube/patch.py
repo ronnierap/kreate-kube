@@ -24,14 +24,9 @@ class Patch(JinYamlKomponent):
             f":{self.kind}.{self.shortname}>"
         )
 
-    @property
-    def dirname(self):
-        return "patches"
-
-    @property
-    def filename(self):
+    def get_filename(self):
         return (
-            f"{self.target.kind}-{self.target.shortname}"
+            f"patches/{self.target.kind}-{self.target.shortname}"
             f"-{self.kind}-{self.shortname}.yaml"
         )
 
