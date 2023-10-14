@@ -1,6 +1,6 @@
 import os
 import logging
-from typing import List, Set
+from typing import List, Set, Mapping
 from pathlib import Path
 
 from ._core import wrap, deep_update
@@ -32,15 +32,22 @@ class App:
         self.target_path = Path(konfig.get_path("system.target_dir", "build"))
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
-        formatstr: str = self.konfig.get_path(
-            f"system.template.{kind}.naming")
-        # backward compatible with 0.9.*
-        # TODO: remove in 1.0.0
+        formatstr = None
+        naming = self.konfig.get_path(f"system.template.{kind}.naming")
+        if isinstance(naming, Mapping):
+            if shortname in naming:
+                formatstr = naming[shortname]
+            elif "*" in naming:
+                formatstr = naming["*"]
+
+        # TODO: remove next 2 lines in 1.0.0, backward compatible with 0.9.*
         if not formatstr:
             formatstr = self.konfig.get_path(f"system.naming.{kind}")
         if formatstr:
             return formatstr.format(
-                kind=kind, shortname=shortname, appname=self.appname
+                kind=kind,
+                shortname=shortname,
+                appname=self.appname,
             )
         return None
 

@@ -52,11 +52,6 @@ class Resource(JinYamlKomponent):
 
 
 class Deployment(Resource):
-    def calc_name(self):
-        if self.shortname == "main":
-            return self.app.appname
-        return f"{self.app.appname}-{self.shortname}"
-
     def aktivate(self):
         super().aktivate()
         self.add_container_items()
@@ -84,9 +79,6 @@ class Deployment(Resource):
 
 
 class Egress(Resource):
-    def calc_name(self):
-        return f"{self.app.appname}-egress-to-{self.shortname}"
-
     def cidr_list(self) -> list:
         r = self._field("cidr_list", "")
         if not r:
@@ -101,9 +93,6 @@ class Egress(Resource):
 
 
 class ConfigMap(Resource):
-    def calc_name(self):
-        return f"{self.app.appname}-{self.shortname}"
-
     def var(self, varname: str):
         value = self.strukture.vars[varname]
         if not isinstance(value, str):
@@ -118,11 +107,6 @@ class ConfigMap(Resource):
 
 
 class Secret(Resource):
-    def calc_name(self):
-        if self.shortname == "main":
-            return f"{self.app.appname}-secrets"
-        return f"{self.app.appname}-{self.shortname}"
-
     def file_data(self, filename: str) -> str:
         location: str = self.app.konfig.yaml["file"][filename]
         return self.app.konfig.load_repo_file(location)
@@ -132,9 +116,6 @@ class Secret(Resource):
 
 
 class SecretBasicAuth(Secret):
-    def calc_name(self):
-        return f"{self.app.appname}-{self.shortname}"
-
     def users(self):
         result = []
         for usr in self.strukture.get("users", []):
