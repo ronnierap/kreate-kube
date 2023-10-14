@@ -39,7 +39,10 @@ class App:
                 formatstr = naming[shortname]
             elif "*" in naming:
                 formatstr = naming["*"]
-
+        elif isinstance(naming, str):
+            formatstr = naming
+        elif naming is not None:
+            raise ValueError(f"Unsupported naming for {kind}.{shortname}: {naming}")
         # TODO: remove next 2 lines in 1.0.0, backward compatible with 0.9.*
         if not formatstr:
             formatstr = self.konfig.get_path(f"system.naming.{kind}")
