@@ -1,6 +1,5 @@
 import os
 import logging
-import pkg_resources
 import importlib.metadata
 from pathlib import Path
 from typing import List, Set
@@ -33,13 +32,6 @@ class Konfig:
         self.inklude(filename)
         self.load_all_inkludes()
 
-    def inklude(self, filename: str):
-        logger.info(f"pre_inkluding {filename}")
-        self.file_getter.konfig_repos()
-        content = self.jinyaml.render(filename, self.dict_)
-        deep_update(self.dict_, content)
-
-
     def get_path(self, path: str, default=None):
         return self.yaml._get_path(path, default=default)
 
@@ -68,17 +60,21 @@ class Konfig:
             if fname not in already_inkluded:
                 count += 1
                 already_inkluded.add(fname)
-                self.load_inklude(fname, idx)
+                self.inklude(fname, idx+1)
         logger.debug(f"inkluded {count} new files")
         return count
 
-    def load_inklude(self, fname: str, idx: int):
+    def inklude(self, fname: str, idx: int = None):
         logger.info(f"inkluding {fname}")
+        # reload all repositories, in case any were added/changed
         self.file_getter.konfig_repos()
         context = self._jinja_context()
+        context["my_repo_name"] = self.file_getter.get_prefix(fname)
         val_yaml = self.jinyaml.render(fname, context)
         if val_yaml:  # it can be empty
-            deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx+1})
+            deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
+
+
 
     def get_kreate_version(self) -> str:
         try:

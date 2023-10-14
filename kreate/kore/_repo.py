@@ -50,6 +50,16 @@ class FileGetter:
         for repo in self.konfig.get_path("system.repo",[]):
             self.repo_prefixes[repo + ":"] = self.get_repo(repo)
 
+    def get_prefix(self, filename: str) -> str:
+        if filename.startswith("optional:"):
+            filename = filename[9:]
+        if filename.startswith("dekrypt:"):
+            filename = filename[8:]
+        match = re.match("^[a-zA-Z0-9_-]*:", filename)
+        if match:
+            return match.group()[:-1]
+        return None
+
     def get_data(self, file: str) -> str:
         orig_file = file
         dekrypt = False
@@ -67,7 +77,6 @@ class FileGetter:
                 repo = self.repo_prefixes[prefix]
         if repo:
             data = repo.get_data(file, optional=optional)
-
         else:
             data = self.load_file_data(file)
         if data is None:
