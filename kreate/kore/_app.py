@@ -33,8 +33,12 @@ class App:
         self.target_path = Path(self.target_dir)
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
-        naming = self.konfig.get_path("system.naming", {})
-        formatstr: str = naming.get(kind, None)
+        formatstr: str = self.konfig.get_path(
+            f"system.template.{kind}.naming")
+        # backward compatible with 0.9.*
+        # TODO: remove in 1.0.0
+        if not formatstr:
+            formatstr = self.konfig.get_path(f"system.naming.{kind}")
         if formatstr:
             return formatstr.format(
                 kind=kind, shortname=shortname, appname=self.appname
