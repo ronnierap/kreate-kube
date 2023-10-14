@@ -115,7 +115,7 @@ class Secret(Resource):
         return f"secrets/resources/{self.kind}-{self.name}.yaml"
 
 
-class SecretBasicAuth(Secret):
+class SecretBasicAuth(Resource):
     def users(self):
         result = []
         for usr in self.strukture.get("users", []):
@@ -123,6 +123,9 @@ class SecretBasicAuth(Secret):
             result.append(f"{usr}:{entry}")
         result.append("")  # for the final newline
         return "\n".join(result)
+
+    def get_filename(self):
+        return f"secrets/resources/{self.kind}-{self.name}.yaml"
 
 
 class Ingress(Resource):
