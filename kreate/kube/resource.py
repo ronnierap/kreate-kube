@@ -9,10 +9,8 @@ logger = logging.getLogger(__name__)
 __all__ = [
     "Resource",
     "Deployment",
-    "PodDisruptionBudget",
     "ConfigMap",
     "Ingress",
-    "Service",
     "Egress",
 ]
 
