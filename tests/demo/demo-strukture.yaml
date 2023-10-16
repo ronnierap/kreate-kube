@@ -4,6 +4,26 @@ val:
     cpu_request: 100m
   generic:
     imagePullPolicy: Always
+system:
+  template:
+    # Override naming conventions of default templates
+    Egress:
+      naming: "{appname}-egress-to-{shortname}"
+    PodDisruptionBudget:
+      naming: "{appname}-pdb"
+    ConfigMap:
+      naming: "{appname}-{shortname}"
+    Deployment:
+      naming:
+        main: "{appname}"
+        "*": "{appname}-{shortname}"
+    Secret:
+      naming:
+        main: "{appname}-secrets"
+        "*": "{appname}-{shortname}"
+    SecretBasicAuth:
+      naming: "{appname}-{shortname}"
+
 
 strukt:
   CronJob:

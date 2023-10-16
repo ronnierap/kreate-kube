@@ -111,11 +111,7 @@ class Komponent:
         konf = self.app.konfig
         result = konf.get_path(f"val.{self.kind}.{self.shortname}.{fieldname}")
         if result is None:
-            result =  konf.get_path(f"val.{self.shortname}.{fieldname}")
-        if result is None:
             result =  konf.get_path(f"val.{self.kind}.{fieldname}")
-        #if result is None:
-        #    result =  konf.get_path(f"val.{fieldname}")
         if result is None:
             result =  konf.get_path(f"val.generic.{fieldname}")
         if result is not None:

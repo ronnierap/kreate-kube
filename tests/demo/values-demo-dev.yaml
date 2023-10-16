@@ -1,11 +1,19 @@
 # This file should just provide basic values
 val:
-  project: kreate-demo
+  generic:
+    project: kreate-demo
+    image_repo: https://repo.kisst.org
+    container_port: 8080
+    cpu_request: "50m" # extra small for dev environment
+    service_port: 8080
+    service_account_role: some-role-dev
 
-  probe_path: /demo/actuator/info
-  image_repo: https://repo.kisst.org
-  service_port: 8080
-  container_port: 8080
+  HttpProbes:
+    probe_path: /demo/actuator/info
+
+  Deployment:
+    main:
+      cpu_request: "50m" # extra small for dev environment
 
   serviceAccount: some-svc-account
   serviceAccountName: some-svc-account-name
@@ -26,10 +34,7 @@ val:
     cidr_list: dummy
     port_list: 1234
 
-  # do not override cpu_limit
-  cpu_request: "50m" # extra small for dev environment
 
-  serviceaccount_role: some-role-dev
   root_whitelist: 10.20.30.40
   replicas: 3
 
