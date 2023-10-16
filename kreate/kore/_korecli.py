@@ -85,6 +85,7 @@ class KoreCli:
         # subcommand: view
         cmd = self.add_subcommand(view, [], aliases=["v"])
         cmd.add_argument("key", help="key(s) to show", action="store", nargs="*")
+        #self.add_output_options(cmd)
 
         # subcommand: view_template
         cmd = self.add_subcommand(view_template, [], aliases=["vt"])
@@ -173,44 +174,50 @@ class KoreCli:
     def default_command(self):
         version(self)
 
-    def add_main_options(self):
-        self.cli.add_argument(
+    def add_konfig_options(self, cmd):
+        cmd.add_argument(
             "-d",
             "--define",
             action="append",
             default=[],
             help="add yaml (toplevel) element to konfig file",
         )
-        self.cli.add_argument(
+        cmd.add_argument(
             "-i",
             "--inklude",
             action="append",
             default=[],
             help="inklude extra files before parsing main konfig",
         )
-        self.cli.add_argument(
+        cmd.add_argument(
             "-k",
             "--konf",
             action="store",
             default=".",
             help="konfig file or directory to use (default=.)",
         )
-        self.cli.add_argument(
+
+    def add_output_options(self, cmd):
+        cmd.add_argument(
             "-v",
             "--verbose",
             action="count",
             default=0,
             help="output more details (inluding stacktrace) -vv even more",
         )
-        self.cli.add_argument(
+        cmd.add_argument(
             "-w", "--warn", action="store_true", help="only output warnings"
         )
-        self.cli.add_argument(
+        cmd.add_argument(
             "-q",
             "--quiet",
             action="store_true",
             help="do not output any info, just essential output",
         )
+
+    def add_main_options(self):
+        self.add_konfig_options(self.cli)
+        self.add_output_options(self.cli)
         self.cli.add_argument(
             "-K",
             "--keep-secrets",
