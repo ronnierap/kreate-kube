@@ -3,6 +3,8 @@ import logging
 import importlib.metadata
 from pathlib import Path
 from typing import List, Set
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version, InvalidVersion
 
 from ._core import deep_update, wrap
 from ._repo import FileGetter
@@ -84,7 +86,7 @@ class Konfig:
 
     def check_kreate_version(self, force: bool = False):
         version = self.get_kreate_version()
-        dev_versions = [ "Unknown", "rc", "editable"]
+        dev_versions = ["Unknown"]  #  , "rc", "editable"]
         if any(txt in version for txt in dev_versions) and not force:
             logger.info(f"skipping check for development version {version}")
             return
@@ -92,10 +94,8 @@ class Konfig:
         if not req_version:
             logger.info(f"skipping check since no kreate_version specified")
             return
-        # TODO: use more versatile semver check
-        for v,r in zip(version.split("."), req_version.split(".")):
-            if r != v and r != "*":
-                raise ValueError(f"kreate version {version} does not match required version {req_version}")
+        if not SpecifierSet(req_version).contains(Version(version)):
+            raise InvalidVersion(f"Invalid kreate version {version} for specifier {req_version}")
 
     def dekrypt_bytes(b: bytes) -> bytes:
         raise NotImplementedError("dekrypt_bytes not implemented")

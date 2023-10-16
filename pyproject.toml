@@ -17,6 +17,7 @@ dependencies = [
     "jinja2",
     "cryptography",
     "requests>=2.31.0",
+    "packaging>=23.2",
 ]
 
 # This is needed for a namespace packages without __init__.py
