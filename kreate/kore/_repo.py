@@ -172,6 +172,9 @@ class KonfigRepo(Repo):
         raise NotImplementedError
 
     def get_data(self, filename: str, optional: bool = False):
+        if optional and self.repo_konf.get("disabled", False):
+            logger.info(f"skipping optional {filename} in disable repo {self.repo_name}")
+            return ""
         dir = Path(self.calc_dir())
         if not dir.exists():
             self.download(filename)
