@@ -22,6 +22,7 @@ class JinYaml:
         self.env.globals["konf"] = konfig.yaml
         self.yaml_parser = YAML()
         self.add_jinja_filter("b64encode", b64encode)
+        self.add_jinja_filter("handle_empty_str", handle_empty_str)
 
     def add_jinja_filter(self, name, func):
         self.env.filters[name] = func
@@ -77,9 +78,13 @@ def b64encode(value: str) -> str:
             res = base64.b64encode(value.encode())
         return res.decode()
     else:
-        logger.warning("empty value to b64encode")
+        logger.debug("empty value to b64encode")
         return ""
 
+def handle_empty_str(value: str) -> str:
+    if value == "":
+        return '""'
+    return value
 
 class RepoLoader(jinja2.BaseLoader):
     def __init__(self, konfig):

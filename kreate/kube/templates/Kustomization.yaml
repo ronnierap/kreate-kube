@@ -42,7 +42,7 @@ secretGenerator:
   {% if strukt.secrets[cm].get("vars",{}) %}
   literals:
     {% for varname in strukt.secrets[cm].get("vars",{}).keys() %}
-     - {{ varname }}={{ strukt.secrets[cm].vars[varname ] }}
+     - {{ varname }}={{ my.secret(varname)  }}
     {% endfor %}
   {% endif %}
   {% if strukt.secrets[cm].get("files",{}) %}
