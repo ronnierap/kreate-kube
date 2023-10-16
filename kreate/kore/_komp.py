@@ -108,13 +108,16 @@ class Komponent:
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
-        val = wrap(self.app.konfig.yaml["val"])
-        result = val._get_path(f"{self.shortname}.{fieldname}")
-        result = result if result is not None else val._get_path(fieldname)
-        result = (
-            result if result is not None else val._get_path(f"{self.kind}.{fieldname}")
-        )
-        result = result if result is not None else val._get_path(f"generic.{fieldname}")
+        konf = self.app.konfig
+        result = konf.get_path(f"val.{self.kind}.{self.shortname}.{fieldname}")
+        if result is None:
+            result =  konf.get_path(f"val.{self.shortname}.{fieldname}")
+        if result is None:
+            result =  konf.get_path(f"val.{self.kind}.{fieldname}")
+        #if result is None:
+        #    result =  konf.get_path(f"val.{fieldname}")
+        if result is None:
+            result =  konf.get_path(f"val.generic.{fieldname}")
         if result is not None:
             return result
         if default is not None:
