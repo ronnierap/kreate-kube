@@ -31,7 +31,7 @@ class FileGetter:
         self.konfig = konfig
         self.dir = dir # Path(dir)
         self.repo_prefixes = {
-            "konf:":  FixedDirRepo(dir),
+            "main_konfig:":  FixedDirRepo(dir),
             "cwd:":   FixedDirRepo(Path.cwd()),
             "home:":  FixedDirRepo(Path.home()),
             "py:": PythonPackageRepo(konfig, None)
