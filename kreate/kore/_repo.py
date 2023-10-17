@@ -265,7 +265,7 @@ class BitbucketZipRepo(KonfigRepo):
         if self.version.startswith("branch."):
             version = self.version[7:]
             logger.warning(
-                f"Using branch {version} for {self.repo_name} as version is not recommended, use a tag instead"
+                f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
             )
             url += f"?at=refs/heads/{version}" + format
         else:
