@@ -87,16 +87,6 @@ class KoreCli:
         cmd.add_argument("key", help="key(s) to show", action="store", nargs="*")
         #self.add_output_options(cmd)
 
-        # subcommand: view_template
-        cmd = self.add_subcommand(view_template, [], aliases=["vt"])
-        cmd.add_argument(
-            "-t",
-            "--template",
-            help="template to show",
-            action="store",
-            default=None,
-        )
-
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
 
@@ -262,32 +252,38 @@ def clear_repo_cache(cli: KoreCli):
     clear_cache()
 
 
-def view_template(cli: KoreCli):
+def view_template(cli, template):
+    app: JinjaApp = cli.kreate_app()
+    if template not in app.kind_templates or template not in app.kind_classes:
+        logger.warn(f"Unknown template kind {template}")
+        return
+    if not cli.args.quiet:
+        print("==========================")
+        print(
+            f"{template} "
+            f"{app.kind_classes[template].__name__}: "
+            f"{app.kind_templates[template]}"
+        )
+        print("==========================")
+        if app.kind_classes[template].__doc__:
+            print(inspect.cleandoc(app.kind_classes[template].__doc__))
+            print("==========================")
+    if app.kind_templates[template] != "NoTemplate":
+        tmpl = app.kind_templates[template]
+        tmpl_text = app.konfig.file_getter.get_data(tmpl)
+        print(tmpl_text)
+
+
+def view_templates(cli, templates):
     """view the template for a specific kind"""
     # we call the kreate_app method and not the convenience app()
     # method, because aktivating the app, will do stuff that might break
-    app: JinjaApp = cli.kreate_app()
-    template = cli.args.template
-    if template:
-        if template not in app.kind_templates or template not in app.kind_classes:
-            logger.warn(f"Unknown template kind {template}")
-            return
-        if not cli.args.quiet:
-            print("==========================")
-            print(
-                f"{template} "
-                f"{app.kind_classes[template].__name__}: "
-                f"{app.kind_templates[template]}"
-            )
-            print("==========================")
-            if app.kind_classes[template].__doc__:
-                print(inspect.cleandoc(app.kind_classes[template].__doc__))
-                print("==========================")
-        if app.kind_templates[template] != "NoTemplate":
-            tmpl = app.kind_templates[template]
-            tmpl_text = app.konfig.file_getter.get_data(tmpl)
-            print(tmpl_text)
+    #template = cli.args.template
+    if templates:
+        for t in templates:
+            view_template(cli, t)
     else:
+        app: JinjaApp = cli.kreate_app()
         for template in app.kind_templates:
             if template in app.kind_templates and template in app.kind_classes:
                 print(
@@ -296,13 +292,15 @@ def view_template(cli: KoreCli):
                     f"{app.kind_templates[template]}"
                 )
             else:
-                logger.debug("skipping kind")
+                logger.warn(f"skipping template {template}")
 
 def view_aliases():
     return {
         "i": "inklude",
         "s": "strukt",
         "a": "app",
+        "t": "template",
+        "tmpl": "template",
         "ink": "inklude",
         "sys": "system",
         "ver": "version",
@@ -319,8 +317,11 @@ def view(cli: KoreCli):
     """view the entire konfig or subkey(s)"""
     konfig: Konfig = cli.konfig()
     if cli.args.key:
-        for k in cli.args.key:
+        for idx, k in enumerate(cli.args.key):
             k = view_aliases().get(k, k)
+            if k == "template":
+                view_templates(cli, cli.args.key[idx+1:])
+                break
             result = konfig.get_path(k)
             if isinstance(result, str):
                 print(f"{k}: {result}")
