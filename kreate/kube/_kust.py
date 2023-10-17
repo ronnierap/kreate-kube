@@ -12,9 +12,6 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
 
-    def register_patch_file(self, kind: str = None) -> None:
-        package = templates
-        super().register_template_file(kind=kind, cls=Patch, package=package)
 
     def kreate_komponents_from_strukture(self):
         super().kreate_komponents_from_strukture()
