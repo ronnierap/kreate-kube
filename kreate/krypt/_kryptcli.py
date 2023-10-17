@@ -1,6 +1,7 @@
 import sys
 import logging
 import jinja2.filters
+from pathlib import Path
 
 from ..kore import KoreCli, Konfig
 from ..kore._korecli import argument as argument
@@ -28,11 +29,13 @@ class KryptCli(KoreCli):
             krypt_functions._dekrypt_testdummy = True
 
     def add_krypt_subcommands(self):
-        self.add_subcommand(
-            dek_lines,
-            [argument("-f", "--file", help="yaml file to enkrypt")],
-            aliases=["dl"],
-        )
+        dl_cmd = self.add_subcommand(dek_lines, aliases=["dl"])
+        dl_cmd.add_argument("file", help="yaml file(s) to dekrypt", default=[], nargs="*")
+
+        el_cmd = self.add_subcommand(enk_lines, aliases=["el"])
+        el_cmd.add_argument("file", help="yaml file(s) to enkrypt", default=[], nargs="*")
+
+
         self.add_subcommand(
             dekstr,
             [argument("-s", "--str", help="string value to dekrypt")],
@@ -42,11 +45,6 @@ class KryptCli(KoreCli):
             dekfile,
             [argument("file", help=" filename to dekrypt")],
             aliases=["df"],
-        )
-        self.add_subcommand(
-            enk_lines,
-            [argument("-f", "--file", help="filename to enkrypt")],
-            aliases=["el"],
         )
         self.add_subcommand(
             enkfile,
@@ -66,11 +64,11 @@ class KryptCli(KoreCli):
 def dek_lines(cli: KryptCli):
     """dekrypt lines in a text file"""
     konfig: Konfig = cli.konfig()
-    filename = (
-        cli.args.file or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
-    )
-    krypt_functions.dekrypt_lines(filename, ".")
-
+    files = cli.args.file
+    files = files or Path(konfig.dir).glob("secret*konf")
+    for f in files:
+        logger.warn(f"dekrypting: {f}")
+        krypt_functions.dekrypt_lines(f, ".")
 
 def dekstr(cli: KryptCli):
     """dekrypt string value"""
@@ -93,10 +91,11 @@ def dekfile(cli: KryptCli):
 def enk_lines(cli: KryptCli):
     "enkrypt lines in a text file"
     konfig: Konfig = cli.konfig()
-    filename = (
-        cli.args.file or f"{konfig.dir}/secrets-{konfig.appname}-{konfig.env}.yaml"
-    )
-    krypt_functions.enkrypt_lines(filename, ".")
+    files = cli.args.file
+    files = files or Path(konfig.dir).glob("secret*konf")
+    for f in files:
+        logger.warn(f"enkrypting: {f}")
+        krypt_functions.enkrypt_lines(f, ".")
 
 
 def enkfile(cli: KryptCli):

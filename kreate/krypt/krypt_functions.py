@@ -64,20 +64,23 @@ def change_lines(filename: str, func, from_: str, to_: str, dir: str = None):
     with open(f"{dir}/{filename}") as f:
         lines = f.readlines()
     for idx, line in enumerate(lines):
-        line = line.rstrip()
-        if line.endswith(from_):
-            line = line[: -len(from_)]
-            value = line.rsplit(":", 1)[1].strip()
-            start = line.rsplit(":", 1)[0]
-            value = func(value)
-            lines[idx] = f"{start}: {value}  {to_}\n"
+        #line = line.rstrip()
+        if from_ in line:
+            try:
+                parts = line.split(from_, 1)
+                value = parts[1].strip()
+                start = parts[0]
+                value = func(value)
+                lines[idx] = f"{start}{to_}{value}\n"
+            except Exception as e:
+                logger.error(f"problem with f{func} in {parts[0]}")
     with open(f"{dir}/{filename}", "w") as f:
         f.writelines(lines)
 
 
 def dekrypt_lines(filename: str, dir: str = None):
-    change_lines(filename, dekrypt_str, "# enkrypted", "# dekrypted", dir=dir)
+    change_lines(filename, dekrypt_str, "dekrypt:", "enkrypt:", dir=dir)
 
 
 def enkrypt_lines(filename: str, dir: str = None):
-    change_lines(filename, enkrypt_str, "# dekrypted", "# enkrypted", dir=dir)
+    change_lines(filename, enkrypt_str, "enkrypt:", "dekrypt:", dir=dir)
