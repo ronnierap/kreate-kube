@@ -283,7 +283,7 @@ def view_template(cli: KoreCli):
             if app.kind_classes[template].__doc__:
                 print(inspect.cleandoc(app.kind_classes[template].__doc__))
                 print("==========================")
-        if app.kind_templates[template].filename != "NoTemplate":
+        if app.kind_templates[template] != "NoTemplate":
             tmpl = app.kind_templates[template]
             tmpl_text = app.konfig.file_getter.get_data(tmpl)
             print(tmpl_text)
