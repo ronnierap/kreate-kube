@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 __all__ = [
     "Resource",
-    "Deployment",
+    "Workload",
     "ConfigMap",
     "Egress",
 ]
@@ -50,7 +50,7 @@ class Resource(JinYamlKomponent):
             return f.read()
 
 
-class Deployment(Resource):
+class Workload(Resource):
     def aktivate(self):
         super().aktivate()
         self.add_container_items()

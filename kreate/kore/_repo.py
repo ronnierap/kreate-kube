@@ -168,7 +168,7 @@ class KonfigRepo(Repo):
         return f"{self.__class__.__name__}({self.repo_name}, version={self.version})"
 
     def download(self, filename: str):
-        raise NotImplementedError
+        raise NotImplementedError(f"Could not download {self.repo_name}")
 
     def get_data(self, filename: str, optional: bool = False):
         if optional and self.repo_konf.get("disabled", False):
