@@ -34,8 +34,6 @@ class FileGetter:
             "konf:":  FixedDirRepo(dir),
             "cwd:":   FixedDirRepo(Path.cwd()),
             "home:":  FixedDirRepo(Path.home()),
-            "./":     FixedDirRepo(dir),
-            "../":    FixedDirRepo(dir.parent),
             "py:": PythonPackageRepo(konfig, None)
         }
         self.repo_types = {
@@ -146,6 +144,7 @@ class FixedDirRepo(Repo):
             raise TypeError(f"Unsupported type {type(dir)}")
 
     def get_data(self, filename: str, optional: bool = False):
+        print(self.dir, filename)
         path = self.dir / filename
         if not path.exists():
             raise FileNotFoundError(f"could not find file {filename} in {dir}")

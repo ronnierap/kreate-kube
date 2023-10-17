@@ -17,12 +17,22 @@ logger = logging.getLogger(__name__)
 class Konfig:
     def __init__(self, filename: str = None, dict_: dict = None,
                  inkludes=None):
-        filename = filename or "konfig.yaml"
-        if os.path.isdir(filename):
-            filename += "/konfig.yaml"
-        self.filename = filename
+        glob_pattern = os.getenv("KREATE_MAIN_KONFIG")
+        glob_pattern = glob_pattern or "kreate*.konf"
+        filename = Path(filename)
+        possible_files = [filename]
+        if filename is None:
+            possible_files = tuple(Path.cwd().glob(glob_pattern))
+        elif os.path.isdir(filename):
+            possible_files = tuple(Path(filename).glob(glob_pattern))
+        if len(possible_files) == 0:
+            raise ValueError(f"No main konfig file found for {filename}, {glob_pattern}")
+        if len(possible_files) > 1:
+            raise ValueError(f"Ambiguous konfig file found for {filename}, {glob_pattern}")
+        konfig_path = possible_files[0]
+        self.dir = konfig_path.parent
+        self.filename = str(konfig_path)
         self.dekrypt_func = None
-        self.dir = Path(os.path.dirname(filename))
         filename = os.path.basename(filename)
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
@@ -30,8 +40,9 @@ class Konfig:
         deep_update(dict_, {"system": { "getenv":  os.getenv}})
         self.file_getter = FileGetter(self, self.dir)
         for ink in inkludes or []:
+            print(ink)
             self.inklude(ink)
-        self.inklude(filename)
+        self.inklude(konfig_path.name)
         self.load_all_inkludes()
 
     def get_path(self, path: str, default=None):
