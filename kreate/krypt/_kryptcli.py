@@ -29,42 +29,55 @@ class KryptCli(KoreCli):
             krypt_functions._dekrypt_testdummy = True
 
     def add_krypt_subcommands(self):
-        dl_cmd = self.add_subcommand(dek_lines, aliases=["dl"])
-        dl_cmd.add_argument("file", help="yaml file(s) to dekrypt", default=[], nargs="*")
+        dek_cmd = self.add_subcommand(dekrypt, aliases=["dek"])
+        dek_cmd.add_argument("subcmd", help="what to dekrypt", default="lines", nargs="?")
+        dek_cmd.add_argument("item", help="item(s) to dekrypt", default=[], nargs="*")
 
-        el_cmd = self.add_subcommand(enk_lines, aliases=["el"])
-        el_cmd.add_argument("file", help="yaml file(s) to enkrypt", default=[], nargs="*")
-
-
-        self.add_subcommand(
-            dekstr,
-            [argument("-s", "--str", help="string value to dekrypt")],
-            aliases=["ds"],
-        )
-        self.add_subcommand(
-            dekfile,
-            [argument("file", help=" filename to dekrypt")],
-            aliases=["df"],
-        )
-        self.add_subcommand(
-            enkfile,
-            [argument("file", help=" filename to enkrypt")],
-            aliases=["ef"],
-        )
-        self.add_subcommand(
-            enkstr,
-            [argument("-s", "--str", help="string value to enkrypt")],
-            aliases=["es"],
-        )
+        enk_cmd = self.add_subcommand(enkrypt, aliases=["enk"])
+        enk_cmd.add_argument("subcmd", help="what to enkrypt", default="lines", nargs="?")
+        enk_cmd.add_argument("item", help="item(s) to enkrypt", default=[], nargs="*")
 
     def kreate_konfig(self, filename: str) -> KryptKonfig:
         return KryptKonfig()
 
 
+def aliases():
+    return {
+        "f": "file",
+        "s": "string",
+        "str": "string",
+        "l": "lines",
+        "k": "lines",
+    }
+
+def dekrypt(cli: KryptCli):
+    subcmd = cli.args.subcmd
+    subcmd = aliases().get(subcmd, subcmd)
+    if subcmd == "file":
+        dekfile(cli)
+    elif subcmd == "string":
+        dekstr(cli)
+    elif subcmd == "lines":
+        dek_lines(cli)
+    else:
+        raise ValueError(f"unknow dekrypt subcommand {subcmd}")
+
+def enkrypt(cli: KryptCli):
+    subcmd = cli.args.subcmd
+    subcmd = aliases().get(subcmd, subcmd)
+    if subcmd == "file":
+        enkfile(cli)
+    elif subcmd == "string":
+        enkstr(cli)
+    elif subcmd == "lines":
+        enk_lines(cli)
+    else:
+        raise ValueError(f"unknow dekrypt subcommand {subcmd}")
+
 def dek_lines(cli: KryptCli):
     """dekrypt lines in a text file"""
     konfig: Konfig = cli.konfig()
-    files = cli.args.file
+    files = cli.args.item
     files = files or Path(konfig.dir).glob("secret*konf")
     for f in files:
         logger.warn(f"dekrypting: {f}")
@@ -73,25 +86,29 @@ def dek_lines(cli: KryptCli):
 def dekstr(cli: KryptCli):
     """dekrypt string value"""
     cli.konfig()  # init konfig to set the secret value
-    value = cli.args.str
+    value = cli.args.item
     if not value:
         if not cli.args.quiet:
             print("Enter string to dekrypt")
         value = sys.stdin.readline().strip()
-    print(krypt_functions.dekrypt_str(value))
+        print(krypt_functions.dekrypt_str(value))
+    else:
+        for str in value:
+            print(krypt_functions.dekrypt_str(str))
 
 
 def dekfile(cli: KryptCli):
     "dekrypt an entire file"
     cli.konfig()  # init konfig to set the secret value
-    filename = cli.args.file
-    krypt_functions.dekrypt_file(filename)
+    for f in cli.args.item:
+        logger.info(f"dekrypting file {f}")
+        krypt_functions.dekrypt_file(f)
 
 
 def enk_lines(cli: KryptCli):
     "enkrypt lines in a text file"
     konfig: Konfig = cli.konfig()
-    files = cli.args.file
+    files = cli.args.item
     files = files or Path(konfig.dir).glob("secret*konf")
     for f in files:
         logger.warn(f"enkrypting: {f}")
@@ -101,16 +118,20 @@ def enk_lines(cli: KryptCli):
 def enkfile(cli: KryptCli):
     "enkrypt an entire file"
     cli.konfig()
-    filename = cli.args.file
-    krypt_functions.enkrypt_file(filename)
+    for f in cli.args.item:
+        logger.info(f"enkrypting file {f}")
+        krypt_functions.enkrypt_file(f)
 
 
 def enkstr(cli: KryptCli):
     """enkrypt string value"""
     cli.konfig()
-    value = cli.args.str
+    value = cli.args.item
     if not value:
         if not cli.args.quiet:
             print("Enter string to enkrypt")
         value = sys.stdin.readline().strip()
-    print(krypt_functions.enkrypt_str(value))
+        print(krypt_functions.enkrypt_str(value))
+    else:
+        for str in value:
+            print(krypt_functions.enkrypt_str(str))

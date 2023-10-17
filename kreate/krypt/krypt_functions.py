@@ -24,7 +24,7 @@ def dekrypt_str(value):
     fernet = _get_key()
     if _dekrypt_testdummy:
         return f"testdummy-{value[len(value)//2-4:len(value)//2+4]}"
-    return fernet.decrypt(value.encode("ascii")).decode("ascii")
+    return fernet.decrypt(value.encode()).decode()
 
 
 def dekrypt_bytes(value: bytes) -> bytes:
@@ -40,14 +40,14 @@ def dekrypt_file(filename):
         data = f.read()
     if _dekrypt_testdummy:
         data = f"testdummy-{data[len(data)//2-4:len(data)//2+4]}"
-    print(fernet.decrypt(data.encode("ascii")).decode("ascii"), end="")
+    print(fernet.decrypt(data.encode()).decode(), end="")
 
 
 def enkrypt_str(value):
     fernet = _get_key()
     part = b"\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa"
     # use the parts to prevent changes if secret was not changed
-    return fernet._encrypt_from_parts(value.encode("ascii"), 0, part).decode("ascii")
+    return fernet._encrypt_from_parts(value.encode(), 0, part).decode()
 
 
 def enkrypt_file(filename):
@@ -56,7 +56,7 @@ def enkrypt_file(filename):
         data = f.read()
     with open(filename + ".encrypted", "wb") as f:
         part = b"\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa"
-        f.write(fernet._encrypt_from_parts(data.encode("ascii"), 0, part))
+        f.write(fernet._encrypt_from_parts(data.encode(), 0, part))
 
 
 def change_lines(filename: str, func, from_: str, to_: str, dir: str = None):
@@ -70,6 +70,7 @@ def change_lines(filename: str, func, from_: str, to_: str, dir: str = None):
                 parts = line.split(from_, 1)
                 value = parts[1].strip()
                 start = parts[0]
+                logger.info(f"{from_} {parts[0].strip()} ...")
                 value = func(value)
                 lines[idx] = f"{start}{to_}{value}\n"
             except Exception as e:
