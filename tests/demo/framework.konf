@@ -1,5 +1,5 @@
 inklude:
-- py:kreate.kube:kube-defaults.konf
+- kreate-kube-templates:init-kreate-kube-templates.konf
 - shared_github:shared-values.konf
 - shared_local:shared-local.konf
 - shared-values.yaml
@@ -25,6 +25,11 @@ system:
       path: tests/shared-local.zip
       skip_levels: 2
       type: local-zip
+    kreate-kube-templates:
+      version: "{{ version.kreate_kube_templates_version | default("v1.0") }}"
+      url: https://api.github.com/repos/kisst-org/kreate-kube-templates/zipball/{version}
+      skip_levels: 1
+      type: url-zip
     shared_github:
       version: {{ version.shared_github | default("v1.0") }}
       url: https://github.com/MarkHooijkaas/kreate-kube/archive/{version}.zip

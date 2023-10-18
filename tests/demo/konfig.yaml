@@ -6,6 +6,7 @@ version:
   image_version: v1.3.4
   kreate_version: "== 0.9.1.dev0+editable"
   shared_github: master
+  kreate_kube_templates_version: "0.1"
 file:
   application.properties: konf:files/application.properties
   environment.properties: konf:files/environment.properties
