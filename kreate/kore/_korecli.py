@@ -12,6 +12,7 @@ from ._repo import clear_cache
 from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp
+from pathlib import Path
 import importlib.metadata
 import kreate.kore.dotenv as dotenv
 
@@ -106,11 +107,18 @@ class KoreCli:
         # Primitive way to check if to load ENV vars before parsing vars
         # .env needs to be loaded before arg parsing, since it may
         # contain KREATE_OPTIONS
+        load_dot_env = True
+        load_kreate_env = True
         for arg in sys.argv:
             if arg == "--no-dotenv":
-                return
+                load_dot_env = False
+            if arg == "--no-kreate-env":
+                load_kreate_env = False
         try:
-            dotenv.load_dotenv(".env")
+            if load_dot_env:
+                dotenv.load_env(Path.cwd() / ".env")
+            if load_kreate_env:
+                dotenv.load_env(Path.home() / ".config/kreate/kreate.env")
         except Exception as e:
             logger.error(
                 f"ERROR loading .env file, " f"remove .env file or specify --no-dotenv"
@@ -229,7 +237,12 @@ class KoreCli:
         self.cli.add_argument(
             "--no-dotenv",
             action="store_true",
-            help="do not load a .env file for working dir",
+            help="do not load .env file from working dir",
+        )
+        self.cli.add_argument(
+            "--no-kreate-env",
+            action="store_true",
+            help="do not load kreate.env file from user home .config dir",
         )
 
     def process_main_options(self, args):
