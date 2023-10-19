@@ -40,6 +40,13 @@ class KoreCli:
             description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
+        self.cli.add_argument(
+            "konfig",
+            action="store",
+            default=".",
+            help="konfig file or directory to use (default=.)",
+        )
+
         self.subparsers = self.cli.add_subparsers(
             # title="subcmd",
             # description="valid subcommands",
@@ -186,13 +193,6 @@ class KoreCli:
             default=[],
             help="inklude extra files before parsing main konfig",
         )
-        cmd.add_argument(
-            "-k",
-            "--konf",
-            action="store",
-            default=".",
-            help="konfig file or directory to use (default=.)",
-        )
 
     def add_output_options(self, cmd):
         cmd.add_argument(
@@ -250,7 +250,7 @@ class KoreCli:
             logging.basicConfig(format="%(message)s", level=logging.ERROR)
         else:
             logging.basicConfig(format="%(message)s", level=logging.WARN)
-        self.konfig_filename = args.konf
+        self.konfig_filename = args.konfig
 
 
 def clear_repo_cache(cli: KoreCli):

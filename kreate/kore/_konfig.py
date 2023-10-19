@@ -26,9 +26,9 @@ class Konfig:
         elif os.path.isdir(filename):
             possible_files = tuple(Path(filename).glob(glob_pattern))
         if len(possible_files) == 0:
-            raise ValueError(f"No main konfig file found for {filename}, {glob_pattern}")
+            raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
         if len(possible_files) > 1:
-            raise ValueError(f"Ambiguous konfig file found for {filename}, {glob_pattern}")
+            raise ValueError(f"Ambiguous konfig files found for {filename}/{glob_pattern}: {possible_files}")
         konfig_path = possible_files[0]
         self.dir = konfig_path.parent
         self.filename = str(konfig_path)
