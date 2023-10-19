@@ -2,6 +2,7 @@ from typing import Mapping, Protocol, Union
 import requests
 import requests.auth
 import zipfile
+import hashlib
 import io
 import os
 import re
@@ -187,17 +188,28 @@ class KonfigRepo(Repo):
             raise FileNotFoundError(f"could not find file {filename} in {dir}")
         return p.read_text()
 
+    def calc_hash(self, extra: str = "") -> str:
+        return hashlib.md5((
+            self.repo_name
+            + self.repo_konf.get("version", "")
+            + self.calc_url("...", no_warn=True)
+            + extra
+        ).encode()).hexdigest()[:10]
+
     def calc_dir(self) -> Path:
+        hash = self.calc_hash()
         dir = self.repo_konf.get("cache_name")
         if dir:
-            return cache_dir() / dir
+            if self.version:
+                return cache_dir() / f"{dir}/{self.version}-{hash}"
+            return cache_dir() / f"{dir}-{hash}"
         if self.version:
-            return cache_dir() / f"{self.repo_name}-{self.version}"
+            return cache_dir() / f"{self.repo_name}/{self.version.replace('/','-')}-{hash}"
         else:
-            return cache_dir() / f"{self.repo_name}"
+            return cache_dir() / f"{self.repo_name}-{hash}"
 
-    def calc_url(self, filename: str) -> str:
-        url = self.repo_konf.get("url", None)
+    def calc_url(self, filename: str, no_warn=False) -> str:
+        url = self.repo_konf.get("url", "")
         if self.version:
             url = url.replace("{version}", self.version)
         return url
@@ -256,13 +268,13 @@ class BitbucketZipRepo(KonfigRepo):
         data = self.url_response(filename).content
         self.unzip_data(data)
 
-    def calc_url(self, filename: str) -> str:
-        return self._calc_url("archive", "&format=zip")
+    def calc_url(self, filename: str, no_warn=False) -> str:
+        return self._calc_url("archive", "&format=zip", no_warn=no_warn)
 
-    def _calc_url(self, ext: str, format:str = "") -> str:
+    def _calc_url(self, ext: str, format:str = "", no_warn=False) -> str:
         url = self.repo_konf.get("url", None)
         url += f"/{ext}"
-        if self.version.startswith("branch."):
+        if self.version.startswith("branch.") and not no_warn:
             version = self.version[7:]
             logger.warning(
                 f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
@@ -285,14 +297,15 @@ class BitbucketFileRepo(BitbucketZipRepo):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
 
-    def calc_url(self, filename: str) -> str:
+    def calc_dir(self) -> str:
+        hash = self.calc_hash()
         bitb_project = self.repo_konf.get("bitbucket_project")
         bitb_repo = self.repo_konf.get("bitbucket_repo")
         version = self.version.replace("/", "-")
-        return cache_dir() / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}"
+        return cache_dir() / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}-{hash}"
 
-    def calc_url(self, filename: str) -> str:
-        return self._calc_url(f"raw/{filename}")
+    def calc_url(self, filename: str, no_warn=False) -> str:
+        return self._calc_url(f"raw/{filename}", no_warn=no_warn)
 
 def unzip(
     zfile: zipfile.ZipFile,
