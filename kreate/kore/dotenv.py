@@ -9,9 +9,11 @@ import os
 from pathlib import Path
 
 
-def load_dotenv(path: str) -> None:
-    if not Path(path).is_file():
-        return
+def load_env(path: Path, mandatory: bool = False) -> None:
+    if not path.is_file():
+        if not mandatory:
+            return
+        raise FileNotFoundError(f"Could not find mandatory env file {path}")
     with open(path) as file:
         lines = [line.strip() for line in file]
 
@@ -21,6 +23,6 @@ def load_dotenv(path: str) -> None:
                 continue
             k, v = line.split("=", 1)
             if k not in os.environ:
-                os.environ[k] = v
+                os.environ[k.strip()] = v.strip()
         except Exception as e:
             raise ValueError(f"ERROR {e} while parsing line in .env file: {line}")
