@@ -63,8 +63,7 @@ class KoreCli:
         if not self._konfig:
             self._konfig = self.kreate_konfig(self.konfig_filename)
             if not self.args.skip_version_check:
-                force = self.args.force_version_check
-                self._konfig.check_kreate_version(force=force)
+                self._konfig.check_kreate_version()
         return self._konfig
 
     def app(self):
@@ -227,12 +226,6 @@ class KoreCli:
             "--skip-version-check",
             action="store_true",
             help="do not check if required version of kreate is used",
-        )
-        self.cli.add_argument(
-            "-F",
-            "--force-version-check",
-            action="store_true",
-            help="force version check even if development version is detected",
         )
         self.cli.add_argument(
             "--no-dotenv",
