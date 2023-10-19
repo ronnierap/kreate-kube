@@ -19,12 +19,13 @@ def cache_dir():
     cache_dir = os.getenv("KREATE_REPO_CACHE_DIR")
     if not cache_dir:
         cache_dir = Path.home() / ".cache/kreate/repo"
-    return cache_dir
+    return Path(cache_dir)
 
 
 def clear_cache():
-    logger.info(f"removing repo cache dir {cache_dir()}")
-    shutil.rmtree(cache_dir())
+    logger.warn(f"removing repo cache dir {cache_dir()}")
+    if cache_dir().is_dir():
+        shutil.rmtree(cache_dir())
 
 
 class FileGetter:

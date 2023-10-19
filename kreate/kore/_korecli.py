@@ -35,7 +35,7 @@ class KoreCli:
         self.cli = argparse.ArgumentParser(
             prog="kreate",
             usage=(
-                "kreate [optional arguments] [<subcommand>] [subcommand" " options]"
+                "kreate [optional arguments] <konfig> [<subcommand>] [subcommand options]"
             ),
             description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
@@ -86,7 +86,6 @@ class KoreCli:
 
     def add_subcommands(self):
         self.add_subcommand(clear_repo_cache, [], aliases=["cc"])
-
         # subcommand: version
         self.add_subcommand(version, [], aliases=["vr"])
         # subcommand: view
