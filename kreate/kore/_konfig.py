@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class Konfig:
-    def __init__(self, filename: str = None, dict_: dict = None,
-                 inkludes=None):
+    def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
         glob_pattern = os.getenv("KREATE_MAIN_KONFIG")
         glob_pattern = glob_pattern or "kreate*.konf"
         filename = Path(filename)
@@ -28,7 +27,9 @@ class Konfig:
         if len(possible_files) == 0:
             raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
         if len(possible_files) > 1:
-            raise ValueError(f"Ambiguous konfig files found for {filename}/{glob_pattern}: {possible_files}")
+            raise ValueError(
+                f"Ambiguous konfig files found for {filename}/{glob_pattern}: {possible_files}"
+            )
         konfig_path = possible_files[0]
         self.dir = konfig_path.parent
         self.filename = str(konfig_path)
@@ -37,7 +38,7 @@ class Konfig:
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
-        deep_update(dict_, {"system": { "getenv":  os.getenv}})
+        deep_update(dict_, {"system": {"getenv": os.getenv}})
         self.file_getter = FileGetter(self, self.dir)
         for ink in inkludes or []:
             print(ink)
@@ -73,7 +74,7 @@ class Konfig:
             if fname not in already_inkluded:
                 count += 1
                 already_inkluded.add(fname)
-                self.inklude(fname, idx+1)
+                self.inklude(fname, idx + 1)
         logger.debug(f"inkluded {count} new files")
         return count
 
@@ -87,8 +88,6 @@ class Konfig:
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
 
-
-
     def get_kreate_version(self) -> str:
         try:
             return importlib.metadata.version("kreate-kube")
@@ -101,12 +100,14 @@ class Konfig:
         if any(txt in version for txt in dev_versions) and not force:
             logger.info(f"skipping check for development version {version}")
             return
-        req_version : str = self.get_path("version.kreate_version", None)
+        req_version: str = self.get_path("version.kreate_version", None)
         if not req_version:
             logger.info(f"skipping check since no kreate_version specified")
             return
         if not SpecifierSet(req_version).contains(Version(version)):
-            raise InvalidVersion(f"Invalid kreate version {version} for specifier {req_version}")
+            raise InvalidVersion(
+                f"Invalid kreate version {version} for specifier {req_version}"
+            )
 
     def dekrypt_bytes(b: bytes) -> bytes:
         raise NotImplementedError("dekrypt_bytes not implemented")

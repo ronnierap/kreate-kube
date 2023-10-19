@@ -81,10 +81,12 @@ def b64encode(value: str) -> str:
         logger.debug("empty value to b64encode")
         return ""
 
+
 def handle_empty_str(value: str) -> str:
     if value == "":
         return '""'
     return value
+
 
 class RepoLoader(jinja2.BaseLoader):
     def __init__(self, konfig):

@@ -30,11 +30,15 @@ class KryptCli(KoreCli):
 
     def add_krypt_subcommands(self):
         dek_cmd = self.add_subcommand(dekrypt, aliases=["dek"])
-        dek_cmd.add_argument("subcmd", help="what to dekrypt", default="lines", nargs="?")
+        dek_cmd.add_argument(
+            "subcmd", help="what to dekrypt", default="lines", nargs="?"
+        )
         dek_cmd.add_argument("item", help="item(s) to dekrypt", default=[], nargs="*")
 
         enk_cmd = self.add_subcommand(enkrypt, aliases=["enk"])
-        enk_cmd.add_argument("subcmd", help="what to enkrypt", default="lines", nargs="?")
+        enk_cmd.add_argument(
+            "subcmd", help="what to enkrypt", default="lines", nargs="?"
+        )
         enk_cmd.add_argument("item", help="item(s) to enkrypt", default=[], nargs="*")
 
     def kreate_konfig(self, filename: str) -> KryptKonfig:
@@ -50,6 +54,7 @@ def aliases():
         "k": "lines",
     }
 
+
 def dekrypt(cli: KryptCli):
     subcmd = cli.args.subcmd
     subcmd = aliases().get(subcmd, subcmd)
@@ -61,6 +66,7 @@ def dekrypt(cli: KryptCli):
         dek_lines(cli)
     else:
         raise ValueError(f"unknow dekrypt subcommand {subcmd}")
+
 
 def enkrypt(cli: KryptCli):
     subcmd = cli.args.subcmd
@@ -74,6 +80,7 @@ def enkrypt(cli: KryptCli):
     else:
         raise ValueError(f"unknow dekrypt subcommand {subcmd}")
 
+
 def dek_lines(cli: KryptCli):
     """dekrypt lines in a text file"""
     konfig: Konfig = cli.konfig()
@@ -82,6 +89,7 @@ def dek_lines(cli: KryptCli):
     for f in files:
         logger.warn(f"dekrypting: {f}")
         krypt_functions.dekrypt_lines(f, ".")
+
 
 def dekstr(cli: KryptCli):
     """dekrypt string value"""

@@ -111,9 +111,9 @@ class Komponent:
         konf = self.app.konfig
         result = konf.get_path(f"val.{self.kind}.{self.shortname}.{fieldname}")
         if result is None:
-            result =  konf.get_path(f"val.{self.kind}.{fieldname}")
+            result = konf.get_path(f"val.{self.kind}.{fieldname}")
         if result is None:
-            result =  konf.get_path(f"val.generic.{fieldname}")
+            result = konf.get_path(f"val.generic.{fieldname}")
         if result is not None:
             return result
         if default is not None:
@@ -182,7 +182,6 @@ class JinYamlKomponent(JinjaKomponent):
 
     def set_path(self, path: str, val):
         return self.yaml._set_path(path, val)
-
 
     def kreate_file(self) -> None:
         filename = self.get_filename()

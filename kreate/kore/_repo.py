@@ -30,23 +30,23 @@ def clear_cache():
 class FileGetter:
     def __init__(self, konfig, dir: Path):
         self.konfig = konfig
-        self.dir = dir # Path(dir)
+        self.dir = dir  # Path(dir)
         self.repo_prefixes = {
-            "main_konfig:":  FixedDirRepo(dir),
-            "cwd:":   FixedDirRepo(Path.cwd()),
-            "home:":  FixedDirRepo(Path.home()),
-            "py:": PythonPackageRepo(konfig, None)
+            "main_konfig:": FixedDirRepo(dir),
+            "cwd:": FixedDirRepo(Path.cwd()),
+            "home:": FixedDirRepo(Path.home()),
+            "py:": PythonPackageRepo(konfig, None),
         }
         self.repo_types = {
-            "url-zip:":  UrlZipRepo,
-            "local-dir:":  LocalKonfigRepo,
-            "local-zip:":  LocalZipRepo,
-            "bitbucket-zip:":  BitbucketZipRepo,
-            "bitbucket-file:":  BitbucketFileRepo,
+            "url-zip:": UrlZipRepo,
+            "local-dir:": LocalKonfigRepo,
+            "local-zip:": LocalZipRepo,
+            "bitbucket-zip:": BitbucketZipRepo,
+            "bitbucket-file:": BitbucketFileRepo,
         }
 
     def konfig_repos(self):
-        for repo in self.konfig.get_path("system.repo",[]):
+        for repo in self.konfig.get_path("system.repo", []):
             self.repo_prefixes[repo + ":"] = self.get_repo(repo)
 
     def get_prefix(self, filename: str) -> str:
@@ -72,7 +72,7 @@ class FileGetter:
         repo = None
         for prefix in self.repo_prefixes:
             if file.startswith(prefix):
-                file = file[len(prefix):]
+                file = file[len(prefix) :]
                 repo = self.repo_prefixes[prefix]
         if repo:
             data = repo.get_data(file, optional=optional)
@@ -119,10 +119,10 @@ class FileGetter:
         else:
             raise ValueError(f"Unknow repo type {type} for repo {repo_name}")
 
+
 class Repo(Protocol):
     def get_data(self, filename: str, optional: bool = False) -> str:
         ...
-
 
 
 class PythonPackageRepo(Repo):
@@ -156,7 +156,7 @@ class FixedDirRepo(Repo):
 
 
 class KonfigRepo(Repo):
-    def __init__(self, konfig, repo_name:str):
+    def __init__(self, konfig, repo_name: str):
         self.konfig = konfig
         self.repo_name = repo_name
         self.repo_konf = konfig.get_path("system.repo." + repo_name, {})
@@ -173,7 +173,9 @@ class KonfigRepo(Repo):
 
     def get_data(self, filename: str, optional: bool = False):
         if optional and self.repo_konf.get("disabled", False):
-            logger.info(f"skipping optional {filename} in disable repo {self.repo_name}")
+            logger.info(
+                f"skipping optional {filename} in disable repo {self.repo_name}"
+            )
             return ""
         dir = Path(self.calc_dir())
         if not dir.exists():
@@ -189,12 +191,14 @@ class KonfigRepo(Repo):
         return p.read_text()
 
     def calc_hash(self, extra: str = "") -> str:
-        return hashlib.md5((
-            self.repo_name
-            + self.repo_konf.get("version", "")
-            + self.calc_url("...", no_warn=True)
-            + extra
-        ).encode()).hexdigest()[:10]
+        return hashlib.md5(
+            (
+                self.repo_name
+                + self.repo_konf.get("version", "")
+                + self.calc_url("...", no_warn=True)
+                + extra
+            ).encode()
+        ).hexdigest()[:10]
 
     def calc_dir(self) -> Path:
         hash = self.calc_hash()
@@ -204,7 +208,9 @@ class KonfigRepo(Repo):
                 return cache_dir() / f"{dir}/{self.version}-{hash}"
             return cache_dir() / f"{dir}-{hash}"
         if self.version:
-            return cache_dir() / f"{self.repo_name}/{self.version.replace('/','-')}-{hash}"
+            return (
+                cache_dir() / f"{self.repo_name}/{self.version.replace('/','-')}-{hash}"
+            )
         else:
             return cache_dir() / f"{self.repo_name}-{hash}"
 
@@ -259,8 +265,8 @@ class LocalZipRepo(KonfigRepo):
 
 class UrlZipRepo(KonfigRepo):
     def download(self, filename: str) -> None:
-            data = self.url_response(filename).content
-            self.unzip_data(data)
+        data = self.url_response(filename).content
+        self.unzip_data(data)
 
 
 class BitbucketZipRepo(KonfigRepo):
@@ -271,7 +277,7 @@ class BitbucketZipRepo(KonfigRepo):
     def calc_url(self, filename: str, no_warn=False) -> str:
         return self._calc_url("archive", "&format=zip", no_warn=no_warn)
 
-    def _calc_url(self, ext: str, format:str = "", no_warn=False) -> str:
+    def _calc_url(self, ext: str, format: str = "", no_warn=False) -> str:
         url = self.repo_konf.get("url", None)
         url += f"/{ext}"
         if self.version.startswith("branch.") and not no_warn:
@@ -290,6 +296,7 @@ class BitbucketZipRepo(KonfigRepo):
             url = url.replace("{repo}", bitbucket_repo)
         return url
 
+
 class BitbucketFileRepo(BitbucketZipRepo):
     def download(self, filename: str) -> None:
         content = self.url_response(filename).content
@@ -302,10 +309,14 @@ class BitbucketFileRepo(BitbucketZipRepo):
         bitb_project = self.repo_konf.get("bitbucket_project")
         bitb_repo = self.repo_konf.get("bitbucket_repo")
         version = self.version.replace("/", "-")
-        return cache_dir() / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}-{hash}"
+        return (
+            cache_dir()
+            / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}-{hash}"
+        )
 
     def calc_url(self, filename: str, no_warn=False) -> str:
         return self._calc_url(f"raw/{filename}", no_warn=no_warn)
+
 
 def unzip(
     zfile: zipfile.ZipFile,

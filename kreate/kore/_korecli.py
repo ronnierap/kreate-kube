@@ -62,7 +62,7 @@ class KoreCli:
     def calc_dict(self):
         result = {}
         for d in self.args.define:
-            k, v = d.split("=",1)
+            k, v = d.split("=", 1)
             wrap(result).set(k, v)
         return result
 
@@ -79,7 +79,7 @@ class KoreCli:
         return self._app
 
     def kreate_konfig(self, filename: str) -> Konfig:
-        return Konfig(filename, dict_ = self.calc_dict(), inkludes=self.args.inklude)
+        return Konfig(filename, dict_=self.calc_dict(), inkludes=self.args.inklude)
 
     def kreate_app(self) -> App:
         return App(self.konfig())
@@ -92,7 +92,7 @@ class KoreCli:
         # subcommand: view
         cmd = self.add_subcommand(view, [], aliases=["v"])
         cmd.add_argument("key", help="key(s) to show", action="store", nargs="*")
-        #self.add_output_options(cmd)
+        # self.add_output_options(cmd)
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
@@ -142,8 +142,9 @@ class KoreCli:
                 vcount += 2 if opt.startswith("-vv") else 0
                 vcount += 1 if opt == "-v" else 0
             if vcount >= 2:
-                print(f"DEBUG:prepending KREATE_OPTIONS to get {result}",
-                      file=sys.stderr)
+                print(
+                    f"DEBUG:prepending KREATE_OPTIONS to get {result}", file=sys.stderr
+                )
             return result
         return sys.argv[1:]
 
@@ -284,7 +285,7 @@ def view_templates(cli, templates):
     """view the template for a specific kind"""
     # we call the kreate_app method and not the convenience app()
     # method, because aktivating the app, will do stuff that might break
-    #template = cli.args.template
+    # template = cli.args.template
     if templates:
         for t in templates:
             view_template(cli, t)
@@ -299,6 +300,7 @@ def view_templates(cli, templates):
                 )
             else:
                 logger.warn(f"skipping template {template}")
+
 
 def view_aliases():
     return {
@@ -319,6 +321,7 @@ def view_aliases():
         "cm": "strukt.ConfigMap",
     }
 
+
 def view(cli: KoreCli):
     """view the entire konfig or subkey(s)"""
     konfig: Konfig = cli.konfig()
@@ -326,7 +329,7 @@ def view(cli: KoreCli):
         for idx, k in enumerate(cli.args.key):
             k = view_aliases().get(k, k)
             if k == "template":
-                view_templates(cli, cli.args.key[idx+1:])
+                view_templates(cli, cli.args.key[idx + 1 :])
                 break
             result = konfig.get_path(k)
             if isinstance(result, str):

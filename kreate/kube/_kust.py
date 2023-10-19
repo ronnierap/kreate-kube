@@ -12,7 +12,6 @@ class KustApp(KubeApp):
     def register_std_templates(self) -> None:
         super().register_std_templates()
 
-
     def kreate_komponents_from_strukture(self):
         super().kreate_komponents_from_strukture()
         for res in self.komponents:
@@ -79,14 +78,16 @@ class Kustomization(JinYamlKomponent):
     def remove_vars(self):
         removals = self.strukture.get("remove_vars", {})
         for cm_to_remove in removals:
-            for cm in self.get_path("configMapGenerator",{}):
+            for cm in self.get_path("configMapGenerator", {}):
                 if cm["name"] == cm_to_remove:
                     for var in self.strukture["remove_vars"][cm_to_remove]:
                         found = False
                         for idx, v in enumerate(cm["literals"]):
-                            if v.startswith(var+"="):
-                                found =True
+                            if v.startswith(var + "="):
+                                found = True
                                 logger.info(f"removing var {cm_to_remove}.{v}")
                                 cm["literals"].pop(idx)
                         if not found:
-                            logger.warn(f"could not find var to remove {cm_to_remove}.{var}")
+                            logger.warn(
+                                f"could not find var to remove {cm_to_remove}.{var}"
+                            )

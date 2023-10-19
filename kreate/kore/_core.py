@@ -5,7 +5,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def deep_update(target: Mapping, other: Mapping, overwrite=True, list_insert_index: dict = None) -> None:
+def deep_update(
+    target: Mapping, other: Mapping, overwrite=True, list_insert_index: dict = None
+) -> None:
     if other.get("_do_not_overwrite", False):
         overwrite = False
     for k, v in other.items():

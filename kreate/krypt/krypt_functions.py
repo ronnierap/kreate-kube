@@ -64,7 +64,7 @@ def change_lines(filename: str, func, from_: str, to_: str, dir: str = None):
     with open(f"{dir}/{filename}") as f:
         lines = f.readlines()
     for idx, line in enumerate(lines):
-        #line = line.rstrip()
+        # line = line.rstrip()
         if from_ in line:
             try:
                 parts = line.split(from_, 1)
