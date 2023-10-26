@@ -1,5 +1,6 @@
 import os
 import logging
+import shutil
 from typing import List, Set, Mapping
 from pathlib import Path
 
@@ -84,6 +85,9 @@ class App:
         self.tune_komponents()
 
     def kreate_files(self):
+        if self.target_path.exists():
+            logger.info(f"removing target directory {self.target_path}")
+            shutil.rmtree(self.target_path)
         os.makedirs(self.target_path, exist_ok=True)
         for komp in self.komponents:
             if komp.get_filename():
