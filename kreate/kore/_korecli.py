@@ -43,8 +43,9 @@ class KoreCli:
         self.cli.add_argument(
             "konfig",
             action="store",
-            default=".",
-            help="konfig file or directory to use (default=.)",
+            default=os.getenv("KREATE_KONFIG_PATH","."),
+            nargs="?",
+            help="konfig file or directory to use (default=KREATE_KONFIG_PATH or .)",
         )
 
         self.subparsers = self.cli.add_subparsers(
