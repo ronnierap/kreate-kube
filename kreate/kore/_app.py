@@ -89,6 +89,7 @@ class App:
             logger.info(f"removing target directory {self.target_path}")
             shutil.rmtree(self.target_path)
         os.makedirs(self.target_path, exist_ok=True)
+        self.aktivate_komponents()
         for komp in self.komponents:
             if komp.get_filename():
                 logger.info(f"kreating file {komp.get_filename()}")

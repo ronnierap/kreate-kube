@@ -51,7 +51,6 @@ class KubeCli(krypt.KryptCli):
 def kreate_files(cli: KubeCli) -> KustApp:
     app: App = cli.app()
     app.kreate_komponents()
-    app.aktivate_komponents()
     app.kreate_files()
     return app
 
