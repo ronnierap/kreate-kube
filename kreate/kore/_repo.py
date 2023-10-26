@@ -169,7 +169,7 @@ class KonfigRepo(Repo):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.repo_name}, version={self.version})"
 
-    def download(self, filename: str):
+    def download(self, filename: str) -> bool:
         raise NotImplementedError(f"Could not download {self.repo_name}")
 
     def get_data(self, filename: str, optional: bool = False):
@@ -186,10 +186,14 @@ class KonfigRepo(Repo):
             raise FileExistsError(f"repo dir {dir} exists, but is not a directory")
         p = dir / filename
         if not p.exists():
-            if optional:
-                return ""
-            raise FileNotFoundError(f"could not find file {filename} in {dir}")
+            if not self.download_extra_file(filename):
+                if optional:
+                    return ""
+                raise FileNotFoundError(f"could not find file {filename} in {dir}")
         return p.read_text()
+
+    def download_extra_file(self, filename: str) -> bool:
+        return False
 
     def calc_hash(self, extra: str = "") -> str:
         return hashlib.md5(
@@ -228,7 +232,7 @@ class KonfigRepo(Repo):
         self.calc_dir().mkdir(parents=True)
         unzip(z, self.calc_dir(), skip_levels=skip_levels, select_regexp=regexp)
 
-    def url_response(self, filename: str):
+    def url_response(self, filename: str, raise_error=True):
         auth = None
         if self.repo_konf.get("basic_auth", {}):
             usr_env_var = self.repo_konf["basic_auth"]["usr_env_var"]
@@ -239,7 +243,7 @@ class KonfigRepo(Repo):
         url = self.calc_url(filename)
         logger.info(f"downloading {self.calc_dir()} from {url}")
         response = requests.get(url, auth=auth)
-        if response.status_code >= 300:
+        if response.status_code >= 300 and raise_error:
             raise IOError(
                 f"status {response.status_code} while downloading {url} with message {response.content}"
             )
@@ -255,25 +259,28 @@ class LocalKonfigRepo(KonfigRepo):
 
 
 class LocalZipRepo(KonfigRepo):
-    def download(self, filename: str) -> None:
+    def download(self, filename: str) -> bool:
         path: str = self.repo_konf.get("path")
         if self.version:
             path = path.replace("{version}", self.version)
         logger.info(f"unzipping {self.calc_dir()} from {path}")
         data = Path(path).read_bytes()
         self.unzip_data(data)
+        return True
 
 
 class UrlZipRepo(KonfigRepo):
-    def download(self, filename: str) -> None:
+    def download(self, filename: str) -> bool:
         data = self.url_response(filename).content
         self.unzip_data(data)
+        return True
 
 
 class BitbucketZipRepo(KonfigRepo):
-    def download(self, filename: str) -> None:
+    def download(self, filename: str) -> bool:
         data = self.url_response(filename).content
         self.unzip_data(data)
+        return True
 
     def calc_url(self, filename: str, no_warn=False) -> str:
         return self._calc_url("archive", "&format=zip", no_warn=no_warn)
@@ -299,13 +306,16 @@ class BitbucketZipRepo(KonfigRepo):
 
 
 class BitbucketFileRepo(BitbucketZipRepo):
-    def download(self, filename: str) -> None:
-        content = self.url_response(filename).content
+    def download(self, filename: str, raise_error=True) -> bool:
+        response = self.url_response(filename, raise_error=raise_error)
+        if response.status_code > 300:
+            return False
         path = self.calc_dir() / filename
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(content)
+        path.write_bytes(response.content)
+        return True
 
-    def calc_dir(self) -> str:
+    def calc_dir(self) -> Path:
         hash = self.calc_hash()
         bitb_project = self.repo_konf.get("bitbucket_project")
         bitb_repo = self.repo_konf.get("bitbucket_repo")
@@ -317,6 +327,17 @@ class BitbucketFileRepo(BitbucketZipRepo):
 
     def calc_url(self, filename: str, no_warn=False) -> str:
         return self._calc_url(f"raw/{filename}", no_warn=no_warn)
+
+    def download_extra_file(self, filename: str) -> bool:
+        """check if it was previous attempted to download this file"""
+        marker_path = self.calc_dir() / f"{filename}.does-not-exist"
+        if marker_path.exists():
+            return False
+        if self.download(filename, raise_error=False):
+            return True
+        logger.info(f"could not find {self.calc_url(filename)}, marking it to prevent future attempts")
+        marker_path.touch()
+        return False
 
 
 def unzip(
