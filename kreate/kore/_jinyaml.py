@@ -28,8 +28,8 @@ class JinYaml:
         self.env.filters[name] = func
 
     def render_jinja(self, filename: str, vars: Mapping) -> str:
+        tmpl = self.env.get_template(filename)
         try:
-            tmpl = self.env.get_template(filename)
             return tmpl.render(vars)
         except jinja2.exceptions.TemplateSyntaxError as e:
             logger.error(
