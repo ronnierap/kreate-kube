@@ -19,7 +19,6 @@ class Konfig:
         konfig_path = self.find_konfig_file(filename)
         logger.info(f"loading main konfig from {konfig_path}")
         self.dir = konfig_path.parent
-        self.filename = str(konfig_path)
         self.dekrypt_func = None
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
