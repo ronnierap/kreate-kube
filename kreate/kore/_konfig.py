@@ -32,8 +32,8 @@ class Konfig:
 
     def find_konfig_file(self, filename):
         if filename is None:
-            filename = os.getenv("KREATE_KONFIG_PATH",".")
-        glob_pattern = os.getenv("KREATE_KONFIG_FILE", "kreate*.konf")
+            filename = os.getenv("KREATE_MAIN_KONFIG_PATH",".")
+        glob_pattern = os.getenv("KREATE_MAIN_KONFIG_FILE", "kreate*.konf")
         for p in filename.split(os.pathsep):
             path = Path(p)
             if path.is_file():

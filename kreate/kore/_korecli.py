@@ -178,8 +178,8 @@ class KoreCli:
             "--konfig",
             metavar='file',
             action="store",
-            default=None, #os.getenv("KREATE_KONFIG_PATH",".",
-            help="konfig file or directory to use (default=KREATE_KONFIG_PATH or .)",
+            default=None,
+            help="konfig file or directory to use (default=KREATE_MAIN_KONFIG_PATH or .)",
         )
         cmd.add_argument(
             "-d",
