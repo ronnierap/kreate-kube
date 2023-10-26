@@ -101,11 +101,11 @@ class Konfig:
         version = self.get_kreate_version()
         dev_versions = ["Unknown"]  #  , "rc", "editable"]
         if any(txt in version for txt in dev_versions) and not force:
-            logger.info(f"skipping check for development version {version}")
+            logger.debug(f"skipping check for development version {version}")
             return
         req_version: str = self.get_path("version.kreate_version", None)
         if not req_version:
-            logger.info(f"skipping check since no kreate_version specified")
+            logger.debug(f"skipping check since no kreate_version specified")
             return
         if not SpecifierSet(req_version).contains(Version(version)):
             raise InvalidVersion(
