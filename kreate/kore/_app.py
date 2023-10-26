@@ -1,7 +1,7 @@
 import os
 import logging
 import shutil
-from typing import List, Set, Mapping
+from typing import Mapping
 from pathlib import Path
 
 from ._core import wrap, deep_update
@@ -30,7 +30,7 @@ class App:
         self.komponents = []
         self._kinds = {}
         self.strukture = wrap(konfig.get_path("strukt"))
-        self.target_path = Path(konfig.get_path("system.target_dir", "build"))
+        self.target_path = Path(konfig.get_path("system.target_dir", f"build/{self.appname}-{self.env}"))
 
     def komponent_naming(self, kind: str, shortname: str) -> str:
         formatstr = None
