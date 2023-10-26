@@ -48,6 +48,13 @@ class Patch(JinYamlKomponent):
             deep_update(root_strukture, embedded_strukture)
         return root_strukture
 
+    def _field(self, fieldname: str, default=None):
+        if fieldname in self.strukture:
+            return self.strukture[fieldname]
+        if fieldname in self.target.strukture:
+            return self.target.strukture[fieldname]
+        return super()._field(fieldname, default=default)
+
 
 class EgressLabels(Patch):
     def egresses(self):
