@@ -128,10 +128,3 @@ class SecretBasicAuth(Resource):
 
     def get_filename(self):
         return f"secrets/resources/{self.kind}-{self.name}.yaml"
-
-
-class KubeconfigFile(JinYamlKomponent):
-    def get_filename(self):
-        if self.strukture.get("filename"):
-            return self.strukture.get("filename")
-        return "kubeconfig.yaml"

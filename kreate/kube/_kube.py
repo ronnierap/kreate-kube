@@ -1,7 +1,6 @@
 import logging
 from ..kore import JinjaApp, Konfig
 from ..krypt import KryptKonfig
-from . import resource
 
 logger = logging.getLogger(__name__)
 
