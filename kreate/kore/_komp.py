@@ -103,6 +103,8 @@ class Komponent:
                 logger.warn(f"option {opt} for {self.name} not supported")
 
     def get_filename(self):
+        if self.strukture.get("target_filename"):
+            return self.strukture.get("target_filename")
         return f"{self.kind.lower()}-{self.shortname}.yaml"
 
     def _field(self, fieldname: str, default=None):
