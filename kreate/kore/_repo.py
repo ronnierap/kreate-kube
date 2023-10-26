@@ -84,7 +84,7 @@ class FileGetter:
                 logger.debug(f"ignoring optional file {orig_file}")
                 return ""
             else:
-                raise FileExistsError(f"non-optional file {orig_file} does not exist")
+                raise FileNotFoundError(f"non-optional file {orig_file} does not exist")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
