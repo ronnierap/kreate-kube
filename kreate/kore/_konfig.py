@@ -28,7 +28,6 @@ class Konfig:
         deep_update(dict_, {"system": {"getenv": os.getenv}})
         self.file_getter = FileGetter(self, self.dir)
         for ink in inkludes or []:
-            print(ink)
             self.inklude(ink)
         self.inklude(konfig_path.name)
         self.load_all_inkludes()
