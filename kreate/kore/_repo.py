@@ -91,6 +91,7 @@ class FileGetter:
         return data
 
     def kopy_file(self, loc: str, target: Path) -> None:
+        logger.info(f"kopying file {loc} to {target}")
         data = self.get_data(loc)
         dir = target.parent
         dir.mkdir(parents=True, exist_ok=True)
