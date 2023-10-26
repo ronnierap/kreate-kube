@@ -183,6 +183,7 @@ class KoreCli:
         cmd.add_argument(
             "-d",
             "--define",
+            metavar='yaml-setting',
             action="append",
             default=[],
             help="add yaml (toplevel) element to konfig file",
@@ -190,6 +191,7 @@ class KoreCli:
         cmd.add_argument(
             "-i",
             "--inklude",
+            metavar='path',
             action="append",
             default=[],
             help="inklude extra files before parsing main konfig",
