@@ -21,7 +21,6 @@ class Konfig:
         self.dir = konfig_path.parent
         self.filename = str(konfig_path)
         self.dekrypt_func = None
-        filename = os.path.basename(filename)
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)

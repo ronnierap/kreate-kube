@@ -40,13 +40,6 @@ class KoreCli:
             description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
-        self.cli.add_argument(
-            "konfig",
-            action="store",
-            default=os.getenv("KREATE_KONFIG_PATH","."),
-            nargs="?",
-            help="konfig file or directory to use (default=KREATE_KONFIG_PATH or .)",
-        )
 
         self.subparsers = self.cli.add_subparsers(
             # title="subcmd",
@@ -180,6 +173,14 @@ class KoreCli:
         version(self)
 
     def add_konfig_options(self, cmd):
+        cmd.add_argument(
+            "-k",
+            "--konfig",
+            metavar='file',
+            action="store",
+            default=None, #os.getenv("KREATE_KONFIG_PATH",".",
+            help="konfig file or directory to use (default=KREATE_KONFIG_PATH or .)",
+        )
         cmd.add_argument(
             "-d",
             "--define",
