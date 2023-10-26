@@ -16,21 +16,8 @@ logger = logging.getLogger(__name__)
 
 class Konfig:
     def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
-        glob_pattern = os.getenv("KREATE_MAIN_KONFIG")
-        glob_pattern = glob_pattern or "kreate*.konf"
-        filename = Path(filename)
-        possible_files = [filename]
-        if filename is None:
-            possible_files = tuple(Path.cwd().glob(glob_pattern))
-        elif os.path.isdir(filename):
-            possible_files = tuple(Path(filename).glob(glob_pattern))
-        if len(possible_files) == 0:
-            raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
-        if len(possible_files) > 1:
-            raise ValueError(
-                f"Ambiguous konfig files found for {filename}/{glob_pattern}: {possible_files}"
-            )
-        konfig_path = possible_files[0]
+        konfig_path = self.find_konfig_file(filename)
+        logger.info(f"loading main konfig from {konfig_path}")
         self.dir = konfig_path.parent
         self.filename = str(konfig_path)
         self.dekrypt_func = None
@@ -45,6 +32,25 @@ class Konfig:
             self.inklude(ink)
         self.inklude(konfig_path.name)
         self.load_all_inkludes()
+
+    def find_konfig_file(self, filename):
+        if filename is None:
+            filename = os.getenv("KREATE_KONFIG_PATH",".")
+        glob_pattern = os.getenv("KREATE_KONFIG_FILE", "kreate*.konf")
+        for p in filename.split(os.pathsep):
+            path = Path(p)
+            if path.is_file():
+                return path
+            elif path.is_dir():
+                logger.debug(f"checking for {glob_pattern} in dir {path}")
+                possible_files = tuple(path.glob(glob_pattern))
+                if len(possible_files) == 1:
+                    return possible_files[0]
+                elif len(possible_files) > 1:
+                    raise ValueError(
+                        f"Ambiguous konfig files found for {path}/{glob_pattern}: {possible_files}"
+                    )
+        raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
 
     def get_path(self, path: str, default=None):
         return self.yaml._get_path(path, default=default)
