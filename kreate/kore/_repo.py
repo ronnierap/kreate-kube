@@ -36,7 +36,7 @@ class FileGetter:
             "main_konfig:": FixedDirRepo(dir),
             "cwd:": FixedDirRepo(Path.cwd()),
             "home:": FixedDirRepo(Path.home()),
-            "py:": PythonPackageRepo(konfig, None),
+            "py:": PythonPackageRepo(),
         }
         self.repo_types = {
             "url-zip:": UrlZipRepo,
