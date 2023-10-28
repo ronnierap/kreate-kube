@@ -156,6 +156,7 @@ class KoreCli:
                 traceback.print_exc()
             else:
                 print(f"{type(e).__name__}: {e}")
+            sys.exit(1)
         finally:
             if not self.args.keep_secrets:
                 if self._app:
