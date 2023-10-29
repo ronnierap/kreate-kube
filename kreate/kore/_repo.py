@@ -175,7 +175,7 @@ class KonfigRepo(Repo):
         raise NotImplementedError(f"Could not download {self.repo_name}")
 
     def get_data(self, filename: str, optional: bool = False):
-        if self.version.startswith("branch."):
+        if isinstance(self.version, str) and self.version.startswith("branch."):
             version = self.version[7:]
             warnings.warn(
                 f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
