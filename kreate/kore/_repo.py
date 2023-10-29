@@ -1,4 +1,4 @@
-from typing import Mapping, Protocol, Union
+from typing import Protocol, Union
 import requests
 import requests.auth
 import zipfile
@@ -10,6 +10,7 @@ import pkgutil
 import shutil
 import logging
 import importlib
+import warnings
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -174,6 +175,11 @@ class KonfigRepo(Repo):
         raise NotImplementedError(f"Could not download {self.repo_name}")
 
     def get_data(self, filename: str, optional: bool = False):
+        if self.version.startswith("branch."):
+            version = self.version[7:]
+            warnings.warn(
+                f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
+            )
         if optional and self.repo_konf.get("disabled", False):
             logger.info(
                 f"skipping optional {filename} in disable repo {self.repo_name}"
@@ -291,9 +297,6 @@ class BitbucketZipRepo(KonfigRepo):
         url += f"/{ext}"
         if self.version.startswith("branch.") and not no_warn:
             version = self.version[7:]
-            logger.warning(
-                f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
-            )
             url += f"?at=refs/heads/{version}" + format
         else:
             url += f"?at=refs/tags/{self.version}" + format

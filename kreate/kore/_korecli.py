@@ -5,6 +5,7 @@ import argparse
 import logging
 import traceback
 import inspect
+import warnings
 
 from ._core import pprint_map, wrap
 from ._repo import clear_cache
@@ -31,6 +32,8 @@ class KoreCli:
         self.load_dotenv()
         self._konfig = None
         self._app = None
+        self.formatwarnings_orig = warnings.formatwarning
+        warnings.formatwarning = self.custom_warn_format
         self.epilog = "subcommands:\n"
         self.cli = argparse.ArgumentParser(
             prog="kreate",
@@ -48,6 +51,11 @@ class KoreCli:
             metavar="see subcommands",
         )
         self.add_subcommands()
+
+    def custom_warn_format(self, msg, cat, filename, lineno, line):
+        if cat is UserWarning:
+            return f'WARNING: {msg}\n'
+        return self.formatwarnings_orig(msg, cat, filename, lineno, line)
 
     def get_packages(self):
         """a list of packages that are shown in the version command"""
