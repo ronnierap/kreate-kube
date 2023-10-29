@@ -9,6 +9,7 @@ import warnings
 
 from ._core import pprint_map, wrap
 from ._repo import clear_cache
+from ._konfig import VersionWarning
 
 from . import _jinyaml
 from ._app import App, Konfig
@@ -53,7 +54,7 @@ class KoreCli:
         self.add_subcommands()
 
     def custom_warn_format(self, msg, cat, filename, lineno, line):
-        if cat is UserWarning:
+        if cat is UserWarning or cat is VersionWarning:
             return f'WARNING: {msg}\n'
         return self.formatwarnings_orig(msg, cat, filename, lineno, line)
 
@@ -71,8 +72,7 @@ class KoreCli:
     def konfig(self):
         if not self._konfig:
             self._konfig = self.kreate_konfig(self.konfig_filename)
-            if not self.args.skip_version_check:
-                self._konfig.check_kreate_version()
+            self._konfig.check_kreate_version()
         return self._konfig
 
     def app(self):
@@ -233,12 +233,6 @@ class KoreCli:
             "--keep-secrets",
             action="store_true",
             help="do not remove secrets dirs",
-        )
-        self.cli.add_argument(
-            "-C",
-            "--skip-version-check",
-            action="store_true",
-            help="do not check if required version of kreate is used",
         )
         self.cli.add_argument(
             "--no-dotenv",

@@ -1,6 +1,7 @@
 import os
 import logging
 import importlib.metadata
+import warnings
 from pathlib import Path
 from typing import List, Set
 from packaging.specifiers import SpecifierSet
@@ -13,6 +14,8 @@ from ._jinyaml import JinYaml
 
 logger = logging.getLogger(__name__)
 
+class VersionWarning(RuntimeWarning):
+    pass
 
 class Konfig:
     def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
@@ -103,13 +106,14 @@ class Konfig:
         if any(txt in version for txt in dev_versions) and not force:
             logger.debug(f"skipping check for development version {version}")
             return
-        req_version: str = self.get_path("version.kreate_version", None)
+        req_version: str = self.get_path("version.kreate_kube_version", None)
         if not req_version:
             logger.debug(f"skipping check since no kreate_version specified")
             return
         if not SpecifierSet(req_version).contains(Version(version)):
-            raise InvalidVersion(
-                f"Invalid kreate version {version} for specifier {req_version}"
+            warnings.warn(
+                f"Invalid kreate-kube version {version} for specifier {req_version}",
+                VersionWarning
             )
 
     def dekrypt_bytes(b: bytes) -> bytes:
