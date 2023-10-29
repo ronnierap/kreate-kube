@@ -207,7 +207,7 @@ class KonfigRepo(Repo):
             (
                 self.repo_name
                 + self.repo_konf.get("version", "")
-                + self.calc_url("...", no_warn=True)
+                + self.calc_url("...")
                 + extra
             ).encode()
         ).hexdigest()[:10]
@@ -226,7 +226,7 @@ class KonfigRepo(Repo):
         else:
             return cache_dir() / f"{self.repo_name}-{hash}"
 
-    def calc_url(self, filename: str, no_warn=False) -> str:
+    def calc_url(self, filename: str) -> str:
         url = self.repo_konf.get("url", "")
         if self.version:
             url = url.replace("{version}", self.version)
@@ -289,13 +289,13 @@ class BitbucketZipRepo(KonfigRepo):
         self.unzip_data(data)
         return True
 
-    def calc_url(self, filename: str, no_warn=False) -> str:
-        return self._calc_url("archive", "&format=zip", no_warn=no_warn)
+    def calc_url(self, filename: str) -> str:
+        return self._calc_url("archive", "&format=zip")
 
-    def _calc_url(self, ext: str, format: str = "", no_warn=False) -> str:
+    def _calc_url(self, ext: str, format: str = "") -> str:
         url = self.repo_konf.get("url", None)
         url += f"/{ext}"
-        if self.version.startswith("branch.") and not no_warn:
+        if self.version.startswith("branch."):
             version = self.version[7:]
             url += f"?at=refs/heads/{version}" + format
         else:
@@ -329,8 +329,8 @@ class BitbucketFileRepo(BitbucketZipRepo):
             / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}-{hash}"
         )
 
-    def calc_url(self, filename: str, no_warn=False) -> str:
-        return self._calc_url(f"raw/{filename}", no_warn=no_warn)
+    def calc_url(self, filename: str) -> str:
+        return self._calc_url(f"raw/{filename}")
 
     def download_extra_file(self, filename: str) -> bool:
         """check if it was previous attempted to download this file"""
