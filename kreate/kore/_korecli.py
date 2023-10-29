@@ -260,6 +260,7 @@ class KoreCli:
         elif args.verbose == 1:
             logging.basicConfig(format="%(message)s", level=logging.INFO)
         elif args.quiet:
+            warnings.filterwarnings("ignore")
             logging.basicConfig(format="%(message)s", level=logging.ERROR)
         else:
             logging.basicConfig(format="%(message)s", level=logging.WARN)
