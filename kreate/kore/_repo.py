@@ -148,6 +148,8 @@ class FixedDirRepo(Repo):
             raise TypeError(f"Unsupported type {type(dir)}")
 
     def get_data(self, filename: str, optional: bool = False):
+        while filename.startswith("/"):
+            filename = filename[1:]
         print(self.dir, filename)
         path = self.dir / filename
         if not path.exists():
@@ -175,6 +177,8 @@ class KonfigRepo(Repo):
         raise NotImplementedError(f"Could not download {self.repo_name}")
 
     def get_data(self, filename: str, optional: bool = False):
+        while filename.startswith("/"):
+            filename = filename[1:]
         if isinstance(self.version, str) and self.version.startswith("branch."):
             version = self.version[7:]
             warnings.warn(
