@@ -93,7 +93,7 @@ class DictWrapper(UserDict):
         for key in keys[:-1]:
             key = key.replace("_dot_", ".")
             if key not in data:
-                logger.warn(f"non existent key {key} in del_path {path}")
+                logger.warning(f"non existent key {key} in del_path {path}")
                 return
             data = data[key]
             while isinstance(data, Sequence):
@@ -101,14 +101,14 @@ class DictWrapper(UserDict):
                 if len(data) == 1:
                     data = data[0]
                 else:
-                    logger.warn(f"list at {key} in del_path {path}")
+                    logger.warning(f"list at {key} in del_path {path}")
                     return
         final_key = keys[-1]
         final_key = final_key.replace("_dot_", ".")
         if final_key in data:
             del data[final_key]
         else:
-            logger.warn(f"non existent key {final_key} in del_path {path}")
+            logger.warning(f"non existent key {final_key} in del_path {path}")
 
     def get(self, path: str, default=None):
         return self._get_path(path, default)

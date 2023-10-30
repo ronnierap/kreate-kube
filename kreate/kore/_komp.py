@@ -97,10 +97,10 @@ class Komponent:
                         )
                         getattr(self, key)(int(val))
                     else:
-                        logger.warn(f"option map {opt} for {self.name} not supported")
+                        logger.warning(f"option map {opt} for {self.name} not supported")
 
             else:
-                logger.warn(f"option {opt} for {self.name} not supported")
+                logger.warning(f"option {opt} for {self.name} not supported")
 
     def get_filename(self):
         if self.strukture.get("target_filename"):

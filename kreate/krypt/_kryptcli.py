@@ -87,7 +87,7 @@ def dek_lines(cli: KryptCli):
     files = cli.args.item
     files = files or Path(konfig.dir).glob("secret*konf")
     for f in files:
-        logger.warn(f"dekrypting: {f}")
+        logger.warning(f"dekrypting: {f}")
         krypt_functions.dekrypt_lines(f, ".")
 
 
@@ -119,7 +119,7 @@ def enk_lines(cli: KryptCli):
     files = cli.args.item
     files = files or Path(konfig.dir).glob("secret*konf")
     for f in files:
-        logger.warn(f"enkrypting: {f}")
+        logger.warning(f"enkrypting: {f}")
         krypt_functions.enkrypt_lines(f, ".")
 
 

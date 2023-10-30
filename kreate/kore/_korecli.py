@@ -299,7 +299,7 @@ def clear_repo_cache(cli: KoreCli):
 def view_template(cli, template):
     app: JinjaApp = cli.kreate_app()
     if template not in app.kind_templates or template not in app.kind_classes:
-        logger.warn(f"Unknown template kind {template}")
+        logger.warning(f"Unknown template kind {template}")
         return
     if not cli.args.quiet:
         print("==========================")
@@ -336,7 +336,7 @@ def view_templates(cli, templates):
                     f"{app.kind_templates[template]}"
                 )
             else:
-                logger.warn(f"skipping template {template}")
+                logger.warning(f"skipping template {template}")
 
 
 def view_aliases():

@@ -88,6 +88,6 @@ class Kustomization(JinYamlKomponent):
                                 logger.info(f"removing var {cm_to_remove}.{v}")
                                 cm["literals"].pop(idx)
                         if not found:
-                            logger.warn(
+                            logger.warning(
                                 f"could not find var to remove {cm_to_remove}.{var}"
                             )
