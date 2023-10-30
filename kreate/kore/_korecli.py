@@ -304,7 +304,7 @@ class KoreCli:
 
     def run_shell(self, cmd: str) -> None:
         self.kreate_files()
-        cmd = cmd.format(app=self.app(), konf=self.konfig())
+        cmd = cmd.format(app=self.app(), konf=self.konfig(), cli=self)
         logger.info(f"running: {cmd}")
         os.system(cmd)
 
