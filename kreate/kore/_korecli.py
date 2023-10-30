@@ -178,7 +178,7 @@ class KoreCli:
                     # With a warning it might not be clear that the warning is due to a
                     print(f"stopping due to {type(e).__name__}: {e}")
                     print(f"  use -W default::{e.__class__.__name__} to override this")
-                    print(f"  possibly define this as KREATE_OPTIONS in .env file")
+                    print(f"  possibly define this as export KREATE_OPTIONS or in .env file")
                 else:
                     print(f"{type(e).__name__}: {e}")
             sys.exit(1)
@@ -233,7 +233,7 @@ class KoreCli:
             "-w", "--warn", action="store_true", help="only output warnings"
         )
         cmd.add_argument(
-            "-W", "--pythonwarn", action="append", help="set python warnings filter", default=[],
+            "-W", "--warn-filter", action="append", metavar="filter", help="set python warnings filter", default=[],
         )
 
         cmd.add_argument(
@@ -277,7 +277,7 @@ class KoreCli:
         else:
             logging.basicConfig(format="%(message)s", level=logging.WARN)
         warnings.simplefilter("error", VersionWarning)
-        for warn_setting in args.pythonwarn:
+        for warn_setting in args.warn_filter:
             self.parse_warning_setting(warn_setting)
         self.konfig_filename = args.konfig
 
