@@ -14,7 +14,6 @@ class KubeCli(krypt.KryptCli):
     def __init__(self, *, app_class=KustApp):
         super().__init__()
         self._app_class = app_class
-        self.add_subcommand(files, [], aliases=["f"])
         self.add_subcommand(build, [], aliases=["b"])
         self.add_subcommand(diff, [], aliases=["d"])
         self.add_subcommand(apply, [], aliases=["a"])
@@ -44,54 +43,29 @@ class KubeCli(krypt.KryptCli):
     def kreate_app(self) -> KustApp:
         return self._app_class(self.konfig())
 
-    def default_command(self):
-        files(self)
-
-
-def kreate_files(cli: KubeCli) -> KustApp:
-    app: App = cli.app()
-    app.kreate_komponents()
-    app.kreate_files()
-    return app
-
-
-def files(cli: KubeCli) -> None:
-    """kreate all the files (default command)"""
-    kreate_files(cli)
 
 
 def build(cli: KubeCli) -> None:
     """output all the resources"""
-    app = kreate_files(cli)
-    cmd = f"kustomize build {app.target_path}"
-    logger.info(f"running: {cmd}")
-    os.system(cmd)
+    cli.run_command("build")
 
 
 def diff(cli: KubeCli) -> None:
     """diff with current existing resources"""
-    app = kreate_files(cli)
-    cmd = (
-        f"kustomize build {app.target_path} "
-        f"| kubectl --context={app.env} -n {app.namespace} diff -f - "
-    )
-    logger.info(f"running: {cmd}")
-    os.system(cmd)
+    cli.run_command("diff")
 
 
 def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
-    app = kreate_files(cli)
-    cmd = f"kustomize build {app.target_path} " "| kubectl apply --dry-run -f - "
-    logger.info(f"running: {cmd}")
-    os.system(cmd)
+    cli.run_command("apply")
 
 
 def test(cli: KubeCli) -> None:
     """test output against expected-output-<app>-<env>.out file"""
     # Do not dekrypt secrets for testing
     krypt_functions._dekrypt_testdummy = True
-    app = kreate_files(cli)
+    cli.kreate_files()
+    app = cli.app()
     expected = (
         cli.args.expected_output
         or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"
@@ -105,7 +79,8 @@ def testupdate(cli: KubeCli) -> None:
     """update expected-output-<app>-<env>.out file"""
     # Do not dekrypt secrets for testing
     krypt_functions._dekrypt_testdummy = True
-    app = kreate_files(cli)
+    cli.kreate_files()
+    app = cli.app()
     expected = (
         cli.args.expected_output
         or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"

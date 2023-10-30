@@ -53,6 +53,9 @@ class KoreCli:
         )
         self.add_subcommands()
 
+    def default_command(self):
+        files(self)
+
     def custom_warn_format(self, msg, cat, filename, lineno, line):
         #if cat is UserWarning or cat is VersionWarning:
             return f'WARNING: {msg}\n'
@@ -87,6 +90,14 @@ class KoreCli:
         return App(self.konfig())
 
     def add_subcommands(self):
+        cmd = self.add_subcommand(files, [], aliases=["f"])
+
+        cmd = self.add_subcommand(run, [], aliases=["r"])
+        cmd.add_argument("cmd", help="command to run", action="store", default=[])
+
+        cmd = self.add_subcommand(shell, [], aliases=["sh"])
+        cmd.add_argument("script", help="command to run", nargs=argparse.REMAINDER)
+
         self.add_subcommand(clear_repo_cache, [], aliases=["cc"])
         # subcommand: version
         self.add_subcommand(version, [], aliases=["vr"])
@@ -183,9 +194,6 @@ class KoreCli:
                             "use --keep-secrets or -K option to keep it"
                         )
                         shutil.rmtree(secrets_dir)
-
-    def default_command(self):
-        version(self)
 
     def add_konfig_options(self, cmd):
         cmd.add_argument(
@@ -288,6 +296,22 @@ class KoreCli:
         module = module or ""
         lineno = lineno or 0
         warnings.filterwarnings(action, message, category, module, lineno)
+
+    def kreate_files(self):
+        app: App = self.app()
+        app.kreate_komponents()
+        app.kreate_files()
+
+    def run_shell(self, cmd: str) -> None:
+        self.kreate_files()
+        logger.info(f"running: {cmd}")
+        os.system(cmd)
+
+    def run_command(self, cmd_name: str, default_command: str = None) -> None:
+        cmd : str = self.konfig().get_path(f"system.command.{cmd_name}", default_command)
+        cmd = cmd.format(app=self.app(), konf=self.konfig())
+        self.run_shell(cmd)
+
 
 
 
@@ -395,3 +419,19 @@ def version(cli: KoreCli):
         except importlib.metadata.PackageNotFoundError:
             version = "Unknown"
         print(f"{pckg}: {version}")
+
+def files(cli: KoreCli) -> None:
+    """kreate all the files (default command)"""
+    cli.kreate_files()
+
+def run(cli: KoreCli):
+    """run a command as defined in system.command"""
+    cmd = cli.args.cmd
+    print(cmd)
+    cli.run_command(cmd)
+
+def shell(cli: KoreCli):
+    """run a shell script"""
+    cmd = " ".join(cli.args.script)
+    print(cmd)
+    cli.run_shell(cmd)
