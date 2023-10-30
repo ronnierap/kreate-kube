@@ -6,6 +6,7 @@ this functionality
 """
 
 import os
+import warnings
 from pathlib import Path
 
 
@@ -17,12 +18,20 @@ def load_env(path: Path, mandatory: bool = False) -> None:
     with open(path) as file:
         lines = [line.strip() for line in file]
 
-    for line in lines:
-        try:
-            if line.startswith("#") or len(line) == 0:
+    for idx, line in enumerate(lines):
+        #try:
+            if line.startswith("#") or len(line.strip()) == 0:
                 continue
-            k, v = line.split("=", 1)
-            if k not in os.environ:
-                os.environ[k.strip()] = v.strip()
-        except Exception as e:
-            raise ValueError(f"ERROR {e} while parsing line in .env file: {line}")
+            if "+=" in line and line.index("+=",) < line.index('='):
+                k, v = line.split("+=", 1)
+                orig_value = os.environ.get(k.strip(),"")
+                add_value = " " + v.strip() if orig_value else v.strip()
+                os.environ[k.strip()] = orig_value + add_value
+            elif "=" in line:
+                k, v = line.split("=", 1)
+                if k not in os.environ:
+                    os.environ[k.strip()] = v.strip()
+            else:
+                warnings.warn(f"ignore dotenv line {path}:{idx}: {line}", SyntaxWarning)
+        #except Exception as e:
+        #    raise ValueError(f"ERROR {e} while parsing line in .env file: {line}")

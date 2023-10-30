@@ -30,11 +30,11 @@ def argument(*name_or_flags, **kwargs):
 
 class KoreCli:
     def __init__(self):
-        self.load_dotenv()
         self._konfig = None
         self._app = None
         self.formatwarnings_orig = warnings.formatwarning
         warnings.formatwarning = self.custom_warn_format
+        self.load_dotenv()
         self.epilog = "subcommands:\n"
         self.cli = argparse.ArgumentParser(
             prog="kreate",
@@ -54,9 +54,9 @@ class KoreCli:
         self.add_subcommands()
 
     def custom_warn_format(self, msg, cat, filename, lineno, line):
-        if cat is UserWarning or cat is VersionWarning:
+        #if cat is UserWarning or cat is VersionWarning:
             return f'WARNING: {msg}\n'
-        return self.formatwarnings_orig(msg, cat, filename, lineno, line)
+        #return self.formatwarnings_orig(msg, cat, filename, lineno, line)
 
     def get_packages(self):
         """a list of packages that are shown in the version command"""
