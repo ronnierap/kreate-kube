@@ -221,7 +221,7 @@ class KonfigRepo(Repo):
         dir = self.repo_konf.get("cache_name")
         if dir:
             if self.version:
-                return cache_dir() / f"{dir}/{self.version}-{hash}"
+                return cache_dir() / f"{dir}/{self.version.replace('/','-')}-{hash}"
             return cache_dir() / f"{dir}-{hash}"
         if self.version:
             return (
@@ -316,16 +316,6 @@ class BitbucketFileRepo(BitbucketZipRepo):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(response.content)
         return True
-
-    def calc_dir(self) -> Path:
-        hash = self.calc_hash()
-        bitb_project = self.repo_konf.get("bitbucket_project")
-        bitb_repo = self.repo_konf.get("bitbucket_repo")
-        version = self.version.replace("/", "-")
-        return (
-            cache_dir()
-            / f"{self.repo_name}-{bitb_project}-{bitb_repo}/{version}-{hash}"
-        )
 
     def calc_url(self, filename: str) -> str:
         return self._calc_url(f"raw/{filename}")
