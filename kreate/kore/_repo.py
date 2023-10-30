@@ -304,12 +304,6 @@ class BitbucketZipRepo(KonfigRepo):
             url += f"?at=refs/heads/{version}" + format
         else:
             url += f"?at=refs/tags/{self.version}" + format
-        bitbucket_project = self.repo_konf.get("bitbucket_project")
-        bitbucket_repo = self.repo_konf.get("bitbucket_repo")
-        if bitbucket_project:
-            url = url.replace("{project}", bitbucket_project)
-        if bitbucket_repo:
-            url = url.replace("{repo}", bitbucket_repo)
         return url
 
 
