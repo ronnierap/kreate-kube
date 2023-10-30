@@ -13,7 +13,7 @@ from ._konfig import VersionWarning
 
 from . import _jinyaml
 from ._app import App, Konfig
-from ._jinja_app import JinjaApp
+from ._jinja_app import JinjaApp, load_class
 from pathlib import Path
 import importlib.metadata
 import kreate.kore.dotenv as dotenv
@@ -163,7 +163,13 @@ class KoreCli:
             if self.args.verbose:
                 traceback.print_exc()
             else:
-                print(f"{type(e).__name__}: {e}")
+                if isinstance(e, Warning):
+                    # With a warning it might not be clear that the warning is due to a
+                    print(f"stopping due to {type(e).__name__}: {e}")
+                    print(f"  use -W default::{e.__class__.__name__} to override this")
+                    print(f"  possibly define this as KREATE_OPTIONS in .env file")
+                else:
+                    print(f"{type(e).__name__}: {e}")
             sys.exit(1)
         finally:
             if not self.args.keep_secrets:
@@ -219,6 +225,10 @@ class KoreCli:
             "-w", "--warn", action="store_true", help="only output warnings"
         )
         cmd.add_argument(
+            "-W", "--pythonwarn", action="append", help="set python warnings filter", default=[],
+        )
+
+        cmd.add_argument(
             "-q",
             "--quiet",
             action="store_true",
@@ -258,7 +268,27 @@ class KoreCli:
             logging.basicConfig(format="%(message)s", level=logging.ERROR)
         else:
             logging.basicConfig(format="%(message)s", level=logging.WARN)
+        warnings.simplefilter("error", VersionWarning)
+        for warn_setting in args.pythonwarn:
+            self.parse_warning_setting(warn_setting)
         self.konfig_filename = args.konfig
+
+    def parse_warning_setting(self, warn_setting: str):
+        if warn_setting == "reset":
+            warnings.resetwarnings()
+            return
+        action, message, cat_name, module, lineno = (warn_setting.split(":") + [None]*5)[:5]
+        message = message or ""
+        if cat_name is None or cat_name == "":
+            category = Warning
+        elif cat_name == "VersionWarning":
+            category = VersionWarning
+        else:
+            category = load_class(cat_name)
+        module = module or ""
+        lineno = lineno or 0
+        warnings.filterwarnings(action, message, category, module, lineno)
+
 
 
 def clear_repo_cache(cli: KoreCli):
@@ -315,6 +345,7 @@ def view_aliases():
         "s": "strukt",
         "a": "app",
         "t": "template",
+        "wf": "warningfilters",
         "tmpl": "template",
         "ink": "inklude",
         "sys": "system",
@@ -337,16 +368,24 @@ def view(cli: KoreCli):
             k = view_aliases().get(k, k)
             if k == "template":
                 view_templates(cli, cli.args.key[idx + 1 :])
-                break
-            result = konfig.get_path(k)
-            if isinstance(result, str):
-                print(f"{k}: {result}")
+            elif k == "warningfilters":
+                view_warning_filters()
+            elif k == "alias":
+                for alias, full in view_aliases().items():
+                    print(f"{alias:8} {full}")
             else:
-                print(k + ":")
-                pprint_map(result, indent="  ")
+                result = konfig.get_path(k)
+                if isinstance(result, str):
+                    print(f"{k}: {result}")
+                else:
+                    print(k + ":")
+                    pprint_map(result, indent="  ")
     else:
         pprint_map(konfig.yaml)
 
+def view_warning_filters():
+    for w in warnings.filters:
+        print(w)
 
 def version(cli: KoreCli):
     """view the version"""
