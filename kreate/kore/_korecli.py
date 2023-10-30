@@ -92,11 +92,11 @@ class KoreCli:
     def add_subcommands(self):
         cmd = self.add_subcommand(files, [], aliases=["f"])
 
-        cmd = self.add_subcommand(run, [], aliases=["r"])
+        cmd = self.add_subcommand(command, [], aliases=["cmd"])
         cmd.add_argument("cmd", help="command to run", action="store", default=[])
 
         cmd = self.add_subcommand(shell, [], aliases=["sh"])
-        cmd.add_argument("script", help="command to run", nargs=argparse.REMAINDER)
+        cmd.add_argument("script", help="command(s) to run", nargs=argparse.REMAINDER)
 
         self.add_subcommand(clear_repo_cache, [], aliases=["cc"])
         # subcommand: version
@@ -304,12 +304,12 @@ class KoreCli:
 
     def run_shell(self, cmd: str) -> None:
         self.kreate_files()
+        cmd = cmd.format(app=self.app(), konf=self.konfig())
         logger.info(f"running: {cmd}")
         os.system(cmd)
 
     def run_command(self, cmd_name: str, default_command: str = None) -> None:
         cmd : str = self.konfig().get_path(f"system.command.{cmd_name}", default_command)
-        cmd = cmd.format(app=self.app(), konf=self.konfig())
         self.run_shell(cmd)
 
 
@@ -424,14 +424,12 @@ def files(cli: KoreCli) -> None:
     """kreate all the files (default command)"""
     cli.kreate_files()
 
-def run(cli: KoreCli):
-    """run a command as defined in system.command"""
+def command(cli: KoreCli):
+    """run a predefined command from system.command"""
     cmd = cli.args.cmd
-    print(cmd)
     cli.run_command(cmd)
 
 def shell(cli: KoreCli):
-    """run a shell script"""
+    """run one or more shell command including pipes"""
     cmd = " ".join(cli.args.script)
-    print(cmd)
     cli.run_shell(cmd)
