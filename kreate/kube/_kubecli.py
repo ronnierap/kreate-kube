@@ -1,4 +1,3 @@
-import os
 import logging
 import difflib
 import subprocess
@@ -64,7 +63,6 @@ def build_output(cli: KubeCli) -> str:
 
 def test_result(cli: KubeCli, n=0):
     ignores = cli.konfig().get_path("tests.ignore")
-    hide_line_numbers = cli.konfig().get_path("hide_line_numbers", False)
     build_lines = build_output(cli).splitlines()
     expected_lines = cli.konfig().load_repo_file(expected_file(cli)).splitlines()
     diff = difflib.context_diff(expected_lines, build_lines, n=n)
@@ -84,7 +82,7 @@ def test_result(cli: KubeCli, n=0):
             if ign in line:
                 ignore = True
         if not ignore:
-            if stars_loc_old is not stars_loc and not hide_line_numbers:
+            if stars_loc_old is not stars_loc:
                 stars_loc_old = stars_loc
                 diff_result.append(stars_loc)
             diff_result.append(line)
