@@ -1,7 +1,8 @@
 import os
 import logging
+import difflib
+import subprocess
 
-from ..kore import App
 from .. import krypt
 from ..krypt import krypt_functions
 from ._kust import KustApp
@@ -17,22 +18,10 @@ class KubeCli(krypt.KryptCli):
         self.add_subcommand(build, [], aliases=["b"])
         self.add_subcommand(diff, [], aliases=["d"])
         self.add_subcommand(apply, [], aliases=["a"])
-        cmd = self.add_subcommand(test, [], aliases=["t"])
-        cmd.add_argument(
-            "-e",
-            "--expected-output",
-            help="file with expected output of build",
-            action="store",
-            default=None,
-        )
-        cmd = self.add_subcommand(testupdate, [], aliases=["tu"])
-        cmd.add_argument(
-            "-e",
-            "--expected-output",
-            help="file with expected output of build",
-            action="store",
-            default=None,
-        )
+        self.add_subcommand(test, [], aliases=["t"])
+        self.add_subcommand(test_update, [], aliases=["tu"])
+        self.add_subcommand(test_diff, [], aliases=["td"])
+        self.add_subcommand(test_diff_update, [], aliases=["tdu"])
 
     def get_packages(self):
         return ["kreate-kube"]
@@ -59,32 +48,77 @@ def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
     cli.run_command("apply")
 
+def expected_file(cli: KubeCli) -> str:
+    app = cli.app()
+    return (
+        cli.konfig().get_path("tests.expected_output")
+        or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"
+    )
+
+def build_output(cli: KubeCli) -> str:
+    # Do not dekrypt secrets for testing
+    krypt_functions._dekrypt_testdummy = True
+    cli.kreate_files()
+    return subprocess.check_output(["kustomize","build", str(cli.app().target_path)]).decode()
+
+
+def test_result(cli: KubeCli, n=0):
+    ignores = cli.konfig().get_path("tests.ignore")
+    hide_line_numbers = cli.konfig().get_path("hide_line_numbers", False)
+    build_lines = build_output(cli).splitlines()
+    expected_lines = cli.konfig().load_repo_file(expected_file(cli)).splitlines()
+    diff = difflib.context_diff(expected_lines, build_lines, n=n)
+    stars_loc = ""
+    stars_loc_old = "old"
+    diff_result = []
+    for line in diff:
+        if line.startswith("*** "):
+            stars_loc = line.strip()
+            continue
+        elif line.startswith("***"):
+            continue
+        elif line.startswith("---"):
+            continue
+        ignore = False
+        for ign in ignores:
+            if ign in line:
+                ignore = True
+        if not ignore:
+            if stars_loc_old is not stars_loc and not hide_line_numbers:
+                stars_loc_old = stars_loc
+                diff_result.append(stars_loc)
+            diff_result.append(line)
+    return diff_result
+
 
 def test(cli: KubeCli) -> None:
     """test output against expected-output-<app>-<env>.out file"""
-    # Do not dekrypt secrets for testing
-    krypt_functions._dekrypt_testdummy = True
-    cli.kreate_files()
-    app = cli.app()
-    expected = (
-        cli.args.expected_output
-        or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"
-    )
-    cmd = f"kustomize build {app.target_path} | diff {expected} -"
-    logger.info(f"running: {cmd}")
-    os.system(cmd)
+    diff_result = test_result(cli)
+    print("\n".join(diff_result))
 
 
-def testupdate(cli: KubeCli) -> None:
+def test_update(cli: KubeCli) -> None:
+    """test output against expected-output-<app>-<env>.out file"""
+    path = cli.konfig().get_repo_path(expected_file(cli))
+    logger.info(f"saving build output to {str(path)}")
+    with open(path,"w") as f:
+        f.write(build_output(cli))
+
+
+def test_diff(cli: KubeCli):
+    """test output against expected-output-<app>-<env>.out file"""
+    diff_result = test_result(cli)
+    expected_diff = cli.konfig().get_path("tests.expected_diff")
+    expected_diff_lines = cli.konfig().load_repo_file(expected_diff).splitlines()
+    diff2 = difflib.context_diff(expected_diff_lines, diff_result, n=0)
+    for line in diff2:
+        print(line.strip())
+
+def test_diff_update(cli: KubeCli) -> None:
     """update expected-output-<app>-<env>.out file"""
-    # Do not dekrypt secrets for testing
-    krypt_functions._dekrypt_testdummy = True
-    cli.kreate_files()
-    app = cli.app()
-    expected = (
-        cli.args.expected_output
-        or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"
-    )
-    cmd = f"kustomize build {app.target_path} >{expected}"
-    logger.info(f"running: {cmd}")
-    os.system(cmd)
+    diff_result = test_result(cli)
+    expected_diff_file =cli.konfig().get_path("tests.expected_diff")
+    path = cli.konfig().get_repo_path(expected_diff_file)
+    with open(path, "w") as f:
+        for line in diff_result:
+            f.write(line+"\n")
