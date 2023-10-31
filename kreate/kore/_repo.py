@@ -185,11 +185,11 @@ class KonfigRepo(Repo):
     def __init__(self, konfig, repo_name: str):
         self.konfig = konfig
         self.repo_name = repo_name
-        self.repo_konf = konfig.get_path("system.repo." + repo_name, {})
-        self.version = self.get("version")
-
-    def get(self, attr):
-        return self.konfig.get_path(f"system.repo.{self.repo_name}.{attr}", {})
+        self.repo_konf = konfig.get_path("system.repo." + repo_name)
+        self.version = self.repo_konf.get("version", None)
+        if not self.version:
+            raise ValueError(f"no version given for repo {repo_name}")
+        self.version = str(self.version)  # sometimes a version is a float like 0.1
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.repo_name}, version={self.version})"
@@ -231,7 +231,7 @@ class KonfigRepo(Repo):
         return hashlib.md5(
             (
                 self.repo_name
-                + self.repo_konf.get("version", "")
+                + str(self.repo_konf.get("version", ""))
                 + self.calc_url("...")
                 + extra
             ).encode()
