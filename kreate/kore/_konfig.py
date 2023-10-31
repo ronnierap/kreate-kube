@@ -93,6 +93,14 @@ class Konfig:
         self.file_getter.konfig_repos()
         context = self._jinja_context()
         context["my_repo_name"] = self.file_getter.get_prefix(fname)
+        context["args"] = {}
+        if " " in fname.strip():
+            fname, remainder = fname.split(None, 1)
+            for item in remainder.split():
+                if "=" not in item:
+                    raise ValueError("inklude params should contain = in inklude:{fname}")
+                k,v = item.split("=", 1)
+                context["args"][k] = v
         val_yaml = self.jinyaml.render(fname, context)
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
