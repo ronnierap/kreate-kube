@@ -65,6 +65,9 @@ class Konfig:
     def load_repo_file(self, fname: str) -> str:
         return self.file_getter.get_data(fname)
 
+    def get_repo_path(self, fname: str) -> Path:
+        return self.file_getter.get_file_path(fname)
+
     def load_all_inkludes(self):
         logger.debug("loading inklude files")
         already_inkluded = set()

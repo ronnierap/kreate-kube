@@ -61,6 +61,22 @@ class FileGetter:
             return match.group()[:-1]
         return None
 
+    def get_file_path(self, file: str) -> str:
+        if file.startswith("optional:"):
+            file = file[9:]
+        if file.startswith("dekrypt:"):
+            file = file[8:]
+        repo = None
+        for prefix in self.repo_prefixes:
+            if file.startswith(prefix):
+                file = file[len(prefix) :]
+                repo = self.repo_prefixes[prefix]
+        if repo:
+            return repo.get_file_path(file)
+        else:
+            return self.dir / file
+
+
     def get_data(self, file: str) -> str:
         orig_file = file
         dekrypt = False
@@ -127,6 +143,9 @@ class Repo(Protocol):
     def get_data(self, filename: str, optional: bool = False) -> str:
         ...
 
+    def get_file_path(self, filename: str) -> Path:
+        raise NotImplementedError(f"no file path for repo {self.__class__}: {filename}")
+
 
 class PythonPackageRepo(Repo):
     def get_data(self, filename: str, optional: bool = False) -> str:
@@ -147,11 +166,13 @@ class FixedDirRepo(Repo):
         else:
             raise TypeError(f"Unsupported type {type(dir)}")
 
-    def get_data(self, filename: str, optional: bool = False):
+    def get_file_path(self, filename: str) -> Path:
         while filename.startswith("/"):
             filename = filename[1:]
-        print(self.dir, filename)
-        path = self.dir / filename
+        return  self.dir / filename
+
+    def get_data(self, filename: str, optional: bool = False):
+        path = self.get_file_path(filename)
         if not path.exists():
             raise FileNotFoundError(f"could not find file {filename} in {dir}")
         return path.read_text()
