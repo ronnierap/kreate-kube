@@ -1,6 +1,6 @@
 [project]
 name = "kreate-kube"
-version = "0.9.3dev"
+version = "1.0.0"
 authors = [
   { name="Mark Hooijkaas", email="mark@hooijkaas.net" },
 ]
