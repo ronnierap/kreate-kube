@@ -32,7 +32,7 @@ You can now call the `kreate` command line. Some examples:
 kreate -h          # show help info
 kreate version     # show the version
 
-kreate files   # kreate all files based on the konfig.yaml in the current directory
+kreate files   # kreate all files based on the `kreate*.konf` file in the current directory
 kreate         # The same (files is the default command)
 
 kreate diff    # kreate output that shows differences between the kreate and a real kubernetes cluster
@@ -41,15 +41,15 @@ kreate apply   # apply the kreated files to a kubernetes cluster
 Note: for `diff` and `apply` your `.kube/config` should be set up correctly
 
 
-By default `kreate` It will look for a file `konfig.yaml` in your current directory.
+By default `kreate` will look for a file `kreate*.konf` in your current directory.
 It is possible to specify a different directory or file using the `--konfig` option.
-If this is a directory it will look for a `konfig.yaml` file in this directory.
+If this is a directory it will look for a `kreate*.konf` file in this directory.
 
 
 ## Example using application structure file
 Kreating resources is based on a application strukture definition file.
 Usually there are ate least 3 files needed for a setup:
-- `konfig.yaml`  ties all together
+- `kreate*.konf`  ties all together
 - `<app>-strukture.yaml`  describes the structure of all application components
 - `values-<app>-<env>.yaml`  contains specific values for a certain environment
 Note that these filename may be changed.
@@ -70,32 +70,30 @@ Deployment:
       AddEgressLabelsPatch: {}
 
 Egress:
-  db:
-    name: egress-to-db
-    cidr_list: {{ val.db_egress_cidr_list }}
-    port: {{ val.db_port }}
+  db: {}
 
 Ingress:
-  all:
-    host: {{ val.ingress_host_internal }}
+  root:
     path: /
-    options:
-      - basic_auth
+    annotations:
+      nginx.ingress.kubernetes.io/auth-realm: demo-realm
+      nginx.ingress.kubernetes.io/auth-secret: demo-basic-auth
+      nginx.ingress.kubernetes.io/auth-type: basic
 
 Kustomization:
   main:
     configmaps:
       demo-vars:
         vars:
-          ENV: {{ val.env }}
-          DB_URL: {{ val.DB_URL }}
+          ENV: {}
+          DB_URL: {}
 
 Secret:
   main:
     name: demo-secrets
     vars:
-      DB_PSW: {{ secret.DB_PSW | dekrypt() }}
-      DB_USR: {{ secret.DB_USR }}
+      DB_PSW: {}
+      DB_USR: {}
 
 SecretBasicAuth:
   basic-auth:
@@ -107,16 +105,45 @@ Service:
   main:
     name: demo-service
 ```
-Note: This shows only a small subset of possibilities of kreate-kube
+Note: This shows only a small subset of possibilities of kreate-kube.
 
-### konfig.yaml
-The `konfig.yaml` ties everything together:
+As you can see not any specific values are provided in the strukture.
+These values will be gotten from the `val:` section, and for
+environment variables from the `var:` section, or `secret:` section.
+
+### vals, vars and secrets
+These 3 sections can be put in one file or split over multiple files.
+For the above strukture it could simply be something like:
+```
+val:
+  Ingress:
+    host: demo.example.com
+    service: demo-service
+  Egress:
+    db:
+      cidr_list: 1.2.3.4/32,1.3.4.8/32
+      port_list: "1521"
+var:
+  ENV: {{ app.env }}
+  DB_URL: mysql.example.com
+
+secret:
+  var:
+    DB_USR: mark
+    DB_PSW: dekrypt:....
+  basic_auth:
+    admin: ...
+    guest: ...
+```
+
+### kreate-demo.konf
+The `kreate-demo.konf` ties everything together:
 - Some general values (mainly application name and enviroment)
 - extra environment specific "stuff" to load
   -  values such as IP numbers and urls
   -  secrets such as usernames and passwords
 - what strukture file(s) to use
-In general values and secrets will be loaded from separate files, to keep the `konfig.yaml` file simple,
+In general values and secrets will be loaded from separate files, to keep the `kreate-demo.konf` file simple,
 and to separate this environment specific part separated.
 
 The file can contain several other things as well:
@@ -136,45 +163,29 @@ val:
 inklude:
   - values-demo-dev.yaml
   - secrets-demo-dev.yaml
-strukt:
   - demo-strukture.yaml
 ```
 
 ## Versions of kreate-kube
 At this moment there are not many versions of kreate-kube:
-- `0.1.0`  This version was incomplete and does not work when installed from Pypi
-- `0.2.0`  This was the first functional version
-- `0.3.0`
-  - use of a more flat `konfig.yaml`, with a main `app` section
-  - support for default files to simplify `konfig.yaml`
-  - rename of several patches to remove `Patch` suffix, and not start with a verb
-  - many improvements and cleanup changes
-- `0.4.0`  This is the current version, and adds many backward incompatible changes
-  - use repo's for
-    *  inkludes of konf files
-    *  strukture files
-    *  deployment files
-  -  much flatter konfig structure with val, var, secret and system
-  -  many other improvements
-It is expected that new versions will come out regulary:
-- fixing bugs
-- enhancing command line interface
-- adding templates
-- improving templates and default values
-- improving Python API
-Some of these enhancements may not be backward compatible.
-While in `0.x` stage there will be only garantuee for backward compatibility
-between patch versions (e.g. `0.x.1` and `0.x.2`)
+- `1.0.0` This is the first official release
 
-After the `1.0` release a semantic versioning for backward compatibilty will be used.
+After the `1.0.9` release a semantic versioning for backward compatibilty will be used.
 
-In general you should specify a specific version of kreate with a `requirements.txt` file.
+In general you can specify which version of kreate in the version section
+in your konfig:
+```
+version:
+  kreate_kube_version: '>=1.0.0'
+```
+This use the python syntax for specifying version.
+With the special characters you probably need to quote it.
 
 ## Help
 this is the output of the `kreate-kube --help` command
 ```
 $ kreate --help
-usage: kreate [optional arguments] [<subcommand>] [subcommand options]
+usage: kreate [optional arguments] <konfig> [<subcommand>] [subcommand options]
 
 kreates files for deploying applications on kubernetes
 
@@ -184,40 +195,38 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --testdummy           do not dekrypt values
-  -d DEFINE, --define DEFINE
-                        define yame (toplevel) element
-  -i INKLUDE, --inklude INKLUDE
+  -k file, --konfig file
+                        konfig file or directory to use (default=KREATE_MAIN_KONFIG_PATH or .)
+  -d yaml-setting, --define yaml-setting
+                        add yaml (toplevel) element to konfig file
+  -i path, --inklude path
                         inklude extra files before parsing main konfig
-  -k KONF, --konf KONF  konfig file or directory to use (default=.)
   -v, --verbose         output more details (inluding stacktrace) -vv even more
   -w, --warn            only output warnings
+  -W filter, --warn-filter filter
+                        set python warnings filter
   -q, --quiet           do not output any info, just essential output
   -K, --keep-secrets    do not remove secrets dirs
-  -C, --skip-version-check
-                        do not check if required version of kreate is used
-  -F, --force-version-check
-                        force version check even if development version is detected
-  --no-dotenv           do not load a .env file for working dir
+  --no-dotenv           do not load .env file from working dir
+  --no-kreate-env       do not load kreate.env file from user home .config dir
 
 subcommands:
+  files             f   kreate all the files (default command)
+  command           cmd run a predefined command from system.command
+  shell             sh  run one or more shell command including pipes
   clear_repo_cache  cc  clear the repo cache
   version           vr  view the version
   view              v   view the entire konfig or subkey(s)
-  view_template     vt  view the template for a specific kind
-  dek_lines         dl  dekrypt lines in a text file
-  dekstr            ds  dekrypt string value
-  dekfile           df  dekrypt an entire file
-  enk_lines         el  enkrypt lines in a text file
-  enkfile           ef  enkrypt an entire file
-  enkstr            es  enkrypt string value
-  files             f   kreate all the files (default command)
+  dekrypt           dek
+  enkrypt           enk
   build             b   output all the resources
   diff              d   diff with current existing resources
   apply             a   apply the output to kubernetes
   test              t   test output against expected-output-<app>-<env>.out file
-  testupdate        tu  update expected-output-<app>-<env>.out file
-  kubeconfig        kc  kreate a kubeconfig file from a template
-  ```
+  test_update       tu  test output against expected-output-<app>-<env>.out file
+  test_diff         td  test output against expected-output-<app>-<env>.out file
+  test_diff_update  tdu update expected-output-<app>-<env>.out file
+```
 
 ## History
 This is a rewrite of a similar project written as bash scripts.
@@ -243,3 +252,10 @@ for several reasons:
   - jinja templates
   - modular design, where a team can add team-specific templates and defaults for their set of applications
   - powerful requirements.txt/pip dependency management
+
+Initially the idea was to use python scripts just like we were doing in bash.
+The yaml konfiguration became so powerful, that scripting was not needed
+at all, and you could specify everything in yaml (and jinja2 templates).
+
+The new approach is to use only yaml and jinja2, even for extending the
+framework with new templates and other behaviour.
