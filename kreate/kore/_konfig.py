@@ -19,9 +19,16 @@ class VersionWarning(RuntimeWarning):
 
 class Konfig:
     def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
-        konfig_path = self.find_konfig_file(filename)
+        if filename is not None and ":" in filename:
+            # repo filename, do not use search algorithm
+            konfig_path = Path(filename)
+            self.dir = Path(".")
+            main_konfig = filename
+        else:
+            konfig_path = self.find_konfig_file(filename)
+            self.dir = konfig_path.parent
+            main_konfig = konfig_path.name  # relative to self.dir
         logger.info(f"loading main konfig from {konfig_path}")
-        self.dir = konfig_path.parent
         self.dekrypt_func = None
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
@@ -30,7 +37,7 @@ class Konfig:
         self.file_getter = FileGetter(self, self.dir)
         for ink in inkludes or []:
             self.inklude(ink)
-        self.inklude(konfig_path.name)
+        self.inklude(main_konfig)
         self.load_all_inkludes()
 
     def find_konfig_file(self, filename):
