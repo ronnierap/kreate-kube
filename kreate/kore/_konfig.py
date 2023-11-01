@@ -28,13 +28,15 @@ class Konfig:
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
+        self.already_inkluded = set()
         deep_update(dict_, {"system": {"getenv": os.getenv}})
         self.file_getter = FileGetter(self, location)
         logger.debug(self.file_getter)
+        if ink := self.find_init_kreate_konf():
+            self.inklude(ink)
         for ink in inkludes or []:
             self.inklude(ink)
         self.inklude(Path(location).name)
-        self.load_all_inkludes()
 
     def find_konfig_location(self, filename: str) -> str:
         if filename is None:
@@ -55,6 +57,28 @@ class Konfig:
                     )
         raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
 
+    def find_init_kreate_konf(self) -> str:
+        paths = os.getenv("KREATE_INIT_PATH",".:framework")
+        filename = os.getenv("KREATE_INIT_FILE", "init-kreate.konf")
+        if self.file_getter.reponame is None:
+            # first search relative to main konfig, but only makes
+            # sense if main konfig is not in a repo
+            dir = self.file_getter.dir
+            logger.debug(f"searching for initial {filename} in {paths} from {dir}")
+            for p in paths.split(os.pathsep):
+                path = dir / p / filename
+                if path.is_file():
+                    logger.info(f"found initial konfig {path}")
+                    return f"{path}"
+        # not found yet, now try the working dir
+        logger.debug(f"searching for initial {filename} in {paths} from .")
+        for p in paths.split(os.pathsep):
+            path = Path(p) / filename
+            if path.is_file():
+                logger.info(f"found initial konfig cwd:{path}")
+                return f"cwd:{path}" # prefix with cwd to use the working dir
+        return None
+
     def get_path(self, path: str, default=None):
         return self.yaml._get_path(path, default=default)
 
@@ -71,21 +95,20 @@ class Konfig:
     def save_repo_files(self, fname: str, data):
         return self.file_getter.save_repo_file(fname, data)
 
-    def load_all_inkludes(self):
-        logger.debug("loading inklude files")
-        already_inkluded = set()
+    def load_new_inkludes(self):
+        logger.debug("loading new inklude files")
         inkludes = self.get_path("inklude", [])
         # keep loading inkludes until all is done
-        while self.load_inkludes(inkludes, already_inkluded) > 0:
+        while self.load_inkludes(inkludes) > 0:
             # possible new inkludes are added
             inkludes = self.get_path("inklude", [])
 
-    def load_inkludes(self, inkludes: List[str], already_inkluded: Set[str]) -> int:
+    def load_inkludes(self, inkludes: List[str]) -> int:
         count = 0
         for idx, fname in enumerate(inkludes):
-            if fname not in already_inkluded:
+            if fname not in self.already_inkluded:
                 count += 1
-                already_inkluded.add(fname)
+                self.already_inkluded.add(fname)
                 self.inklude(fname, idx + 1)
         logger.debug(f"inkluded {count} new files")
         return count
@@ -107,6 +130,7 @@ class Konfig:
         val_yaml = self.jinyaml.render(location, context)
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
+        self.load_new_inkludes()
 
     def get_kreate_version(self) -> str:
         try:
