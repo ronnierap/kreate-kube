@@ -125,7 +125,7 @@ val:
       port_list: "1521"
 var:
   ENV: {{ app.env }}
-  DB_URL: mysql.example.com
+  DB_URL: jdbc:oracle.example.com
 
 secret:
   var:
@@ -170,7 +170,9 @@ inklude:
 At this moment there are not many versions of kreate-kube:
 - `1.0.0` This is the first official release
 
-After the `1.0.9` release a semantic versioning for backward compatibilty will be used.
+After the `1.0.0` release a semantic versioning for backward compatibilty will be used.
+There is no garantuee that python code will be backward compatible,
+but yaml should be compatible unless otherwise noted.
 
 In general you can specify which version of kreate in the version section
 in your konfig:
