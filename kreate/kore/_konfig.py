@@ -116,7 +116,7 @@ class Konfig:
         return count
 
     def inklude(self, location: str, idx: int = None):
-        logger.info(f"inkluding {location}")
+        logger.debug(f"inkluding {location}")
         # reload all repositories, in case any were added/changed
         self.file_getter.konfig_repos()
         context = self._jinja_context()

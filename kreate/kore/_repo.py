@@ -116,6 +116,7 @@ class FileGetter:
                 return ""
             else:
                 raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.dir}")
+        logger.info(f"loaded {file}")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
