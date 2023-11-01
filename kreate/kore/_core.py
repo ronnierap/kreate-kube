@@ -116,12 +116,14 @@ class DictWrapper(UserDict):
     def set(self, path: str, val):
         return self._set_path(path, val)
 
-    def _get_path(self, path: str, default=None):
+    def _get_path(self, path: str, default=None, mandatory=False):
         keys = path.split(".")
         data = self.data
         for key in keys:
             key = key.replace("_dot_", ".")
             if key not in data:
+                if mandatory:
+                    raise ValueError(f"could not find mandatry field {path}")
                 return default
             data = data[key]
         return data

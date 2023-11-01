@@ -81,8 +81,8 @@ class Konfig:
                 return f"cwd:{path}" # prefix with cwd to use the working dir
         return None
 
-    def get_path(self, path: str, default=None):
-        return self.yaml._get_path(path, default=default)
+    def get_path(self, path: str, default=None, mandatory=False):
+        return self.yaml._get_path(path, default=default, mandatory=mandatory)
 
     def _jinja_context(self):
         result = {}  # "konf": self, "appname": self.appname, "env": self.env}
