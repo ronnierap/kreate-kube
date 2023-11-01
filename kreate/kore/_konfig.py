@@ -23,7 +23,7 @@ class Konfig:
             location = self.find_konfig_location(location)
         elif Path(location).is_dir():
             location = self.find_konfig_location(location)
-        logger.info(f"loading main konfig from {location}")
+        logger.info(f"using main konfig from {location}")
         self.dekrypt_func = None
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
@@ -32,8 +32,10 @@ class Konfig:
         deep_update(dict_, {"system": {"getenv": os.getenv}})
         self.file_getter = FileGetter(self, location)
         logger.debug(self.file_getter)
-        if ink := self.find_init_kreate_konf():
-            self.inklude(ink)
+        # The code below is disable, because it adds little value and
+        # can be confusing. Needs further research
+        #if ink := self.find_init_kreate_konf():
+        #    self.inklude(ink)
         for ink in inkludes or []:
             self.inklude(ink)
         self.inklude(Path(location).name)
