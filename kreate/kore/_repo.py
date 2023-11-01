@@ -30,14 +30,13 @@ def clear_cache():
 
 
 class FileGetter:
-    def __init__(self, konfig, dir: Path):
+    def __init__(self, konfig, location: str):
         self.konfig = konfig
-        self.dir = dir  # Path(dir)
         self.repo_prefixes = {
-            "main_konfig:": FixedDirRepo(dir),
-            "cwd:": FixedDirRepo(Path.cwd()),
-            "home:": FixedDirRepo(Path.home()),
-            "py:": PythonPackageRepo(),
+            #"main_konfig:": FixedDirRepo(dir),
+            "cwd": FixedDirRepo(Path.cwd()),
+            "home": FixedDirRepo(Path.home()),
+            #"py:": PythonPackageRepo(),
         }
         self.repo_types = {
             "url-zip:": UrlZipRepo,
@@ -46,10 +45,15 @@ class FileGetter:
             "bitbucket-zip:": BitbucketZipRepo,
             "bitbucket-file:": BitbucketFileRepo,
         }
+        self.reponame, dir = self.split_location(location)
+        self.dir = Path(dir).parent
+
+    def __str__(self) -> str:
+        return f"FileGetter({self.reponame=}, {self.dir=})"
 
     def konfig_repos(self):
         for repo in self.konfig.get_path("system.repo", []):
-            self.repo_prefixes[repo + ":"] = self.get_repo(repo)
+            self.repo_prefixes[repo ] = self.get_repo(repo)
 
     def get_prefix(self, filename: str) -> str:
         if filename.startswith("optional:"):
@@ -59,26 +63,38 @@ class FileGetter:
         match = re.match("^[a-zA-Z0-9_-]*:", filename)
         if match:
             return match.group()[:-1]
-        return None
+        return self.reponame
 
-    def get_file_path(self, file: str) -> str:
-        if file.startswith("optional:"):
-            file = file[9:]
-        if file.startswith("dekrypt:"):
-            file = file[8:]
-        repo = None
-        for prefix in self.repo_prefixes:
-            if file.startswith(prefix):
-                file = file[len(prefix) :]
-                repo = self.repo_prefixes[prefix]
+    def split_location(self, location: str):
+        if match := re.match("^[a-zA-Z0-9_-]*:", location):
+            reponame = match.group()[:-1]
+            if len(reponame) > 1:
+                # length 1 could mean windows drive letter
+                filename = location[len(reponame)+1:]
+                while filename.startswith("/"):
+                    filename = filename[1:]
+                return reponame, Path(filename)
+        return None, Path(location)
+
+    def my_repo(self, reponame=None):
+        reponame = reponame or self.reponame
+        if repo := self.repo_prefixes.get(reponame):
+            return repo
+        raise ValueError(f"Could not find repo {reponame}")
+
+    def save_repo_file(self, filename: str, data):
+        repo, file = self.split_location(filename)
         if repo:
-            return repo.get_file_path(file)
+           repo.save_repo_file(file)
+        elif self.reponame:
+            self.my_repo().save_repo_file(self.dir / file)
         else:
-            return self.dir / file
-
+            with open(self.dir / file, "w") as f:
+                f.write(data)
 
     def get_data(self, file: str) -> str:
         orig_file = file
+        repo = None
         dekrypt = False
         optional = False
         if file.startswith("optional:"):
@@ -87,21 +103,19 @@ class FileGetter:
         if file.startswith("dekrypt:"):
             dekrypt = True
             file = file[8:]
-        repo = None
-        for prefix in self.repo_prefixes:
-            if file.startswith(prefix):
-                file = file[len(prefix) :]
-                repo = self.repo_prefixes[prefix]
+        repo, path = self.split_location(file)
         if repo:
-            data = repo.get_data(file, optional=optional)
+            data = self.my_repo(repo).get_data(path, optional=optional)
+        elif self.reponame:
+            data = self.my_repo().get_data(self.dir / path, optional=optional)
         else:
-            data = self.load_file_data(file)
+            data = self.load_file_data(path)
         if data is None:
             if optional:
                 logger.debug(f"ignoring optional file {orig_file}")
                 return ""
             else:
-                raise FileNotFoundError(f"non-optional file {orig_file} does not exist")
+                raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.dir}")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)
@@ -116,7 +130,7 @@ class FileGetter:
             data = data.decode()
         target.write_text(data)
 
-    def load_file_data(self, filename: str) -> str:
+    def load_file_data(self, filename: Path) -> str:
         logger.debug(f"loading file {filename} ")
         path = self.dir / filename
         if not path.exists():
@@ -136,15 +150,15 @@ class FileGetter:
         elif type == "bitbucket-file":
             return BitbucketFileRepo(self.konfig, repo_name)
         else:
-            raise ValueError(f"Unknow repo type {type} for repo {repo_name}")
+            raise ValueError(f"Unknown repo type {type} for repo {repo_name}")
 
 
 class Repo(Protocol):
-    def get_data(self, filename: str, optional: bool = False) -> str:
+    def get_data(self, path: Path, optional: bool = False) -> str:
         ...
 
-    def get_file_path(self, filename: str) -> Path:
-        raise NotImplementedError(f"no file path for repo {self.__class__}: {filename}")
+    def save_repo_file(self, filename: str) -> Path:
+        raise NotImplementedError(f"not possible to save file in repo {self.__class__}: {filename}")
 
 
 class PythonPackageRepo(Repo):
@@ -164,15 +178,16 @@ class FixedDirRepo(Repo):
         elif isinstance(dir, Path):
             self.dir = dir
         else:
-            raise TypeError(f"Unsupported type {type(dir)}")
+            raise TypeError(f"Unsupported type {type(dir)}, {dir}")
 
-    def get_file_path(self, filename: str) -> Path:
+    def save_repo_file(self, filename: str, data) -> Path:
         while filename.startswith("/"):
             filename = filename[1:]
-        return  self.dir / filename
+        with open(self.dir / filename, "w") as f:
+            f.write(data)
 
-    def get_data(self, filename: str, optional: bool = False):
-        path = self.get_file_path(filename)
+    def get_data(self, filename: Path, optional: bool = False):
+        path = self.dir / filename
         if not path.exists():
             raise FileNotFoundError(f"could not find file {filename} in {dir}")
         return path.read_text()
@@ -197,9 +212,7 @@ class KonfigRepo(Repo):
     def download(self, filename: str) -> bool:
         raise NotImplementedError(f"Could not download {self.repo_name}")
 
-    def get_data(self, filename: str, optional: bool = False):
-        while filename.startswith("/"):
-            filename = filename[1:]
+    def get_data(self, filename: Path, optional: bool = False):
         if isinstance(self.version, str) and self.version.startswith("branch."):
             version = self.version[7:]
             warnings.warn(
@@ -289,6 +302,12 @@ class LocalKonfigRepo(KonfigRepo):
             dir = dir.replace("{version}", self.version)
         return Path(dir)
 
+    def save_repo_file(self, filename: str, data):
+        while filename.startswith("/"):
+            filename = filename[1:]
+        with open(self.calc_dir() / filename, "w") as f:
+            f.write(data)
+
 
 class LocalZipRepo(KonfigRepo):
     def download(self, filename: str) -> bool:
@@ -339,6 +358,9 @@ class BitbucketFileRepo(BitbucketZipRepo):
         return True
 
     def calc_url(self, filename: str) -> str:
+        filename = str(filename)
+        while filename.startswith("/"):
+            filename = filename[1:]
         return self._calc_url(f"raw/{filename}")
 
     def download_extra_file(self, filename: str) -> bool:

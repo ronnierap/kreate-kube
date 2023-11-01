@@ -18,41 +18,37 @@ class VersionWarning(RuntimeWarning):
     pass
 
 class Konfig:
-    def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
-        if filename is not None and ":" in filename:
-            # repo filename, do not use search algorithm
-            konfig_path = Path(filename)
-            self.dir = Path(".")
-            main_konfig = filename
-        else:
-            konfig_path = self.find_konfig_file(filename)
-            self.dir = konfig_path.parent
-            main_konfig = konfig_path.name  # relative to self.dir
-        logger.info(f"loading main konfig from {konfig_path}")
+    def __init__(self, location: str = None, dict_: dict = None, inkludes=None):
+        if location is None:
+            location = self.find_konfig_location(location)
+        elif Path(location).is_dir():
+            location = self.find_konfig_location(location)
+        logger.info(f"loading main konfig from {location}")
         self.dekrypt_func = None
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
         deep_update(dict_, {"system": {"getenv": os.getenv}})
-        self.file_getter = FileGetter(self, self.dir)
+        self.file_getter = FileGetter(self, location)
+        logger.debug(self.file_getter)
         for ink in inkludes or []:
             self.inklude(ink)
-        self.inklude(main_konfig)
+        self.inklude(Path(location).name)
         self.load_all_inkludes()
 
-    def find_konfig_file(self, filename):
+    def find_konfig_location(self, filename: str) -> str:
         if filename is None:
             filename = os.getenv("KREATE_MAIN_KONFIG_PATH",".")
         glob_pattern = os.getenv("KREATE_MAIN_KONFIG_FILE", "kreate*.konf")
         for p in filename.split(os.pathsep):
             path = Path(p)
             if path.is_file():
-                return path
+                return str(path)
             elif path.is_dir():
                 logger.debug(f"checking for {glob_pattern} in dir {path}")
                 possible_files = tuple(path.glob(glob_pattern))
                 if len(possible_files) == 1:
-                    return possible_files[0]
+                    return str(possible_files[0])
                 elif len(possible_files) > 1:
                     raise ValueError(
                         f"Ambiguous konfig files found for {path}/{glob_pattern}: {possible_files}"
@@ -72,8 +68,8 @@ class Konfig:
     def load_repo_file(self, fname: str) -> str:
         return self.file_getter.get_data(fname)
 
-    def get_repo_path(self, fname: str) -> Path:
-        return self.file_getter.get_file_path(fname)
+    def save_repo_files(self, fname: str, data):
+        return self.file_getter.save_repo_file(fname, data)
 
     def load_all_inkludes(self):
         logger.debug("loading inklude files")
@@ -94,21 +90,21 @@ class Konfig:
         logger.debug(f"inkluded {count} new files")
         return count
 
-    def inklude(self, fname: str, idx: int = None):
-        logger.info(f"inkluding {fname}")
+    def inklude(self, location: str, idx: int = None):
+        logger.info(f"inkluding {location}")
         # reload all repositories, in case any were added/changed
         self.file_getter.konfig_repos()
         context = self._jinja_context()
-        context["my_repo_name"] = self.file_getter.get_prefix(fname)
+        context["my_repo_name"] = self.file_getter.get_prefix(location)
         context["args"] = {}
-        if " " in fname.strip():
-            fname, remainder = fname.split(None, 1)
+        if " " in location.strip():
+            location, remainder = location.split(None, 1)
             for item in remainder.split():
                 if "=" not in item:
                     raise ValueError("inklude params should contain = in inklude:{fname}")
                 k,v = item.split("=", 1)
                 context["args"][k] = v
-        val_yaml = self.jinyaml.render(fname, context)
+        val_yaml = self.jinyaml.render(location, context)
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
 
