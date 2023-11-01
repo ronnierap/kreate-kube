@@ -98,6 +98,8 @@ class App:
                 logger.info(f"skipping file for {komp.kind}.{komp.shortname}")
 
     def kreate_komponents_from_strukture(self):
+        if not self.strukture:
+            raise ValueError("no strukture found in konfig")
         for kind in sorted(self.strukture.keys()):
             if kind in self.kind_classes:
                 strukt = self.strukture.get(kind, None)
