@@ -387,11 +387,14 @@ def view_aliases():
 def view(cli: KoreCli):
     """view the entire konfig or subkey(s)"""
     konfig: Konfig = cli.konfig()
+    first = True
     if cli.args.key:
         for idx, k in enumerate(cli.args.key):
             k = view_aliases().get(k, k)
+            print(f"==== view {k} =======")
             if k == "template":
                 view_templates(cli, cli.args.key[idx + 1 :])
+                break
             elif k == "warningfilters":
                 view_warning_filters()
             elif k == "alias":
@@ -404,6 +407,7 @@ def view(cli: KoreCli):
                 else:
                     print(k + ":")
                     pprint_map(result, indent="  ")
+            print()
     else:
         pprint_map(konfig.yaml)
 
