@@ -10,7 +10,10 @@ The YAML has several sections for different purposes:
 - var: variables that are meant to be put in a Kubernetes ConfigMap
 - secret: secret values and vars, that should be stored in encrypted format
 - inklude: files that will be merged into the YAML document
-- repo: repositories where (shared) konfig files and templates can be located
+- version: version information of files that can be used or inkluded
+- system:
+  - repo: repositories where (shared) konfig files and templates can be located
+  - templates: definitions of templates that can be used
 
 ## app
 This section is small, although you can put in anything you want.
@@ -94,13 +97,13 @@ In the konfig they are specified as follows
 ```yaml
 secret:
   DB_USR: myapp_prd_user
-  DB_PSW: gAAA...QLEc=  # enkrypted
+  DB_PSW: dekrypt:gAAA...QLEc=
   KAFKA_USR: myapp
-  KAFKA_PSW: gAAA...dx2A=  # enkrypted
+  KAFKA_PSW: dekrypt:gAAA...dx2A=
 ```
 Note:
 - You can store both USR and PSW as secret. The username often is not really secret, but this way you can keep them together.
-- The lines of encrypted items ends with `# enkrypted`. This is used by the `dek_lines` cli subcommand to know to dekrypt these.
+- The lines of encrypted items start with `dekrypt:`, so that this secrets will not be visible.
 
 You can use these secrets as follows
 ```yaml
@@ -108,14 +111,14 @@ strukt:
   Secret:
     main:
       vars:
-        DB_USR: {{ secret.DB_USR  }}
-        DB_PSW: {{ secret.DB_PSW | dekrypt() }}
-        KAFKA_USR: {{ secret.KAFKA_USR  }}
-        KAFKA_PSW: {{ secret.KAFKA_PSW | dekrypt() }}
+        ENV: {{ app.env }}
+        DB_USR: {}
+        DB_PSW: {}
+        KAFKA_USR: {}
+        KAFKA_PSW: {}
 ```
-Note:
-- You have to explicitely decrypt the passwords using a jinja2 filter called `dekrypt`.
-- In theory you could use any tag instead of `secret`. This is just a best practice.
+You can provide a value, but if this is left empty (with an empty set), it is fetched from the `var:` section
+
 
 ## inklude
 One of the powerful features of `kreate` is the inklude mechanism.
