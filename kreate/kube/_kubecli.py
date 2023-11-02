@@ -51,7 +51,7 @@ def expected_file(cli: KubeCli) -> str:
     app = cli.app()
     return (
         cli.konfig().get_path("tests.expected_output")
-        or f"{app.konfig.dir}/expected-output-{app.appname}-{app.env}.out"
+        or f"{app.konfig.file_getter.dir}/expected-output-{app.appname}-{app.env}.out"
     )
 
 def build_output(cli: KubeCli) -> str:
