@@ -89,6 +89,7 @@ class FileGetter:
         elif self.reponame:
             self.my_repo().save_repo_file(self.dir / file)
         else:
+            logger.info(f"saving data to {self.dir / file}")
             with open(self.dir / file, "w") as f:
                 f.write(data)
 
@@ -184,6 +185,7 @@ class FixedDirRepo(Repo):
     def save_repo_file(self, filename: str, data) -> Path:
         while filename.startswith("/"):
             filename = filename[1:]
+        logger.info(f"saving data in FixedDirRepo to {self.dir / filename}")
         with open(self.dir / filename, "w") as f:
             f.write(data)
 

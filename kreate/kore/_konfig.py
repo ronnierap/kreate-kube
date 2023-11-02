@@ -94,7 +94,7 @@ class Konfig:
     def load_repo_file(self, fname: str) -> str:
         return self.file_getter.get_data(fname)
 
-    def save_repo_files(self, fname: str, data):
+    def save_repo_file(self, fname: str, data):
         return self.file_getter.save_repo_file(fname, data)
 
     def load_new_inkludes(self):

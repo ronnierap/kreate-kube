@@ -97,10 +97,7 @@ def test(cli: KubeCli) -> None:
 
 def test_update(cli: KubeCli) -> None:
     """test output against expected-output-<app>-<env>.out file"""
-    path = cli.konfig().get_repo_path(expected_file(cli))
-    logger.info(f"saving build output to {str(path)}")
-    with open(path,"w") as f:
-        f.write(build_output(cli))
+    cli.konfig().save_repo_file(expected_file(cli), build_output(cli))
 
 
 def test_diff(cli: KubeCli):
@@ -116,7 +113,4 @@ def test_diff_update(cli: KubeCli) -> None:
     """update expected-output-<app>-<env>.out file"""
     diff_result = test_result(cli)
     expected_diff_file =cli.konfig().get_path("tests.expected_diff")
-    path = cli.konfig().get_repo_path(expected_diff_file)
-    with open(path, "w") as f:
-        for line in diff_result:
-            f.write(line+"\n")
+    cli.konfig().save_repo_file(expected_diff_file, "\n".join(diff_result))
