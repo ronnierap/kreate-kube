@@ -126,9 +126,5 @@ def test_diff(cli: KubeCli):
 def test_diff_update(cli: KubeCli) -> None:
     """update expected-output-<app>-<env>.out file"""
     diff_result = test_result(cli)
-    expected_diff_file =cli.konfig().get_path("tests.expected_diff")
-    cli.konfig().save_repo_file(expected_diff_file, "\n".join(diff_result))
-    cli.konfig().save_repo_file(
-        expected_diff_location(cli),
-        "\n".join(diff_result)
-    )
+    loc = expected_diff_location(cli)
+    cli.konfig().save_repo_file(loc, "\n".join(diff_result))
