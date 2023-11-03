@@ -73,7 +73,7 @@ def build_output(cli: KubeCli) -> str:
 
 
 def test_result(cli: KubeCli, n=0):
-    ignores = cli.konfig().get_path("tests.ignore")
+    ignores = cli.konfig().get_path("tests.ignore", [])
     build_lines = build_output(cli).splitlines()
     loc = expected_output_location(cli)
     expected_lines = cli.konfig().load_repo_file(loc).splitlines()
