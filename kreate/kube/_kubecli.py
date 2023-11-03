@@ -1,3 +1,4 @@
+import os
 import logging
 import difflib
 import subprocess
@@ -47,12 +48,22 @@ def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
     cli.run_command("apply")
 
-def expected_file(cli: KubeCli) -> str:
-    app = cli.app()
-    return (
-        cli.konfig().get_path("tests.expected_output")
-        or f"{app.konfig.file_getter.dir}/expected-output-{app.appname}-{app.env}.out"
-    )
+
+def expected_output_location(cli: KubeCli) -> str:
+    loc = os.getenv("KREATE_TEST_EXPECTED_OUTPUT_LOCATION")
+    loc = loc or cli.konfig().get_path("tests.expected_output_location")
+    loc = loc or "cwd:tests/expected-output-{app.appname}-{app.env}.out"
+    loc = loc.format(app=cli.app(), konf=cli.konfig(), cli=cli)
+    return loc
+
+
+def expected_diff_location(cli: KubeCli) -> str:
+    loc = os.getenv("KREATE_TEST_EXPECTED_DIFF_LOCATION")
+    loc = loc or cli.konfig().get_path("tests.expected_diff_location")
+    loc = loc or "cwd:tests/expected-diff-{app.appname}-{app.env}.out"
+    loc = loc.format(app=cli.app(), konf=cli.konfig(), cli=cli)
+    return loc
+
 
 def build_output(cli: KubeCli) -> str:
     # Do not dekrypt secrets for testing
@@ -64,7 +75,8 @@ def build_output(cli: KubeCli) -> str:
 def test_result(cli: KubeCli, n=0):
     ignores = cli.konfig().get_path("tests.ignore")
     build_lines = build_output(cli).splitlines()
-    expected_lines = cli.konfig().load_repo_file(expected_file(cli)).splitlines()
+    loc = expected_output_location(cli)
+    expected_lines = cli.konfig().load_repo_file(loc).splitlines()
     diff = difflib.context_diff(expected_lines, build_lines, n=n)
     stars_loc = ""
     stars_loc_old = "old"
@@ -97,20 +109,26 @@ def test(cli: KubeCli) -> None:
 
 def test_update(cli: KubeCli) -> None:
     """test output against expected-output-<app>-<env>.out file"""
-    cli.konfig().save_repo_file(expected_file(cli), build_output(cli))
+    loc = expected_output_location(cli)
+    cli.konfig().save_repo_file(loc, build_output(cli))
 
 
 def test_diff(cli: KubeCli):
     """test output against expected-output-<app>-<env>.out file"""
     diff_result = test_result(cli)
-    expected_diff = cli.konfig().get_path("tests.expected_diff")
-    expected_diff_lines = cli.konfig().load_repo_file(expected_diff).splitlines()
+    loc = expected_diff_location(cli)
+    expected_diff_lines = cli.konfig().load_repo_file(loc).splitlines()
     diff2 = difflib.context_diff(expected_diff_lines, diff_result, n=0)
     for line in diff2:
         print(line.strip())
+
 
 def test_diff_update(cli: KubeCli) -> None:
     """update expected-output-<app>-<env>.out file"""
     diff_result = test_result(cli)
     expected_diff_file =cli.konfig().get_path("tests.expected_diff")
     cli.konfig().save_repo_file(expected_diff_file, "\n".join(diff_result))
+    cli.konfig().save_repo_file(
+        expected_diff_location(cli),
+        "\n".join(diff_result)
+    )
