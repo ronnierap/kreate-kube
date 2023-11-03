@@ -85,9 +85,9 @@ class FileGetter:
     def save_repo_file(self, filename: str, data):
         repo, file = self.split_location(filename)
         if repo:
-           repo.save_repo_file(file)
+           self.my_repo(repo).save_repo_file(str(file), data)
         elif self.reponame:
-            self.my_repo().save_repo_file(self.dir / file)
+            self.my_repo().save_repo_file(str(self.dir / file), data)
         else:
             logger.info(f"saving data to {self.dir / file}")
             with open(self.dir / file, "w") as f:
