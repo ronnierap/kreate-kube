@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import difflib
 import subprocess
@@ -72,39 +73,37 @@ def build_output(cli: KubeCli) -> str:
     return subprocess.check_output(["kustomize","build", str(cli.app().target_path)]).decode()
 
 
+def truncate_ignores(ignores, lines):
+    for idx, line in enumerate(lines):
+        for ign in ignores:
+            if ign in line:
+                line = line.split(ign)[0] + ign + " ... "
+                logger.info(f"ignoring part after: {line}")
+            lines[idx] = line
+    return lines
+
+
+
 def test_result(cli: KubeCli, n=0):
     ignores = cli.konfig().get_path("tests.ignore", [])
     build_lines = build_output(cli).splitlines()
     loc = expected_output_location(cli)
     expected_lines = cli.konfig().load_repo_file(loc).splitlines()
-    diff = difflib.context_diff(expected_lines, build_lines, n=n)
-    stars_loc = ""
-    stars_loc_old = "old"
-    diff_result = []
-    for line in diff:
-        if line.startswith("*** "):
-            stars_loc = line.strip()
-            continue
-        elif line.startswith("***"):
-            continue
-        elif line.startswith("---"):
-            continue
-        ignore = False
-        for ign in ignores:
-            if ign in line:
-                ignore = True
-        if not ignore:
-            if stars_loc_old is not stars_loc:
-                stars_loc_old = stars_loc
-                diff_result.append(stars_loc)
-            diff_result.append(line)
-    return diff_result
+    diff = difflib.unified_diff(
+        truncate_ignores(ignores, expected_lines),
+        truncate_ignores(ignores, build_lines),
+        fromfile="expected",
+        tofile="kreated",
+        n=n,
+    )
+    return [line.strip() for line in diff]
 
 
 def test(cli: KubeCli) -> None:
     """test output against expected-output-<app>-<env>.out file"""
     diff_result = test_result(cli)
-    print("\n".join(diff_result))
+    for line in  diff_result:
+        print(line)
 
 
 def test_update(cli: KubeCli) -> None:
