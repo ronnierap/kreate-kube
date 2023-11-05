@@ -36,10 +36,6 @@ class Konfig:
         }})
         self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
-        # The code below is disable, because it adds little value and
-        # can be confusing. Needs further research
-        #if ink := self.find_init_kreate_konf():
-        #    self.inklude(ink)
         for ink in inkludes or []:
             self.inklude_one_file(ink)
         self.inklude_one_file(main_konfig_path.name)
@@ -63,28 +59,6 @@ class Konfig:
                         f"Ambiguous konfig files found for {path}/{glob_pattern}: {possible_files}"
                     )
         raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
-
-    def find_init_kreate_konf(self) -> str:
-        paths = os.getenv("KREATE_INIT_PATH",".:framework")
-        filename = os.getenv("KREATE_INIT_FILE", "init-kreate.konf")
-        if self.file_getter.reponame is None:
-            # first search relative to main konfig, but only makes
-            # sense if main konfig is not in a repo
-            dir = self.file_getter.main_dir_path
-            logger.debug(f"searching for initial {filename} in {paths} from {dir}")
-            for p in paths.split(os.pathsep):
-                path = dir / p / filename
-                if path.is_file():
-                    logger.info(f"found initial konfig {path}")
-                    return f"{path}"
-        # not found yet, now try the working dir
-        logger.debug(f"searching for initial {filename} in {paths} from .")
-        for p in paths.split(os.pathsep):
-            path = Path(p) / filename
-            if path.is_file():
-                logger.info(f"found initial konfig cwd:{path}")
-                return f"cwd:{path}" # prefix with cwd to use the working dir
-        return None
 
     def get_path(self, path: str, default=None, mandatory=False):
         return self.yaml._get_path(path, default=default, mandatory=mandatory)
