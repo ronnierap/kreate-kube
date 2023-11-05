@@ -3,7 +3,7 @@ import logging
 import importlib.metadata
 import warnings
 from pathlib import Path
-from typing import List, Set
+from typing import List
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version, InvalidVersion
 
@@ -18,19 +18,23 @@ class VersionWarning(RuntimeWarning):
     pass
 
 class Konfig:
-    def __init__(self, location: str = None, dict_: dict = None, inkludes=None):
-        if location is None:
-            location = self.find_konfig_location(location)
-        elif Path(location).is_dir():
-            location = self.find_konfig_location(location)
-        logger.info(f"using main konfig from {location}")
+    def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
+        if filename is None:
+            main_konfig_path = self.find_main_konfig_path(filename)
+        elif Path(filename).is_dir():
+            main_konfig_path = self.find_main_konfig_path(filename)
+        logger.info(f"using main konfig from {main_konfig_path}")
         self.dekrypt_func = None
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
         self.already_inkluded = set()
-        deep_update(dict_, {"system": {"getenv": os.getenv}})
-        self.file_getter = FileGetter(self, location)
+        deep_update(dict_, {"system": {
+            "getenv": os.getenv,
+            "main_konfig_path": main_konfig_path,
+            "logger": logger,
+        }})
+        self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
         # The code below is disable, because it adds little value and
         # can be confusing. Needs further research
@@ -38,21 +42,21 @@ class Konfig:
         #    self.inklude(ink)
         for ink in inkludes or []:
             self.inklude(ink)
-        self.inklude(Path(location).name)
+        self.inklude(main_konfig_path.name)
 
-    def find_konfig_location(self, filename: str) -> str:
+    def find_main_konfig_path(self, filename: str) -> Path:
         if filename is None:
             filename = os.getenv("KREATE_MAIN_KONFIG_PATH",".")
         glob_pattern = os.getenv("KREATE_MAIN_KONFIG_FILE", "kreate*.konf")
         for p in filename.split(os.pathsep):
             path = Path(p)
             if path.is_file():
-                return str(path)
+                return path
             elif path.is_dir():
                 logger.debug(f"checking for {glob_pattern} in dir {path}")
                 possible_files = tuple(path.glob(glob_pattern))
                 if len(possible_files) == 1:
-                    return str(possible_files[0])
+                    return possible_files[0]
                 elif len(possible_files) > 1:
                     raise ValueError(
                         f"Ambiguous konfig files found for {path}/{glob_pattern}: {possible_files}"
@@ -65,7 +69,7 @@ class Konfig:
         if self.file_getter.reponame is None:
             # first search relative to main konfig, but only makes
             # sense if main konfig is not in a repo
-            dir = self.file_getter.dir
+            dir = self.file_getter.main_dir_path
             logger.debug(f"searching for initial {filename} in {paths} from {dir}")
             for p in paths.split(os.pathsep):
                 path = dir / p / filename
@@ -115,8 +119,7 @@ class Konfig:
         logger.debug(f"inkluded {count} new files")
         return count
 
-    def inklude(self, location: str, idx: int = None):
-        logger.debug(f"inkluding {location}")
+    def inklude_one_file(self, location: str, idx: int = None):
         # reload all repositories, in case any were added/changed
         self.file_getter.konfig_repos()
         context = self._jinja_context()
@@ -132,6 +135,10 @@ class Konfig:
         val_yaml = self.jinyaml.render(location, context)
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
+
+    def inklude(self, location: str, idx: int = None):
+        logger.debug(f"inkluding {location}")
+        self.inklude_one_file(location, idx=idx)
         self.load_new_inkludes()
 
     def get_kreate_version(self) -> str:

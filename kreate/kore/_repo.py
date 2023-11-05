@@ -30,7 +30,7 @@ def clear_cache():
 
 
 class FileGetter:
-    def __init__(self, konfig, location: str):
+    def __init__(self, konfig, main_dir_path: Path):
         self.konfig = konfig
         self.repo_prefixes = {
             #"main_konfig:": FixedDirRepo(dir),
@@ -45,11 +45,11 @@ class FileGetter:
             "bitbucket-zip:": BitbucketZipRepo,
             "bitbucket-file:": BitbucketFileRepo,
         }
-        self.reponame, dir = self.split_location(location)
-        self.dir = Path(dir).parent
+        self.reponame = None # TODO: remove self.split_location(location)
+        self.main_dir_path = main_dir_path
 
     def __str__(self) -> str:
-        return f"FileGetter({self.reponame=}, {self.dir=})"
+        return f"FileGetter({self.reponame=}, {self.main_dir_path=})"
 
     def konfig_repos(self):
         for repo in self.konfig.get_path("system.repo", []):
@@ -87,10 +87,10 @@ class FileGetter:
         if repo:
            self.my_repo(repo).save_repo_file(str(file), data)
         elif self.reponame:
-            self.my_repo().save_repo_file(str(self.dir / file), data)
+            self.my_repo().save_repo_file(str(self.main_dir_path / file), data)
         else:
-            logger.info(f"saving data to {self.dir / file}")
-            with open(self.dir / file, "w") as f:
+            logger.info(f"saving data to {self.main_dir_path / file}")
+            with open(self.main_dir_path / file, "w") as f:
                 f.write(data)
 
     def get_data(self, file: str) -> str:
@@ -108,7 +108,7 @@ class FileGetter:
         if repo:
             data = self.my_repo(repo).get_data(path, optional=optional)
         elif self.reponame:
-            data = self.my_repo().get_data(self.dir / path, optional=optional)
+            data = self.my_repo().get_data(self.main_dir_path / path, optional=optional)
         else:
             data = self.load_file_data(path)
         if data is None:
@@ -116,7 +116,7 @@ class FileGetter:
                 logger.debug(f"ignoring optional file {orig_file}")
                 return ""
             else:
-                raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.dir}")
+                raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.main_dir_path}")
         logger.info(f"loaded {file}")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
@@ -134,7 +134,7 @@ class FileGetter:
 
     def load_file_data(self, filename: Path) -> str:
         logger.debug(f"loading file {filename} ")
-        path = self.dir / filename
+        path = self.main_dir_path / filename
         if not path.exists():
             return None
         return path.read_text()
