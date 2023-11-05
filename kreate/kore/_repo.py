@@ -45,11 +45,11 @@ class FileGetter:
             "bitbucket-zip:": BitbucketZipRepo,
             "bitbucket-file:": BitbucketFileRepo,
         }
-        self.reponame = None # TODO: remove self.split_location(location)
+        #self.reponame = None # TODO: remove self.split_location(location)
         self.main_dir_path = main_dir_path
 
     def __str__(self) -> str:
-        return f"FileGetter({self.reponame=}, {self.main_dir_path=})"
+        return f"FileGetter({self.main_dir_path=})"
 
     def konfig_repos(self):
         for repo in self.konfig.get_path("system.repo", []):
@@ -63,7 +63,7 @@ class FileGetter:
         match = re.match("^[a-zA-Z0-9_-]*:", filename)
         if match:
             return match.group()[:-1]
-        return self.reponame
+        return ""
 
     def split_location(self, location: str):
         if match := re.match("^[a-zA-Z0-9_-]*:", location):
@@ -107,8 +107,6 @@ class FileGetter:
         repo, path = self.split_location(file)
         if repo:
             data = self.my_repo(repo).get_data(path, optional=optional)
-        elif self.reponame:
-            data = self.my_repo().get_data(self.main_dir_path / path, optional=optional)
         else:
             data = self.load_file_data(path)
         if data is None:
@@ -117,7 +115,7 @@ class FileGetter:
                 return ""
             else:
                 raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.main_dir_path}")
-        logger.info(f"loaded {file}")
+        logger.debug(f"loaded {file}")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
             data = self.konfig.dekrypt_bytes(data)

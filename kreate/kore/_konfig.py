@@ -41,8 +41,9 @@ class Konfig:
         #if ink := self.find_init_kreate_konf():
         #    self.inklude(ink)
         for ink in inkludes or []:
-            self.inklude(ink)
-        self.inklude(main_konfig_path.name)
+            self.inklude_one_file(ink)
+        self.inklude_one_file(main_konfig_path.name)
+        self.load_new_inkludes()
 
     def find_main_konfig_path(self, filename: str) -> Path:
         if filename is None:
@@ -115,12 +116,13 @@ class Konfig:
             if fname not in self.already_inkluded:
                 count += 1
                 self.already_inkluded.add(fname)
-                self.inklude(fname, idx + 1)
+                self.inklude_one_file(fname, idx + 1)
         logger.debug(f"inkluded {count} new files")
         return count
 
     def inklude_one_file(self, location: str, idx: int = None):
         # reload all repositories, in case any were added/changed
+        logger.info(f"inkluding {location}")
         self.file_getter.konfig_repos()
         context = self._jinja_context()
         context["my_repo_name"] = self.file_getter.get_prefix(location)
@@ -137,7 +139,6 @@ class Konfig:
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
 
     def inklude(self, location: str, idx: int = None):
-        logger.debug(f"inkluding {location}")
         self.inklude_one_file(location, idx=idx)
         self.load_new_inkludes()
 
