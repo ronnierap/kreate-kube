@@ -1,5 +1,6 @@
 from cryptography.fernet import Fernet
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +24,18 @@ def _get_key():
 def dekrypt_str(value):
     fernet = _get_key()
     if _dekrypt_testdummy:
-        return f"testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+        format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
+        format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+        return format.format(value=value)
     return fernet.decrypt(value.encode()).decode()
 
 
 def dekrypt_bytes(value: bytes) -> bytes:
     fernet = _get_key()
     if _dekrypt_testdummy:
-        return f"testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+        format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
+        format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+        return format.format(value=value)
     return fernet.decrypt(value)
 
 
@@ -39,7 +44,9 @@ def dekrypt_file(filename):
     with open(filename) as f:
         data = f.read()
     if _dekrypt_testdummy:
-        data = f"testdummy-{data[len(data)//2-4:len(data)//2+4]}"
+        format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
+        format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+        return format.format(value=data)
     print(fernet.decrypt(data.encode()).decode(), end="")
 
 
