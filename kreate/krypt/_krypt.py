@@ -9,9 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class KryptKonfig(Konfig):
-    def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
+    def __init__(self, filename: str = None, dict_: dict = None, inkludes=None,
+                 tracer=None):
         krypt_functions._konfig = self
-        super().__init__(filename=filename, dict_=dict_, inkludes=inkludes)
+        super().__init__(filename=filename, dict_=dict_, inkludes=inkludes, tracer=tracer)
 
     def dekrypt_bytes(self, b: bytes) -> bytes:
         return krypt_functions.dekrypt_bytes(b)

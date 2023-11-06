@@ -29,16 +29,14 @@ class JinYaml:
         self.env.filters[name] = func
 
     def render_jinja(self, filename: str, vars: Mapping) -> str:
-        tmpl = self.env.get_template(filename)
         try:
+            tmpl = self.env.get_template(filename)
             return tmpl.render(vars)
         except jinja2.exceptions.TemplateSyntaxError as e:
             logger.error(
                 f"Syntax Error in jinja2 template {e.filename}:{e.lineno} {e.message}"
             )
             raise
-        except TypeError:
-            raise ValueError(f"Problem loading jinja template {filename}")
         except jinja2.exceptions.TemplateError as e:
             found = False
             for line in traceback.format_exc().splitlines():
@@ -48,17 +46,16 @@ class JinYaml:
             if not found:
                 logger.error(f"Error when rendering {filename}, {e}")
             raise
-        except Exception as e:
-            logger.error(f"ERROR when parsing {filename}")
-            raise
 
     def render(self, fname: str, vars: Mapping) -> Mapping:
+        self.konfig.tracer.push(f"rendering jinja: {fname}")
         text = self.render_jinja(fname, vars)
-        try:
-            return self.yaml_parser.load(text)
-        except:
-            logger.error(f"Error parsing {fname}\n" + text)
-            raise
+        self.konfig.tracer.pop()
+
+        self.konfig.tracer.push(f"rendering yaml: {fname}")
+        result =  self.yaml_parser.load(text)
+        self.konfig.tracer.pop()
+        return result
 
     def dump(self, data, output_file):
         self.yaml_parser.dump(data, output_file)

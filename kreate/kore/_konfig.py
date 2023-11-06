@@ -9,6 +9,7 @@ from packaging.version import Version, InvalidVersion
 
 from ._core import deep_update, wrap
 from ._repo import FileGetter
+from .trace import Trace
 from ._jinyaml import JinYaml
 
 
@@ -18,7 +19,12 @@ class VersionWarning(RuntimeWarning):
     pass
 
 class Konfig:
-    def __init__(self, filename: str = None, dict_: dict = None, inkludes=None):
+    def __init__(self, filename: str = None,
+                 dict_: dict = None,
+                 inkludes=None,
+                 tracer: Trace = None,
+        ):
+        self.tracer = tracer or Trace()
         if filename is None:
             main_konfig_path = self.find_main_konfig_path(filename)
         elif Path(filename).is_dir():
@@ -71,10 +77,16 @@ class Konfig:
         return result
 
     def load_repo_file(self, fname: str) -> str:
-        return self.file_getter.get_data(fname)
+        self.tracer.push(f"loading repo file: {fname}")
+        result = self.file_getter.get_data(fname)
+        self.tracer.pop()
+        return result
 
     def save_repo_file(self, fname: str, data):
-        return self.file_getter.save_repo_file(fname, data)
+        self.tracer.push(f"saving repo file: {fname}")
+        result =  self.file_getter.save_repo_file(fname, data)
+        self.tracer.pop()
+        return result
 
     def load_new_inkludes(self):
         logger.debug("loading new inklude files")
@@ -96,7 +108,7 @@ class Konfig:
 
     def inklude_one_file(self, location: str, idx: int = None):
         # reload all repositories, in case any were added/changed
-        logger.info(f"inkluding {location}")
+        self.tracer.push_info(f"inkluding {location}")
         self.file_getter.konfig_repos()
         context = self._jinja_context()
         context["my_repo_name"] = self.file_getter.get_prefix(location)
@@ -111,6 +123,7 @@ class Konfig:
         val_yaml = self.jinyaml.render(location, context)
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
+        self.tracer.pop()
 
     def inklude(self, location: str, idx: int = None):
         self.inklude_one_file(location, idx=idx)

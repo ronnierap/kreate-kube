@@ -15,6 +15,7 @@ from . import _jinyaml
 from ._app import App, Konfig
 from ._jinja_app import JinjaApp, load_class
 from pathlib import Path
+from .trace import Trace
 import importlib.metadata
 import kreate.kore.dotenv as dotenv
 
@@ -30,6 +31,7 @@ def argument(*name_or_flags, **kwargs):
 
 class KoreCli:
     def __init__(self):
+        self.tracer = Trace()
         self._konfig = None
         self._app = None
         self.formatwarnings_orig = warnings.formatwarning
@@ -173,6 +175,7 @@ class KoreCli:
         except Exception as e:
             if self.args.verbose:
                 traceback.print_exc()
+                self.tracer.print_all()
             else:
                 if isinstance(e, Warning):
                     # With a warning it might not be clear that the warning is due to a
@@ -181,6 +184,7 @@ class KoreCli:
                     print(f"  possibly define this as export KREATE_OPTIONS or in .env file")
                 else:
                     print(f"{type(e).__name__}: {e}")
+                    self.tracer.print_last()
             sys.exit(1)
         finally:
             if not self.args.keep_secrets:
