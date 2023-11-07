@@ -109,6 +109,7 @@ class FileGetter:
         if repo:
             data = self.my_repo(repo).get_data(path, optional=optional)
         else:
+            logger.debug(f"getting {file} from {path}")
             data = self.load_file_data(path)
         if data is None:
             if optional:
@@ -241,6 +242,7 @@ class KonfigRepo(Repo):
             # add other assertions, or better error message?
             raise FileExistsError(f"repo dir {dir} exists, but is not a directory")
         p = dir / filename
+        logger.debug(f"getting data from {p}")
         if not p.exists():
             if not self.download_extra_file(filename):
                 if optional:
