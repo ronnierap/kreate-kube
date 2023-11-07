@@ -107,6 +107,8 @@ class Secret(Resource):
         value = self.strukture.vars[varname]
         if not isinstance(value, str):
             value = self.app.konfig.get_path(f"secret.var.{varname}", None)
+        if value is None:
+            raise ValueError(f"missing secret.var.{varname}")
         if value.startswith("escape:"):
             # escape mechanism is a value needs to start with dekrypt:
             value = value[7:]
