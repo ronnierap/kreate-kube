@@ -69,6 +69,9 @@ class Konfig:
     def get_path(self, path: str, default=None, mandatory=False):
         return self.yaml._get_path(path, default=default, mandatory=mandatory)
 
+    def set_path(self, path: str, value):
+        return self.yaml._set_path(path, value)
+
     def _jinja_context(self):
         result = {}  # "konf": self, "appname": self.appname, "env": self.env}
         for k in self.yaml.keys():
