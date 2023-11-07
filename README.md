@@ -177,6 +177,14 @@ At this moment there are not many versions of kreate-kube:
   - it is possible to have a main konfig in a repo
   - removed `py:` and `main_konfig:` repo's. They were not used
   - fixed bug in `view` cli subcommand
+- `1.2.0` This version was never released since the tag was not set
+- `1.2.1` This had all the improvements for `1.2.0`
+  - many fixes and improvents for the test and test_diff commands
+  - added a tracer to get shorter trace with additional information
+- `1.3.0`
+  - add cli_args for so you can now say `kreate files ...` and do smart stuff with that
+  - added many `KREATE_REPO_..LOCAL_DIR..` options for development
+  - added a third logging level `-vvv` to see even more detailed information
 
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
