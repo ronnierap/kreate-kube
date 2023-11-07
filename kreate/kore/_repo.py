@@ -12,6 +12,7 @@ import logging
 import importlib
 import warnings
 from pathlib import Path
+from ._core import DictWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -139,18 +140,27 @@ class FileGetter:
 
     def get_repo(self, repo_name: str):
         type = self.konfig.get_path(f"system.repo.{repo_name}.type", None)
-        if type == "url-zip":
-            return UrlZipRepo(self.konfig, repo_name)
-        elif type == "local-dir":
+        if type == "local-dir":
             return LocalKonfigRepo(self.konfig, repo_name)
         elif type == "local-zip":
             return LocalZipRepo(self.konfig, repo_name)
+        elif self.use_local_dir(repo_name):
+            return LocalKonfigRepo(self.konfig, repo_name)
+        elif type == "url-zip":
+            return UrlZipRepo(self.konfig, repo_name)
         elif type == "bitbucket-zip":
             return BitbucketZipRepo(self.konfig, repo_name)
         elif type == "bitbucket-file":
             return BitbucketFileRepo(self.konfig, repo_name)
         else:
             raise ValueError(f"Unknown repo type {type} for repo {repo_name}")
+
+    def use_local_dir(self, repo_name: str) -> bool:
+         postfix = repo_name.upper().replace("-","_")
+         use = os.getenv("KREATE_REPO_USE_LOCAL_DIR", "False")
+         use = os.getenv("KREATE_REPO_USE_LOCAL_DIR_" + postfix, use)
+         return use == "True"
+
 
 
 class Repo(Protocol):
@@ -297,8 +307,21 @@ class KonfigRepo(Repo):
 
 
 class LocalKonfigRepo(KonfigRepo):
+    def calc_local_dir(self) -> str:
+         postfix = self.repo_name.upper().replace("-","_")
+         dir = os.getenv("KREATE_REPO_LOCAL_DIR", "..")
+         dir = os.getenv("KREATE_REPO_LOCAL_DIR_" + postfix, dir)
+         self.konfig.tracer.push(f"formatting repo {self.repo_name} dir: {dir}")
+         dir = dir.format(
+             my=self,
+             app=DictWrapper(self.konfig.get_path("app", {}))
+         )
+         self.konfig.tracer.pop()
+         return dir
+
     def calc_dir(self):
-        dir: str = self.repo_konf.get("dir")
+        dir: str = self.calc_local_dir()
+        dir = self.repo_konf.get("dir", dir)
         if self.version:
             dir = dir.replace("{version}", self.version)
         return Path(dir)
