@@ -68,7 +68,8 @@ class KoreCli:
         return []
 
     def calc_dict(self):
-        result = {}
+        args = vars(self.args).get("cli_args", [])
+        result = { "system": {"cli_args": args}}
         for d in self.args.define:
             k, v = d.split("=", 1)
             wrap(result).set(k, v)
@@ -93,6 +94,7 @@ class KoreCli:
 
     def add_subcommands(self):
         cmd = self.add_subcommand(files, [], aliases=["f"])
+        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
 
         cmd = self.add_subcommand(command, [], aliases=["cmd"])
         cmd.add_argument("cmd", help="command to run", action="store", default=[])
@@ -176,7 +178,7 @@ class KoreCli:
             if self.args.verbose > 1:
                 traceback.print_exc()
                 self.tracer.print_all()
-            if self.args.verbose == 1:
+            elif self.args.verbose == 1:
                 print(f"{type(e).__name__}: {e}")
                 self.tracer.print_all()
             else:
@@ -433,6 +435,8 @@ def version(cli: KoreCli):
 
 def files(cli: KoreCli) -> None:
     """kreate all the files (default command)"""
+    args = vars(cli.args).get("cli_args",[])
+    cli.konfig().set_path("system.cli_args", args)
     cli.kreate_files()
 
 def command(cli: KoreCli):
