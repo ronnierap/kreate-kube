@@ -26,7 +26,10 @@ class Trace:
         logger.log(5,"popping: " + self.stack.pop())
 
     def print_last(self):
-        print(f"while: {self.stack[-1]}")
+        if len(self.stack) > 0:
+            print(f"while: {self.stack[-1]}")
+        else:
+            print("no trace info")
 
     def print_all(self):
         for line in self.stack:
