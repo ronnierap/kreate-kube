@@ -272,7 +272,7 @@ class KoreCli:
 
     def process_main_options(self, args):
         if args.verbose >= 3:
-            logging.basicConfig(level=logging.DEBUG)
+            logging.basicConfig(level=5)
         elif args.verbose == 2:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)

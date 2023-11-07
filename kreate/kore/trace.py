@@ -2,12 +2,20 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Add a trace logging level
+# See: https://stackoverflow.com/questions/2183233/how-to-add-a-custom-loglevel-to-pythons-logging-facility
+#TRACE = 9
+#logging.addLevelName(TRACE, "TRACE")
+#def trace(self, message, *args, **kws):
+#    self._log(TRACE, message, args, **kws)
+#logging.Logger.trace = trace
+
 class Trace:
     def __init__(self) -> None:
         self.stack = []
 
     def push(self, msg:str):
-        logger.debug(msg)
+        logger.log(5, msg)
         self.stack.append(msg)
 
     def push_info(self, msg:str):
@@ -15,7 +23,7 @@ class Trace:
         self.stack.append(msg)
 
     def pop(self):
-        logger.debug("popping: " + self.stack.pop())
+        logger.log(5,"popping: " + self.stack.pop())
 
     def print_last(self):
         print(f"while: {self.stack[-1]}")
