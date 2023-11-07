@@ -173,8 +173,11 @@ class KoreCli:
             else:
                 self.args.func(self)
         except Exception as e:
-            if self.args.verbose:
+            if self.args.verbose > 1:
                 traceback.print_exc()
+                self.tracer.print_all()
+            if self.args.verbose == 1:
+                print(f"{type(e).__name__}: {e}")
                 self.tracer.print_all()
             else:
                 if isinstance(e, Warning):
