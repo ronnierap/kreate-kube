@@ -121,11 +121,22 @@ class DictWrapper(UserDict):
         data = self.data
         for key in keys:
             key = key.replace("_dot_", ".")
-            if key not in data:
+            if key == "[0]":
+                if isinstance(data, Sequence):
+                    if len(data) > 0:
+                        data = data[0]
+                    elif mandatory:
+                        raise ValueError(f"could not find mandatory field {path}")
+                    else:
+                        return default
+                else:
+                    raise ValueError(f"trying to get [0] in path {path} of non-sequence {type(data)}")
+            elif key not in data:
                 if mandatory:
-                    raise ValueError(f"could not find mandatry field {path}")
+                    raise ValueError(f"could not find mandatory field {path}")
                 return default
-            data = data[key]
+            else:
+                data = data[key]
         return data
 
 
