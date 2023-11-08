@@ -77,10 +77,12 @@ class FileGetter:
                 return reponame, Path(filename)
         return None, Path(location)
 
-    def my_repo(self, reponame=None):
+    def my_repo(self, reponame=None, optional: bool = False):
         reponame = reponame or self.reponame
         if repo := self.repo_prefixes.get(reponame):
             return repo
+        if optional:
+            return None
         raise ValueError(f"Could not find repo {reponame}")
 
     def save_repo_file(self, filename: str, data):
@@ -96,7 +98,7 @@ class FileGetter:
 
     def get_data(self, file: str) -> str:
         orig_file = file
-        repo = None
+        reponame = None
         dekrypt = False
         optional = False
         if file.startswith("optional:"):
@@ -105,9 +107,13 @@ class FileGetter:
         if file.startswith("dekrypt:"):
             dekrypt = True
             file = file[8:]
-        repo, path = self.split_location(file)
-        if repo:
-            data = self.my_repo(repo).get_data(path, optional=optional)
+        reponame, path = self.split_location(file)
+        if reponame:
+            repo = self.my_repo(reponame, optional=optional)
+            if not repo and optional:
+                logger.warning(f"WARNING: could not find repo {reponame}")
+                return ""
+            data = repo.get_data(path, optional=optional)
         else:
             logger.debug(f"getting {file} from {path}")
             data = self.load_file_data(path)
