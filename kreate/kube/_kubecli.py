@@ -96,8 +96,8 @@ def test_result(cli: KubeCli, n=0):
     diff = difflib.unified_diff(
         truncate_ignores(ignores, expected_lines),
         truncate_ignores(ignores, build_lines),
-        fromfile="expected",
-        tofile="kreated",
+        fromfile="expected-output",
+        tofile="kreated-output",
         n=n,
     )
     return [line.strip() for line in diff]
@@ -121,7 +121,13 @@ def test_diff(cli: KubeCli):
     diff_result = test_result(cli)
     loc = expected_diff_location(cli)
     expected_diff_lines = cli.konfig().load_repo_file(loc).splitlines()
-    diff2 = difflib.context_diff(expected_diff_lines, diff_result, n=0)
+    diff2 = difflib.unified_diff(
+        expected_diff_lines,
+        diff_result,
+        fromfile="expected-diff",
+        tofile="kreated-diff",
+        n=0,
+    )
     for line in diff2:
         print(line.strip())
 
