@@ -52,7 +52,7 @@ class JinYaml:
         text = self.render_jinja(fname, vars)
         self.konfig.tracer.pop()
 
-        self.konfig.tracer.push(f"rendering yaml: {fname}")
+        self.konfig.tracer.push(f"rendering yaml: {fname}\n"+ text)
         result =  self.yaml_parser.load(text)
         self.konfig.tracer.pop()
         return result
