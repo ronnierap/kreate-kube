@@ -233,9 +233,10 @@ class KonfigRepo(Repo):
     def get_data(self, filename: Path, optional: bool = False):
         if isinstance(self.version, str) and self.version.startswith("branch."):
             version = self.version[7:]
-            warnings.warn(
-                f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
-            )
+            if self.repo_konf.get("show_branch_warning", True)  :
+                warnings.warn(
+                    f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
+                )
         if optional and self.repo_konf.get("disabled", False):
             logger.info(
                 f"skipping optional {filename} in disable repo {self.repo_name}"
