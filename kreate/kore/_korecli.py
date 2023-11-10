@@ -6,6 +6,7 @@ import logging
 import traceback
 import inspect
 import warnings
+import subprocess
 
 from ._core import pprint_map, wrap
 from ._repo import clear_cache
@@ -94,6 +95,9 @@ class KoreCli:
 
     def add_subcommands(self):
         cmd = self.add_subcommand(files, [], aliases=["f"])
+        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
+
+        cmd = self.add_subcommand(output, [], aliases=["o"])
         cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
 
         cmd = self.add_subcommand(command, [], aliases=["cmd"])
@@ -311,15 +315,16 @@ class KoreCli:
         app.kreate_komponents()
         app.kreate_files()
 
-    def run_shell(self, cmd: str) -> None:
+    def run_shell(self, cmd: str) -> str:
         self.kreate_files()
         cmd = cmd.format(app=self.app(), konf=self.konfig(), cli=self)
         logger.info(f"running: {cmd}")
-        os.system(cmd)
+        return subprocess.check_output(cmd.split()).decode()
 
-    def run_command(self, cmd_name: str, default_command: str = None) -> None:
-        cmd : str = self.konfig().get_path(f"system.command.{cmd_name}", default_command)
-        self.run_shell(cmd)
+    def run_command(self, cmd_name: str) -> None:
+        konfig = self.konfig()
+        cmd : str = konfig.get_path(f"system.command.{cmd_name}")
+        return self.run_shell(cmd)
 
 
 
@@ -438,6 +443,13 @@ def files(cli: KoreCli) -> None:
     args = vars(cli.args).get("cli_args",[])
     cli.konfig().set_path("system.cli_args", args)
     cli.kreate_files()
+
+def output(cli: KoreCli) -> None:
+    """kreate output based on the kreated  files"""
+    args = vars(cli.args).get("cli_args",[])
+    cli.konfig().set_path("system.cli_args", args)
+    cli.run_command("output")
+
 
 def command(cli: KoreCli):
     """run a predefined command from system.command"""

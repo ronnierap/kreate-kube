@@ -38,7 +38,6 @@ class KubeCli(krypt.KryptCli):
         return self._app_class(self.konfig())
 
 
-
 def build(cli: KubeCli) -> None:
     """output all the resources"""
     cli.run_command("build")
@@ -73,8 +72,7 @@ def expected_diff_location(cli: KubeCli) -> str:
 def build_output(cli: KubeCli) -> str:
     # Do not dekrypt secrets for testing
     krypt_functions._dekrypt_testdummy = True
-    cli.kreate_files()
-    return subprocess.check_output(["kustomize","build", str(cli.app().target_path)]).decode()
+    return cli.run_command("build")
 
 
 def truncate_ignores(ignores, lines):
