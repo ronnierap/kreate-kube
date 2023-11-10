@@ -9,7 +9,7 @@ while also having flexibility to tweak each application.
 
 ## Installing and running kreate-kube
 ### Installing
-see [doc/versions.md](versions) for available versions.
+see [versions](doc/versions.md) for available versions.
 
 The `kreate-kube` framework is available on PyPi.
 To install it, you will need:
