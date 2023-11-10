@@ -319,7 +319,7 @@ class KoreCli:
         self.kreate_files()
         cmd = cmd.format(app=self.app(), konf=self.konfig(), cli=self)
         logger.info(f"running: {cmd}")
-        return subprocess.check_output(cmd.split()).decode()
+        return subprocess.check_output(cmd, shell=True).decode()
 
     def run_command(self, cmd_name: str) -> None:
         konfig = self.konfig()
@@ -448,7 +448,7 @@ def output(cli: KoreCli) -> None:
     """kreate output based on the kreated  files"""
     args = vars(cli.args).get("cli_args",[])
     cli.konfig().set_path("system.cli_args", args)
-    cli.run_command("output")
+    print(cli.run_command("output"))
 
 
 def command(cli: KoreCli):
