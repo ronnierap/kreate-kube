@@ -20,6 +20,7 @@ At this moment there are not many versions of kreate-kube:
   - added syntax to get_path to get first element of array
   - added a new `output` command, which is synomous for build
   - include the text of rendered jinja text when not being able to parse yaml
+  - added a `show_branch_warning` property on repos', when set to False will not show a warning if using a branch
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
