@@ -1,4 +1,4 @@
-# Recommended framework
+# Example framework
 `kreate-kube` is meant for organisations to manage a large number of different kubernetes application deployments.
 
 The recommended way to organize this is to use a set of repositories where shared
@@ -16,7 +16,8 @@ Note: In fact the examples are based on a real world case where two teams with o
 in 3 environments (`dev`, `acc` and `prd`) all managed by `kreate`
 
 Note: This framework is an example how to set up files, and can be changed in many aspects.
-Almost nothing of this framework is hard coded in `kreate-kube`,
+Almost nothing of this framework is hard coded in `kreate-kube`.
+Extra repo's or files can be added, or some complexity might be removed.
 
 Note: If you run the `kreate` the default is to kreate files for a certain `target`.
 The default target is `kustomize`, which is used in these examples but other targets
@@ -81,7 +82,7 @@ Once the other repositories are known, files these from these repo's can be incl
 - `knn-templates:` defines templates specifically for the KNN organisation.
 - `shared-values-acc:` defines values for the acceptance environment
 - `shared-secret-acc:` is to keep (shared) secrets in a separate repo from normal values
-- `shared-systems:` is similar to shared values, but with systems that an application can `use:` (e..g. `db/postgres-acc`)
+- `shared-systems:` is similar to shared values, but with systems that an application `uses:` (e..g. `db/postgres-acc`)
 
 Finally the values, secrets and strukture for the application are loaded.
 Note that these files are marked `optional:` so you could for example not have secrets or default-values.
