@@ -111,7 +111,7 @@ class FileGetter:
         if reponame:
             repo = self.my_repo(reponame, optional=optional)
             if not repo and optional:
-                logger.warning(f"WARNING: could not find repo {reponame}")
+                logger.warning(f"WARNING: could not find repo {reponame}, for optional file {file}")
                 return ""
             data = repo.get_data(path, optional=optional)
         else:
