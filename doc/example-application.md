@@ -3,16 +3,10 @@
 This page describes a example application that is defined by 5 files
 - [Example application](#example-application)
   - [`kreate-<app>-<env>.konf`](#kreate-app-envkonf)
-      - [`kreate-demo-acc.konf`](#kreate-demo-acckonf)
   - [`<app>-strukt.konf`](#app-struktkonf)
-      - [`demo-strukt.konf`](#demo-struktkonf)
-      - [`knn-templates:helper/std-deployment.konf`](#knn-templateshelperstd-deploymentkonf)
   - [`default-values-<app>.konf`](#default-values-appkonf)
-      - [`default-values-demo.konf`](#default-values-demokonf)
   - [`values-<app-<env>.konf`](#values-app-envkonf)
-      - [`values-demo-acc.konf`](#values-demo-acckonf)
   - [`secrets-<app>-<env>.konf`](#secrets-app-envkonf)
-      - [`secrets-demo-acc.konf`](#secrets-demo-acckonf)
 
 
 ## `kreate-<app>-<env>.konf`
@@ -23,7 +17,7 @@ This way each file is unique and the filename indicates what will be kreated.
 
 Below is a simple example
 
-#### `kreate-demo-acc.konf`
+`kreate-demo-acc.konf`
 ```yaml
 app:
   appname: demo
@@ -78,7 +72,7 @@ Typically for a webservice/frontend application these are:
 - Zero or more Egress objects
 
 Below is a typical (simple) example
-#### `demo-strukt.konf`
+`demo-strukt.konf`
 ```yaml
 inklude:
 - knn-templates:helper/std-deployment.konf
@@ -119,7 +113,7 @@ the `var:` section or from the `secret.var` section.
 Because some patterns are almost always the same, the knn-framework has a
 helper that defines some of these typical things:
 
-#### `knn-templates:helper/std-deployment.konf`
+`knn-templates:helper/std-deployment.konf`
 ```yaml
 strukt:
   Deployment:
@@ -144,7 +138,7 @@ Typically these are things as
 - specific thresholds or timeout values
 - ...
 
-#### `default-values-demo.konf`
+`default-values-demo.konf`
 ```yaml
 val:
   Deployment:
@@ -172,7 +166,7 @@ For this Kubernetes ConfigMaps and Secrets should be used.
 The `kreate-kube-templates` for these resources will look
 
 
-#### `values-demo-acc.konf`
+`values-demo-acc.konf`
 ```yaml
 val:
   Deployment:
@@ -190,7 +184,7 @@ are stored together.
 Even though the username is not really secret, it is considered better to store these together.
 The `DB_PSW` is enkrypted using the `kreate-kube` enkryption mechanism.
 
-#### `secrets-demo-acc.konf`
+`secrets-demo-acc.konf`
 ```yaml
 secret:
   var:
