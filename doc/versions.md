@@ -21,6 +21,11 @@ At this moment there are not many versions of kreate-kube:
   - added a new `output` command, which is synomous for build
   - include the text of rendered jinja text when not being able to parse yaml
   - added a `show_branch_warning` property on repos', when set to False will not show a warning if using a branch
+- `1.4.0`
+  - added documentation with example framework and application
+  - better warning when repo could not be found for optional file
+  - added jinja_extension with: sorted, getenv, error, warning, logger
+  - removed jinja global konf, and only have konfig
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
