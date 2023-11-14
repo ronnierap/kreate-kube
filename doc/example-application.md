@@ -1,5 +1,20 @@
 # Example application
 
+This page describes a example application that is defined by 5 files
+- [Example application](#example-application)
+  - [`kreate-<app>-<env>.konf`](#kreate-app-envkonf)
+      - [`kreate-demo-acc.konf`](#kreate-demo-acckonf)
+  - [`<app>-strukt.konf`](#app-struktkonf)
+      - [`demo-strukt.konf`](#demo-struktkonf)
+      - [`knn-templates:helper/std-deployment.konf`](#knn-templateshelperstd-deploymentkonf)
+  - [`default-values-<app>.konf`](#default-values-appkonf)
+      - [`default-values-demo.konf`](#default-values-demokonf)
+  - [`values-<app-<env>.konf`](#values-app-envkonf)
+      - [`values-demo-acc.konf`](#values-demo-acckonf)
+  - [`secrets-<app>-<env>.konf`](#secrets-app-envkonf)
+      - [`secrets-demo-acc.konf`](#secrets-demo-acckonf)
+
+
 ## `kreate-<app>-<env>.konf`
 When `kreate` is started it will look for a file with name `kreate*.konf` (where `*` is a wildcard).
 This can be any file that starts with `kreate`, but it is recommended to add the name of
@@ -9,7 +24,7 @@ This way each file is unique and the filename indicates what will be kreated.
 Below is a simple example
 
 #### `kreate-demo-acc.konf`
-```
+```yaml
 app:
   appname: demo
   env: acc
@@ -64,7 +79,7 @@ Typically for a webservice/frontend application these are:
 
 Below is a typical (simple) example
 #### `demo-strukt.konf`
-```
+```yaml
 inklude:
 - knn-templates:helper/std-deployment.konf
 
@@ -105,7 +120,7 @@ Because some patterns are almost always the same, the knn-framework has a
 helper that defines some of these typical things:
 
 #### `knn-templates:helper/std-deployment.konf`
-```
+```yaml
 strukt:
   Deployment:
     main:
@@ -122,13 +137,19 @@ strukt:
   Service: {}
 ```
 
-## `default-values-demo.konf`
-This file defines some defaults that can be used for all environments
-```
+## `default-values-<app>.konf`
+This file defines some defaults that can be used for all environments.
+Typically these are things as
+- (default) CPU and memory specification (although these might be overridden for some environments)
+- specific thresholds or timeout values
+- ...
+
+#### `default-values-demo.konf`
+```yaml
 val:
   Deployment:
     cpu_limit:   1000m
-    cpu_request: 88m
+    cpu_request: 50m
     memory_limit:   2048Mi
     memory_request: 2048Mi
     terminationGracePeriodSeconds: 120
@@ -137,14 +158,40 @@ val:
     startup_initialDelaySeconds: 30
 ```
 
-## `values-demo-acc.konf`
-```
+## `values-<app-<env>.konf`
+This file can override some values, of the default-values.
+You should also define values that are unique for each environment, such as url's or IP numbers.
+
+This file can have two sections:
+- `val:`  for any arbitrary values
+- `var:`  specifically for environment variables in the pods
+
+According to the [12-factor app](https://12factor.net/config) principles, application
+configuration should preferably be stored in environment variables.
+For this Kubernetes ConfigMaps and Secrets should be used.
+The `kreate-kube-templates` for these resources will look
+
+
+#### `values-demo-acc.konf`
+```yaml
+val:
+  Deployment:
+    cpu_request: 10m  # Use a very low value for acceptance, since this is barely used
 var:
-  DB_URL: jdbc:postgresql://postgres.example.com:5432/demodb
+  DB_URL: jdbc:postgresql://postgres.acc.example.com:5432/demo-acc-db
 ```
 
-## `secrets-demo-acc.konf`
-```
+## `secrets-<app>-<env>.konf`
+Since secrets are usually very sensitive, these are placed in a special file.
+They should be stored in an enkrypted format, which is supported by `kreate-kube`
+
+In the example below the `DB_USR` (database username) and `DB_PSW` (database password)
+are stored together.
+Even though the username is not really secret, it is considered better to store these together.
+The `DB_PSW` is enkrypted using the `kreate-kube` enkryption mechanism.
+
+#### `secrets-demo-acc.konf`
+```yaml
 secret:
   var:
     DB_USR: DEMO_ACC_USR
