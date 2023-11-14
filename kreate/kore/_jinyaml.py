@@ -26,7 +26,6 @@ class JinYaml:
             lstrip_blocks=True,
             loader=RepoLoader(konfig),
         )
-        #self.env.globals["konf"] = konfig.yaml # this might be deprecated in future
         self.env.globals["konfig"] = konfig
         self.env.globals["jinja_extension"] = {
             "getenv": os.getenv,
