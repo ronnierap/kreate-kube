@@ -5,7 +5,7 @@ import warnings
 from pathlib import Path
 from typing import List
 from packaging.specifiers import SpecifierSet
-from packaging.version import Version, InvalidVersion
+from packaging.version import Version
 
 from ._core import deep_update, wrap
 from ._repo import FileGetter
@@ -36,7 +36,6 @@ class Konfig:
         self.jinyaml = JinYaml(self)
         self.already_inkluded = set()
         deep_update(dict_, {"system": {
-            "getenv": os.getenv,
             "main_konfig_path": main_konfig_path,
             "logger": logger,
         }})

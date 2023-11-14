@@ -1,12 +1,19 @@
+import os
 import jinja2
 import logging
 import base64
+import warnings
 import traceback
 from sys import exc_info
 from collections.abc import Mapping
 from ruamel.yaml import YAML
 
 logger = logging.getLogger(__name__)
+
+
+def error(msg: str):
+    # TODO: is this best Exception?
+    raise RuntimeError(msg)
 
 
 class JinYaml:
@@ -19,8 +26,15 @@ class JinYaml:
             lstrip_blocks=True,
             loader=RepoLoader(konfig),
         )
-        self.env.globals["konf"] = konfig.yaml # this might be deprecated in future
+        #self.env.globals["konf"] = konfig.yaml # this might be deprecated in future
         self.env.globals["konfig"] = konfig
+        self.env.globals["jinja_extension"] = {
+            "getenv": os.getenv,
+            "sorted": sorted,
+            "error": error,
+            "warning": warnings.warn,
+            "logger": logger,
+        }
         self.yaml_parser = YAML()
         self.add_jinja_filter("b64encode", b64encode)
         self.add_jinja_filter("handle_empty_str", handle_empty_str)
