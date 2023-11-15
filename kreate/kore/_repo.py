@@ -119,7 +119,7 @@ class FileGetter:
             data = self.load_file_data(path)
         if data is None:
             if optional:
-                logger.debug(f"ignoring optional file {orig_file}")
+                logger.debug(f"ignoring missing optional file {orig_file}")
                 return ""
             else:
                 raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.main_dir_path}")
