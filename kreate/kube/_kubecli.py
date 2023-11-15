@@ -45,8 +45,10 @@ def build(cli: KubeCli) -> None:
 
 def diff(cli: KubeCli) -> None:
     """diff with current existing resources"""
-    cli.run_command("diff")
-
+    if  cli.run_command("diff"):
+        logger.info("no differences found with cluster")
+    else:
+        logger.info("kreated files differ from cluster")
 
 def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
