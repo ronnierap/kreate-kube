@@ -1,4 +1,4 @@
-from . import KubeCli
+from kreate.kube._kubecli import KubeCli
 
 
 def main():
