@@ -45,7 +45,7 @@ def build(cli: KubeCli) -> None:
 
 def diff(cli: KubeCli) -> None:
     """diff with current existing resources"""
-    if  cli.run_command("diff"):
+    if not cli.run_command("diff"):
         logger.info("no differences found with cluster")
     else:
         logger.info("kreated files differ from cluster")

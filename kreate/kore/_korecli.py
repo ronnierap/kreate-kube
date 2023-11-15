@@ -322,12 +322,11 @@ class KoreCli:
         result =  subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return result
 
-    def run_command(self, cmd_name: str) -> bool:
+    def run_command(self, cmd_name: str) -> str:
         konfig = self.konfig()
         cmd : str = konfig.get_path(f"system.command.{cmd_name}")
         result = self.run_shell(cmd)
-        print(result.stdout.decode())
-        return result.returncode == 0
+        return result.stdout.decode()
 
 
 
