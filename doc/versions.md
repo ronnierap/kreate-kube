@@ -24,8 +24,10 @@ At this moment there are not many versions of kreate-kube:
 - `1.4.0`
   - added documentation with example framework and application
   - better warning when repo could not be found for optional file
+  - better warning when skipping optional file
   - added jinja_extension with: sorted, getenv, error, warning, logger
   - removed jinja global konf, and only have konfig
+  - fixed bug that diff would get an error
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
@@ -36,7 +38,7 @@ In general you can specify which version of kreate in the version section
 in your konfig:
 ```
 version:
-  kreate_kube_version: '>=1.0.0'
+  kreate_kube_version: '>=1.4.0'
 ```
 This use the python syntax for specifying version.
 With the special characters you probably need to quote it.
