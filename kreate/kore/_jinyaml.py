@@ -43,7 +43,11 @@ class JinYaml:
 
     def render_jinja(self, filename: str, vars: Mapping) -> str:
         try:
-            tmpl = self.env.get_template(filename)
+            data = self.konfig.load_repo_file(filename)
+            if data is None:
+                logger.debug(f"did not find {filename}")
+                return None
+            tmpl = self.env.from_string(data) # self.env.get_template(filename)
             return tmpl.render(vars)
         except jinja2.exceptions.TemplateSyntaxError as e:
             logger.error(
@@ -64,8 +68,9 @@ class JinYaml:
         self.konfig.tracer.push(f"rendering jinja: {fname}")
         text = self.render_jinja(fname, vars)
         self.konfig.tracer.pop()
-
-        self.konfig.tracer.push(f"rendering yaml: {fname}\n"+ text)
+        if text is None:
+            return None
+        self.konfig.tracer.push(f"rendering yaml: {fname}\n" + text)
         result =  self.yaml_parser.load(text)
         self.konfig.tracer.pop()
         return result
@@ -105,6 +110,8 @@ class RepoLoader(jinja2.BaseLoader):
 
     def get_source(self, environment, filename):
         data = self.konfig.load_repo_file(filename)
+        if data is None:
+            raise jinja2.TemplateNotFound(f"could not find template {filename}")
         if isinstance(data, bytes):
             data = data.decode()
         return data, filename, lambda: True

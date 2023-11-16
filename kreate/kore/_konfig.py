@@ -3,7 +3,7 @@ import logging
 import importlib.metadata
 import warnings
 from pathlib import Path
-from typing import List
+from typing import List, Sequence
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
@@ -42,8 +42,8 @@ class Konfig:
         self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
         for ink in inkludes or []:
-            self.inklude_one_file(ink)
-        self.inklude_one_file(main_konfig_path.name)
+            self.inklude(ink)
+        self.inklude(main_konfig_path.name)
         self.load_new_inkludes()
 
     def find_main_konfig_path(self, filename: str) -> Path:
@@ -101,16 +101,17 @@ class Konfig:
     def load_inkludes(self, inkludes: List[str]) -> int:
         count = 0
         for idx, fname in enumerate(inkludes):
-            if fname not in self.already_inkluded:
+            fname_hash = tuple(fname)
+            if fname_hash not in self.already_inkluded:
                 count += 1
-                self.already_inkluded.add(fname)
-                self.inklude_one_file(fname, idx + 1)
+                self.already_inkluded.add(fname_hash)
+                self.inklude(fname, idx + 1)
         logger.debug(f"inkluded {count} new files")
         return count
 
     def inklude_one_file(self, location: str, idx: int = None):
         # reload all repositories, in case any were added/changed
-        self.tracer.push_info(f"inkluding {location}")
+        self.tracer.push(f"inkluding {location}")
         self.file_getter.konfig_repos()
         context = self._jinja_context()
         context["my_repo_name"] = self.file_getter.get_prefix(location)
@@ -126,10 +127,24 @@ class Konfig:
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
         self.tracer.pop()
+        return val_yaml
 
     def inklude(self, location: str, idx: int = None):
-        self.inklude_one_file(location, idx=idx)
-        self.load_new_inkludes()
+        if isinstance(location, str):
+            locations = location.split("|")
+        elif isinstance(location, Sequence):
+            locations = location
+        else:
+            raise TypeError(f"only str or list is accepted, not {type(location)}: {location}")
+        if len(locations) > 1:
+            logger.info(f"trying multiple locations {locations}")
+        for loc in locations:
+            result = self.inklude_one_file(loc.strip(), idx=idx)
+            if result:
+                logger.info(f"inkluded  {loc}")
+            else:
+                logger.info(f"ignored   {loc}")
+        #self.load_new_inkludes()
 
     def get_kreate_version(self) -> str:
         try:

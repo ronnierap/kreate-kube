@@ -115,12 +115,12 @@ class FileGetter:
                 return ""
             data = repo.get_data(path, optional=optional)
         else:
-            logger.debug(f"getting {file} from {path}")
+            logger.debug(f"looking for {file} in {path}")
             data = self.load_file_data(path)
         if data is None:
             if optional:
                 logger.debug(f"ignoring missing optional file {orig_file}")
-                return ""
+                return None
             else:
                 raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.main_dir_path}")
         logger.debug(f"loaded {file}")
@@ -132,6 +132,8 @@ class FileGetter:
     def kopy_file(self, loc: str, target: Path) -> None:
         logger.info(f"kopying file {loc} to {target}")
         data = self.get_data(loc)
+        if data is None:
+            raise ValueError(f"could not find file {loc} to kopy to {target}")
         dir = target.parent
         dir.mkdir(parents=True, exist_ok=True)
         if isinstance(data, bytes):
@@ -139,10 +141,11 @@ class FileGetter:
         target.write_text(data)
 
     def load_file_data(self, filename: Path) -> str:
-        logger.debug(f"loading file {filename} ")
         path = self.main_dir_path / filename
         if not path.exists():
+            logger.debug(f"skipping file {filename} ")
             return None
+        logger.debug(f"loading file {filename} ")
         return path.read_text()
 
     def get_repo(self, repo_name: str):
