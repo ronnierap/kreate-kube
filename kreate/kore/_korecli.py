@@ -20,6 +20,12 @@ from .trace import Trace
 import importlib.metadata
 import kreate.kore.dotenv as dotenv
 
+# TODO: is this the right location for this
+logging.VERBOSE = 15
+logging.addLevelName(logging.VERBOSE, "VERBOSE")
+logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(logging.VERBOSE, msg, *args, **kwargs)
+logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg, *args, **kwargs)
+
 logger = logging.getLogger(__name__)
 
 
@@ -277,18 +283,24 @@ class KoreCli:
         )
 
     def process_main_options(self, args):
-        if args.verbose >= 3:
+        handlers=[
+            logging.FileHandler('put your log path here'),
+            logging.StreamHandler()
+        ]
+
+        if args.quiet:
+            warnings.filterwarnings("ignore")
+            #logging.basicConfig(format="%(message)s", level=logging.ERROR)
+            logging.basicConfig(format="%(message)s", level=logging.WARN)
+        elif args.verbose >= 3:
             logging.basicConfig(level=5)
         elif args.verbose == 2:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)
         elif args.verbose == 1:
-            logging.basicConfig(format="%(message)s", level=logging.INFO)
-        elif args.quiet:
-            warnings.filterwarnings("ignore")
-            logging.basicConfig(format="%(message)s", level=logging.ERROR)
+            logging.basicConfig(format="%(message)s", level=logging.VERBOSE, handlers=handlers)
         else:
-            logging.basicConfig(format="%(message)s", level=logging.WARN)
+            logging.basicConfig(format="%(message)s", level=logging.INFO)
         warnings.simplefilter("error", VersionWarning)
         for warn_setting in args.warn_filter:
             self.parse_warning_setting(warn_setting)

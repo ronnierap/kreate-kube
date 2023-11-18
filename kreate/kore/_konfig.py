@@ -141,9 +141,9 @@ class Konfig:
         for loc in locations:
             result = self.inklude_one_file(loc.strip(), idx=idx)
             if result:
-                logger.info(f"inkluded  {loc}")
+                logger.verbose(f"inkluded  {loc}")
             else:
-                logger.info(f"ignored   {loc}")
+                logger.verbose(f"ignored   {loc}")
         #self.load_new_inkludes()
 
     def get_kreate_version(self) -> str:
