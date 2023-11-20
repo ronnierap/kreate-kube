@@ -126,7 +126,7 @@ class FileGetter:
         logger.debug(f"loaded {file}")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
-            data = self.konfig.dekrypt_bytes(data)
+            data = self.konfig.dekrypt_bytes(data.encode()).decode()
         return data
 
     def kopy_file(self, loc: str, target: Path) -> None:
