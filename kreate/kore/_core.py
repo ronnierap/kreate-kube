@@ -54,8 +54,8 @@ class DictWrapper(UserDict):
         return f"DictWrapper({self.data})"
 
     def pprint_str(self, indent=""):
-        output = io.StringIO
-        pprint_map(self, file=output)
+        output = io.StringIO()
+        pprint_map(self, indent=indent, file=output)
         result = output.getvalue()
         output.close
         return result
@@ -191,25 +191,25 @@ def pprint_map(map, indent="", file=None):
         file = sys.stdout
     indent_step = "  "
     if isinstance(map, str):
-        print(f"{indent}{map}")
+        print(f"{indent}{map}", file=file)
         return
     elif isinstance(map, Sequence):
         for v in map:
-            print(f"{indent}- {v}")
+            print(f"{indent}- {v}", file=file)
         return
     for key in sorted(map.keys()):
         val = map.get(key, None)
         if isinstance(val, Mapping):
             if len(val) == 0:
-                print(f"{indent}{key}: " + "{}")
+                print(f"{indent}{key}: " + "{}", file=file)
             else:
-                print(f"{indent}{key}:")
-                pprint_map(val, indent=indent + indent_step)
+                print(f"{indent}{key}:", file=file)
+                pprint_map(val, indent=indent + indent_step, file=file)
         elif isinstance(val, str):
-            print(f"{indent}{key}: {val}")
+            print(f"{indent}{key}: {val}", file=file)
         elif isinstance(val, Sequence):
-            print(f"{indent}{key}:")
+            print(f"{indent}{key}:", file=file)
             for v in val:
-                print(f"{indent}- {v}")
+                print(f"{indent}- {v}", file=file)
         else:
-            print(f"{indent}{key}: {val}")
+            print(f"{indent}{key}: {val}", file=file)

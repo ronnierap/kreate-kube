@@ -434,6 +434,7 @@ def view(cli: KoreCli):
                     print(f"{k}: {result}")
                 else:
                     print(k + ":")
+                    #print(wrap(result).pprint_str(indent="  "))
                     pprint_map(result, indent="  ")
             print()
     else:
