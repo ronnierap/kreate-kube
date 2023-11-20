@@ -29,6 +29,8 @@ class Konfig:
             main_konfig_path = self.find_main_konfig_path(filename)
         elif Path(filename).is_dir():
             main_konfig_path = self.find_main_konfig_path(filename)
+        else:
+            main_konfig_path = Path(filename)
         logger.info(f"using main konfig from {main_konfig_path}")
         self.dekrypt_func = None
         self.dict_ = dict_ or {}
