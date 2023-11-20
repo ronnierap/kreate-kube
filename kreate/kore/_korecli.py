@@ -283,11 +283,6 @@ class KoreCli:
         )
 
     def process_main_options(self, args):
-        handlers=[
-            logging.FileHandler('put your log path here'),
-            logging.StreamHandler()
-        ]
-
         if args.quiet:
             warnings.filterwarnings("ignore")
             #logging.basicConfig(format="%(message)s", level=logging.ERROR)
@@ -298,7 +293,7 @@ class KoreCli:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)
         elif args.verbose == 1:
-            logging.basicConfig(format="%(message)s", level=logging.VERBOSE, handlers=handlers)
+            logging.basicConfig(format="%(message)s", level=logging.VERBOSE)
         else:
             logging.basicConfig(format="%(message)s", level=logging.INFO)
         warnings.simplefilter("error", VersionWarning)
