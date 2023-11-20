@@ -28,6 +28,11 @@ At this moment there are not many versions of kreate-kube:
   - added jinja_extension with: sorted, getenv, error, warning, logger
   - removed jinja global konf, and only have konfig
   - fixed bug that diff would get an error
+- `1.5.0`
+  - made possible to have list of inklude options, improved inklude logging
+  - made info default level and added verbose level
+  - removed __getattr__ on DictWrapper
+  - added pprint_str and update_path on DictWrapper
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
