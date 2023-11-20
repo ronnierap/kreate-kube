@@ -48,21 +48,43 @@ class DictWrapper(UserDict):
     def __init__(self, dict):
         # do not copy the original dict as the normal UserDict does
         # but wrap the original so that updates go to the original
-        # __setattr__ is used, because the data attribute does not exist yet
-        #super().__setattr__("data", dict)
         self.data = dict
-
-    #def __getattr__(self, attr):
-    #    if attr not in self.data:
-    #        raise AttributeError(f"could not find attribute {attr} in {self}")
-    #    else:
-    #        return wrap(self.data[attr])
-#
-    #def __setattr__(self, attr, val):
-    #    self.data[attr] = val
 
     def __repr__(self):
         return f"DictWrapper({self.data})"
+
+    def pprint_str(self, indent=""):
+        output = io.StringIO
+        pprint_map(self, file=output)
+        result = output.getvalue()
+        output.close
+        return result
+
+    def deep_update_path(self, path: str, value):
+        keys = path.split(".")
+        data = self.data
+        for key in keys[:-1]:
+            key = key.replace("_dot_", ".")
+            if key not in data:
+                data[key] = {}
+            data = data[key]
+        final_key = keys[-1]
+        final_key = final_key.replace("_dot_", ".")
+        if final_key in data:
+            if isinstance(data[final_key], Mapping):
+                # Try to merge two Mappings
+                if not isinstance(value, Mapping):
+                    raise ValueError(
+                        f"Can not assign non-dict {value} to"
+                        f"dict {data[final_key]} for path {path}"
+                    )
+                deep_update(data[final_key], value)
+            else:
+                data[final_key] = value
+        elif final_key == "[0]" and isinstance(data, Sequence):
+            deep_update(data[0], value)
+        else:
+            data[final_key] = value
 
     def _set_path(self, path: str, value):
         keys = path.split(".")
@@ -164,7 +186,9 @@ def wrap(obj):
     return obj
 
 
-def pprint_map(map, indent=""):
+def pprint_map(map, indent="", file=None):
+    if file is None:
+        file = sys.stdout
     indent_step = "  "
     if isinstance(map, str):
         print(f"{indent}{map}")

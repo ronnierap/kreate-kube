@@ -65,6 +65,9 @@ class Konfig:
                     )
         raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
 
+    def __getitem__(self, key: str):
+        return self.yaml[key]
+
     def get_path(self, path: str, default=None, mandatory=False):
         return self.yaml._get_path(path, default=default, mandatory=mandatory)
 

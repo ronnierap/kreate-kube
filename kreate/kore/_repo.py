@@ -326,8 +326,11 @@ class LocalKonfigRepo(KonfigRepo):
          self.konfig.tracer.push(f"formatting repo {self.repo_name} dir: {dir}")
          dir = dir.format(
              my=self,
-             app=DictWrapper(self.konfig.get_path("app", {}))
-         )
+             konfig=self.konfig,
+             app=self.konfig.get_path("app"),
+             env=self.konfig.get_path("app.env"),
+             appname=self.konfig.get_path("app.appname"),
+        )
          self.konfig.tracer.pop()
          return dir
 
