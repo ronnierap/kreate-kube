@@ -136,7 +136,7 @@ class Konfig:
 
     def inklude(self, location: str, idx: int = None):
         if isinstance(location, str):
-            locations = location.split("|")
+            locations = [loc.strip() for loc in location.split("|")]
         elif isinstance(location, Sequence):
             locations = location
         else:
