@@ -33,6 +33,8 @@ At this moment there are not many versions of kreate-kube:
   - made info default level and added verbose level
   - removed __getattr__ on DictWrapper
   - added pprint_str and update_path on DictWrapper
+- `1.5.1`
+  - removed some old code that left a strange file after running verbose
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
