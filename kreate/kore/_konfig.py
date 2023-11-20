@@ -147,6 +147,7 @@ class Konfig:
             result = self.inklude_one_file(loc.strip(), idx=idx)
             if result:
                 logger.verbose(f"inkluded  {loc}")
+                break
             else:
                 logger.verbose(f"ignored   {loc}")
         #self.load_new_inkludes()
