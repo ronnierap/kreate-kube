@@ -27,23 +27,15 @@ class Resource(JinYamlKomponent):
 
     def add_metadata(self):
         for key in self.strukture.get("annotations", {}):
-            if "annotations" not in self.yaml.metadata:
-                self.yaml.metadata.annotations = {}
-            self.yaml.metadata.annotations[key] = self.strukture.annotations[key]
+            self.yaml.get("metadata.annotations")[key] = self.strukture.get("annotations")[key]
         for key in self.strukture.get("labels", {}):
-            if "labels" not in self.yaml.metadata:
-                self.yaml.metadata.labels = {}
-            self.yaml.metadata.labels[key] = self.strukture.labels[key]
+            self.yaml._set_path(f"metadata.labels.{key}",  self.strukture._get_path(f"labels.{key}"))
 
-    def annotation(self, name: str, val: str) -> None:
-        if "annotations" not in self.yaml.metadata:
-            self.yaml.metadata["annotations"] = {}
-        self.yaml.metadata.annotations[name] = val
-
-    def label(self, name: str, val: str) -> None:
-        if "labels" not in self.yaml.metadata:
-            self.yaml.metadata["labels"] = {}
-        self.yaml.metadata.labels[name] = val
+    #def annotation(self, name: str, val: str) -> None:
+    #    self.yaml._set_path(f"metadata.annotations.{name}", val)
+    #
+    #def label(self, name: str, val: str) -> None:
+    #    self.yaml._set_path(f"metadata.labels.{name}", val)
 
     def load_file(self, filename: str) -> str:
         with open(f"{self.app.konfig.dir}/{filename}") as f:
@@ -104,7 +96,7 @@ class Secret(Resource):
         return f"secrets/resources/{self.kind}-{self.name}.yaml"
 
     def secret(self, varname: str):
-        value = self.strukture.vars[varname]
+        value = self.strukture._get_path(f"vars.{varname}")
         if not isinstance(value, str):
             value = self.app.konfig.get_path(f"secret.var.{varname}", None)
         if value is None:

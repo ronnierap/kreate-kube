@@ -1,6 +1,8 @@
 from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
 import logging
+import io
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -47,16 +49,17 @@ class DictWrapper(UserDict):
         # do not copy the original dict as the normal UserDict does
         # but wrap the original so that updates go to the original
         # __setattr__ is used, because the data attribute does not exist yet
-        super().__setattr__("data", dict)
+        #super().__setattr__("data", dict)
+        self.data = dict
 
-    def __getattr__(self, attr):
-        if attr not in self.data:
-            raise AttributeError(f"could not find attribute {attr} in {self}")
-        else:
-            return wrap(self.data[attr])
-
-    def __setattr__(self, attr, val):
-        self.data[attr] = val
+    #def __getattr__(self, attr):
+    #    if attr not in self.data:
+    #        raise AttributeError(f"could not find attribute {attr} in {self}")
+    #    else:
+    #        return wrap(self.data[attr])
+#
+    #def __setattr__(self, attr, val):
+    #    self.data[attr] = val
 
     def __repr__(self):
         return f"DictWrapper({self.data})"

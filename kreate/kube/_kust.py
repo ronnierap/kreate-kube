@@ -32,8 +32,8 @@ class KustApp(KubeApp):
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
-            for kind in sorted(res.strukture.patches.keys()):
-                subpatches = res.strukture.patches[kind]
+            for kind in sorted(res.strukture.get("patches").keys()):
+                subpatches = res.strukture._get_path(f"patches.{kind}")
                 if not subpatches.keys():
                     subpatches = {"main": {}}
                 # use sorted because some patches, e.g. the MountVolumes
@@ -50,7 +50,7 @@ class Kustomization(JinYamlKomponent):
         return [res for res in self.app.komponents if isinstance(res, Patch)]
 
     def var(self, cm: str, varname: str):
-        value = self.strukture.configmaps[cm]["vars"][varname]
+        value = self.strukture._get_path(f"configmaps.{cm}.vars.{varname}")
         if not isinstance(value, str):
             value = self.app.konfig.get_path("var", {}).get(varname, None)
         if value is None:
