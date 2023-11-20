@@ -37,7 +37,7 @@ At this moment there are not many versions of kreate-kube:
   - removed some old code that left a strange file after running verbose
 - `1.5.2`
   - fixed bug that you could not use --konfig to specify a file
-  -
+  - fixed bug that `cmd`, `build`, `diff` and `apply` commands show no output
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

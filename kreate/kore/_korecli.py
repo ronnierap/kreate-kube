@@ -464,7 +464,7 @@ def output(cli: KoreCli) -> None:
 def command(cli: KoreCli):
     """run a predefined command from system.command"""
     cmd = cli.args.cmd
-    cli.run_command(cmd)
+    print(cli.run_command(cmd))
 
 def shell(cli: KoreCli):
     """run one or more shell command including pipes"""

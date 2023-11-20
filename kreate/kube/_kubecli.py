@@ -40,19 +40,21 @@ class KubeCli(krypt.KryptCli):
 
 def build(cli: KubeCli) -> None:
     """output all the resources"""
-    cli.run_command("build")
+    print(cli.run_command("build"))
 
 
 def diff(cli: KubeCli) -> None:
     """diff with current existing resources"""
-    if not cli.run_command("diff"):
+    result = cli.run_command("diff")
+    if not result:
         logger.info("no differences found with cluster")
     else:
         logger.info("kreated files differ from cluster")
+        print(result)
 
 def apply(cli: KubeCli) -> None:
     """apply the output to kubernetes"""
-    cli.run_command("apply")
+    print(cli.run_command("apply"))
 
 
 def expected_output_location(cli: KubeCli) -> str:
