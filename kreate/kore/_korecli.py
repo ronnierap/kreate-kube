@@ -322,17 +322,20 @@ class KoreCli:
         app.kreate_komponents()
         app.kreate_files()
 
-    def run_shell(self, cmd: str) -> subprocess.CompletedProcess:
+    def run_shell(self, cmd: str, success_codes=None) -> subprocess.CompletedProcess:
+        success_codes = success_codes or (0,)
         self.kreate_files()
         cmd = cmd.format(app=self.app(), konf=self.konfig(), cli=self)
         logger.info(f"running: {cmd}")
-        result =  subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode not in success_codes:
+            raise RuntimeError(f"command {cmd} resulted in return code {result.returncode}\n{result.stderr.decode()}")
         return result
 
-    def run_command(self, cmd_name: str) -> str:
+    def run_command(self, cmd_name: str, success_codes=None) -> str:
         konfig = self.konfig()
         cmd : str = konfig.get_path(f"system.command.{cmd_name}")
-        result = self.run_shell(cmd)
+        result = self.run_shell(cmd, success_codes=success_codes)
         return result.stdout.decode()
 
 

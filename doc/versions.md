@@ -40,6 +40,9 @@ At this moment there are not many versions of kreate-kube:
   - fixed bug that `cmd`, `build`, `diff` and `apply` commands show no output
   - fixed bug in dekrypting repo file
   - fixed bug when inkluding a list of files, it didn't stop after first one found
+- `1.5.3`
+  - show stderr if a shell command return exit code, instead of assuming everything is ok
+
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
