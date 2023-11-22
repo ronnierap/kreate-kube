@@ -21,13 +21,8 @@ def _get_key():
     return Fernet(_krypt_key)
 
 
-def dekrypt_str(value):
-    fernet = _get_key()
-    if _dekrypt_testdummy:
-        format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
-        format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
-        return format.format(value=value)
-    return fernet.decrypt(value.encode()).decode()
+def dekrypt_str(value: str) -> str:
+    return dekrypt_bytes(value).decode()
 
 
 def dekrypt_bytes(value: bytes) -> bytes:
@@ -35,7 +30,7 @@ def dekrypt_bytes(value: bytes) -> bytes:
     if _dekrypt_testdummy:
         format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
         format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
-        return format.format(value=value)
+        return format.format(value=value).encode()
     return fernet.decrypt(value)
 
 

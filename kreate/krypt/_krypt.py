@@ -17,6 +17,9 @@ class KryptKonfig(Konfig):
     def dekrypt_bytes(self, b: bytes) -> bytes:
         return krypt_functions.dekrypt_bytes(b)
 
+    def dekrypt_str(self, s: str) -> str:
+        return krypt_functions.dekrypt_str(s)
+
     def get_krypt_key(self):
         krypt_key = self.default_krypt_key().encode()
         return base64.b64encode(krypt_key).decode()

@@ -14,6 +14,11 @@ import warnings
 from pathlib import Path
 from ._core import DictWrapper
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:  # Only imports the below statements during type checking
+    from kreate.kore._konfig import Konfig
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -31,7 +36,7 @@ def clear_cache():
 
 
 class FileGetter:
-    def __init__(self, konfig, main_dir_path: Path):
+    def __init__(self, konfig: "Konfig", main_dir_path: Path):
         self.konfig = konfig
         self.repo_prefixes = {
             #"main_konfig:": FixedDirRepo(dir),
@@ -126,7 +131,7 @@ class FileGetter:
         logger.debug(f"loaded {file}")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
-            data = self.konfig.dekrypt_bytes(data.encode()).decode()
+            data = self.konfig.dekrypt_str(data)
         return data
 
     def kopy_file(self, loc: str, target: Path) -> None:

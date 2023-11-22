@@ -157,3 +157,6 @@ class Konfig:
 
     def dekrypt_bytes(b: bytes) -> bytes:
         raise NotImplementedError("dekrypt_bytes not implemented")
+
+    def dekrypt_str(s: str) -> str:
+        raise NotImplementedError("dekrypt_str not implemented")
