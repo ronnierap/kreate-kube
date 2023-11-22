@@ -29,7 +29,7 @@ def dekrypt_bytes(value: bytes) -> bytes:
     fernet = _get_key()
     if _dekrypt_testdummy:
         format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
-        format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+        format = format or "test-dummy"
         return format.format(value=value).encode()
     return fernet.decrypt(value)
 
