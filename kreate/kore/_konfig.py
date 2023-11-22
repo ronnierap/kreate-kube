@@ -48,25 +48,6 @@ class Konfig:
         self.inklude(main_konfig_path.name)
         self.load_new_inkludes()
 
-    def find_main_konfig_path(self, filename: str) -> Path:
-        if filename is None:
-            filename = os.getenv("KREATE_MAIN_KONFIG_PATH",".")
-        glob_pattern = os.getenv("KREATE_MAIN_KONFIG_FILE", "kreate*.konf")
-        for p in filename.split(os.pathsep):
-            path = Path(p)
-            if path.is_file():
-                return path
-            elif path.is_dir():
-                logger.debug(f"checking for {glob_pattern} in dir {path}")
-                possible_files = tuple(path.glob(glob_pattern))
-                if len(possible_files) == 1:
-                    return possible_files[0]
-                elif len(possible_files) > 1:
-                    raise ValueError(
-                        f"Ambiguous konfig files found for {path}/{glob_pattern}: {possible_files}"
-                    )
-        raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
-
     def __getitem__(self, key: str):
         return self.yaml[key]
 

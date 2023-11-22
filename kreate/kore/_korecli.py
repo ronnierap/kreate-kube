@@ -84,7 +84,7 @@ class KoreCli:
 
     def konfig(self):
         if not self._konfig:
-            self._konfig = self.kreate_konfig(self.konfig_filename)
+            self._konfig = self.kreate_konfig(self.find_main_konfig_path())
             self._konfig.check_kreate_version()
         return self._konfig
 
@@ -178,6 +178,7 @@ class KoreCli:
         self.cli.epilog = self.epilog + "\n"
         self.add_main_options()
         self.args = self.cli.parse_args(self.get_argv())
+        self.main_konfigs = self.find_main_konfig_path()
         self.process_main_options(self.args)
         try:
             if self.args.subcommand is None:
@@ -213,6 +214,28 @@ class KoreCli:
                             "use --keep-secrets or -K option to keep it"
                         )
                         shutil.rmtree(secrets_dir)
+
+    def find_main_konfig_path(self) -> Path:
+        filename = self.args.konfig
+        if filename is None:
+            filename = os.getenv("KREATE_MAIN_KONFIG_PATH",".")
+        glob_pattern = os.getenv("KREATE_MAIN_KONFIG_FILE", "kreate*.konf")
+        for p in filename.split(os.pathsep):
+            path = Path(p)
+            if path.is_file():
+                return path
+            elif path.is_dir():
+                logger.debug(f"checking for {glob_pattern} in dir {path}")
+                possible_files = tuple(path.glob(glob_pattern))
+                if len(possible_files) == 1:
+                    return possible_files[0]
+                elif len(possible_files) > 1:
+                    raise ValueError(
+                        f"Ambiguous konfig files found for {path}/{glob_pattern}: {possible_files}"
+                    )
+        raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
+
+
 
     def add_konfig_options(self, cmd):
         cmd.add_argument(
@@ -299,7 +322,6 @@ class KoreCli:
         warnings.simplefilter("error", VersionWarning)
         for warn_setting in args.warn_filter:
             self.parse_warning_setting(warn_setting)
-        self.konfig_filename = args.konfig
 
     def parse_warning_setting(self, warn_setting: str):
         if warn_setting == "reset":
@@ -337,8 +359,6 @@ class KoreCli:
         cmd : str = konfig.get_path(f"system.command.{cmd_name}")
         result = self.run_shell(cmd, success_codes=success_codes)
         return result.stdout.decode()
-
-
 
 
 def clear_repo_cache(cli: KoreCli):
