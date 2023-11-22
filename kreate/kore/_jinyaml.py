@@ -1,4 +1,5 @@
 import os
+from io import StringIO
 import jinja2
 import logging
 import base64
@@ -37,6 +38,21 @@ class JinYaml:
         self.yaml_parser = YAML()
         self.add_jinja_filter("b64encode", b64encode)
         self.add_jinja_filter("handle_empty_str", handle_empty_str)
+        self.add_jinja_filter("yaml", self.yaml_filter)
+
+    def yaml_filter(self, value, indent=""):
+        if isinstance(value, str):
+            return value
+        if isinstance(value, int):
+            return value
+        out = StringIO()
+        self.yaml_parser.dump(value, out)
+        if isinstance(indent, int):
+            start = "\n" + (" " * indent)
+        else:
+            start = "\n" + indent
+        return start + start.join(out.getvalue().splitlines())
+
 
     def add_jinja_filter(self, name, func):
         self.env.filters[name] = func

@@ -42,6 +42,7 @@ At this moment there are not many versions of kreate-kube:
   - fixed bug when inkluding a list of files, it didn't stop after first one found
 - `1.5.3`
   - show stderr if a shell command return exit code, instead of assuming everything is ok
+  - added jinja2 filter to format (indented) yaml
 
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
