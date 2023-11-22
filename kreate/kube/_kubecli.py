@@ -27,16 +27,6 @@ class KubeCli(krypt.KryptCli):
     def get_packages(self):
         return ["kreate-kube"]
 
-    def kreate_konfig(self, filename: str) -> KubeKonfig:
-        return KubeKonfig(filename,
-                          dict_=self.calc_dict(),
-                          inkludes=self.args.inklude,
-                          tracer=self.tracer
-        )
-
-    def kreate_app(self) -> KustApp:
-        return self._app_class(self.konfig())
-
 
 def build(cli: KubeCli) -> None:
     """output all the resources"""

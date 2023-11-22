@@ -4,7 +4,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
-_konfig = None
+_key_finder = None
 _krypt_key = None
 _dekrypt_testdummy = False
 
@@ -12,10 +12,10 @@ _dekrypt_testdummy = False
 def _get_key():
     global _krypt_key
     if not _krypt_key:
-        global _konfig
-        if not _konfig:
+        global _key_finder
+        if not _key_finder:
             raise ValueError("No konfig tosearch for _krypt_key")
-        _krypt_key = _konfig.get_krypt_key()
+        _krypt_key = _key_finder.get_krypt_key()
         if not _krypt_key:
             raise ValueError("_krypt_key is empty")
     return Fernet(_krypt_key)
@@ -29,7 +29,7 @@ def dekrypt_bytes(value: bytes) -> bytes:
     fernet = _get_key()
     if _dekrypt_testdummy:
         format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
-        format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
+        format = format or "test-dummy"
         return format.format(value=value).encode()
     return fernet.decrypt(value)
 

@@ -1,9 +1,8 @@
-import os
 import logging
 import importlib.metadata
 import warnings
 from pathlib import Path
-from typing import List, Sequence
+from typing import List, Sequence, Protocol
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
@@ -18,28 +17,52 @@ logger = logging.getLogger(__name__)
 class VersionWarning(RuntimeWarning):
     pass
 
+class Kontext:
+    def __init__(self) -> None:
+        self.tracer = Trace()
+        self.modules : List[Module] = []
+
+    def add_module(self, module: "Module"):
+        self.modules.append(module)
+
+    def load_konfig(self, path: Path) -> "Konfig":
+        konfig = Konfig(path, tracer=self.tracer)
+        for m in self.modules:
+            m.init_konfig(konfig)
+        konfig.load()
+        return konfig
+
+
+class Module:
+    def __init__(self, kontext: Kontext) -> None:
+        self.kontext = kontext
+    def init_konfig(self, konfig: "Konfig"): ...
+
+
+
 class Konfig:
-    def __init__(self, main_konfig_path: Path,
-                 dict_: dict = None,
-                 inkludes=None,
-                 tracer: Trace = None,
-        ):
+    def __init__(self, main_konfig_path: Path, tracer: Trace = None):
+        # dict_: dict = None, inkludes=None,
+
+        self.main_konfig_path = main_konfig_path
         self.tracer = tracer or Trace()
         logger.info(f"using main konfig from {main_konfig_path}")
         self.dekrypt_func = None
-        self.dict_ = dict_ or {}
+        self.dict_ = {}  # dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
         self.already_inkluded = set()
-        deep_update(dict_, {"system": {
+        deep_update(self.dict_, {"system": {
             "main_konfig_path": main_konfig_path,
             "logger": logger,
         }})
         self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
-        for ink in inkludes or []:
-            self.inklude(ink)
-        self.inklude(main_konfig_path.name)
+
+    def load(self):
+        #for ink in inkludes or []:
+        #    self.inklude(ink)
+        self.inklude(self.main_konfig_path.name)
         self.load_new_inkludes()
 
     def __getitem__(self, key: str):

@@ -1,20 +1,15 @@
 import logging
 
-from ..kore import JinYamlKomponent
+from ..kore import JinYamlKomponent, Module
 from .resource import Resource
-from . import KubeApp
 from .patch import Patch
 
 logger = logging.getLogger(__name__)
 
 
-class KustApp(KubeApp):
-    def register_std_templates(self) -> None:
-        super().register_std_templates()
-
-    def kreate_komponents_from_strukture(self):
-        super().kreate_komponents_from_strukture()
-        for res in self.komponents:
+class KustApp(Module):
+    def kreate_komponents_from_strukture(self, app: App):
+        for res in app.komponents:
             if isinstance(res, Resource):
                 self.kreate_patches(res)
 
