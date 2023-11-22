@@ -56,6 +56,7 @@ def aliases():
 
 
 def dekrypt(cli: KryptCli):
+    """dekrypt lines|string|file <file> (abbrevs l|s|str|f)"""
     subcmd = cli.args.subcmd
     subcmd = aliases().get(subcmd, subcmd)
     if subcmd == "file":
@@ -69,6 +70,7 @@ def dekrypt(cli: KryptCli):
 
 
 def enkrypt(cli: KryptCli):
+    """enkrypt lines|string|file <file> (abbrevs l|s|str|f)"""
     subcmd = cli.args.subcmd
     subcmd = aliases().get(subcmd, subcmd)
     if subcmd == "file":

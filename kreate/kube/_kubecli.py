@@ -103,13 +103,13 @@ def test(cli: KubeCli) -> None:
 
 
 def test_update(cli: KubeCli) -> None:
-    """test output against expected-output-<app>-<env>.out file"""
+    """update expected-output-<app>-<env>.out file with new output"""
     loc = expected_output_location(cli)
     cli.konfig().save_repo_file(loc, build_output(cli))
 
 
 def test_diff(cli: KubeCli):
-    """test output against expected-output-<app>-<env>.out file"""
+    """test output against expected-diff-<app>-<env>.out file"""
     diff_result = test_result(cli)
     loc = expected_diff_location(cli)
     expected_diff_lines = cli.konfig().load_repo_file(loc).splitlines()
@@ -125,7 +125,7 @@ def test_diff(cli: KubeCli):
 
 
 def test_diff_update(cli: KubeCli) -> None:
-    """update expected-output-<app>-<env>.out file"""
+    """update expected-diff-<app>-<env>.out file with new diff"""
     diff_result = test_result(cli)
     loc = expected_diff_location(cli)
     cli.konfig().save_repo_file(loc, "\n".join(diff_result))
