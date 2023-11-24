@@ -1,14 +1,8 @@
-from ._kube import KubeKonfig
-from ._kube import KubeApp
-from ._kust import KustApp
+from ._kube import KubeModule
 from ._kust import Kustomization
-from ._kubecli import KubeCli
 
 
 __all__ = [
-    "KubeKonfig",
-    "KubeApp",
-    "KubeCli",
-    "Kustomization",
-    "KustApp",
+    KubeModule.__name__,
+    Kustomization.__name__,
 ]

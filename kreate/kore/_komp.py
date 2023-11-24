@@ -166,7 +166,7 @@ class JinjaKomponent(Komponent):
     def _template_vars(self):
         return {
             "strukt": self.strukture,
-            "app": self.app,
+            "app": self.app.konfig.get_path("app", {}),
             "my": self,
         }
 

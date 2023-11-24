@@ -1,14 +1,14 @@
 import logging
 
-from ..kore import JinYamlKomponent, Module
+from ..kore import JinYamlKomponent, Module, Konfig, App
 from .resource import Resource
 from .patch import Patch
 
 logger = logging.getLogger(__name__)
 
 
-class KustApp(Module):
-    def kreate_komponents_from_strukture(self, app: App):
+class KustomizeModule(Module):
+    def init_app(self, konfig: Konfig, app: App):
         for res in app.komponents:
             if isinstance(res, Resource):
                 self.kreate_patches(res)

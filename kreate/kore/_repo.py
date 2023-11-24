@@ -1,4 +1,4 @@
-from typing import Protocol, Union
+from typing import Protocol, Union, TYPE_CHECKING
 import requests
 import requests.auth
 import zipfile
@@ -12,12 +12,9 @@ import logging
 import importlib
 import warnings
 from pathlib import Path
-from ._core import DictWrapper
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # Only imports the below statements during type checking
     from kreate.kore._konfig import Konfig
-
 
 logger = logging.getLogger(__name__)
 

@@ -2,14 +2,18 @@ import logging
 import importlib.metadata
 import warnings
 from pathlib import Path
-from typing import List, Sequence, Protocol
+from typing import List, Sequence, Protocol, TYPE_CHECKING
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
+from ._kontext import Kontext
 from ._core import deep_update, wrap
 from ._repo import FileGetter
 from .trace import Trace
 from ._jinyaml import JinYaml
+
+if TYPE_CHECKING:  # Only imports the below statements during type checking
+    from kreate.kore._app import App
 
 
 logger = logging.getLogger(__name__)
@@ -17,40 +21,20 @@ logger = logging.getLogger(__name__)
 class VersionWarning(RuntimeWarning):
     pass
 
-class Kontext:
-    def __init__(self) -> None:
-        self.tracer = Trace()
-        self.modules : List[Module] = []
-
-    def add_module(self, module: "Module"):
-        self.modules.append(module)
-
-    def load_konfig(self, path: Path) -> "Konfig":
-        konfig = Konfig(path, tracer=self.tracer)
-        for m in self.modules:
-            m.init_konfig(konfig)
-        konfig.load()
-        return konfig
-
-
-class Module:
-    def __init__(self, kontext: Kontext) -> None:
-        self.kontext = kontext
-    def init_konfig(self, konfig: "Konfig"): ...
-
-
 
 class Konfig:
-    def __init__(self, main_konfig_path: Path, tracer: Trace = None):
+    def __init__(self, kontext: Kontext, main_konfig_path: Path):
         # dict_: dict = None, inkludes=None,
-
+        self.kontext = kontext
         self.main_konfig_path = main_konfig_path
-        self.tracer = tracer or Trace()
+        self.tracer = self.kontext.tracer or Trace()
         logger.info(f"using main konfig from {main_konfig_path}")
         self.dekrypt_func = None
         self.dict_ = {}  # dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
+        for mod in self.kontext.modules:
+            mod.init_konfig(self)
         self.already_inkluded = set()
         deep_update(self.dict_, {"system": {
             "main_konfig_path": main_konfig_path,
@@ -58,8 +42,6 @@ class Konfig:
         }})
         self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
-
-    def load(self):
         #for ink in inkludes or []:
         #    self.inklude(ink)
         self.inklude(self.main_konfig_path.name)
@@ -140,7 +122,7 @@ class Konfig:
         else:
             raise TypeError(f"only str or list is accepted, not {type(location)}: {location}")
         if len(locations) > 1:
-            logger.info(f"trying multiple locations {locations}")
+            logger.verbose(f"trying multiple locations {locations}")
         for loc in locations:
             result = self.inklude_one_file(loc.strip(), idx=idx)
             if result:

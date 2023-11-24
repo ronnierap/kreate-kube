@@ -4,19 +4,17 @@ import shutil
 import argparse
 import logging
 import traceback
-import inspect
 import warnings
-import subprocess
 
 from ._core import pprint_map, wrap
 from ._repo import clear_cache
 from ._konfig import VersionWarning
 
+from ._kontext import Kontext
+from ._konfig import Konfig
+from ._app import App, load_class
 from . import _jinyaml
-from ._app import App, Konfig
-from ._jinja_app import JinjaApp, load_class
 from pathlib import Path
-from .trace import Trace
 import importlib.metadata
 import kreate.kore.dotenv as dotenv
 
@@ -29,23 +27,15 @@ logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg,
 logger = logging.getLogger(__name__)
 
 
-def argument(*name_or_flags, **kwargs):
-    """Convenience function to properly format arguments to pass to the
-    subcommand decorator.
-    """
-    return (list(name_or_flags), kwargs)
-
-
-class KoreCli:
-    def __init__(self):
-        self.tracer = Trace()
-        self._konfig = None
-        self._app = None
+class Cli:
+    def __init__(self, kontext: Kontext):
+        self.kontext = kontext
+        self.tracer = kontext.tracer
         self.formatwarnings_orig = warnings.formatwarning
         warnings.formatwarning = self.custom_warn_format
         self.load_dotenv()
         self.epilog = "subcommands:\n"
-        self.cli = argparse.ArgumentParser(
+        self.parser = argparse.ArgumentParser(
             prog="kreate",
             usage=(
                 "kreate [optional arguments] <konfig> [<subcommand>] [subcommand options]"
@@ -53,14 +43,20 @@ class KoreCli:
             description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
-
-        self.subparsers = self.cli.add_subparsers(
+        self.subparsers = self.parser.add_subparsers(
             # title="subcmd",
             # description="valid subcommands",
             dest="subcommand",
             metavar="see subcommands",
         )
-        self.add_subcommands()
+        cmd = self.add_subcommand(files, [], aliases=["f"])
+        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
+
+        cmd = self.add_subcommand(output, [], aliases=["o"])
+        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
+
+        for mod in self.kontext.modules:
+            mod.init_cli(self)
 
     def default_command(self):
         files(self)
@@ -70,9 +66,9 @@ class KoreCli:
             return f'WARNING: {msg}\n'
         #return self.formatwarnings_orig(msg, cat, filename, lineno, line)
 
-    def get_packages(self):
-        """a list of packages that are shown in the version command"""
-        return []
+    #def get_packages(self):
+    #    """a list of packages that are shown in the version command"""
+    #    return ["kreate-kube"]
 
     def calc_dict(self):
         args = vars(self.args).get("cli_args", [])
@@ -82,43 +78,6 @@ class KoreCli:
             wrap(result).set(k, v)
         return result
 
-    def konfig(self):
-        if not self._konfig:
-            self._konfig = self.kreate_konfig(self.find_main_konfig_path())
-            self._konfig.check_kreate_version()
-        return self._konfig
-
-    def app(self):
-        if not self._app:
-            self._app = self.kreate_app()
-        return self._app
-
-    def kreate_konfig(self, filename: str) -> Konfig:
-        return Konfig(filename, dict_=self.calc_dict(), inkludes=self.args.inklude)
-
-    def kreate_app(self) -> App:
-        return App(self.konfig())
-
-    def add_subcommands(self):
-        cmd = self.add_subcommand(files, [], aliases=["f"])
-        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
-
-        cmd = self.add_subcommand(output, [], aliases=["o"])
-        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
-
-        cmd = self.add_subcommand(command, [], aliases=["cmd"])
-        cmd.add_argument("cmd", help="command to run", action="store", default=[])
-
-        cmd = self.add_subcommand(shell, [], aliases=["sh"])
-        cmd.add_argument("script", help="command(s) to run", nargs=argparse.REMAINDER)
-
-        self.add_subcommand(clear_repo_cache, [], aliases=["cc"])
-        # subcommand: version
-        self.add_subcommand(version, [], aliases=["vr"])
-        # subcommand: view
-        cmd = self.add_subcommand(view, [], aliases=["v"])
-        cmd.add_argument("key", help="key(s) to show", action="store", nargs="*")
-        # self.add_output_options(cmd)
 
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
@@ -134,6 +93,11 @@ class KoreCli:
             parser.add_argument(*arg[0], **arg[1])
         parser.set_defaults(func=func)
         return parser
+
+    def add_help_section(self, text: str):
+        self.epilog += text + "\n"
+
+
 
     def load_dotenv(self) -> None:
         # Primitive way to check if to load ENV vars before parsing vars
@@ -175,12 +139,11 @@ class KoreCli:
         return sys.argv[1:]
 
     def run(self):
-        self.cli.epilog = self.epilog + "\n"
-        self.add_main_options()
-        self.args = self.cli.parse_args(self.get_argv())
-        self.main_konfigs = self.find_main_konfig_path()
+        self.parser.epilog = self.epilog + "\n"
+        self.args = self.parser.parse_args(self.get_argv())
         self.process_main_options(self.args)
         try:
+            self.main_konfig = self.find_main_konfig_path()
             if self.args.subcommand is None:
                 self.default_command()
             else:
@@ -204,7 +167,7 @@ class KoreCli:
             sys.exit(1)
         finally:
             if not self.args.keep_secrets:
-                if self._app:
+                if False: # TODO: self._app:
                     # app was kreated so secrets might need to be cleaned
                     dir = self._app.target_path
                     secrets_dir = f"{dir}/secrets"
@@ -214,6 +177,13 @@ class KoreCli:
                             "use --keep-secrets or -K option to keep it"
                         )
                         shutil.rmtree(secrets_dir)
+
+    def kreate_konfig(self) -> Konfig:
+        path = self.find_main_konfig_path()
+        return Konfig(self.kontext, path)
+
+    #def kreate_app(self) -> App:
+    #    return App(self.kreate_konfig())
 
     def find_main_konfig_path(self) -> Path:
         filename = self.args.konfig
@@ -234,7 +204,6 @@ class KoreCli:
                         f"Ambiguous konfig files found for {path}/{glob_pattern}: {possible_files}"
                     )
         raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
-
 
 
     def add_konfig_options(self, cmd):
@@ -285,25 +254,6 @@ class KoreCli:
             help="do not output any info, just essential output",
         )
 
-    def add_main_options(self):
-        self.add_konfig_options(self.cli)
-        self.add_output_options(self.cli)
-        self.cli.add_argument(
-            "-K",
-            "--keep-secrets",
-            action="store_true",
-            help="do not remove secrets dirs",
-        )
-        self.cli.add_argument(
-            "--no-dotenv",
-            action="store_true",
-            help="do not load .env file from working dir",
-        )
-        self.cli.add_argument(
-            "--no-kreate-env",
-            action="store_true",
-            help="do not load kreate.env file from user home .config dir",
-        )
 
     def process_main_options(self, args):
         if args.quiet:
@@ -339,157 +289,25 @@ class KoreCli:
         lineno = lineno or 0
         warnings.filterwarnings(action, message, category, module, lineno)
 
-    def kreate_files(self):
-        app: App = self.app()
+    def kreate_files(self) -> App:
+        args = vars(self.args).get("cli_args",[])
+        konfig = self.kreate_konfig()
+        konfig.set_path("system.cli_args", args)
+        app = App(konfig)
         app.kreate_komponents()
         app.kreate_files()
-
-    def run_shell(self, cmd: str, success_codes=None) -> subprocess.CompletedProcess:
-        success_codes = success_codes or (0,)
-        self.kreate_files()
-        cmd = cmd.format(app=self.app(), konf=self.konfig(), cli=self)
-        logger.info(f"running: {cmd}")
-        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if result.returncode not in success_codes:
-            raise RuntimeError(f"command {cmd} resulted in return code {result.returncode}\n{result.stderr.decode()}")
-        return result
+        return app
 
     def run_command(self, cmd_name: str, success_codes=None) -> str:
-        konfig = self.konfig()
-        cmd : str = konfig.get_path(f"system.command.{cmd_name}")
-        result = self.run_shell(cmd, success_codes=success_codes)
+        app = self.kreate_files()
+        cmd : str = app.konfig.get_path(f"system.command.{cmd_name}")
+        result = self.kontext.run_shell(cmd, success_codes=success_codes)
         return result.stdout.decode()
 
-
-def clear_repo_cache(cli: KoreCli):
-    """clear the repo cache"""
-    clear_cache()
-
-
-def view_template(cli, template):
-    app: JinjaApp = cli.kreate_app()
-    if template not in app.kind_templates or template not in app.kind_classes:
-        logger.warning(f"Unknown template kind {template}")
-        return
-    if not cli.args.quiet:
-        print("==========================")
-        print(
-            f"{template} "
-            f"{app.kind_classes[template].__name__}: "
-            f"{app.kind_templates[template]}"
-        )
-        print("==========================")
-        if app.kind_classes[template].__doc__:
-            print(inspect.cleandoc(app.kind_classes[template].__doc__))
-            print("==========================")
-    if app.kind_templates[template] != "NoTemplate":
-        tmpl = app.kind_templates[template]
-        tmpl_text = app.konfig.file_getter.get_data(tmpl)
-        print(tmpl_text)
-
-
-def view_templates(cli, templates):
-    """view the template for a specific kind"""
-    # we call the kreate_app method and not the convenience app()
-    # method, because aktivating the app, will do stuff that might break
-    # template = cli.args.template
-    if templates:
-        for t in templates:
-            view_template(cli, t)
-    else:
-        app: JinjaApp = cli.kreate_app()
-        for template in app.kind_templates:
-            if template in app.kind_templates and template in app.kind_classes:
-                print(
-                    f"{template:24} "
-                    f"{app.kind_classes[template].__name__:20} "
-                    f"{app.kind_templates[template]}"
-                )
-            else:
-                logger.warning(f"skipping template {template}")
-
-
-def view_aliases():
-    return {
-        "i": "inklude",
-        "s": "strukt",
-        "a": "app",
-        "t": "template",
-        "wf": "warningfilters",
-        "tmpl": "template",
-        "ink": "inklude",
-        "sys": "system",
-        "ver": "version",
-        "kust": "strukt.Kustomization",
-        "depl": "strukt.Deployment",
-        "cron": "strukt.CronJob",
-        "ingr": "strukt.Ingress",
-        "egr": "strukt.Egress",
-        "svc": "strukt.Service",
-        "cm": "strukt.ConfigMap",
-    }
-
-
-def view(cli: KoreCli):
-    """view the entire konfig or subkey(s)"""
-    konfig: Konfig = cli.konfig()
-    first = True
-    if cli.args.key:
-        for idx, k in enumerate(cli.args.key):
-            k = view_aliases().get(k, k)
-            print(f"==== view {k} =======")
-            if k == "template":
-                view_templates(cli, cli.args.key[idx + 1 :])
-                break
-            elif k == "warningfilters":
-                view_warning_filters()
-            elif k == "alias":
-                for alias, full in view_aliases().items():
-                    print(f"{alias:8} {full}")
-            else:
-                result = konfig.get_path(k)
-                if isinstance(result, str):
-                    print(f"{k}: {result}")
-                else:
-                    print(k + ":")
-                    #print(wrap(result).pprint_str(indent="  "))
-                    pprint_map(result, indent="  ")
-            print()
-    else:
-        pprint_map(konfig.yaml)
-
-def view_warning_filters():
-    for w in warnings.filters:
-        print(w)
-
-def version(cli: KoreCli):
-    """view the version"""
-    for pckg in cli.get_packages():
-        try:
-            version = cli.dist_package_version(pckg)
-        except importlib.metadata.PackageNotFoundError:
-            version = "Unknown"
-        print(f"{pckg}: {version}")
-
-def files(cli: KoreCli) -> None:
+def files(cli: Cli) -> None:
     """kreate all the files (default command)"""
-    args = vars(cli.args).get("cli_args",[])
-    cli.konfig().set_path("system.cli_args", args)
     cli.kreate_files()
 
-def output(cli: KoreCli) -> None:
-    """kreate output based on the kreated  files"""
-    args = vars(cli.args).get("cli_args",[])
-    cli.konfig().set_path("system.cli_args", args)
+def output(cli: Cli) -> None:
+    cli.kreate_files()
     print(cli.run_command("output"))
-
-
-def command(cli: KoreCli):
-    """run a predefined command from system.command"""
-    cmd = cli.args.cmd
-    print(cli.run_command(cmd))
-
-def shell(cli: KoreCli):
-    """run one or more shell command including pipes"""
-    cmd = " ".join(cli.args.script)
-    cli.run_shell(cmd)

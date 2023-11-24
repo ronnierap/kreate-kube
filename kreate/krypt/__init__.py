@@ -1,8 +1,5 @@
-from ._krypt import KryptKonfig, KryptApp
-from ._kryptcli import KryptCli
+from ._krypt import KryptModule
 
 __all__ = [
-    "KryptKonfig",
-    "KryptApp",
-    "KryptCli",
+    KryptModule.__name__
 ]
