@@ -13,12 +13,6 @@ from ._cli import Cli
 from . import _jinyaml
 from ._app import App, load_class
 
-# TODO: is this the right location for this
-logging.VERBOSE = 15
-logging.addLevelName(logging.VERBOSE, "VERBOSE")
-logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(logging.VERBOSE, msg, *args, **kwargs)
-logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg, *args, **kwargs)
-
 logger = logging.getLogger(__name__)
 
 

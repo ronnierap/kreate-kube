@@ -1,4 +1,5 @@
 import subprocess
+import logging
 from typing import List, TYPE_CHECKING
 from .trace import Trace
 
@@ -6,6 +7,11 @@ if TYPE_CHECKING:  # Only imports the below statements during type checking
     from kreate.kore._app import App
     from kreate.kore._konfig import Konfig
     from kreate.kore._cli import Cli
+
+logging.VERBOSE = 15
+logging.addLevelName(logging.VERBOSE, "VERBOSE")
+logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(logging.VERBOSE, msg, *args, **kwargs)
+logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg, *args, **kwargs)
 
 
 class Kontext:

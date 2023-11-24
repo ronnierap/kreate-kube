@@ -18,12 +18,6 @@ from pathlib import Path
 import importlib.metadata
 import kreate.kore.dotenv as dotenv
 
-# TODO: is this the right location for this
-logging.VERBOSE = 15
-logging.addLevelName(logging.VERBOSE, "VERBOSE")
-logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(logging.VERBOSE, msg, *args, **kwargs)
-logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg, *args, **kwargs)
-
 logger = logging.getLogger(__name__)
 
 
