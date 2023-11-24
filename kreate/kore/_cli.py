@@ -173,7 +173,7 @@ class Cli:
     def kreate_konfig(self) -> Konfig:
         path = self.find_main_konfig_path()
         dict_ = self.calc_dict()
-        return Konfig(self.kontext, path, dict_=dict_)
+        return Konfig(self.kontext, path, dict_=dict_, inkludes=self.args.inklude)
 
     #def kreate_app(self) -> App:
     #    return App(self.kreate_konfig())

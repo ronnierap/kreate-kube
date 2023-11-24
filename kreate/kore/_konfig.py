@@ -41,8 +41,8 @@ class Konfig:
         }})
         self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
-        #for ink in inkludes or []:
-        #    self.inklude(ink)
+        for ink in inkludes or []:
+            self.inklude(ink)
         self.inklude(self.main_konfig_path.name)
         self.load_new_inkludes()
 
