@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class KubeModule(Module):
     def init_kontext(self, kontext: Kontext) -> None:
         super().init_kontext(kontext)
-        kontext.packages.append("kreate.kube")
+        kontext.packages.append("kreate-kube")
 
     def init_cli(self, cli: Cli):
         cli.add_help_section("kube commands:")
