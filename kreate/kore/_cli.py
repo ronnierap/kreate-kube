@@ -91,8 +91,6 @@ class Cli:
     def add_help_section(self, text: str):
         self.epilog += text + "\n"
 
-
-
     def load_dotenv(self) -> None:
         # Primitive way to check if to load ENV vars before parsing vars
         # .env needs to be loaded before arg parsing, since it may
@@ -174,7 +172,8 @@ class Cli:
 
     def kreate_konfig(self) -> Konfig:
         path = self.find_main_konfig_path()
-        return Konfig(self.kontext, path)
+        dict_ = self.calc_dict()
+        return Konfig(self.kontext, path, dict_=dict_)
 
     #def kreate_app(self) -> App:
     #    return App(self.kreate_konfig())

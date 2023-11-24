@@ -23,14 +23,13 @@ class VersionWarning(RuntimeWarning):
 
 
 class Konfig:
-    def __init__(self, kontext: Kontext, main_konfig_path: Path):
-        # dict_: dict = None, inkludes=None,
+    def __init__(self, kontext: Kontext, main_konfig_path: Path, dict_: dict = None, inkludes=None):
         self.kontext = kontext
         self.main_konfig_path = main_konfig_path
         self.tracer = self.kontext.tracer or Trace()
         logger.info(f"using main konfig from {main_konfig_path}")
         self.dekrypt_func = None
-        self.dict_ = {}  # dict_ or {}
+        self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
         for mod in self.kontext.modules:
