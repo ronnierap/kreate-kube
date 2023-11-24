@@ -1,6 +1,9 @@
 import subprocess
+import os
 import logging
-from typing import List, TYPE_CHECKING
+import shutil
+from pathlib import Path
+from typing import List, Set, TYPE_CHECKING
 from .trace import Trace
 
 if TYPE_CHECKING:  # Only imports the below statements during type checking
@@ -12,6 +15,7 @@ logging.VERBOSE = 15
 logging.addLevelName(logging.VERBOSE, "VERBOSE")
 logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(logging.VERBOSE, msg, *args, **kwargs)
 logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg, *args, **kwargs)
+logger = logging.getLogger(__name__)
 
 
 class Kontext:
@@ -19,6 +23,7 @@ class Kontext:
         self.tracer = Trace()
         self.modules : List[Module] = []
         self.packages = []
+        self.cleanup_paths: Set[Path] = set()
 
     def add_module(self, module: "Module"):
         module.init_kontext(self)
@@ -33,6 +38,17 @@ class Kontext:
         self.tracer.pop()
         return result
 
+    def add_cleanup_path(self, path: Path):
+        self.cleanup_paths.add(Path(path))
+
+    def cleanup(self, msg: str):
+        for path in self.cleanup_paths:
+            if path.exists():
+                logger.info(f"removing {path}{msg}")
+                if path.is_dir():
+                    path.rmdir()
+                else:
+                    path.unlink()
 
 class Module:
     def init_kontext(self, kontext: Kontext) -> None:

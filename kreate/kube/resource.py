@@ -95,6 +95,9 @@ class Secret(Resource):
     def get_filename(self):
         return f"secrets/resources/{self.kind}-{self.name}.yaml"
 
+    def is_secret(self) -> bool:
+        return True
+
     def secret(self, varname: str):
         value = self.strukture._get_path(f"vars.{varname}")
         if not isinstance(value, str):
@@ -122,3 +125,6 @@ class SecretBasicAuth(Resource):
 
     def get_filename(self):
         return f"secrets/resources/{self.kind}-{self.name}.yaml"
+
+    def is_secret(self) -> bool:
+        return True

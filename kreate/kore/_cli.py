@@ -1,6 +1,5 @@
 import os
 import sys
-import shutil
 import argparse
 import logging
 import traceback
@@ -159,16 +158,7 @@ class Cli:
             sys.exit(1)
         finally:
             if not self.args.keep_secrets:
-                if False: # TODO: self._app:
-                    # app was kreated so secrets might need to be cleaned
-                    dir = self._app.target_path
-                    secrets_dir = f"{dir}/secrets"
-                    if os.path.exists(secrets_dir):
-                        logger.info(
-                            f"removing {secrets_dir}, "
-                            "use --keep-secrets or -K option to keep it"
-                        )
-                        shutil.rmtree(secrets_dir)
+                self.kontext.cleanup(", use --keep-secrets or -K option to keep it")
 
     def kreate_konfig(self) -> Konfig:
         path = self.find_main_konfig_path()

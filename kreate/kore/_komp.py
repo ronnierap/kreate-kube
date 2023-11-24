@@ -155,10 +155,15 @@ class JinjaKomponent(Komponent):
         vars = self._template_vars()
         self.data = self.app.konfig.jinyaml.render_jinja(self.template, vars)
 
+    def is_secret(self) -> bool:
+        return False
+
     def kreate_file(self) -> None:
         filename = self.get_filename()
         if filename:
             path = self.app.target_path / filename
+            if self.is_secret():
+                self.app.kontext.add_cleanup_path(path)
             os.makedirs(path.parent, exist_ok=True)
             with open(path, "w") as f:
                 f.write(self.data)
@@ -189,6 +194,8 @@ class JinYamlKomponent(JinjaKomponent):
         filename = self.get_filename()
         if filename:
             path = self.app.target_path / filename
+            if self.is_secret():
+                self.app.kontext.add_cleanup_path(path)
             os.makedirs(path.parent, exist_ok=True)
             with open(path, "w") as f:
                 self.app.konfig.jinyaml.dump(self.yaml.data, f)
