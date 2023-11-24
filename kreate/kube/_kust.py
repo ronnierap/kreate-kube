@@ -1,6 +1,6 @@
 import logging
 
-from ..kore import JinYamlKomponent, Module, Konfig, App
+from ..kore import JinYamlKomponent, Module, App
 from .resource import Resource
 from .patch import Patch
 
@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class KustomizeModule(Module):
-    def init_app(self, konfig: Konfig, app: App):
+    def kreate_app_komponents(self, app: App):
         for res in app.komponents:
             if isinstance(res, Resource):
                 self.kreate_patches(res)
@@ -19,9 +19,9 @@ class KustomizeModule(Module):
         kind: str = None,
         shortname: str = None,
     ) -> None:
-        cls = self.kind_classes[kind]
+        cls = res.app.kind_classes[kind]
         if issubclass(cls, Patch):
-            cls(res, shortname, kind)
+            res.app.add_komponent(cls(res, shortname, kind))
         else:
             raise TypeError(f"class for {kind}.{shortname} is not a Patch but {cls}")
 

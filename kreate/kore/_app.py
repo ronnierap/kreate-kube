@@ -52,7 +52,6 @@ class App:
         for mod in self.kontext.modules:
             mod.kreate_app_komponents(self)
 
-
     def komponent_naming(self, kind: str, shortname: str) -> str:
         formatstr = None
         naming = self.konfig.get_path(f"system.template.{kind}.naming")

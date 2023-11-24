@@ -13,9 +13,6 @@ class KubeModule(Module):
         super().init_kontext(kontext)
         kontext.packages.append("kreate.kube")
 
-    #def init_app(self, konfig: Konfig, app: App):
-        #app.namespace = konfig.get_path("app.namespace", f"{self.appname}-{self.env}")
-
     def init_cli(self, cli: Cli):
         cli.add_help_section("kube commands:")
         cli.add_subcommand(build, [], aliases=["b"])
