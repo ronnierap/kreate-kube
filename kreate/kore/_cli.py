@@ -28,25 +28,19 @@ class Cli:
         warnings.formatwarning = self.custom_warn_format
         self.load_dotenv()
         self.epilog = "subcommands:\n"
+        self.subcommands = {}
+        self.aliases = {}
         self.parser = argparse.ArgumentParser(
             prog="kreate",
             usage=(
-                "kreate [optional arguments] <konfig> [<subcommand>] [subcommand options]"
+                "kreate [options] [<subcommand> [param ...]]"
             ),
             description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
-        self.subparsers = self.parser.add_subparsers(
-            # title="subcmd",
-            # description="valid subcommands",
-            dest="subcommand",
-            metavar="see subcommands",
-        )
-        cmd = self.add_subcommand(files, [], aliases=["f"])
-        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
-
-        cmd = self.add_subcommand(output, [], aliases=["o"])
-        cmd.add_argument("cli_args", help="extra args to files", nargs=argparse.REMAINDER, default=[])
+        self.parser.add_argument("param", nargs="*", help="parameters for subcommand")
+        self.add_subcommand(files, aliases=["f"])
+        self.add_subcommand(output, aliases=["o"])
 
         for mod in self.kontext.modules:
             mod.init_cli(self)
@@ -75,17 +69,13 @@ class Cli:
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
 
-    def add_subcommand(self, func, args=[], aliases=[], parent=None):
-        parent = parent or self.subparsers
+    def add_subcommand(self, func, name=None, aliases=[] ) -> None:
+        name = name or func.__name__.replace("_","-")
+        self.subcommands[name] = func
+        for a in aliases:
+            self.aliases[a] = name
         alias0 = aliases[0] if aliases else ""
         self.epilog += f"  {func.__name__:17} {alias0 :3} {func.__doc__ or ''} \n"
-        parser = parent.add_parser(
-            func.__name__, aliases=aliases, description=func.__doc__
-        )
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-        return parser
 
     def add_help_section(self, text: str):
         self.epilog += text + "\n"
@@ -134,11 +124,16 @@ class Cli:
         self.args = self.parser.parse_args(self.get_argv())
         self.process_main_options(self.args)
         try:
-            self.main_konfig = self.find_main_konfig_path()
-            if self.args.subcommand is None:
-                self.default_command()
+            #self.main_konfig = self.find_main_konfig_path()
+
+            if self.args.param:
+                subcmd = self.args.param[0]
+                self.subcmd = self.aliases[subcmd]
+                self.params = self.args.param[1:]
             else:
-                self.args.func(self)
+                self.subcmd = "files"
+                self.params = []
+            self.subcommands[self.subcmd](self)
         except Exception as e:
             if self.args.verbose > 1:
                 traceback.print_exc()

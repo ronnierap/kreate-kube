@@ -2,7 +2,6 @@ import argparse
 import logging
 import inspect
 import warnings
-import subprocess
 import importlib.metadata
 
 from ._core import pprint_map, wrap
@@ -33,19 +32,11 @@ class KoreModule(Module):
         self.process_kore_options(cli.args)
 
     def add_kore_subcommands(self, cli: Cli):
-        cmd = cli.add_subcommand(command, [], aliases=["cmd"])
-        cmd.add_argument("cmd", help="command to run", action="store", default=[])
-
-        cmd = cli.add_subcommand(shell, [], aliases=["sh"])
-        cmd.add_argument("script", help="command(s) to run", nargs=argparse.REMAINDER)
-
-        cli.add_subcommand(clear_repo_cache, [], aliases=["cc"])
-        # subcommand: version
-        cli.add_subcommand(version, [], aliases=["vr"])
-        # subcommand: view
-        cmd = cli.add_subcommand(view, [], aliases=["v"])
-        cmd.add_argument("key", help="key(s) to show", action="store", nargs="*")
-        # self.add_output_options(cmd)
+        cli.add_subcommand(command, aliases=["cmd"])
+        cli.add_subcommand(shell, aliases=["sh"])
+        cli.add_subcommand(clear_cache, aliases=["cc"])
+        cli.add_subcommand(version, aliases=["vr"])
+        cli.add_subcommand(view, aliases=["v"])
 
     def add_kore_options(self, cli: Cli):
         self.add_konfig_options(cli)
@@ -222,12 +213,12 @@ def view_aliases():
 def view(cli: Cli):
     """view the entire konfig or subkey(s)"""
     first = True
-    if cli.args.key:
-        for idx, k in enumerate(cli.args.key):
+    if cli.params:
+        for idx, k in enumerate(cli.params):
             k = view_aliases().get(k, k)
             print(f"==== view {k} =======")
             if k == "template":
-                view_templates(cli, cli.args.key[idx + 1 :])
+                view_templates(cli, cli.params[idx + 1 :])
                 break
             elif k == "warningfilters":
                 view_warning_filters()

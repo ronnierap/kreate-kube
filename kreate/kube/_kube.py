@@ -15,14 +15,14 @@ class KubeModule(Module):
 
     def init_cli(self, cli: Cli):
         cli.add_help_section("kube commands:")
-        cli.add_subcommand(build, [], aliases=["b"])
-        cli.add_subcommand(diff, [], aliases=["d"])
-        cli.add_subcommand(apply, [], aliases=["a"])
+        cli.add_subcommand(build, aliases=["b"])
+        cli.add_subcommand(diff, aliases=["d"])
+        cli.add_subcommand(apply, aliases=["a"])
         cli.add_help_section("test commands:")
-        cli.add_subcommand(test, [], aliases=["t"])
-        cli.add_subcommand(test_update, [], aliases=["tu"])
-        cli.add_subcommand(test_diff, [], aliases=["td"])
-        cli.add_subcommand(test_diff_update, [], aliases=["tdu"])
+        cli.add_subcommand(test, aliases=["t"])
+        cli.add_subcommand(test_update, aliases=["tu"])
+        cli.add_subcommand(test_diff, aliases=["td"])
+        cli.add_subcommand(test_diff_update, aliases=["tdu"])
 
 def build(cli: Cli) -> None:
     """output all the resources"""
