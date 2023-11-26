@@ -22,12 +22,30 @@ def load_env(path: Path, mandatory: bool = False) -> None:
         #try:
             if line.startswith("#") or len(line.strip()) == 0:
                 continue
-            if "+=" in line and line.index("+=",) < line.index('='):
+            elif "+=" in line and line.index("+=",) < line.index('='):
+                # append to existing value with space as separator
                 k, v = line.split("+=", 1)
                 orig_value = os.environ.get(k.strip(),"")
                 add_value = " " + v.strip() if orig_value else v.strip()
                 os.environ[k.strip()] = orig_value + add_value
+            elif ",=" in line and line.index(",=",) < line.index('='):
+                # append to existing value with comma as separator
+                k, v = line.split(",=", 1)
+                orig_value = os.environ.get(k.strip(),"")
+                add_value = "," + v.strip() if orig_value else v.strip()
+                os.environ[k.strip()] = orig_value + add_value
+            elif ":=" in line and line.index(":=",) < line.index('='):
+                # overwrite
+                k, v = line.split(":=", 1)
+                os.environ[k.strip()] = orig_value + add_value
+            elif "?=" in line and line.index("?=",) < line.index('='):
+                # only use as not set (same as =)
+                k, v = line.split("?=", 1)
+                if k not in os.environ:
+                    os.environ[k.strip()] = v.strip()
             elif "=" in line:
+                # only use as not set (same as ?=)
+                # might be deprecated, since ?= is more explicit
                 k, v = line.split("=", 1)
                 if k not in os.environ:
                     os.environ[k.strip()] = v.strip()
