@@ -7,7 +7,7 @@ import warnings
 
 from ._core import pprint_map, wrap
 from ._repo import clear_cache
-from ._konfig import VersionWarning
+from ._kontext import VersionWarning
 
 from ._kontext import Kontext
 from ._konfig import Konfig
@@ -26,7 +26,6 @@ class Cli:
         self.tracer = kontext.tracer
         self.formatwarnings_orig = warnings.formatwarning
         warnings.formatwarning = self.custom_warn_format
-        self.load_dotenv()
         self.epilog = "subcommands:\n"
         self.subcommands = {}
         self.aliases = {}
@@ -41,9 +40,41 @@ class Cli:
         self.parser.add_argument("param", nargs="*", help="parameters for subcommand")
         self.add_subcommand(files, aliases=["f"])
         self.add_subcommand(output, aliases=["o"])
-
         for mod in self.kontext.modules:
             mod.init_cli(self)
+
+    # TODO: prepare for better Cli, without argparse
+    #    self.verbosity = 0
+    #    self.warn = True
+    #    self.quiet = False
+    #    self.params = []
+
+    #def parse_verbosity_options(self, args=None):
+    #    args = args or sys.argv
+    #    skip = False
+    #    for idx, arg in enumerate(args):
+    #        if skip:
+    #            skip = False
+    #            continue
+    #        elif arg == "--verbose":
+    #            self.verbosity += 1
+    #        elif arg.startswith("-v"):
+    #            # TODO allow other letters than v
+    #            self.verbosity += len(arg)-1
+    #        elif arg == "--warn" or arg == "-w":
+    #            self.verbosity = -1
+    #        elif arg == "--quiet" or arg == "-q":
+    #            self.verbosity = -2
+    #        elif arg == "--warn-filter" or arg == "-W":
+    #            if idx == len(args)-1:
+    #                raise IndexError(f"-W/--warn-filter can not be last argument in {args}")
+    #            self.parse_warning_setting(args[idx+1])
+    #            skip = True
+    #        else:
+    #            self.params.append(arg)
+    #    self.warn = self.verbosity >= -1
+    #    self.quiet = self.verbosity <= -2
+
 
     def default_command(self):
         files(self)
@@ -80,27 +111,6 @@ class Cli:
     def add_help_section(self, text: str):
         self.epilog += text + "\n"
 
-    def load_dotenv(self) -> None:
-        # Primitive way to check if to load ENV vars before parsing vars
-        # .env needs to be loaded before arg parsing, since it may
-        # contain KREATE_OPTIONS
-        load_dot_env = True
-        load_kreate_env = True
-        for arg in sys.argv:
-            if arg == "--no-dotenv":
-                load_dot_env = False
-            if arg == "--no-kreate-env":
-                load_kreate_env = False
-        try:
-            if load_dot_env:
-                dotenv.load_env(Path.cwd() / ".env")
-            if load_kreate_env:
-                dotenv.load_env(Path.home() / ".config/kreate/kreate.env")
-        except Exception as e:
-            logger.error(
-                f"ERROR loading .env file, " f"remove .env file or specify --no-dotenv"
-            )
-            raise
 
     def get_argv(self):
         options = os.getenv("KREATE_OPTIONS")

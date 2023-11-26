@@ -1,7 +1,8 @@
 import subprocess
-import os
+import sys
 import logging
-import shutil
+from . import dotenv
+import warnings
 from pathlib import Path
 from typing import List, Set, TYPE_CHECKING
 from .trace import Trace
@@ -17,6 +18,17 @@ logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(logging.VER
 logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg, *args, **kwargs)
 logger = logging.getLogger(__name__)
 
+def load_class(name):
+    components = name.split(".")
+    mod = __import__(components[0])
+    for comp in components[1:-1]:
+        mod = getattr(mod, comp)
+    return getattr(mod, components[-1])
+
+
+class VersionWarning(RuntimeWarning):
+    pass
+
 
 class Kontext:
     def __init__(self) -> None:
@@ -24,6 +36,7 @@ class Kontext:
         self.modules : List[Module] = []
         self.packages = []
         self.cleanup_paths: Set[Path] = set()
+        self.load_dotenv()
 
     def add_module(self, module: "Module"):
         module.init_kontext(self)
@@ -50,6 +63,28 @@ class Kontext:
                 else:
                     path.unlink()
 
+
+    def load_dotenv(self) -> None:
+        # Primitive way to check if to load ENV vars before parsing vars
+        # .env needs to be loaded before arg parsing, since it may
+        # contain KREATE_OPTIONS
+        load_dot_env = True
+        load_kreate_env = True
+        for arg in sys.argv:
+            if arg == "--no-dotenv":
+                load_dot_env = False
+            if arg == "--no-kreate-env":
+                load_kreate_env = False
+        try:
+            if load_dot_env:
+                dotenv.load_env(Path.cwd() / ".env")
+            if load_kreate_env:
+                dotenv.load_env(Path.home() / ".config/kreate/kreate.env")
+        except Exception as e:
+            logger.error(
+                f"ERROR loading .env file, " f"remove .env file or specify --no-dotenv"
+            )
+            raise
 class Module:
     def init_kontext(self, kontext: Kontext) -> None:
         self.kontext = kontext
