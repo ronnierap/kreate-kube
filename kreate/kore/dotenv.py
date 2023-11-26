@@ -11,6 +11,8 @@ from pathlib import Path
 
 
 def load_env(path: Path, mandatory: bool = False) -> None:
+    # TODO: logging, but this is loaded before logging
+    # might be defined (by command line options in KREATE_OPTIONS)
     if not path.is_file():
         if not mandatory:
             return
@@ -22,6 +24,14 @@ def load_env(path: Path, mandatory: bool = False) -> None:
         #try:
             if line.startswith("#") or len(line.strip()) == 0:
                 continue
+            elif line.startswith("inklude "):
+                # TODO: handle optional and absolute paths
+                file = line[8:]
+                newpath = path.parent / file
+                if newpath.exists():
+                    load_env(newpath, mandatory=True)
+                else:
+                    raise FileNotFoundError(f"could not inklude env file f{newpath} from {path}")
             elif "+=" in line and line.index("+=",) < line.index('='):
                 # append to existing value with space as separator
                 k, v = line.split("+=", 1)
