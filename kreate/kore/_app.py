@@ -5,7 +5,7 @@ import inspect
 from typing import Mapping
 from pathlib import Path
 
-from ._core import wrap, deep_update
+from ._core import wrap
 from ._konfig import Konfig
 from ._kontext import load_class
 

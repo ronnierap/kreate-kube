@@ -2,7 +2,7 @@ import logging
 import importlib.metadata
 import warnings
 from pathlib import Path
-from typing import List, Sequence, Protocol, TYPE_CHECKING
+from typing import List, Sequence, TYPE_CHECKING
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
