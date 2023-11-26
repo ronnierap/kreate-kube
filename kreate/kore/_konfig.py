@@ -6,7 +6,7 @@ from typing import List, Sequence, Protocol, TYPE_CHECKING
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
-from ._kontext import Kontext
+from ._kontext import Kontext, VersionWarning
 from ._core import deep_update, wrap
 from ._repo import FileGetter
 from .trace import Trace
@@ -17,9 +17,6 @@ if TYPE_CHECKING:  # Only imports the below statements during type checking
 
 
 logger = logging.getLogger(__name__)
-
-class VersionWarning(RuntimeWarning):
-    pass
 
 
 class Konfig:

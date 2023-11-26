@@ -7,16 +7,9 @@ from pathlib import Path
 
 from ._core import wrap, deep_update
 from ._konfig import Konfig
+from ._kontext import load_class
 
 logger = logging.getLogger(__name__)
-
-
-def load_class(name):
-    components = name.split(".")
-    mod = __import__(components[0])
-    for comp in components[1:-1]:
-        mod = getattr(mod, comp)
-    return getattr(mod, components[-1])
 
 
 class App:

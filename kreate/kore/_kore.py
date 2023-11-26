@@ -6,11 +6,10 @@ import importlib.metadata
 
 from ._core import pprint_map, wrap
 from ._repo import clear_cache
-from ._kontext import Module
-from ._konfig import Konfig, VersionWarning
+from ._kontext import Module, VersionWarning, load_class
 from ._cli import Cli
 from . import _jinyaml
-from ._app import App, load_class
+from ._app import App
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ def argument(*name_or_flags, **kwargs):
 
 class KoreModule(Module):
     def init_cli(self, cli: Cli):
-        cli.add_help_section("kore commands:")
+        #cli.add_help_section("kore commands:")
         self.add_kore_subcommands(cli)
         self.add_kore_options(cli)
 
@@ -32,15 +31,15 @@ class KoreModule(Module):
         self.process_kore_options(cli.args)
 
     def add_kore_subcommands(self, cli: Cli):
-        cli.add_subcommand(command, aliases=["cmd"])
-        cli.add_subcommand(shell, aliases=["sh"])
         cli.add_subcommand(clear_cache, aliases=["cc"])
         cli.add_subcommand(version, aliases=["vr"])
         cli.add_subcommand(view, aliases=["v"])
+        cli.add_subcommand(command, aliases=["cmd"])
+        cli.add_subcommand(shell, aliases=["sh"])
 
     def add_kore_options(self, cli: Cli):
-        self.add_konfig_options(cli)
         self.add_output_options(cli)
+        self.add_konfig_options(cli)
         cli.parser.add_argument(
             "-K",
             "--keep-secrets",
@@ -97,14 +96,13 @@ class KoreModule(Module):
             "-w", "--warn", action="store_true", help="only output warnings"
         )
         cli.parser.add_argument(
-            "-W", "--warn-filter", action="append", metavar="filter", help="set python warnings filter", default=[],
-        )
-
-        cli.parser.add_argument(
             "-q",
             "--quiet",
             action="store_true",
             help="do not output any info, just essential output",
+        )
+        cli.parser.add_argument(
+            "-W", "--warn-filter", action="append", metavar="filter", help="set python warnings filter", default=[],
         )
 
     def process_kore_options(self, args):
@@ -147,7 +145,7 @@ def clear_repo_cache(cli: Cli):
     clear_cache()
 
 
-def view_template(cli, template):
+def view_template(cli: Cli, template: str):
     app = App(cli.kreate_konfig())
     if template not in app.kind_templates or template not in app.kind_classes:
         logger.warning(f"Unknown template kind {template}")

@@ -27,6 +27,7 @@ def cache_dir():
 
 
 def clear_cache():
+    """clear the repo cache"""
     logger.warning(f"removing repo cache dir {cache_dir()}")
     if cache_dir().is_dir():
         shutil.rmtree(cache_dir())

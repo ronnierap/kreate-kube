@@ -4,18 +4,14 @@ import argparse
 import logging
 import traceback
 import warnings
+import importlib.metadata
 
+from pathlib import Path
 from ._core import pprint_map, wrap
 from ._repo import clear_cache
-from ._kontext import VersionWarning
-
-from ._kontext import Kontext
+from ._kontext import Kontext, load_class
 from ._konfig import Konfig
-from ._app import App, load_class
-from . import _jinyaml
-from pathlib import Path
-import importlib.metadata
-import kreate.kore.dotenv as dotenv
+from ._app import App
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +35,7 @@ class Cli:
         )
         self.parser.add_argument("param", nargs="*", help="parameters for subcommand")
         self.add_subcommand(files, aliases=["f"])
-        self.add_subcommand(output, aliases=["o"])
+        #self.add_subcommand(output, aliases=["o"])
         for mod in self.kontext.modules:
             mod.init_cli(self)
 
@@ -241,41 +237,6 @@ class Cli:
             action="store_true",
             help="do not output any info, just essential output",
         )
-
-
-    def process_main_options(self, args):
-        if args.quiet:
-            warnings.filterwarnings("ignore")
-            #logging.basicConfig(format="%(message)s", level=logging.ERROR)
-            logging.basicConfig(format="%(message)s", level=logging.WARN)
-        elif args.verbose >= 3:
-            logging.basicConfig(level=5)
-        elif args.verbose == 2:
-            logging.basicConfig(level=logging.DEBUG)
-            _jinyaml.logger.setLevel(logging.INFO)
-        elif args.verbose == 1:
-            logging.basicConfig(format="%(message)s", level=logging.VERBOSE)
-        else:
-            logging.basicConfig(format="%(message)s", level=logging.INFO)
-        warnings.simplefilter("error", VersionWarning)
-        for warn_setting in args.warn_filter:
-            self.parse_warning_setting(warn_setting)
-
-    def parse_warning_setting(self, warn_setting: str):
-        if warn_setting == "reset":
-            warnings.resetwarnings()
-            return
-        action, message, cat_name, module, lineno = (warn_setting.split(":") + [None]*5)[:5]
-        message = message or ""
-        if cat_name is None or cat_name == "":
-            category = Warning
-        elif cat_name == "VersionWarning":
-            category = VersionWarning
-        else:
-            category = load_class(cat_name)
-        module = module or ""
-        lineno = lineno or 0
-        warnings.filterwarnings(action, message, category, module, lineno)
 
     def kreate_files(self) -> App:
         args = vars(self.args).get("cli_args",[])
