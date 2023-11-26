@@ -7,9 +7,8 @@ import warnings
 import importlib.metadata
 
 from pathlib import Path
-from ._core import pprint_map, wrap
-from ._repo import clear_cache
-from ._kontext import Kontext, load_class
+from ._core import wrap
+from ._kontext import Kontext
 from ._konfig import Konfig
 from ._app import App
 
@@ -128,10 +127,9 @@ class Cli:
     def run(self):
         self.parser.epilog = self.epilog + "\n"
         self.args = self.parser.parse_args(self.get_argv())
-        self.process_main_options(self.args)
         try:
-            #self.main_konfig = self.find_main_konfig_path()
-
+            for mod in self.kontext.modules:
+                mod.process_cli_options(self)
             if self.args.param:
                 subcmd = self.args.param[0]
                 self.subcmd = self.aliases[subcmd]

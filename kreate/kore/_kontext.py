@@ -2,7 +2,6 @@ import subprocess
 import sys
 import logging
 from . import dotenv
-import warnings
 from pathlib import Path
 from typing import List, Set, TYPE_CHECKING
 from .trace import Trace
