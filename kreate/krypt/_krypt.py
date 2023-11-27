@@ -99,12 +99,10 @@ def enkrypt(cli: Cli):
 
 def dek_lines(cli: Cli):
     """dekrypt lines in a text file"""
-    konfig = cli.kreate_konfig()
-    files = cli.params[1]
-    files = files or Path(konfig.dir).glob("secret*konf")
-    for f in files:
-        logger.warning(f"dekrypting: {f}")
-        krypt_functions.dekrypt_lines(f, ".")
+    cli.kreate_konfig()
+    file = cli.params[1]
+    logger.warning(f"dekrypting: {file}")
+    krypt_functions.dekrypt_lines(file, ".")
 
 
 def dekstr(cli: Cli):
@@ -123,27 +121,26 @@ def dekstr(cli: Cli):
 def dekfile(cli: Cli):
     "dekrypt an entire file"
     cli.kreate_konfig()  # init konfig to set the secret value
-    for f in cli.params[1]:
-        logger.info(f"dekrypting file {f}")
-        krypt_functions.dekrypt_file(f)
+    file = cli.params[1]
+    logger.info(f"dekrypting file {file}")
+    krypt_functions.dekrypt_file(file)
 
 
 def enk_lines(cli: Cli):
     "enkrypt lines in a text file"
-    konfig: Konfig = cli.kreate_konfig()
-    files = cli.params[1]
-    files = files or Path(konfig.dir).glob("secret*konf")
-    for f in files:
-        logger.warning(f"enkrypting: {f}")
-        krypt_functions.enkrypt_lines(f, ".")
+    cli.kreate_konfig()
+    file = cli.params[1]
+    #files = files or Path(konfig.dir).glob("secret*konf")
+    logger.warning(f"enkrypting: {file}")
+    krypt_functions.enkrypt_lines(file, ".")
 
 
 def enkfile(cli: Cli):
     "enkrypt an entire file"
     cli.kreate_konfig()
-    for f in cli.params[1]:
-        logger.info(f"enkrypting file {f}")
-        krypt_functions.enkrypt_file(f)
+    file =  cli.params[1]
+    logger.info(f"enkrypting file {file}")
+    krypt_functions.enkrypt_file(file)
 
 
 def enkstr(cli: Cli):

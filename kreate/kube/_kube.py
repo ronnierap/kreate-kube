@@ -27,7 +27,7 @@ class KubeModule(Module):
 def build(cli: Cli) -> None:
     """output all the resources"""
     app = cli.kreate_files()
-    print(app, cli.run_command("build"))
+    print(cli.run_command(app, "build"))
 
 
 def diff(cli: Cli) -> None:
@@ -43,7 +43,7 @@ def diff(cli: Cli) -> None:
 def apply(cli: Cli) -> None:
     """apply the output to kubernetes"""
     app = cli.kreate_files()
-    print(app, cli.run_command("apply"))
+    print(cli.run_command(app, "apply"))
 
 
 def expected_output_location(konfig: Konfig) -> str:
