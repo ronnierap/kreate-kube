@@ -50,6 +50,12 @@ class DictWrapper(UserDict):
         # but wrap the original so that updates go to the original
         self.data = dict
 
+    def __getattr__(self, attr):
+        if attr not in self.data:
+            raise AttributeError(f"could not find attribute {attr} in {self}, {self.data}")
+        else:
+            return wrap(self.data[attr])
+
     def __repr__(self):
         return f"DictWrapper({self.data})"
 
