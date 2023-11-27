@@ -5,7 +5,7 @@ import jinja2
 from collections.abc import Mapping
 from typing import Any
 
-from ._core import wrap, deep_update
+from ._core import wrap
 from ._app import App
 
 logger = logging.getLogger(__name__)

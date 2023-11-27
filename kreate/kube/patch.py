@@ -3,6 +3,9 @@ import logging
 from ..kore import deep_update
 from ..kore import JinYamlKomponent
 from .resource import Resource, Egress
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ._kust import KustomizeModule
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +17,7 @@ __all__ = [
 
 
 class Patch(JinYamlKomponent):
-    def __init__(self, target: Resource, shortname: str, kind: str):
+    def __init__(self, target: Resource, shortname: str, kind: str, _: "KustomizeModule"):
         self.target = target
         super().__init__(target.app, shortname=shortname, kind=kind)
 
@@ -62,7 +65,7 @@ class EgressLabels(Patch):
 
 
 class MultiPatch(Patch):
-    def __init__(self, res: Resource, shortname, kind, template=None):
-        patches = res.app.konfig.yaml["system"]["template"][kind]["template"]
+    def __init__(self, target: Resource, shortname: str, kind: str, module: "KustomizeModule"):
+        patches = target.app.konfig.yaml["system"]["template"][kind]["template"]
         for patch_name in patches:
-            res.app.kreate_patch(res, patch_name, "main")
+            module.kreate_patch(target, patch_name, "main")

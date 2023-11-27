@@ -10,10 +10,10 @@ from . import krypt_functions
 
 logger = logging.getLogger(__name__)
 
-def dekrypt_bytes(self, b: bytes) -> bytes:
+def dekrypt_bytes(b: bytes) -> bytes:
     return krypt_functions.dekrypt_bytes(b)
 
-def dekrypt_str(self, s: str) -> str:
+def dekrypt_str(s: str) -> str:
     return krypt_functions.dekrypt_str(s)
 
 class KryptModule(Module):

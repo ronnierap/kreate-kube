@@ -244,8 +244,7 @@ class Cli:
         app.kreate_files()
         return app
 
-    def run_command(self, cmd_name: str, success_codes=None) -> str:
-        app = self.kreate_files()
+    def run_command(self, app: App, cmd_name: str, success_codes=None) -> str:
         cmd: str = app.konfig.get_path(f"system.command.{cmd_name}.script")
         cmd = cmd.format(target_dir=app.target_path, app=app, konfig=app.konfig.yaml)
         result = self.kontext.run_shell(cmd, success_codes=success_codes)
@@ -256,5 +255,5 @@ def files(cli: Cli) -> None:
     cli.kreate_files()
 
 def output(cli: Cli) -> None:
-    cli.kreate_files()
-    print(cli.run_command("output"))
+    app = cli.kreate_files()
+    print(cli.run_command(app, "output"))

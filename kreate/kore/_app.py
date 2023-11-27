@@ -2,12 +2,13 @@ import os
 import logging
 import shutil
 import inspect
-from typing import Mapping
+from typing import Mapping, TYPE_CHECKING
 from pathlib import Path
-
 from ._core import wrap
 from ._konfig import Konfig
 from ._kontext import load_class
+if TYPE_CHECKING:
+    from ._komp import Komponent
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +69,7 @@ class App:
             )
         return None
 
-    def add_komponent(self, komp) -> None:
+    def add_komponent(self, komp: "Komponent") -> None:
         if not komp.skip:
             self.komponents.append(komp)
         map = self._kinds.get(komp.kind.lower(), None)

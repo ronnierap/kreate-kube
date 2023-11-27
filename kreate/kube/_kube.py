@@ -26,12 +26,14 @@ class KubeModule(Module):
 
 def build(cli: Cli) -> None:
     """output all the resources"""
-    print(cli.run_command("build"))
+    app = cli.kreate_files()
+    print(app, cli.run_command("build"))
 
 
 def diff(cli: Cli) -> None:
     """diff with current existing resources"""
-    result = cli.run_command("diff", success_codes=(0,1))
+    app = cli.kreate_files()
+    result = cli.run_command(app, "diff", success_codes=(0,1))
     if not result:
         logger.info("no differences found with cluster")
     else:
@@ -40,30 +42,30 @@ def diff(cli: Cli) -> None:
 
 def apply(cli: Cli) -> None:
     """apply the output to kubernetes"""
-    print(cli.run_command("apply"))
+    app = cli.kreate_files()
+    print(app, cli.run_command("apply"))
 
 
-def expected_output_location(cli: Cli) -> str:
+def expected_output_location(konfig: Konfig) -> str:
     loc = os.getenv("KREATE_TEST_EXPECTED_OUTPUT_LOCATION")
-    loc = loc or cli.konfig().get_path("tests.expected_output_location")
-    loc = loc or "cwd:tests/expected-output-{app.appname}-{app.env}.out"
-    loc = loc.format(app=cli.app(), konf=cli.konfig(), cli=cli)
+    loc = loc or konfig.get_path("tests.expected_output_location")
+    loc = loc or "cwd:tests/expected-output-{konfig.app.appname}-{konfig.app.env}.out"
+    loc = loc.format(konfig=konfig.yaml)
     return loc
 
 
-def expected_diff_location(cli: Cli) -> str:
+def expected_diff_location(konfig: Konfig) -> str:
     loc = os.getenv("KREATE_TEST_EXPECTED_DIFF_LOCATION")
-    loc = loc or cli.konfig().get_path("tests.expected_diff_location")
-    loc = loc or "cwd:tests/expected-diff-{app.appname}-{app.env}.out"
-    loc = loc.format(app=cli.app(), konf=cli.konfig(), cli=cli)
+    loc = loc or konfig.get_path("tests.expected_diff_location")
+    loc = loc or "cwd:tests/expected-diff-{konfig.app.appname}-{konfig.app.env}.out"
+    loc = loc.format(konfig=konfig.yaml)
     return loc
 
 
-def build_output(cli: Cli) -> str:
+def build_output(cli: Cli, app: App) -> str:
     # Do not dekrypt secrets for testing
     krypt_functions._dekrypt_testdummy = True
-    return cli.run_command("build")
-
+    return cli.run_command(app, "build")
 
 def truncate_ignores(ignores, lines):
     for idx, line in enumerate(lines):
@@ -76,11 +78,11 @@ def truncate_ignores(ignores, lines):
 
 
 
-def test_result(cli: Cli, n=0):
-    ignores = cli.konfig().get_path("tests.ignore", [])
-    build_lines = build_output(cli).splitlines()
-    loc = expected_output_location(cli)
-    expected_lines = cli.konfig().load_repo_file(loc).splitlines()
+def test_result(cli: Cli, app: App, n=0):
+    ignores = [] # cli.konfig().get_path("tests.ignore", [])
+    build_lines = build_output(cli, app).splitlines()
+    loc = expected_output_location(app.konfig)
+    expected_lines = app.konfig.load_repo_file(loc).splitlines()
     diff = difflib.unified_diff(
         truncate_ignores(ignores, expected_lines),
         truncate_ignores(ignores, build_lines),
@@ -93,22 +95,28 @@ def test_result(cli: Cli, n=0):
 
 def test(cli: Cli) -> None:
     """test output against expected-output-<app>-<env>.out file"""
-    diff_result = test_result(cli)
-    for line in  diff_result:
+    krypt_functions._dekrypt_testdummy = True
+    app = cli.kreate_files()
+    diff_result = test_result(cli, app)
+    for line in diff_result:
         print(line)
 
 
 def test_update(cli: Cli) -> None:
     """update expected-output-<app>-<env>.out file with new output"""
-    loc = expected_output_location(cli)
-    cli.konfig().save_repo_file(loc, build_output(cli))
+    krypt_functions._dekrypt_testdummy = True
+    app = cli.kreate_files()
+    loc = expected_output_location(app.konfig)
+    app.konfig.save_repo_file(loc, build_output(cli, app))
 
 
 def test_diff(cli: Cli):
     """test output against expected-diff-<app>-<env>.out file"""
-    diff_result = test_result(cli)
-    loc = expected_diff_location(cli)
-    expected_diff_lines = cli.konfig().load_repo_file(loc).splitlines()
+    krypt_functions._dekrypt_testdummy = True
+    app = cli.kreate_files()
+    diff_result = test_result(cli, app)
+    loc = expected_diff_location(app.konfig)
+    expected_diff_lines = app.konfig.load_repo_file(loc).splitlines()
     diff2 = difflib.unified_diff(
         expected_diff_lines,
         diff_result,
@@ -122,6 +130,8 @@ def test_diff(cli: Cli):
 
 def test_diff_update(cli: Cli) -> None:
     """update expected-diff-<app>-<env>.out file with new diff"""
-    diff_result = test_result(cli)
-    loc = expected_diff_location(cli)
-    cli.konfig().save_repo_file(loc, "\n".join(diff_result))
+    krypt_functions._dekrypt_testdummy = True
+    app = cli.kreate_files()
+    diff_result = test_result(cli, app)
+    loc = expected_diff_location(app.konfig)
+    app.konfig.save_repo_file(loc, "\n".join(diff_result))
