@@ -2,7 +2,7 @@ import os
 import logging
 import shutil
 import inspect
-from typing import Mapping, TYPE_CHECKING
+from typing import Mapping, List, TYPE_CHECKING
 from pathlib import Path
 from ._core import wrap
 from ._konfig import Konfig
@@ -31,7 +31,7 @@ class App:
         self.kontext = konfig.kontext
         self.appname = konfig.get_path("app.appname")
         self.env = konfig.get_path("app.env")
-        self.komponents = []
+        self.komponents: List["Komponent"] = []
         self._kinds = {}
         self.kind_templates = {}
         self.kind_classes = {}
@@ -70,30 +70,19 @@ class App:
         return None
 
     def add_komponent(self, komp: "Komponent") -> None:
-        if not komp.skip:
-            self.komponents.append(komp)
+        if komp.skip():
+            return
+        self.komponents.append(komp)
         map = self._kinds.get(komp.kind.lower(), None)
         if map is None:
             map = wrap({})
             self._kinds[komp.kind.lower()] = map
         map[komp.shortname] = komp
 
-    def __getattr__(self, attr):
-        if attr in self.__dict__ or attr == "_dict":
-            return super().__getattribute__(attr)
-        return self._kinds.get(attr, None)
-
-    def kreate_komponent(self, kind: str, shortname: str = None):
-        raise NotImplementedError(f"can not create komponent for {kind}.{shortname}")
-
-    def tune_komponents(self):
-        pass
-
     def aktivate_komponents(self):
         for komp in self.komponents:
             logger.debug(f"aktivating {komp.kind}.{komp.shortname}")
             komp.aktivate()
-        self.tune_komponents()
 
     def kreate_files(self):
         if self.target_path.exists():
@@ -165,7 +154,6 @@ class App:
 
     def kreate_komponent(self, kind: str, shortname: str = None):
         cls = self.kind_classes[kind]
-        templ = self.kind_templates[kind]
         if inspect.isclass(cls):
             return cls(app=self, kind=kind, shortname=shortname)
         else:

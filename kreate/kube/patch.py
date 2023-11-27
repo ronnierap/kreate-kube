@@ -17,7 +17,7 @@ __all__ = [
 
 
 class Patch(JinYamlKomponent):
-    def __init__(self, target: Resource, shortname: str, kind: str, _: "KustomizeModule"):
+    def __init__(self, target: Resource, shortname: str, kind: str):
         self.target = target
         super().__init__(target.app, shortname=shortname, kind=kind)
 
@@ -65,7 +65,12 @@ class EgressLabels(Patch):
 
 
 class MultiPatch(Patch):
-    def __init__(self, target: Resource, shortname: str, kind: str, module: "KustomizeModule"):
+    def __init__(self, target: Resource, shortname: str, kind: str):
+        super().__init__(target, shortname, kind)
         patches = target.app.konfig.yaml["system"]["template"][kind]["template"]
         for patch_name in patches:
-            module.kreate_patch(target, patch_name, "main")
+            cls = target.app.kind_classes[patch_name]
+            cls(target, "main", patch_name)
+
+    def skip(self):
+        return True

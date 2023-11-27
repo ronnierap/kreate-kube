@@ -21,7 +21,7 @@ class KustomizeModule(Module):
     ) -> None:
         cls = res.app.kind_classes[kind]
         if issubclass(cls, Patch):
-            res.app.add_komponent(cls(res, shortname, kind, self))
+            cls(res, shortname, kind)
         else:
             raise TypeError(f"class for {kind}.{shortname} is not a Patch but {cls}")
 

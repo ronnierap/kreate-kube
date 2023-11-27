@@ -24,7 +24,6 @@ class Komponent:
         self.kind = kind or self.__class__.__name__
         self.shortname = shortname or "main"
         self.strukture = wrap(self._find_strukture())
-        self.skip = self.strukture.get("ignore", False)
         self.field = Field(self)
         name = (
             self.strukture.get("name", None)
@@ -32,14 +31,16 @@ class Komponent:
             or self.calc_name()
         )
         self.name = name.lower()
-        if self.skip:
+        if self.skip():
             # do not load the template (strukture might be missing)
             logger.info(f"ignoring {self.name}")
         else:
             logger.debug(f"adding  {self.kind}.{self.shortname}")
-        if not self.app:
-            raise ValueError("Komponent {self.name} has no application")
-        self.app.add_komponent(self)
+            self.app.add_komponent(self)
+
+
+    def skip(self):
+        return self.strukture.get("ignore", False)
 
     def aktivate(self):
         pass
