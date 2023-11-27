@@ -79,13 +79,12 @@ class Cli:
             return f'WARNING: {msg}\n'
         #return self.formatwarnings_orig(msg, cat, filename, lineno, line)
 
-    #def get_packages(self):
-    #    """a list of packages that are shown in the version command"""
-    #    return ["kreate-kube"]
-
     def calc_dict(self):
-        args = vars(self.args).get("cli_args", [])
-        result = { "system": {"cli_args": args}}
+        #args = vars(self.args).get("cli_args", [])
+        result = { "system": {"cli": {
+            "subcmd": self.subcmd,
+            "params": self.params,
+        }}}
         for d in self.args.define:
             k, v = d.split("=", 1)
             wrap(result).set(k, v)
@@ -247,7 +246,8 @@ class Cli:
 
     def run_command(self, cmd_name: str, success_codes=None) -> str:
         app = self.kreate_files()
-        cmd : str = app.konfig.get_path(f"system.command.{cmd_name}")
+        cmd: str = app.konfig.get_path(f"system.command.{cmd_name}.script")
+        cmd = cmd.format(target_dir=app.target_path, app=app, konfig=app.konfig.yaml)
         result = self.kontext.run_shell(cmd, success_codes=success_codes)
         return result.stdout.decode()
 
