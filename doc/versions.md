@@ -50,6 +50,7 @@ At this moment there are not many versions of kreate-kube:
   - improved error message if basic_auth use is not found
   - enkrypt/dekrypt lines by default uses the secret*.konf file
   - fixed bug that full command names did not work
+  - improved error message if subcommand is unknown
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

@@ -28,8 +28,6 @@ class Trace:
     def print_last(self):
         if len(self.stack) > 0:
             print(f"while: {self.stack[-1]}")
-        else:
-            print("no trace info")
 
     def print_all(self):
         for line in self.stack:

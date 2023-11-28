@@ -137,6 +137,8 @@ class Cli:
             else:
                 self.subcmd = "files"
                 self.params = []
+            if self.subcmd not in self.subcommands:
+                raise LookupError(f"Unknown subcommand {self.subcmd}")
             self.subcommands[self.subcmd](self)
         except Exception as e:
             if self.args.verbose > 1:
