@@ -26,7 +26,7 @@ def cache_dir():
     return Path(cache_dir)
 
 
-def clear_cache():
+def clear_cache(_=None):
     """clear the repo cache"""
     logger.warning(f"removing repo cache dir {cache_dir()}")
     if cache_dir().is_dir():

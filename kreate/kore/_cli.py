@@ -246,6 +246,7 @@ class Cli:
 
     def run_command(self, app: App, cmd_name: str, success_codes=None) -> str:
         cmd: str = app.konfig.get_path(f"system.command.{cmd_name}.script")
+        logger.debug(f"formatting {cmd_name} [{cmd}]")
         cmd = cmd.format(target_dir=app.target_path, app=app, konfig=app.konfig.yaml)
         result = self.kontext.run_shell(cmd, success_codes=success_codes)
         return result.stdout.decode()
