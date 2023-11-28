@@ -86,7 +86,7 @@ class JinYaml:
         self.konfig.tracer.pop()
         if text is None:
             return None
-        self.konfig.tracer.push(f"rendering yaml: {fname}\n" + text)
+        self.konfig.tracer.push(f"parsing yaml: {fname}\n" + text)
         result =  self.yaml_parser.load(text)
         self.konfig.tracer.pop()
         return result
