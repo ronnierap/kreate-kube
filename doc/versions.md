@@ -40,11 +40,12 @@ At this moment there are not many versions of kreate-kube:
   - fixed bug that `cmd`, `build`, `diff` and `apply` commands show no output
   - fixed bug in dekrypting repo file
   - fixed bug when inkluding a list of files, it didn't stop after first one found
-- `1.5.3-inprogress`
+- `1.6.0`
   - show stderr if a shell command return exit code, instead of assuming everything is ok
   - added jinja2 filter to format (indented) yaml
   - fixed bug with test-dummy format
   - fixed wrong or missing help descriptions
+  - total rewrite of the cli, as preparation for new (custom) commands
 
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
