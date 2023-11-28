@@ -130,8 +130,9 @@ class Cli:
             for mod in self.kontext.modules:
                 mod.process_cli_options(self)
             if self.args.param:
-                subcmd = self.args.param[0]
-                self.subcmd = self.aliases[subcmd]
+                self.subcmd = self.args.param[0]
+                if self.subcmd in self.aliases:
+                    self.subcmd = self.aliases[self.subcmd]
                 self.params = self.args.param[1:]
             else:
                 self.subcmd = "files"
