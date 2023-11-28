@@ -99,8 +99,11 @@ def enkrypt(cli: Cli):
 
 def dek_lines(cli: Cli):
     """dekrypt lines in a text file"""
-    cli.kreate_konfig()
-    file = cli.params[1]
+    konfig : "Konfig" = cli.kreate_konfig()
+    if len(cli.params) > 1:
+        file = cli.params[1]
+    else:
+        file = list(konfig.main_konfig_path.parent.glob("secret*konf"))[0]
     logger.warning(f"dekrypting: {file}")
     krypt_functions.dekrypt_lines(file, ".")
 
@@ -128,9 +131,11 @@ def dekfile(cli: Cli):
 
 def enk_lines(cli: Cli):
     "enkrypt lines in a text file"
-    cli.kreate_konfig()
-    file = cli.params[1]
-    #files = files or Path(konfig.dir).glob("secret*konf")
+    konfig : "Konfig" = cli.kreate_konfig()
+    if len(cli.params) > 1:
+        file = cli.params[1]
+    else:
+        file = list(konfig.main_konfig_path.parent.glob("secret*konf"))[0]
     logger.warning(f"enkrypting: {file}")
     krypt_functions.enkrypt_lines(file, ".")
 
