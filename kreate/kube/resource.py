@@ -118,7 +118,10 @@ class SecretBasicAuth(Resource):
     def users(self):
         result = []
         for usr in self.strukture.get("users", []):
-            entry = dekrypt_str(self.app.konfig.get_path(f"secret.basic_auth.{usr}"))
+            secret = self.app.konfig.get_path(f"secret.basic_auth.{usr}")
+            if not secret:
+                raise LookupError(f"could not find secret.basic_auth.{usr}")
+            entry = dekrypt_str(secret)
             result.append(f"{usr}:{entry}")
         result.append("")  # for the final newline
         return "\n".join(result)
