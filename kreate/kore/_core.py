@@ -219,3 +219,12 @@ def pprint_map(map, indent="", file=None):
                 print(f"{indent}- {v}", file=file)
         else:
             print(f"{indent}{key}: {val}", file=file)
+
+def pprint_tuple(tup, prefix=None, delimiter="."):
+    for item in sorted(tup, key=lambda x: x[0]):
+        if prefix is None:
+            print(f"{item[0]}={item[1]}")
+        else:
+            print(f"{prefix}{delimiter}{item[0]}={item[1]}")
+
+

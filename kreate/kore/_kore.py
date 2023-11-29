@@ -1,10 +1,11 @@
 import os
+import flatdict
 import logging
 import inspect
 import warnings
 import importlib.metadata
 
-from ._core import pprint_map, wrap
+from ._core import pprint_map, wrap, pprint_tuple
 from ._repo import clear_cache
 from ._kontext import Module, VersionWarning, load_class
 from ._cli import Cli
@@ -56,7 +57,6 @@ class KoreModule(Module):
             action="store_true",
             help="do not load kreate.env file from user home .config dir",
         )
-
 
     def add_konfig_options(self, cli: Cli):
         cli.parser.add_argument(
@@ -116,7 +116,7 @@ class KoreModule(Module):
             os.environ["KREATE_REPO_USE_LOCAL_DIR"] = "True"
         if args.quiet:
             warnings.filterwarnings("ignore")
-            #logging.basicConfig(format="%(message)s", level=logging.ERROR)
+            # logging.basicConfig(format="%(message)s", level=logging.ERROR)
             logging.basicConfig(format="%(message)s", level=logging.WARN)
         elif args.verbose >= 3:
             logging.basicConfig(level=5)
@@ -135,7 +135,7 @@ class KoreModule(Module):
         if warn_setting == "reset":
             warnings.resetwarnings()
             return
-        action, message, cat_name, module, lineno = (warn_setting.split(":") + [None]*5)[:5]
+        action, message, cat_name, module, lineno = (warn_setting.split(":") + [None] * 5)[:5]
         message = message or ""
         if cat_name is None or cat_name == "":
             category = Warning
@@ -205,6 +205,10 @@ def view_aliases():
         "wf": "warningfilters",
         "tmpl": "template",
         "ink": "inklude",
+        "p": "propertyview",
+        "prop": "propertyview",
+        "y": "yamlview",
+        "yaml": "yamlview",
         "sys": "system",
         "ver": "version",
         "kust": "strukt.Kustomization",
@@ -216,38 +220,64 @@ def view_aliases():
         "cm": "strukt.ConfigMap",
     }
 
+
 def view(cli: Cli):
-    """view the entire konfig or subkey(s)"""
+    """view the entire konfig or subkey(s); possible other subcommand arguments: [template, warningfilters, alias]"""
     first = True
+    printFullConfig = True
+    yamlMode = True
     if cli.params:
-        for idx, k in enumerate(cli.params):
-            k = view_aliases().get(k, k)
-            print(f"==== view {k} =======")
-            if k == "template":
-                view_templates(cli, cli.params[idx + 1 :])
+        for idx, param in enumerate(cli.params):
+            param = view_aliases().get(param, param)
+
+            # Check for View-Parameters
+            if (param == "propertyview"):
+                # Change to property view
+                yamlMode = False
+                continue
+            elif (param == "yamlview"):
+                yamlMode = True
+                continue
+
+            # Regular Parameters
+            print(f"==== view {param} =======")
+            printFullConfig = False
+            if param == "template":
+                view_templates(cli, cli.params[idx + 1:])
                 break
-            elif k == "warningfilters":
+            elif param == "warningfilters":
                 view_warning_filters()
-            elif k == "alias":
+            elif param == "alias":
                 for alias, full in view_aliases().items():
                     print(f"{alias:8} {full}")
             else:
                 konfig = cli.kreate_konfig()
-                result = konfig.get_path(k)
-                if isinstance(result, str):
-                    print(f"{k}: {result}")
+                result = konfig.get_path(param)
+                if yamlMode:
+                    if isinstance(result, str):
+                        print(f"{param}: {result}")
+                    else:
+                        print(f"{param}:")
+                        pprint_map(result, indent="  ")
                 else:
-                    print(k + ":")
-                    #print(wrap(result).pprint_str(indent="  "))
-                    pprint_map(result, indent="  ")
+                    if isinstance(result, str):
+                        print(f"{param}={result}")
+                    else:
+                        pprint_tuple(flatdict.FlatDict(result, delimiter=".").items(), prefix=param)
             print()
-    else:
+
+    if printFullConfig:
         konfig = cli.kreate_konfig()
-        pprint_map(konfig.yaml)
+        if yamlMode:
+            pprint_map(konfig.yaml)
+        else:
+            pprint_tuple(flatdict.FlatDict(konfig.dict_, delimiter=".").items())
+
 
 def view_warning_filters():
     for w in warnings.filters:
         print(w)
+
 
 def version(cli: Cli):
     """view the version"""
@@ -263,6 +293,7 @@ def command(cli: Cli):
     """run a predefined command from system.command"""
     cmd = cli.args.cmd
     print(cli.run_command(cmd))
+
 
 def shell(cli: Cli):
     """run one or more shell command including pipes"""
