@@ -66,11 +66,12 @@ def aliases():
         "str": "string",
         "l": "lines",
         "k": "lines",
+        "v": "view",
     }
 
 
 def dekrypt(cli: Cli):
-    """dekrypt lines|string|file <file> (abbrevs l|s|str|f)"""
+    """dekrypt lines|string|file <file> (abbrevs l|s|str|f|v)"""
     if len(cli.params) == 0:
         raise ValueError("dekrypt should have at least a second param: lines, file or string")
     subcmd = cli.params[0]
@@ -81,6 +82,8 @@ def dekrypt(cli: Cli):
         dekstr(cli)
     elif subcmd == "lines":
         dek_lines(cli)
+    elif subcmd == "view":
+        dek_lines(cli, stdout=True)
     else:
         raise ValueError(f"unknow dekrypt subcommand {subcmd}")
 
@@ -88,7 +91,7 @@ def dekrypt(cli: Cli):
 def enkrypt(cli: Cli):
     """enkrypt lines|string|file <file> (abbrevs l|s|str|f)"""
     if len(cli.params) == 0:
-        raise ValueError("dekrypt should have at least a second param: lines, file or string")
+        raise ValueError("dekrypt should have at least a second param: lines, file, view or string")
     subcmd = cli.params[0]
     subcmd = aliases().get(subcmd, subcmd)
     if subcmd == "file":
@@ -97,19 +100,21 @@ def enkrypt(cli: Cli):
         enkstr(cli)
     elif subcmd == "lines":
         enk_lines(cli)
+    elif subcmd == "view":
+        enk_lines(cli, stdout=True)
     else:
-        raise ValueError(f"unknow dekrypt subcommand {subcmd}")
+        raise ValueError(f"unknown dekrypt subcommand {subcmd}")
 
 
-def dek_lines(cli: Cli):
+def dek_lines(cli: Cli, stdout=False):
     """dekrypt lines in a text file"""
     konfig : "Konfig" = cli.kreate_konfig()
     if len(cli.params) > 1:
         file = cli.params[1]
     else:
         file = list(konfig.main_konfig_path.parent.glob("secret*konf"))[0]
-    logger.warning(f"dekrypting: {file}")
-    krypt_functions.dekrypt_lines(file, ".")
+    logger.info(f"dekrypting lines of {file}")
+    krypt_functions.dekrypt_lines(file, ".", stdout=stdout)
 
 
 def dekstr(cli: Cli):
@@ -133,15 +138,15 @@ def dekfile(cli: Cli):
     krypt_functions.dekrypt_file(file)
 
 
-def enk_lines(cli: Cli):
+def enk_lines(cli: Cli, stdout=False):
     "enkrypt lines in a text file"
     konfig : "Konfig" = cli.kreate_konfig()
     if len(cli.params) > 1:
         file = cli.params[1]
     else:
         file = list(konfig.main_konfig_path.parent.glob("secret*konf"))[0]
-    logger.warning(f"enkrypting: {file}")
-    krypt_functions.enkrypt_lines(file, ".")
+    logger.info(f"enkrypting lines of {file}")
+    krypt_functions.enkrypt_lines(file, ".", stdout=stdout)
 
 
 def enkfile(cli: Cli):

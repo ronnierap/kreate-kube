@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 import logging
 import os
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ def enkrypt_file(filename):
         f.write(fernet._encrypt_from_parts(data.encode(), 0, part))
 
 
-def change_lines(filename: str, func, from_: str, to_: str, dir: str = None):
+def change_lines(filename: str, func, from_: str, to_: str, dir: str = None, stdout=False):
     dir = dir or "."
     with open(f"{dir}/{filename}") as f:
         lines = f.readlines()
@@ -76,14 +77,17 @@ def change_lines(filename: str, func, from_: str, to_: str, dir: str = None):
                 value = func(value)
                 lines[idx] = f"{start}{to_}{value}\n"
             except Exception as e:
-                logger.error(f"problem with f{func} in {parts[0]}")
-    with open(f"{dir}/{filename}", "w") as f:
-        f.writelines(lines)
+                logger.error(f"problem with {func} in {parts[0]}: {e}")
+    if stdout:
+        sys.stdout.writelines(lines)
+    else:
+        with open(f"{dir}/{filename}", "w") as f:
+            f.writelines(lines)
 
 
-def dekrypt_lines(filename: str, dir: str = None):
-    change_lines(filename, dekrypt_str, "dekrypt:", "enkrypt:", dir=dir)
+def dekrypt_lines(filename: str, dir: str = None, stdout=False):
+    change_lines(filename, dekrypt_str, "dekrypt:", "enkrypt:", dir=dir, stdout=stdout)
 
 
-def enkrypt_lines(filename: str, dir: str = None):
-    change_lines(filename, enkrypt_str, "enkrypt:", "dekrypt:", dir=dir)
+def enkrypt_lines(filename: str, dir: str = None, stdout=False):
+    change_lines(filename, enkrypt_str, "enkrypt:", "dekrypt:", dir=dir, stdout=stdout)
