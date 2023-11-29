@@ -216,28 +216,6 @@ class Cli:
             help="inklude extra files before parsing main konfig",
         )
 
-    def add_output_options(self, cmd):
-        cmd.add_argument(
-            "-v",
-            "--verbose",
-            action="count",
-            default=0,
-            help="output more details (inluding stacktrace) -vv even more",
-        )
-        cmd.add_argument(
-            "-w", "--warn", action="store_true", help="only output warnings"
-        )
-        cmd.add_argument(
-            "-W", "--warn-filter", action="append", metavar="filter", help="set python warnings filter", default=[],
-        )
-
-        cmd.add_argument(
-            "-q",
-            "--quiet",
-            action="store_true",
-            help="do not output any info, just essential output",
-        )
-
     def kreate_files(self) -> App:
         args = vars(self.args).get("cli_args",[])
         konfig = self.kreate_konfig()
