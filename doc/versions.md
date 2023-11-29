@@ -46,7 +46,7 @@ At this moment there are not many versions of kreate-kube:
   - fixed bug with test-dummy format
   - fixed wrong or missing help descriptions
   - total rewrite of the cli, as preparation for new (custom) commands
-- `1.6.x`
+- `1.6.1`
   - improved error message if basic_auth use is not found
   - enkrypt/dekrypt lines by default uses the secret*.konf file
   - fixed bug that full command names did not work
