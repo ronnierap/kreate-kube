@@ -1,4 +1,4 @@
-import argparse
+import os
 import logging
 import inspect
 import warnings
@@ -83,6 +83,12 @@ class KoreModule(Module):
             default=[],
             help="inklude extra files before parsing main konfig",
         )
+        cli.parser.add_argument(
+            "-l",
+            "--local-repo",
+            action="store_true",
+            help="use local repo's (force KREATE_REPO_USE_LOCAL_DIR=True)",
+        )
 
     def add_output_options(self, cli: Cli):
         cli.parser.add_argument(
@@ -106,6 +112,8 @@ class KoreModule(Module):
         )
 
     def process_kore_options(self, args):
+        if args.local_repo:
+            os.setenv("KREATE_REPO_USE_LOCAL_DIR", "True")
         if args.quiet:
             warnings.filterwarnings("ignore")
             #logging.basicConfig(format="%(message)s", level=logging.ERROR)
