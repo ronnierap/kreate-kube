@@ -113,7 +113,7 @@ class KoreModule(Module):
 
     def process_kore_options(self, args):
         if args.local_repo:
-            os.setenv("KREATE_REPO_USE_LOCAL_DIR", "True")
+            os.environ["KREATE_REPO_USE_LOCAL_DIR"] = "True"
         if args.quiet:
             warnings.filterwarnings("ignore")
             #logging.basicConfig(format="%(message)s", level=logging.ERROR)
