@@ -71,6 +71,8 @@ def aliases():
 
 def dekrypt(cli: Cli):
     """dekrypt lines|string|file <file> (abbrevs l|s|str|f)"""
+    if len(cli.params) == 0:
+        raise ValueError("dekrypt should have at least a second param: lines, file or string")
     subcmd = cli.params[0]
     subcmd = aliases().get(subcmd, subcmd)
     if subcmd == "file":
@@ -85,6 +87,8 @@ def dekrypt(cli: Cli):
 
 def enkrypt(cli: Cli):
     """enkrypt lines|string|file <file> (abbrevs l|s|str|f)"""
+    if len(cli.params) == 0:
+        raise ValueError("dekrypt should have at least a second param: lines, file or string")
     subcmd = cli.params[0]
     subcmd = aliases().get(subcmd, subcmd)
     if subcmd == "file":
