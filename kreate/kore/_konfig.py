@@ -104,7 +104,7 @@ class Konfig:
                     raise ValueError("inklude params should contain = in inklude:{fname}")
                 k,v = item.split("=", 1)
                 context["args"][k] = v
-        val_yaml = self.jinyaml.render(location, context)
+        val_yaml = self.jinyaml.render_yaml(location, context)
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
         self.tracer.pop()

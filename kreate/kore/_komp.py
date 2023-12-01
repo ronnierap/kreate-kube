@@ -15,10 +15,10 @@ class Komponent:
     """A base class for other komponents"""
 
     def __init__(
-        self,
-        app: App,
-        shortname: str = None,
-        kind: str = None,
+            self,
+            app: App,
+            shortname: str = None,
+            kind: str = None,
     ):
         self.app = app
         self.kind = kind or self.__class__.__name__
@@ -38,11 +38,11 @@ class Komponent:
             logger.debug(f"adding  {self.kind}.{self.shortname}")
             self.app.add_komponent(self)
 
-
     def skip(self):
         return self.strukture.get("ignore", False)
 
     def aktivate(self):
+        # Abstract Method, sub-classes may implement this method
         pass
 
     def __str__(self):
@@ -72,36 +72,36 @@ class Komponent:
                 logger.debug(f"invoking {self} option {opt}")
                 getattr(self, opt)()
             elif isinstance(opt, Mapping):
-                for key in opt.keys():
-                    val = opt.get(key)
-                    if isinstance(val, Mapping):
-                        logger.debug(
-                            f"invoking {self} option {key}"
-                            f" with kwargs parameters {val}"
-                        )
-                        getattr(self, key)(**dict(val))
-                    elif isinstance(val, list):
-                        logger.debug(
-                            f"invoking {self} option {key}"
-                            f" with list parameters {val}"
-                        )
-                        getattr(self, key)(*val)
-                    elif isinstance(val, str):
-                        logger.debug(
-                            f"invoking {self} option {key}"
-                            f" with string parameter {val}"
-                        )
-                        getattr(self, key)(val)
-                    elif isinstance(val, int):
-                        logger.debug(
-                            f"invoking {self} option {key}" f" with int parameter {val}"
-                        )
-                        getattr(self, key)(int(val))
-                    else:
-                        logger.warning(f"option map {opt} for {self.name} not supported")
-
+                self.__invoke_mapping_options(opt)
             else:
                 logger.warning(f"option {opt} for {self.name} not supported")
+
+    def __invoke_mapping_options(self, opt):
+        for key in opt.keys():
+            val = opt.get(key)
+            if isinstance(val, Mapping):
+                logger.debug(
+                    f"invoking {self} option {key}"
+                    f" with kwargs parameters {val}"
+                )
+                getattr(self, key)(**dict(val))
+            elif isinstance(val, list):
+                logger.debug(
+                    f"invoking {self} option {key}"
+                    f" with list parameters {val}"
+                )
+                getattr(self, key)(*val)
+            elif isinstance(val, str):
+                logger.debug(
+                    f"invoking {self} option {key}"
+                    f" with string parameter {val}"
+                )
+                getattr(self, key)(val)
+            elif isinstance(val, int):
+                logger.debug(f"invoking {self} option {key} with int parameter {val}")
+                getattr(self, key)(int(val))
+            else:
+                logger.warning(f"option map {opt} for {self.name} not supported")
 
     def get_filename(self):
         if self.strukture.get("target_filename"):
@@ -145,6 +145,7 @@ class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""
 
     def __init__(self, app: App, shortname: str = None, kind: str = None):
+        self.data = None
         if kind is None:
             kind = self.__class__.__name__
         if shortname is None:
@@ -153,8 +154,8 @@ class JinjaKomponent(Komponent):
         self.template = self.app.kind_templates[self.kind]
 
     def aktivate(self):
-        vars = self._template_vars()
-        self.data = self.app.konfig.jinyaml.render_jinja(self.template, vars)
+        komponent_vars = self._template_vars()
+        self.data = self.app.konfig.jinyaml.render_jinja(self.template, komponent_vars)
 
     def is_secret(self) -> bool:
         return False
@@ -177,10 +178,36 @@ class JinjaKomponent(Komponent):
         }
 
 
-class JinYamlKomponent(JinjaKomponent):
+class MultiJinYamlKomponent(JinjaKomponent):
+    def __init__(self, app: App, shortname: str = None, kind: str = None):
+        super().__init__(app, shortname, kind)
+        self.documents = None
+
     def aktivate(self):
-        vars = self._template_vars()
-        self.yaml = wrap(self.app.konfig.jinyaml.render(self.template, vars))
+        template_vars = self._template_vars()
+        self.documents = self.app.konfig.jinyaml.render_multi_yaml(self.template, template_vars)
+
+    def kreate_file(self) -> None:
+        filename = self.get_filename()
+        if filename:
+            path = self.app.target_path / filename
+            if self.is_secret():
+                self.app.kontext.add_cleanup_path(path)
+            os.makedirs(path.parent, exist_ok=True)
+            with open(path, "w") as f:
+                for doc in self.documents:
+                    f.write("---\n")
+                    self.app.konfig.jinyaml.dump(doc, f)
+
+
+class JinYamlKomponent(JinjaKomponent):
+    def __init__(self, app: App, shortname: str = None, kind: str = None):
+        super().__init__(app, shortname, kind)
+        self.yaml = None
+
+    def aktivate(self):
+        template_vars = self._template_vars()
+        self.yaml = wrap(self.app.konfig.jinyaml.render_yaml(self.template, template_vars))
         self.invoke_options()
         self.add_additions()
         self.remove_deletions()

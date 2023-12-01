@@ -1,7 +1,7 @@
 import logging
 
 from ..kore import JinYamlKomponent, Module, App
-from .resource import Resource
+from .resource import Resource, MultiDocumentResource
 from .patch import Patch
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,8 @@ class KustomizeModule(Module):
 
 class Kustomization(JinYamlKomponent):
     def resources(self):
-        return [res for res in self.app.komponents if isinstance(res, Resource)]
+        return [res for res in self.app.komponents if
+                (isinstance(res, Resource) or isinstance(res, MultiDocumentResource))]
 
     def patches(self):
         return [res for res in self.app.komponents if isinstance(res, Patch)]

@@ -53,7 +53,6 @@ class JinYaml:
             start = "\n" + indent
         return start + start.join(out.getvalue().splitlines())
 
-
     def add_jinja_filter(self, name, func):
         self.env.filters[name] = func
 
@@ -80,16 +79,28 @@ class JinYaml:
                 logger.error(f"Error when rendering {filename}, {e}")
             raise
 
-    def render(self, fname: str, vars: Mapping) -> Mapping:
+    def render_yaml(self, fname: str, vars: Mapping) -> Mapping:
         self.konfig.tracer.push(f"rendering jinja: {fname}")
         text = self.render_jinja(fname, vars)
         self.konfig.tracer.pop()
         if text is None:
             return None
         self.konfig.tracer.push(f"parsing yaml: {fname}\n" + text)
-        result =  self.yaml_parser.load(text)
+        result = self.yaml_parser.load(text)
         self.konfig.tracer.pop()
         return result
+
+    def render_multi_yaml(self, fname: str, vars: Mapping) -> Mapping:
+        self.konfig.tracer.push(f"rendering jinja: {fname}")
+        text = self.render_jinja(fname, vars)
+        self.konfig.tracer.pop()
+        if text is None:
+            return None
+        self.konfig.tracer.push(f"parsing yaml: {fname}\n" + text)
+        # Support to load multiple documents
+        generator = self.yaml_parser.load_all(text)
+        self.konfig.tracer.pop()
+        return generator
 
     def dump(self, data, output_file):
         self.yaml_parser.dump(data, output_file)
