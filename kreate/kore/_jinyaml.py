@@ -11,7 +11,6 @@ from ruamel.yaml import YAML
 
 logger = logging.getLogger(__name__)
 
-
 def error(msg: str):
     # TODO: is this best Exception?
     raise RuntimeError(msg)
@@ -26,6 +25,7 @@ class JinYaml:
             trim_blocks=True,
             lstrip_blocks=True,
             loader=RepoLoader(konfig),
+            extensions=['jinja2.ext.debug']
         )
         self.env.globals["konfig"] = konfig
         self.env.globals["jinja_extension"] = {
