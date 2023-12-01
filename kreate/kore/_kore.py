@@ -1,16 +1,16 @@
-import os
-import flatdict
-import logging
-import inspect
-import warnings
 import importlib.metadata
+import inspect
+import logging
+import os
+import warnings
+from collections.abc import MutableMapping
 
-from ._core import pprint_map, wrap, pprint_tuple
-from ._repo import clear_cache
-from ._kontext import Module, VersionWarning, load_class
-from ._cli import Cli
 from . import _jinyaml
 from ._app import App
+from ._cli import Cli
+from ._core import pprint_map, pprint_tuple
+from ._kontext import Module, VersionWarning, load_class
+from ._repo import clear_cache
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ def argument(*name_or_flags, **kwargs):
 
 class KoreModule(Module):
     def init_cli(self, cli: Cli):
-        #cli.add_help_section("kore commands:")
+        # cli.add_help_section("kore commands:")
         self.add_kore_subcommands(cli)
         self.add_kore_options(cli)
 
@@ -263,7 +263,7 @@ def view(cli: Cli):
                     if isinstance(result, str):
                         print(f"{param}={result}")
                     else:
-                        pprint_tuple(flatdict.FlatDict(result, delimiter=".").items(), prefix=param)
+                        pprint_tuple(__flatten_dict(result).items(), prefix=param)
             print()
 
     if printFullConfig:
@@ -271,7 +271,7 @@ def view(cli: Cli):
         if yamlMode:
             pprint_map(konfig.yaml)
         else:
-            pprint_tuple(flatdict.FlatDict(konfig.dict_, delimiter=".").items())
+            pprint_tuple(__flatten_dict(konfig.dict_).items())
 
 
 def view_warning_filters():
@@ -299,3 +299,16 @@ def shell(cli: Cli):
     """run one or more shell command including pipes"""
     cmd = " ".join(cli.args.script)
     cli.run_shell(cmd)
+
+
+def __flatten_dict_gen(d, parent_key, sep):
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, MutableMapping):
+            yield from __flatten_dict(v, new_key, sep=sep).items()
+        else:
+            yield new_key, v
+
+
+def __flatten_dict(d: MutableMapping, parent_key: str = '', sep: str = '.'):
+    return dict(__flatten_dict_gen(d, parent_key, sep))
