@@ -1,15 +1,16 @@
-import os
-from io import StringIO
-import jinja2
-import logging
 import base64
-import warnings
+import logging
+import os
 import traceback
-from sys import exc_info
+import warnings
 from collections.abc import Mapping
+from io import StringIO
+
+import jinja2
 from ruamel.yaml import YAML
 
 logger = logging.getLogger(__name__)
+
 
 def error(msg: str):
     # TODO: is this best Exception?
@@ -62,7 +63,7 @@ class JinYaml:
             if data is None:
                 logger.debug(f"did not find {filename}")
                 return None
-            tmpl = self.env.from_string(data) # self.env.get_template(filename)
+            tmpl = self.env.from_string(data)  # self.env.get_template(filename)
             return tmpl.render(vars)
         except jinja2.exceptions.TemplateSyntaxError as e:
             logger.error(
