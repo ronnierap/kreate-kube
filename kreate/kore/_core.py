@@ -203,6 +203,11 @@ def pprint_map(map, indent="", file=None):
         for v in map:
             print(f"{indent}- {v}", file=file)
         return
+
+    if map is None:
+        logger.warning("No values present to print")
+        return
+
     for key in sorted(map.keys()):
         val = map.get(key, None)
         if isinstance(val, Mapping):
