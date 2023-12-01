@@ -8,10 +8,11 @@ from collections.abc import MutableMapping
 from . import _jinyaml
 from ._app import App
 from ._cli import Cli
-from ._core import pprint_map, pprint_tuple
+from ._core import pprint_map, pprint_tuple, print_filtered
 from ._kontext import Module, VersionWarning, load_class
 from ._repo import clear_cache
 
+FORMAT = "%(message)s"
 logger = logging.getLogger(__name__)
 
 
@@ -117,16 +118,16 @@ class KoreModule(Module):
         if args.quiet:
             warnings.filterwarnings("ignore")
             # logging.basicConfig(format="%(message)s", level=logging.ERROR)
-            logging.basicConfig(format="%(message)s", level=logging.WARN)
+            logging.basicConfig(format=FORMAT, level=logging.WARN)
         elif args.verbose >= 3:
             logging.basicConfig(level=5)
         elif args.verbose == 2:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)
         elif args.verbose == 1:
-            logging.basicConfig(format="%(message)s", level=logging.VERBOSE)
+            logging.basicConfig(format=FORMAT, level=logging.VERBOSE)
         else:
-            logging.basicConfig(format="%(message)s", level=logging.INFO)
+            logging.basicConfig(format=FORMAT, level=logging.INFO)
         warnings.simplefilter("error", VersionWarning)
         for warn_setting in args.warn_filter:
             self.parse_warning_setting(warn_setting)
@@ -205,8 +206,8 @@ def view_aliases():
         "wf": "warningfilters",
         "tmpl": "template",
         "ink": "inklude",
-        "p": "propertyview",
-        "prop": "propertyview",
+        "f": "flatview",
+        "flat": "flatview",
         "y": "yamlview",
         "yaml": "yamlview",
         "sys": "system",
@@ -223,52 +224,68 @@ def view_aliases():
 
 def view(cli: Cli):
     """view the entire konfig or subkey(s); possible other subcommand arguments: [template, warningfilters, alias]"""
-    first = True
-    printFullConfig = True
-    yamlMode = True
+    print_full_config = True
+    yaml_mode = True
     if cli.params:
         for idx, param in enumerate(cli.params):
             param = view_aliases().get(param, param)
 
             # Check for View-Parameters
-            if (param == "propertyview"):
+            if (param == "flatview"):
                 # Change to property view
-                yamlMode = False
+                yaml_mode = False
                 continue
             elif (param == "yamlview"):
-                yamlMode = True
+                yaml_mode = True
                 continue
 
             # Regular Parameters
             print(f"==== view {param} =======")
-            printFullConfig = False
+            print_full_config = False
             if param == "template":
+                # View Templates
                 view_templates(cli, cli.params[idx + 1:])
                 break
+
             elif param == "warningfilters":
+                # View Warning Filter
                 view_warning_filters()
+
             elif param == "alias":
+                # View Alassses
                 for alias, full in view_aliases().items():
                     print(f"{alias:8} {full}")
+
             else:
+                # View Filtered Section
                 konfig = cli.kreate_konfig()
-                result = konfig.get_path(param)
-                if yamlMode:
+
+                # Get search path and pattern
+                if "=" in param:
+                    path, pattern = param.split("=", 1)
+                else:
+                    path = param
+                    pattern = None
+
+                logger.info(f"Pattern: {pattern}")
+                result = konfig.get_path(path)
+                if yaml_mode:
                     if isinstance(result, str):
-                        print(f"{param}: {result}")
+                        print(f"{path}: {result}")
                     else:
-                        print(f"{param}:")
+                        print(f"{path}:")
                         pprint_map(result, indent="  ")
                 else:
                     if isinstance(result, str):
-                        print(f"{param}={result}")
+                        print_filtered(f"{path}={result}", pattern)
                     else:
-                        pprint_tuple(__flatten_dict(result).items(), prefix=param)
+                        logger.info("flatten dict found")
+                        pprint_tuple(__flatten_dict(result).items(), prefix=path, pattern=pattern)
             print()
 
-    if printFullConfig:
+    if print_full_config:
         konfig = cli.kreate_konfig()
-        if yamlMode:
+        if yaml_mode:
             pprint_map(konfig.yaml)
         else:
             pprint_tuple(__flatten_dict(konfig.dict_).items())
