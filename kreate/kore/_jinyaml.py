@@ -1,12 +1,12 @@
-import os
-from io import StringIO
-import jinja2
-import logging
 import base64
-import warnings
+import logging
+import os
 import traceback
-from sys import exc_info
+import warnings
 from collections.abc import Mapping
+from io import StringIO
+
+import jinja2
 from ruamel.yaml import YAML
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,7 @@ class JinYaml:
             trim_blocks=True,
             lstrip_blocks=True,
             loader=RepoLoader(konfig),
+            extensions=['jinja2.ext.debug']
         )
         self.env.globals["konfig"] = konfig
         self.env.globals["jinja_extension"] = {
@@ -53,7 +54,6 @@ class JinYaml:
             start = "\n" + indent
         return start + start.join(out.getvalue().splitlines())
 
-
     def add_jinja_filter(self, name, func):
         self.env.filters[name] = func
 
@@ -63,7 +63,7 @@ class JinYaml:
             if data is None:
                 logger.debug(f"did not find {filename}")
                 return None
-            tmpl = self.env.from_string(data) # self.env.get_template(filename)
+            tmpl = self.env.from_string(data)  # self.env.get_template(filename)
             return tmpl.render(vars)
         except jinja2.exceptions.TemplateSyntaxError as e:
             logger.error(
@@ -80,16 +80,28 @@ class JinYaml:
                 logger.error(f"Error when rendering {filename}, {e}")
             raise
 
-    def render(self, fname: str, vars: Mapping) -> Mapping:
+    def render_yaml(self, fname: str, vars: Mapping) -> Mapping:
         self.konfig.tracer.push(f"rendering jinja: {fname}")
         text = self.render_jinja(fname, vars)
         self.konfig.tracer.pop()
         if text is None:
             return None
         self.konfig.tracer.push(f"parsing yaml: {fname}\n" + text)
-        result =  self.yaml_parser.load(text)
+        result = self.yaml_parser.load(text)
         self.konfig.tracer.pop()
         return result
+
+    def render_multi_yaml(self, fname: str, vars: Mapping) -> Mapping:
+        self.konfig.tracer.push(f"rendering jinja: {fname}")
+        text = self.render_jinja(fname, vars)
+        self.konfig.tracer.pop()
+        if text is None:
+            return None
+        self.konfig.tracer.push(f"parsing yaml: {fname}\n" + text)
+        # Support to load multiple documents
+        generator = self.yaml_parser.load_all(text)
+        self.konfig.tracer.pop()
+        return generator
 
     def dump(self, data, output_file):
         self.yaml_parser.dump(data, output_file)

@@ -1,6 +1,7 @@
 import logging
 
 from ..kore import JinYamlKomponent, wrap
+from ..kore._komp import MultiJinYamlKomponent
 from ..krypt.krypt_functions import dekrypt_str
 
 logger = logging.getLogger(__name__)
@@ -12,6 +13,14 @@ __all__ = [
     "ConfigMap",
     "Egress",
 ]
+
+
+class MultiDocumentResource(MultiJinYamlKomponent):
+    def __str__(self):
+        return f"<MultiDocumentResource {self.kind}.{self.shortname} {self.name}>"
+
+    def get_filename(self):
+        return f"resources/{self.kind}-{self.name}.yaml"
 
 
 class Resource(JinYamlKomponent):

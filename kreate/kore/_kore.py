@@ -1,16 +1,18 @@
-import os
-import logging
-import inspect
-import warnings
 import importlib.metadata
+import inspect
+import logging
+import os
+import warnings
+from collections.abc import MutableMapping
 
-from ._core import pprint_map, wrap
-from ._repo import clear_cache
-from ._kontext import Module, VersionWarning, load_class
-from ._cli import Cli
 from . import _jinyaml
 from ._app import App
+from ._cli import Cli
+from ._core import pprint_map, pprint_tuple, print_filtered
+from ._kontext import Module, VersionWarning, load_class
+from ._repo import clear_cache
 
+FORMAT = "%(message)s"
 logger = logging.getLogger(__name__)
 
 
@@ -23,7 +25,7 @@ def argument(*name_or_flags, **kwargs):
 
 class KoreModule(Module):
     def init_cli(self, cli: Cli):
-        #cli.add_help_section("kore commands:")
+        # cli.add_help_section("kore commands:")
         self.add_kore_subcommands(cli)
         self.add_kore_options(cli)
 
@@ -56,7 +58,6 @@ class KoreModule(Module):
             action="store_true",
             help="do not load kreate.env file from user home .config dir",
         )
-
 
     def add_konfig_options(self, cli: Cli):
         cli.parser.add_argument(
@@ -116,17 +117,17 @@ class KoreModule(Module):
             os.environ["KREATE_REPO_USE_LOCAL_DIR"] = "True"
         if args.quiet:
             warnings.filterwarnings("ignore")
-            #logging.basicConfig(format="%(message)s", level=logging.ERROR)
-            logging.basicConfig(format="%(message)s", level=logging.WARN)
+            # logging.basicConfig(format="%(message)s", level=logging.ERROR)
+            logging.basicConfig(format=FORMAT, level=logging.WARN)
         elif args.verbose >= 3:
             logging.basicConfig(level=5)
         elif args.verbose == 2:
             logging.basicConfig(level=logging.DEBUG)
             _jinyaml.logger.setLevel(logging.INFO)
         elif args.verbose == 1:
-            logging.basicConfig(format="%(message)s", level=logging.VERBOSE)
+            logging.basicConfig(format=FORMAT, level=logging.VERBOSE)
         else:
-            logging.basicConfig(format="%(message)s", level=logging.INFO)
+            logging.basicConfig(format=FORMAT, level=logging.INFO)
         warnings.simplefilter("error", VersionWarning)
         for warn_setting in args.warn_filter:
             self.parse_warning_setting(warn_setting)
@@ -135,7 +136,7 @@ class KoreModule(Module):
         if warn_setting == "reset":
             warnings.resetwarnings()
             return
-        action, message, cat_name, module, lineno = (warn_setting.split(":") + [None]*5)[:5]
+        action, message, cat_name, module, lineno = (warn_setting.split(":") + [None] * 5)[:5]
         message = message or ""
         if cat_name is None or cat_name == "":
             category = Warning
@@ -205,6 +206,10 @@ def view_aliases():
         "wf": "warningfilters",
         "tmpl": "template",
         "ink": "inklude",
+        "f": "flatview",
+        "flat": "flatview",
+        "y": "yamlview",
+        "yaml": "yamlview",
         "sys": "system",
         "ver": "version",
         "kust": "strukt.Kustomization",
@@ -216,38 +221,80 @@ def view_aliases():
         "cm": "strukt.ConfigMap",
     }
 
+
 def view(cli: Cli):
-    """view the entire konfig or subkey(s)"""
-    first = True
+    """view the entire konfig or subkey(s); possible other subcommand arguments: [template, warningfilters, alias]"""
+    print_full_config = True
+    yaml_mode = True
     if cli.params:
-        for idx, k in enumerate(cli.params):
-            k = view_aliases().get(k, k)
-            print(f"==== view {k} =======")
-            if k == "template":
-                view_templates(cli, cli.params[idx + 1 :])
+        for idx, param in enumerate(cli.params):
+            param = view_aliases().get(param, param)
+
+            # Check for View-Parameters
+            if (param == "flatview"):
+                # Change to property view
+                yaml_mode = False
+                continue
+            elif (param == "yamlview"):
+                yaml_mode = True
+                continue
+
+            # Regular Parameters
+            print(f"==== view {param} =======")
+            print_full_config = False
+            if param == "template":
+                # View Templates
+                view_templates(cli, cli.params[idx + 1:])
                 break
-            elif k == "warningfilters":
+
+            elif param == "warningfilters":
+                # View Warning Filter
                 view_warning_filters()
-            elif k == "alias":
+
+            elif param == "alias":
+                # View Alassses
                 for alias, full in view_aliases().items():
                     print(f"{alias:8} {full}")
+
             else:
+                # View Filtered Section
                 konfig = cli.kreate_konfig()
-                result = konfig.get_path(k)
-                if isinstance(result, str):
-                    print(f"{k}: {result}")
+
+                # Get search path and pattern
+                if "=" in param:
+                    path, pattern = param.split("=", 1)
                 else:
-                    print(k + ":")
-                    #print(wrap(result).pprint_str(indent="  "))
-                    pprint_map(result, indent="  ")
+                    path = param
+                    pattern = None
+
+                logger.info(f"Pattern: {pattern}")
+                result = konfig.get_path(path)
+                if yaml_mode:
+                    if isinstance(result, str):
+                        print(f"{path}: {result}")
+                    else:
+                        print(f"{path}:")
+                        pprint_map(result, indent="  ")
+                else:
+                    if isinstance(result, str):
+                        print_filtered(f"{path}={result}", pattern)
+                    else:
+                        logger.info("flatten dict found")
+                        pprint_tuple(__flatten_dict(result).items(), prefix=path, pattern=pattern)
             print()
-    else:
+
+    if print_full_config:
         konfig = cli.kreate_konfig()
-        pprint_map(konfig.yaml)
+        if yaml_mode:
+            pprint_map(konfig.yaml)
+        else:
+            pprint_tuple(__flatten_dict(konfig.dict_).items())
+
 
 def view_warning_filters():
     for w in warnings.filters:
         print(w)
+
 
 def version(cli: Cli):
     """view the version"""
@@ -264,7 +311,21 @@ def command(cli: Cli):
     cmd = cli.args.cmd
     print(cli.run_command(cmd))
 
+
 def shell(cli: Cli):
     """run one or more shell command including pipes"""
     cmd = " ".join(cli.args.script)
     cli.run_shell(cmd)
+
+
+def __flatten_dict_gen(d, parent_key, sep):
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, MutableMapping):
+            yield from __flatten_dict(v, new_key, sep=sep).items()
+        else:
+            yield new_key, v
+
+
+def __flatten_dict(d: MutableMapping, parent_key: str = '', sep: str = '.'):
+    return dict(__flatten_dict_gen(d, parent_key, sep))

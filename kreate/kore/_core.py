@@ -1,14 +1,15 @@
+import io
+import logging
+import re
+import sys
 from collections import UserDict, UserList
 from collections.abc import Mapping, Sequence
-import logging
-import io
-import sys
 
 logger = logging.getLogger(__name__)
 
 
 def deep_update(
-    target: Mapping, other: Mapping, overwrite=True, list_insert_index: dict = None
+        target: Mapping, other: Mapping, overwrite=True, list_insert_index: dict = None
 ) -> None:
     if other.get("_do_not_overwrite", False):
         overwrite = False
@@ -203,6 +204,11 @@ def pprint_map(map, indent="", file=None):
         for v in map:
             print(f"{indent}- {v}", file=file)
         return
+
+    if map is None:
+        logger.warning("No values present to print")
+        return
+
     for key in sorted(map.keys()):
         val = map.get(key, None)
         if isinstance(val, Mapping):
@@ -219,3 +225,20 @@ def pprint_map(map, indent="", file=None):
                 print(f"{indent}- {v}", file=file)
         else:
             print(f"{indent}{key}: {val}", file=file)
+
+
+def pprint_tuple(tup, prefix=None, delimiter=".", pattern=None):
+    for item in sorted(tup, key=lambda x: x[0]):
+        if prefix is None:
+            print_filtered(f"{item[0]}={item[1]}", pattern)
+        else:
+            print_filtered(f"{prefix}{delimiter}{item[0]}={item[1]}", pattern)
+
+
+def print_filtered(text, pattern):
+    if pattern is not None:
+        regex_pattern = re.compile(pattern, re.IGNORECASE)
+        if regex_pattern.search(text):
+            print(text)
+    else:
+        print(text)
