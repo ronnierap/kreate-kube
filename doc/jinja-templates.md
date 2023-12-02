@@ -7,7 +7,7 @@ Jinja templates are used for 2 different parts:
 The uses are very different, and have some specific details, especially what kind of jinja context variables are available.
 There are also some common context variables and filters.
 
-# TLDR
+# Summary
 In all templates (bot for konfig and for kreated files) there are some global variables:
 - `{{ konfig }}` The konfig object. (Note that while still inkluding it is only partially filled)
 - `{{ jinja_extension.<func> }}` Some functions that might be useful in templates
@@ -30,12 +30,12 @@ Some examples are
 - `{{ my.var(key) }}` only for `ConfigMap`
 - `{{ my.secret(key) }}` only for `Secret`
 - `{{ my.user(key) }}` only for `SecretbasicAuth`
-- `{{ my.target... }}` only for patches, to point oto the target resource of the patch
+- `{{ my.target... }}` only for patches, to point to the target resource of the patch
 - `{{ app.env }}` or `{{ app.team }}` or `{{ app.appname }}`
 - `{{ strukt.pod.labels[lbl] }}`
 
 
-## Available context vars while parsing konfig files
+# Available context vars while parsing konfig files
 Basically the context contains all konfig data of previously inkluded konf files.
 While new files are inkluded this grows, so for each file new (sub)variable are available.
 Since you can basically add any yaml in you *.konf file there is no fixed set of vars.
@@ -68,7 +68,7 @@ inklude:
 ```
 It would work if the user named this repository `my_own_repo`, but also something else like `my_framework`
 
-## templates for generating files from komponents
+# templates for generating files from komponents
 After the entire konfig has been loaded, files may be generated.
 Note that many commands only load the konfig, but do not kreate files.
 For example the `view`, `enkrypt` and `dekrypt` commands use the konfig, but do not generate any files.
@@ -102,7 +102,7 @@ Many templates have generic classes (e.g. Resource or Patch), but sometimes more
 classes are used.
 
 Depending on the template class some extra features may be available.
-### The `Komponent` class.
+## The `Komponent` class.
 The base class for all komponents is the `Komponent` class.
 ```
 class Komponent:
@@ -137,7 +137,7 @@ Notes about the important attributes:
   For the `main` shortname, often a shorter convention is used.
 - The `field` is a way to search for values. This is described in: [setting-defaults.md](setting-defaults.md)
 
-### The JinjaKomponent and JinyamlKomponent
+## The JinjaKomponent and JinyamlKomponent
 The JinjaKomponent inherits from Komponent and does not at very relevant fields for template designers.
 It does add the important capability to kreate files based on Jinja templates.
 It might be merged into the Komponent class, since kreating files is the base functionality of a Komponent.
@@ -162,7 +162,7 @@ Note that the `app` object is a Python object while there is also an `app` field
 The `app` object of the `App` class might be renamed in the future (maybe to `Kontainer` since it is just a container of komponents)
 
 
-### The JinyamlKomponent
+## The JinyamlKomponent
 The JinyamlKomponent inherits from the JinjaKomponent and is intended to contain YAML.
 It has a specific field for this called `yaml` that can be referenced.
 Note that this is the yaml **after** the entire template has been rendered and parsed as yaml.
@@ -197,10 +197,14 @@ strukt:
           label2: value
 ```
 
+## Other JinyamlKomponent sub classes
+There are several subclasses Of JinyamlKomponent that might add some extra capabilities:
+- Resource: base class for all kubernetes resources. Most resource can use this class, but some sub classes provide more
+  -
 
 
 
-## Common context variables and filters
+# Common context variables and filters
 Both templates use the same jinja enviroment, and thus share some properties.
 The following globals are defined and available in each template:
 ```
