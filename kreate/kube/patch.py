@@ -2,10 +2,8 @@ import logging
 
 from ..kore import deep_update
 from ..kore import JinYamlKomponent
+from ..kore._komp import KomponentKlass
 from .resource import Resource, Egress
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from ._kust import KustomizeModule
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +15,11 @@ __all__ = [
 
 
 class Patch(JinYamlKomponent):
-    def __init__(self, target: Resource, shortname: str, kind: str):
+    # TODO the signature differs from other komponents, and might not work
+    # in KomponentKlass.kreate_komponent. Needs some redesign
+    def __init__(self, target: Resource, klass: KomponentKlass, shortname: str):
         self.target = target
-        super().__init__(target.app, shortname=shortname, kind=kind)
+        super().__init__(target.app, klass=klass, shortname=shortname)
 
     def __str__(self):
         return (
@@ -65,12 +65,13 @@ class EgressLabels(Patch):
 
 
 class MultiPatch(Patch):
-    def __init__(self, target: Resource, shortname: str, kind: str):
-        super().__init__(target, shortname, kind)
-        patches = target.app.konfig.yaml["system"]["template"][kind]["template"]
+    def __init__(self, target: Resource, klass: KomponentKlass, shortname: str):
+        super().__init__(target, klass, shortname)
+        patches = klass.info.get("patches")
+        patches = patches or klass.info.get("template") # TODO remove in kreate 2.0
         for patch_name in patches:
-            cls = target.app.kind_classes[patch_name]
-            cls(target, "main", patch_name)
+            klass = self.app.klasses[patch_name]
+            klass.kreate_komponent(target, "main")
 
     def skip(self):
         return True

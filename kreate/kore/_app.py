@@ -7,8 +7,7 @@ from pathlib import Path
 from ._core import wrap
 from ._konfig import Konfig
 from ._kontext import load_class
-if TYPE_CHECKING:
-    from ._komp import Komponent
+from ._komp import Komponent, KomponentKlass
 
 logger = logging.getLogger(__name__)
 
@@ -31,24 +30,22 @@ class App:
         self.kontext = konfig.kontext
         self.appname = konfig.get_path("app.appname")
         self.env = konfig.get_path("app.env")
-        self.komponents: List["Komponent"] = []
-        self._kinds = {}
-        self.kind_templates = {}
-        self.kind_classes = {}
+        self.komponents: List[Komponent] = []
+        self.klasses: Mapping[KomponentKlass] = {}
         self.strukture = wrap(konfig.get_path("strukt"))
         self.target_path = Path(konfig.get_path("system.target_dir", f"build/{self.appname}-{self.env}"))
         for mod in self.kontext.modules:
             mod.init_app(self)
-        self.register_templates_from_konfig()
+        self.register_klasses_from_konfig()
 
     def kreate_komponents(self):
         self.kreate_komponents_from_strukture()
         for mod in self.kontext.modules:
             mod.kreate_app_komponents(self)
 
-    def komponent_naming(self, kind: str, shortname: str) -> str:
+    def komponent_naming(self, klass_name: str, shortname: str) -> str:
         formatstr = None
-        naming = self.konfig.get_path(f"system.template.{kind}.naming")
+        naming = self.konfig.get_path(f"system.template.{klass_name}.naming")
         if isinstance(naming, Mapping):
             if shortname in naming:
                 formatstr = naming[shortname]
@@ -57,13 +54,10 @@ class App:
         elif isinstance(naming, str):
             formatstr = naming
         elif naming is not None:
-            raise ValueError(f"Unsupported naming for {kind}.{shortname}: {naming}")
-        # TODO: remove next 2 lines in 1.0.0, backward compatible with 0.9.*
-        if not formatstr:
-            formatstr = self.konfig.get_path(f"system.naming.{kind}")
+            raise ValueError(f"Unsupported naming for {klass_name}.{shortname}: {naming}")
         if formatstr:
             return formatstr.format(
-                kind=kind,
+                kind=klass_name,
                 shortname=shortname,
                 appname=self.appname,
             )
@@ -73,11 +67,6 @@ class App:
         if komp.skip():
             return
         self.komponents.append(komp)
-        map = self._kinds.get(komp.kind.lower(), None)
-        if map is None:
-            map = wrap({})
-            self._kinds[komp.kind.lower()] = map
-        map[komp.shortname] = komp
 
     def aktivate_komponents(self):
         for komp in self.komponents:
@@ -101,7 +90,7 @@ class App:
         if not self.strukture:
             raise ValueError("no strukture found in konfig")
         for kind in sorted(self.strukture.keys()):
-            if kind in self.kind_classes:
+            if kind in self.klasses:
                 strukt = self.strukture.get(kind, None)
                 strukt = strukt or {"main": {}}
                 for shortname in sorted(strukt.keys()):
@@ -112,49 +101,18 @@ class App:
 
 ####################################################
 
-    def register_templates_from_konfig(self):
+    def register_klasses_from_konfig(self):
         templates = self.konfig.get_path("system.template", {})
-        for key, _def in templates.items():
-            logger.debug(f"adding custom template {key}")
-            if _def.get("template"):
-                if _def.get("class"):
-                    self.register_template_path(key, _def["class"], _def["template"])
-                else:
-                    self.kind_templates = _def["template"]
-
-    def register_template_path(self, kind: str, clsname: str, path: str) -> None:
-        self.kind_templates[kind] = path
-        self.kind_classes[kind] = load_class(clsname)
-
-    def register_template(self, kind: str, cls, filename=None, package=None):
-        if kind in self.kind_templates:
-            if cls is None:
-                cls = self.kind_classes[kind]
-                logger.debug(
-                    f"overriding template {kind} "
-                    f"using existing class {cls.__name__}"
-                )
+        for klass_name, info in templates.items():
+            logger.debug(f"adding klass {klass_name}")
+            if clsname := info.get("class"):
+                cls = load_class(clsname)
+                self.klasses[klass_name] = KomponentKlass(cls, klass_name, info)
             else:
-                logger.debug(f"overriding template {kind} using default class")
-        filename = filename or f"{kind}.yaml"
-        if package:
-            filename = f"py:{package.__name__}:{filename}"
-        logger.debug(f"registering template {kind}: {filename}")
-        if cls is None:
-            raise ValueError(f"No class specified for template {kind}: {filename}")
-        self.kind_templates[kind] = filename
-        self.kind_classes[kind] = cls
+                raise KeyError(f"No python class defined for Klass {klass_name}")
 
-    def register_template_class(self: str, cls, filename=None, package=None):
-        kind = cls.__name__
-        self.register_template(kind, cls, filename=filename, package=package)
-
-    def register_template_file(self, kind: str, cls=None, filename=None, package=None):
-        self.register_template(kind, cls, filename=filename, package=package)
-
-    def kreate_komponent(self, kind: str, shortname: str = None):
-        cls = self.kind_classes[kind]
-        if inspect.isclass(cls):
-            return cls(app=self, kind=kind, shortname=shortname)
+    def kreate_komponent(self, klass_name: str, shortname: str = None):
+        if kls := self.klasses[klass_name]:
+            return kls.kreate_komponent(app=self, shortname=shortname)
         else:
-            raise ValueError(f"Unknown template type {type(cls)}, {cls}")
+            raise ValueError(f"Unknown klass name {klass_name}")

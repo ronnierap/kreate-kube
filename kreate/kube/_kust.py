@@ -1,6 +1,6 @@
 import logging
 
-from ..kore import JinYamlKomponent, Module, App
+from ..kore import JinYamlKomponent, Module, App, KomponentKlass
 from .resource import Resource, MultiDocumentResource
 from .patch import Patch
 
@@ -13,28 +13,23 @@ class KustomizeModule(Module):
             if isinstance(res, Resource):
                 self.kreate_patches(res)
 
-    def kreate_patch(
-        self,
-        res: Resource,
-        kind: str = None,
-        shortname: str = None,
-    ) -> None:
-        cls = res.app.kind_classes[kind]
-        if issubclass(cls, Patch):
-            cls(res, shortname, kind)
+    def kreate_patch(self, target: Resource, klass: KomponentKlass, shortname: str) -> None:
+        if issubclass(klass.python_class, Patch):
+            klass.kreate_komponent(target, shortname)
         else:
-            raise TypeError(f"class for {kind}.{shortname} is not a Patch but {cls}")
+            raise TypeError(f"class for {klass.name}.{shortname} is not a Patch but {klass.python_class.__name__}")
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
-            for kind in sorted(res.strukture.get("patches").keys()):
-                subpatches = res.strukture._get_path(f"patches.{kind}")
+            for patch_name in sorted(res.strukture.get("patches").keys()):
+                subpatches = res.strukture._get_path(f"patches.{patch_name}")
+                klass = res.app.klasses[patch_name]
                 if not subpatches.keys():
                     subpatches = {"main": {}}
                 # use sorted because some patches, e.g. the MountVolumes
                 # result in a list, were the order can be unpredictable
                 for shortname in sorted(subpatches.keys()):
-                    self.kreate_patch(res, kind=kind, shortname=shortname)
+                    self.kreate_patch(res, klass, shortname)
 
 
 class Kustomization(JinYamlKomponent):

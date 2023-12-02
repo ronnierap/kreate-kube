@@ -3,12 +3,23 @@ import os
 import jinja2
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from ._core import wrap
-from ._app import App
+if TYPE_CHECKING:
+        from ._app import App
 
 logger = logging.getLogger(__name__)
+
+
+class KomponentKlass:
+    def __init__(self, python_class, name: str, info: Mapping) -> None:
+        self.python_class = python_class
+        self.name = name
+        self.info = info
+
+    def kreate_komponent(self, app: "App", shortname: str) -> "Komponent":
+        return self.python_class(app, self, shortname)
 
 
 class Komponent:
@@ -16,12 +27,13 @@ class Komponent:
 
     def __init__(
             self,
-            app: App,
+            app: "App",
+            klass: KomponentKlass,
             shortname: str = None,
-            kind: str = None,
     ):
         self.app = app
-        self.kind = kind or self.__class__.__name__
+        self.klass = klass
+        self.kind = klass.name  # TODO move to Resource
         self.shortname = shortname or "main"
         self.strukture = wrap(self._find_strukture())
         self.field = Field(self)
@@ -144,14 +156,12 @@ class Field:
 class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""
 
-    def __init__(self, app: App, shortname: str = None, kind: str = None):
+    def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
+        super().__init__(app, klass, shortname)
         self.data = None
-        if kind is None:
-            kind = self.__class__.__name__
-        if shortname is None:
-            shortname = "main"
-        super().__init__(app, shortname, kind)
-        self.template = self.app.kind_templates[self.kind]
+        self.template = klass.info.get("template")
+        if not self.template:
+            raise KeyError(f"no template defined for {klass.name}.{shortname} in {klass.info}")
 
     def aktivate(self):
         komponent_vars = self._template_vars()
@@ -179,8 +189,8 @@ class JinjaKomponent(Komponent):
 
 
 class MultiJinYamlKomponent(JinjaKomponent):
-    def __init__(self, app: App, shortname: str = None, kind: str = None):
-        super().__init__(app, shortname, kind)
+    def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
+        super().__init__(app, klass, shortname)
         self.documents = None
 
     def aktivate(self):
@@ -201,8 +211,8 @@ class MultiJinYamlKomponent(JinjaKomponent):
 
 
 class JinYamlKomponent(JinjaKomponent):
-    def __init__(self, app: App, shortname: str = None, kind: str = None):
-        super().__init__(app, shortname, kind)
+    def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
+        super().__init__(app, klass, shortname)
         self.yaml = None
 
     def aktivate(self):
