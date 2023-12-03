@@ -12,6 +12,7 @@ from ._core import pprint_map, pprint_tuple, print_filtered
 from ._kontext import Module, VersionWarning, load_class
 from ._repo import clear_cache
 
+
 FORMAT = "%(message)s"
 logger = logging.getLogger(__name__)
 
@@ -154,25 +155,25 @@ def clear_repo_cache(cli: Cli):
     clear_cache()
 
 
-def view_template(cli: Cli, template: str):
-    app = App(cli.kreate_konfig())
-    if template not in app.kind_templates or template not in app.kind_classes:
+def view_template(cli: Cli, app: App, template: str):
+    if template not in app.klasses:
         logger.warning(f"Unknown template kind {template}")
         return
+    klass = app.klasses[template]
     if not cli.args.quiet:
         print("==========================")
         print(
             f"{template} "
-            f"{app.kind_classes[template].__name__}: "
-            f"{app.kind_templates[template]}"
+            f"{klass.python_class.__name__}: "
+            f"{klass.info}"
         )
         print("==========================")
-        if app.kind_classes[template].__doc__:
-            print(inspect.cleandoc(app.kind_classes[template].__doc__))
+        if klass.python_class.__doc__:
+            print(inspect.cleandoc(klass.python_class.__doc__))
             print("==========================")
-    if app.kind_templates[template] != "NoTemplate":
-        tmpl = app.kind_templates[template]
-        tmpl_text = app.konfig.file_getter.get_data(tmpl)
+    template_loc = klass.info.get("template")
+    if template_loc:
+        tmpl_text = app.konfig.file_getter.get_data(template_loc)
         print(tmpl_text)
 
 
@@ -181,20 +182,17 @@ def view_templates(cli: Cli, templates):
     # we call the kreate_app method and not the convenience app()
     # method, because aktivating the app, will do stuff that might break
     # template = cli.args.template
+    app = App(cli.kreate_konfig())
     if templates:
         for t in templates:
-            view_template(cli, t)
+            view_template(cli, app, t)
     else:
-        app = App(cli.kreate_konfig())
-        for template in app.kind_templates:
-            if template in app.kind_templates and template in app.kind_classes:
-                print(
-                    f"{template:24} "
-                    f"{app.kind_classes[template].__name__:20} "
-                    f"{app.kind_templates[template]}"
-                )
-            else:
-                logger.warning(f"skipping template {template}")
+        for name, klass in app.klasses.items():
+            print(
+                f"{name:24} "
+                f"{klass.python_class.__name__:20} "
+                f"{klass.info.get('template', 'no template')}"
+            )
 
 
 def view_aliases():
