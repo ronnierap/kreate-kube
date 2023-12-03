@@ -2,6 +2,7 @@ import importlib.metadata
 import inspect
 import logging
 import os
+import re
 import warnings
 from collections.abc import MutableMapping
 
@@ -160,6 +161,9 @@ def view_template(cli: Cli, app: App, template: str):
         logger.warning(f"Unknown template kind {template}")
         return
     klass = app.klasses[template]
+    template_loc = klass.info.get("template")
+    if template_loc:
+        tmpl_text = app.konfig.file_getter.get_data(template_loc)
     if not cli.args.quiet:
         print("==========================")
         print(
@@ -171,9 +175,12 @@ def view_template(cli: Cli, app: App, template: str):
         if klass.python_class.__doc__:
             print(inspect.cleandoc(klass.python_class.__doc__))
             print("==========================")
-    template_loc = klass.info.get("template")
+        if template_loc:
+            print("Fields:")
+            fields = re.findall("{{ *my.field.[^}]*}}", tmpl_text)
+            for field in sorted(set(fields)):
+                print(field.replace("{"," ").replace("}"," "))
     if template_loc:
-        tmpl_text = app.konfig.file_getter.get_data(template_loc)
         print(tmpl_text)
 
 
