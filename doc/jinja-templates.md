@@ -19,12 +19,16 @@ In konfig files you can use any part of the yaml already inkluded. Examples are:
 There also is a special var to be used for inkluding files from the same repo:
 - `{{ my_repo_name }}`
 
-In templates for creating files for a komponent you can use the following vars:
+In templates for creating files for a komponent you can use all the parts of
+the konfig yaml just as above.
+There is one addition variable `my`.
+This points to the komponent and can be used to access other object.
+For example
 - `{{ my... }}` point to the Komponent object
-- `{{ strukt... }}` can also be referenced as `{{ my.strukture }}`
-- `{{ app... }}` is a convenience shortcut to the `app:` element of the konfig
-Some examples are
-- `{{ my.field.cpu_limit }}`
+- `{{ my.strukture }}` points to the part of the strukt, specific for this komponent
+- `{{ my.field.cpu_limit }}` to get a field from various locations.
+  see [using fields](doc/settings-defaults.md)
+- `{{ my.id }}` e.g.  `Ingress.root` or `Service.main`
 - `{{ my.shortname }}` shortname e.g. `main` or `root` (for `Ingress.root`)
 - `{{ my.name }}` full name usualy for kubernetes resource, e.g. `demo-ingress-root`
 - `{{ my.var(key) }}` only for `ConfigMap`
@@ -32,7 +36,6 @@ Some examples are
 - `{{ my.user(key) }}` only for `SecretbasicAuth`
 - `{{ my.target... }}` only for patches, to point to the target resource of the patch
 - `{{ app.env }}` or `{{ app.team }}` or `{{ app.appname }}`
-- `{{ strukt.pod.labels[lbl] }}`
 
 
 # Available context vars while parsing konfig files
