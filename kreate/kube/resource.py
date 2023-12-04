@@ -1,7 +1,7 @@
 import logging
 
-from ..kore import JinYamlKomponent, wrap
-from ..kore._komp import MultiJinYamlKomponent
+from ..kore import JinYamlKomponent, wrap, App
+from ..kore._komp import MultiJinYamlKomponent, KomponentKlass
 from ..krypt.krypt_functions import dekrypt_str
 
 logger = logging.getLogger(__name__)
@@ -17,22 +17,28 @@ __all__ = [
 
 class MultiDocumentResource(MultiJinYamlKomponent):
     def __str__(self):
-        return f"<MultiDocumentResource {self.kind}.{self.shortname} {self.name}>"
+        return f"<MultiDocumentResource {self.id} {self.name}>"
 
     def get_filename(self):
-        return f"resources/{self.kind}-{self.name}.yaml"
+        return f"resources/{self.id}.yaml"
 
 
 class Resource(JinYamlKomponent):
+    def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
+        super().__init__(app, klass, shortname)
+        # TODO: This might be deprecated and gotten from template in future
+        # It is mostly used for patches, and then apiVersion is needed as well
+        self.kind = klass.info.get("kind", klass.name)
+
     def aktivate(self):
         super().aktivate()
         self.add_metadata()
 
     def __str__(self):
-        return f"<Resource {self.kind}.{self.shortname} {self.name}>"
+        return f"<Resource {self.id} {self.name}>"
 
     def get_filename(self):
-        return f"resources/{self.kind}-{self.name}.yaml"
+        return f"resources/{self.id}.yaml"
 
     def add_metadata(self):
         for key in self.strukture.get("annotations", {}):
@@ -102,7 +108,7 @@ class Secret(Resource):
         return self.app.konfig.load_repo_file(location)
 
     def get_filename(self):
-        return f"secrets/resources/{self.kind}-{self.name}.yaml"
+        return f"secrets/resources/{self.id}.yaml"
 
     def is_secret(self) -> bool:
         return True
@@ -136,7 +142,7 @@ class SecretBasicAuth(Resource):
         return "\n".join(result)
 
     def get_filename(self):
-        return f"secrets/resources/{self.kind}-{self.name}.yaml"
+        return f"secrets/resources/{self.id}.yaml"
 
     def is_secret(self) -> bool:
         return True

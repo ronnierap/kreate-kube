@@ -57,7 +57,6 @@ class App:
             raise ValueError(f"Unsupported naming for {klass_name}.{shortname}: {naming}")
         if formatstr:
             return formatstr.format(
-                kind=klass_name,
                 shortname=shortname,
                 appname=self.appname,
             )
@@ -70,7 +69,7 @@ class App:
 
     def aktivate_komponents(self):
         for komp in self.komponents:
-            logger.debug(f"aktivating {komp.kind}.{komp.shortname}")
+            logger.debug(f"aktivating {komp.id}")
             komp.aktivate()
 
     def kreate_files(self):
@@ -84,20 +83,20 @@ class App:
                 logger.info(f"kreating file {komp.get_filename()}")
                 komp.kreate_file()
             else:
-                logger.info(f"skipping file for {komp.kind}.{komp.shortname}")
+                logger.info(f"skipping file for {komp.id}")
 
     def kreate_komponents_from_strukture(self):
         if not self.strukture:
             raise ValueError("no strukture found in konfig")
-        for kind in sorted(self.strukture.keys()):
-            if kind in self.klasses:
-                strukt = self.strukture.get(kind, None)
+        for klass_name in sorted(self.strukture.keys()):
+            if klass_name in self.klasses:
+                strukt = self.strukture.get(klass_name, None)
                 strukt = strukt or {"main": {}}
                 for shortname in sorted(strukt.keys()):
-                    logger.debug(f"kreating komponent {kind}.{shortname}")
-                    self.kreate_komponent(kind, shortname)
-            elif kind != "default" and kind != "use":
-                logger.warning(f"Unknown toplevel komponent {kind}")
+                    logger.debug(f"kreating komponent {klass_name}.{shortname}")
+                    self.kreate_komponent(klass_name, shortname)
+            elif klass_name != "default" and klass_name != "use":
+                logger.warning(f"Unknown toplevel komponent {klass_name}")
 
 ####################################################
 

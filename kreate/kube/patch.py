@@ -22,34 +22,26 @@ class Patch(JinYamlKomponent):
         super().__init__(target.app, klass=klass, shortname=shortname)
 
     def __str__(self):
-        return (
-            f"<Patch {self.target.kind}.{self.target.shortname}"
-            f":{self.kind}.{self.shortname}>"
-        )
+        return (f"<Patch {self.target.id}: {self.id}>")
 
     def get_filename(self):
         return (
-            f"patches/{self.target.kind}-{self.target.shortname}"
-            f"-{self.kind}-{self.shortname}.yaml"
+            f"patches/{self.target.id}-{self.id}.yaml"
         )
 
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}
 
     def _find_strukture(self):
-        root_strukture = super()._find_strukture()
-        typename = self.kind
-        tar_struk = self.target.strukture.get("patches", {})
-        if typename in tar_struk and self.shortname in tar_struk[typename]:
-            logger.debug(
-                f"using embedded strukture {typename}.{self.shortname}"
-                f" from {self.target.kind}.{self.target.shortname}"
-            )
+        #root_strukture = super()._find_strukture()
+        target_struk = self.target.strukture.get(f"patches.{self.id}", {})
+        #if target_struk:
+        #    logger.debug(f"using embedded strukture {self.id} from {self.target.id}")
             # The embedded_strukture is first,
             # since the root_strukture will contain all default values
-            embedded_strukture = tar_struk[typename][self.shortname]
-            deep_update(root_strukture, embedded_strukture)
-        return root_strukture
+            #deep_update(root_strukture, embedded_strukture)
+        #return root_strukture
+        return target_struk
 
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:

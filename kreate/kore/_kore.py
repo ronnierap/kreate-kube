@@ -156,18 +156,18 @@ def clear_repo_cache(cli: Cli):
     clear_cache()
 
 
-def view_template(cli: Cli, app: App, template: str):
-    if template not in app.klasses:
-        logger.warning(f"Unknown template kind {template}")
+def view_template(cli: Cli, app: App, klass_name: str):
+    if klass_name not in app.klasses:
+        logger.warning(f"Unknown klass {klass_name}")
         return
-    klass = app.klasses[template]
+    klass = app.klasses[klass_name]
     template_loc = klass.info.get("template")
     if template_loc:
         tmpl_text = app.konfig.file_getter.get_data(template_loc)
     if not cli.args.quiet:
         print("==========================")
         print(
-            f"{template} "
+            f"{klass_name} "
             f"{klass.python_class.__name__}: "
             f"{klass.info}"
         )
@@ -185,7 +185,7 @@ def view_template(cli: Cli, app: App, template: str):
 
 
 def view_templates(cli: Cli, templates):
-    """view the template for a specific kind"""
+    """view the defintion for a specific klass"""
     # we call the kreate_app method and not the convenience app()
     # method, because aktivating the app, will do stuff that might break
     # template = cli.args.template

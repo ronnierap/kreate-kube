@@ -33,13 +33,13 @@ class Komponent:
     ):
         self.app = app
         self.klass = klass
-        self.kind = klass.name  # TODO move to Resource
         self.shortname = shortname or "main"
+        self.id = f"{klass.name}.{shortname}"
         self.strukture = wrap(self._find_strukture())
         self.field = Field(self)
         name = (
             self.strukture.get("name", None)
-            or app.komponent_naming(self.kind, self.shortname)
+            or app.komponent_naming(self.klass.name, self.shortname)
             or self.calc_name()
         )
         self.name = name.lower()
@@ -47,7 +47,7 @@ class Komponent:
             # do not load the template (strukture might be missing)
             logger.info(f"ignoring {self.name}")
         else:
-            logger.debug(f"adding  {self.kind}.{self.shortname}")
+            logger.debug(f"adding  {self.id}")
             self.app.add_komponent(self)
 
     def skip(self):
@@ -58,21 +58,19 @@ class Komponent:
         pass
 
     def __str__(self):
-        return f"<Komponent {self.kind}.{self.shortname} {self.name}>"
+        return f"<Komponent {self.id} {self.name}>"
 
     def calc_name(self):
         if self.shortname == "main":
-            return f"{self.app.appname}-{self.kind}"
-        return f"{self.app.appname}-{self.kind}-{self.shortname}"
+            return f"{self.app.appname}-{self.klass.name}"
+        return f"{self.app.appname}-{self.klass.name}-{self.shortname}"
 
     def _find_strukture(self):
-        typename = self.kind
-        strukt = self.app.strukture if self.app else {}
-        if typename in strukt and self.shortname in strukt[typename]:
-            logger.debug(f"using named strukture {typename}.{self.shortname}")
-            return self.app.strukture[typename][self.shortname]
-        logger.debug(f"could not find strukture for {typename}.{self.shortname}")
-        return {}
+        strukt = self.app.strukture._get_path(self.id)
+        if strukt is None:
+            logger.debug(f"could not find strukture for {self.id}")
+            return {}
+        return strukt
 
     def kreate_file(self) -> None:
         raise NotImplementedError(f"no kreate_file for {type(self)}")
@@ -118,15 +116,15 @@ class Komponent:
     def get_filename(self):
         if self.strukture.get("target_filename"):
             return self.strukture.get("target_filename")
-        return f"{self.kind.lower()}-{self.shortname}.yaml"
+        return f"{self.klass.name}-{self.shortname}.yaml".lower()
 
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
         konf = self.app.konfig
-        result = konf.get_path(f"val.{self.kind}.{self.shortname}.{fieldname}")
+        result = konf.get_path(f"val.{self.id}.{fieldname}")
         if result is None:
-            result = konf.get_path(f"val.{self.kind}.{fieldname}")
+            result = konf.get_path(f"val.{self.klass.name}.{fieldname}")
         if result is None:
             result = konf.get_path(f"val.generic.{fieldname}")
         if result is not None:
