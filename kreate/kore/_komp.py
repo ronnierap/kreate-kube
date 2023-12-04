@@ -73,7 +73,7 @@ class Komponent:
         return strukt
 
     def is_secret(self) -> bool:
-        return False
+        return self.klass.info.get("secret", False)
 
     def kreate_file(self) -> None:
         filename = self.get_filename()
@@ -186,7 +186,7 @@ class TextFile(Komponent):
         return self.filename
 
     def is_secret(self):
-        return "dekrypt:" in self.from_location
+        return super().is_secret() or "dekrypt:" in self.from_location
 
     def kreate_file_data(self) -> str:
         return self.app.konfig.file_getter.get_data(self.from_location)
