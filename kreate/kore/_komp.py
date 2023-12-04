@@ -72,8 +72,22 @@ class Komponent:
             return {}
         return strukt
 
+    def is_secret(self) -> bool:
+        return False
+
     def kreate_file(self) -> None:
-        raise NotImplementedError(f"no kreate_file for {type(self)}")
+        filename = self.get_filename()
+        if filename:
+            path = self.app.target_path / filename
+            if self.is_secret():
+                self.app.kontext.add_cleanup_path(path)
+            os.makedirs(path.parent, exist_ok=True)
+            text = self.kreate_file_data()
+            with open(path, "w") as f:
+                f.write(text)
+
+    def kreate_file_data(self) -> str:
+        raise NotImplementedError(f"no kreate_file_data for {type(self)}")
 
     def invoke_options(self):
         options = self.strukture.get("options", [])
@@ -162,6 +176,31 @@ class Field:
         return self._komp._contains_field(key)
 
 
+class TextFile(Komponent):
+    def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
+        super().__init__(app, klass, shortname)
+        self.from_location = self.strukture.get("from")
+        self.to = self.strukture.get("to")
+
+    def get_filename(self):
+        # TODO: do we want to use to or target_filename?
+        if self.strukture.get("target_filename"):
+            return self.strukture.get("target_filename")
+        return self.to
+
+    def is_secret(self):
+        return "dekrypt:" in self.from_location
+
+    def kreate_file_data(self) -> str:
+        text = self.app.konfig.file_getter.get_data(self.from_location)
+        return text
+
+class JinjaFile(TextFile):
+    def kreate_file_data(self) -> str:
+        konfig = self.app.konfig
+        # TODO: pass my to template?
+        return konfig.jinyaml.render_jinja(self.from_location, konfig.yaml)
+
 class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""
 
@@ -176,18 +215,8 @@ class JinjaKomponent(Komponent):
         komponent_vars = self._template_vars()
         self.data = self.app.konfig.jinyaml.render_jinja(self.template, komponent_vars)
 
-    def is_secret(self) -> bool:
-        return False
-
     def kreate_file(self) -> None:
-        filename = self.get_filename()
-        if filename:
-            path = self.app.target_path / filename
-            if self.is_secret():
-                self.app.kontext.add_cleanup_path(path)
-            os.makedirs(path.parent, exist_ok=True)
-            with open(path, "w") as f:
-                f.write(self.data)
+        return self.data
 
     def _template_vars(self):
         return {

@@ -7,7 +7,7 @@ from pathlib import Path
 from ._core import wrap
 from ._konfig import Konfig
 from ._kontext import load_class
-from ._komp import Komponent, KomponentKlass
+from ._komp import Komponent, KomponentKlass, TextFile, JinjaFile
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class App:
         self.target_path = Path(konfig.get_path("system.target_dir", f"build/{self.appname}-{self.env}"))
         for mod in self.kontext.modules:
             mod.init_app(self)
-        self.register_klasses_from_konfig()
+        self.register_klasses()
 
     def kreate_komponents(self):
         self.kreate_komponents_from_strukture()
@@ -102,8 +102,11 @@ class App:
 
 ####################################################
 
-    def register_klasses_from_konfig(self):
-        templates = self.konfig.get_path("system.template", {})
+    def register_klasses(self):
+        self.klasses["TextFile"] = KomponentKlass(TextFile, "TextFile", {})
+        self.klasses["JinjaFile"] = KomponentKlass(JinjaFile, "JinjaFile", {})
+        templates = dict(self.konfig.get_path("system.template", {})) # TODO: deprecated after 2.0
+        templates.update(self.konfig.get_path("system.klasses", {}))
         for klass_name, info in templates.items():
             logger.debug(f"adding klass {klass_name}")
             if clsname := info.get("class"):
