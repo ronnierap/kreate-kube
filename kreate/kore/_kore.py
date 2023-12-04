@@ -211,10 +211,10 @@ def view_aliases():
         "wf": "warningfilters",
         "tmpl": "template",
         "ink": "inklude",
-        "f": "flatview",
-        "flat": "flatview",
-        "y": "yamlview",
-        "yaml": "yamlview",
+        "p": "paths",
+        "path": "paths",
+        "y": "yaml",
+        "k": "komponent",
         "komp": "komponent",
         "sys": "system",
         "ver": "version",
@@ -237,7 +237,7 @@ def view(cli: Cli):
             param = view_aliases().get(param, param)
 
             # Check for View-Parameters
-            if (param == "flatview"):
+            if (param == "paths"):
                 # Change to property view
                 yaml_mode = False
                 continue
