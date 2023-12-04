@@ -164,7 +164,9 @@ def view_template(cli: Cli, app: App, klass_name: str):
     template_loc = klass.info.get("template")
     if template_loc:
         tmpl_text = app.konfig.file_getter.get_data(template_loc)
-    if not cli.args.quiet:
+    if cli.args.quiet:
+        print(tmpl_text)
+    else:
         print("==========================")
         print(
             f"{klass_name} "
@@ -180,8 +182,11 @@ def view_template(cli: Cli, app: App, klass_name: str):
             fields = re.findall("{{ *my.field.[^}]*}}", tmpl_text)
             for field in sorted(set(fields)):
                 print(field.replace("{"," ").replace("}"," "))
-    if template_loc:
-        print(tmpl_text)
+            print(tmpl_text)
+        if doc_loc := klass.info.get("doc"):
+            print("==========================")
+            doc = app.konfig.file_getter.get_data(doc_loc)
+            print(doc)
 
 
 def view_templates(cli: Cli, templates):
