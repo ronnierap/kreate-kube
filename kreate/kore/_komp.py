@@ -121,12 +121,20 @@ class Komponent:
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
+        if result := self.strukture._get_path(f"field.{fieldname}"):
+            return result
         konf = self.app.konfig
-        result = konf.get_path(f"val.{self.id}.{fieldname}")
+        result = konf.get_path(f"val.{self.id}.{fieldname}") # deprecated in 2.0.0
         if result is None:
-            result = konf.get_path(f"val.{self.klass.name}.{fieldname}")
+            result = konf.get_path(f"val.field.{self.id}.{fieldname}")
         if result is None:
-            result = konf.get_path(f"val.generic.{fieldname}")
+            result = konf.get_path(f"val.{self.klass.name}.{fieldname}") # deprecated in 2.0.0
+        if result is None:
+            result = konf.get_path(f"val.field.{self.klass.name}.{fieldname}")
+        if result is None:
+            result = konf.get_path(f"val.generic.{fieldname}") # deprecated in 2.0.0
+        if result is None:
+            result = konf.get_path(f"val.field.generic.{fieldname}")
         if result is not None:
             return result
         if default is not None:
@@ -143,6 +151,9 @@ class Komponent:
 class Field:
     def __init__(self, komp: Komponent) -> None:
         self._komp = komp
+
+    def get(self, __name: str) -> Any:
+        return self._komp._field(__name)
 
     def __getattr__(self, __name: str) -> Any:
         return self._komp._field(__name)

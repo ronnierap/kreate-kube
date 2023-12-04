@@ -6,7 +6,7 @@ import re
 import warnings
 from collections.abc import MutableMapping
 
-from . import _jinyaml
+from . import _jinyaml, Komponent, Konfig
 from ._app import App
 from ._cli import Cli
 from ._core import pprint_map, pprint_tuple, print_filtered
@@ -215,6 +215,7 @@ def view_aliases():
         "flat": "flatview",
         "y": "yamlview",
         "yaml": "yamlview",
+        "komp": "komponent",
         "sys": "system",
         "ver": "version",
         "kust": "strukt.Kustomization",
@@ -250,6 +251,11 @@ def view(cli: Cli):
             if param == "template":
                 # View Templates
                 view_templates(cli, cli.params[idx + 1:])
+                break
+
+            elif param == "komponent":
+                # View komponent details
+                view_komponent(cli, cli.params[idx + 1])
                 break
 
             elif param == "warningfilters":
@@ -299,6 +305,43 @@ def view(cli: Cli):
 def view_warning_filters():
     for w in warnings.filters:
         print(w)
+
+def view_komponent(cli: Cli, komp_id: str):
+    app = cli.kreate_files()
+    komp : Komponent = app.komponents_by_id[komp_id]
+    print(komp.id, komp.klass)
+    print("Strukture:")
+    pprint_map(komp.strukture)
+    #if isinstance(komp.klass.python_class, JinjaKomponent):
+    template_loc = komp.klass.info.get("template")
+    if template_loc:
+        tmpl_text = app.konfig.file_getter.get_data(template_loc)
+        print("Fields:")
+        fields = re.findall("{{ *my.field.([a-zA-Z_0-9]*)", tmpl_text)
+        for field in sorted(set(fields)):
+            print(f"  {field}: " + str(komp.field.get(field)))
+            if (cli.args.verbose > 0):
+                found = False
+                found = _pfp(app.konfig, f"strukt.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"strukt.field.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"val.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"val.field.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"val.{komp.klass.name}.{field}", found)
+                found = _pfp(app.konfig, f"val.field.{komp.klass.name}.{field}", found)
+                found = _pfp(app.konfig, f"val.generic.{field}", found)
+                found = _pfp(app.konfig, f"val.field.generic.{field}", found)
+
+def _pfp(konfig: Konfig, path: str , found: bool) -> bool:
+    result = konfig.get_path(path)
+    if result is None and not found:
+        print(f"    . {path}: -")
+    elif not found:
+        print(f"    * {path}: {result}")
+        found = True
+    else:
+        print(f"      {path}: {result}")
+    return found
+
 
 
 def version(cli: Cli):

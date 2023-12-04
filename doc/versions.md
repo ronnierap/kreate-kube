@@ -59,6 +59,8 @@ At this moment there are not many versions of kreate-kube:
   - added jinja debug option
   - fixed bug in `command` (e.g. for dry-run)
   - Added `KomponentKlass` to replace/improve the templates
+  - got rid of kind, and use klass.name and komp.id instead
+  - added `view komponent` command
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

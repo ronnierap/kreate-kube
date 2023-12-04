@@ -31,6 +31,7 @@ class App:
         self.appname = konfig.get_path("app.appname")
         self.env = konfig.get_path("app.env")
         self.komponents: List[Komponent] = []
+        self.komponents_by_id = {}
         self.klasses: Mapping[KomponentKlass] = {}
         self.strukture = wrap(konfig.get_path("strukt"))
         self.target_path = Path(konfig.get_path("system.target_dir", f"build/{self.appname}-{self.env}"))
@@ -66,6 +67,7 @@ class App:
         if komp.skip():
             return
         self.komponents.append(komp)
+        self.komponents_by_id[komp.id] = komp
 
     def aktivate_komponents(self):
         for komp in self.komponents:
