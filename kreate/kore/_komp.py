@@ -6,8 +6,9 @@ from collections.abc import Mapping
 from typing import Any, TYPE_CHECKING
 
 from ._core import wrap
+
 if TYPE_CHECKING:
-        from ._app import App
+    from ._app import App
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +27,10 @@ class Komponent:
     """A base class for other komponents"""
 
     def __init__(
-            self,
-            app: "App",
-            klass: KomponentKlass,
-            shortname: str = None,
+        self,
+        app: "App",
+        klass: KomponentKlass,
+        shortname: str = None,
     ):
         self.app = app
         self.klass = klass
@@ -106,20 +107,17 @@ class Komponent:
             val = opt.get(key)
             if isinstance(val, Mapping):
                 logger.debug(
-                    f"invoking {self} option {key}"
-                    f" with kwargs parameters {val}"
+                    f"invoking {self} option {key}" f" with kwargs parameters {val}"
                 )
                 getattr(self, key)(**dict(val))
             elif isinstance(val, list):
                 logger.debug(
-                    f"invoking {self} option {key}"
-                    f" with list parameters {val}"
+                    f"invoking {self} option {key}" f" with list parameters {val}"
                 )
                 getattr(self, key)(*val)
             elif isinstance(val, str):
                 logger.debug(
-                    f"invoking {self} option {key}"
-                    f" with string parameter {val}"
+                    f"invoking {self} option {key}" f" with string parameter {val}"
                 )
                 getattr(self, key)(val)
             elif isinstance(val, int):
@@ -139,15 +137,17 @@ class Komponent:
         if result := self.strukture._get_path(f"field.{fieldname}"):
             return result
         konf = self.app.konfig
-        result = konf.get_path(f"val.{self.id}.{fieldname}") # deprecated in 2.0.0
+        result = konf.get_path(f"val.{self.id}.{fieldname}")  # deprecated in 2.0.0
         if result is None:
             result = konf.get_path(f"val.field.{self.id}.{fieldname}")
         if result is None:
-            result = konf.get_path(f"val.{self.klass.name}.{fieldname}") # deprecated in 2.0.0
+            result = konf.get_path(
+                f"val.{self.klass.name}.{fieldname}"
+            )  # deprecated in 2.0.0
         if result is None:
             result = konf.get_path(f"val.field.{self.klass.name}.{fieldname}")
         if result is None:
-            result = konf.get_path(f"val.generic.{fieldname}") # deprecated in 2.0.0
+            result = konf.get_path(f"val.generic.{fieldname}")  # deprecated in 2.0.0
         if result is None:
             result = konf.get_path(f"val.field.generic.{fieldname}")
         if result is not None:
@@ -218,6 +218,7 @@ class JinjaKomponent(Komponent):
         result["my"] = self
         return result
 
+
 class JinjaFile(JinjaKomponent):
     def get_template_location(self) -> str:
         return self.strukture.get("template")
@@ -230,7 +231,9 @@ class MultiJinYamlKomponent(JinjaKomponent):
 
     def aktivate(self):
         template_vars = self._template_vars()
-        self.documents = self.app.konfig.jinyaml.render_multi_yaml(self.template, template_vars)
+        self.documents = self.app.konfig.jinyaml.render_multi_yaml(
+            self.template, template_vars
+        )
 
     def kreate_file(self) -> None:
         filename = self.get_filename()

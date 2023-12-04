@@ -26,15 +26,13 @@ class Cli:
         self.aliases = {}
         self.parser = argparse.ArgumentParser(
             prog="kreate",
-            usage=(
-                "kreate [options] [<subcommand> [param ...]]"
-            ),
+            usage=("kreate [options] [<subcommand> [param ...]]"),
             description=("kreates files for deploying applications on kubernetes"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
         self.parser.add_argument("param", nargs="*", help="parameters for subcommand")
         self.add_subcommand(files, aliases=["f"])
-        #self.add_subcommand(output, aliases=["o"])
+        # self.add_subcommand(output, aliases=["o"])
         for mod in self.kontext.modules:
             mod.init_cli(self)
 
@@ -44,7 +42,7 @@ class Cli:
     #    self.quiet = False
     #    self.params = []
 
-    #def parse_verbosity_options(self, args=None):
+    # def parse_verbosity_options(self, args=None):
     #    args = args or sys.argv
     #    skip = False
     #    for idx, arg in enumerate(args):
@@ -70,32 +68,35 @@ class Cli:
     #    self.warn = self.verbosity >= -1
     #    self.quiet = self.verbosity <= -2
 
-
     def default_command(self):
         files(self)
 
     def custom_warn_format(self, msg, cat, filename, lineno, line):
-        #if cat is UserWarning or cat is VersionWarning:
-            return f'WARNING: {msg}\n'
-        #return self.formatwarnings_orig(msg, cat, filename, lineno, line)
+        # if cat is UserWarning or cat is VersionWarning:
+        return f"WARNING: {msg}\n"
+
+    # return self.formatwarnings_orig(msg, cat, filename, lineno, line)
 
     def calc_dict(self):
-        #args = vars(self.args).get("cli_args", [])
-        result = { "system": {"cli": {
-            "subcmd": self.subcmd,
-            "params": self.params,
-        }}}
+        # args = vars(self.args).get("cli_args", [])
+        result = {
+            "system": {
+                "cli": {
+                    "subcmd": self.subcmd,
+                    "params": self.params,
+                }
+            }
+        }
         for d in self.args.define:
             k, v = d.split("=", 1)
             wrap(result).set(k, v)
         return result
 
-
     def dist_package_version(self, package_name: str):
         return importlib.metadata.version(package_name)
 
-    def add_subcommand(self, func, name=None, aliases=[] ) -> None:
-        name = name or func.__name__.replace("_","-")
+    def add_subcommand(self, func, name=None, aliases=[]) -> None:
+        name = name or func.__name__.replace("_", "-")
         self.subcommands[name] = func
         for a in aliases:
             self.aliases[a] = name
@@ -104,7 +105,6 @@ class Cli:
 
     def add_help_section(self, text: str):
         self.epilog += text + "\n"
-
 
     def get_argv(self):
         options = os.getenv("KREATE_OPTIONS")
@@ -152,7 +152,9 @@ class Cli:
                     # With a warning it might not be clear that the warning is due to a
                     print(f"stopping due to {type(e).__name__}: {e}")
                     print(f"  use -W default::{e.__class__.__name__} to override this")
-                    print(f"  possibly define this as export KREATE_OPTIONS or in .env file")
+                    print(
+                        f"  possibly define this as export KREATE_OPTIONS or in .env file"
+                    )
                 else:
                     print(f"{type(e).__name__}: {e}")
                     self.tracer.print_last()
@@ -166,13 +168,13 @@ class Cli:
         dict_ = self.calc_dict()
         return Konfig(self.kontext, path, dict_=dict_, inkludes=self.args.inklude)
 
-    #def kreate_app(self) -> App:
+    # def kreate_app(self) -> App:
     #    return App(self.kreate_konfig())
 
     def find_main_konfig_path(self) -> Path:
         filename = self.args.konfig
         if filename is None:
-            filename = os.getenv("KREATE_MAIN_KONFIG_PATH",".")
+            filename = os.getenv("KREATE_MAIN_KONFIG_PATH", ".")
         glob_pattern = os.getenv("KREATE_MAIN_KONFIG_FILE", "kreate*.konf")
         for p in filename.split(os.pathsep):
             path = Path(p)
@@ -189,12 +191,11 @@ class Cli:
                     )
         raise ValueError(f"No main konfig file found for {filename}/{glob_pattern}")
 
-
     def add_konfig_options(self, cmd):
         cmd.add_argument(
             "-k",
             "--konfig",
-            metavar='file',
+            metavar="file",
             action="store",
             default=None,
             help="konfig file or directory to use (default=KREATE_MAIN_KONFIG_PATH or .)",
@@ -202,7 +203,7 @@ class Cli:
         cmd.add_argument(
             "-d",
             "--define",
-            metavar='yaml-setting',
+            metavar="yaml-setting",
             action="append",
             default=[],
             help="add yaml (toplevel) element to konfig file",
@@ -210,14 +211,14 @@ class Cli:
         cmd.add_argument(
             "-i",
             "--inklude",
-            metavar='path',
+            metavar="path",
             action="append",
             default=[],
             help="inklude extra files before parsing main konfig",
         )
 
     def kreate_files(self) -> App:
-        args = vars(self.args).get("cli_args",[])
+        args = vars(self.args).get("cli_args", [])
         konfig = self.kreate_konfig()
         konfig.set_path("system.cli_args", args)
         app = App(konfig)
@@ -232,9 +233,11 @@ class Cli:
         result = self.kontext.run_shell(cmd, success_codes=success_codes)
         return result.stdout.decode()
 
+
 def files(cli: Cli) -> None:
     """kreate all the files (default command)"""
     cli.kreate_files()
+
 
 def output(cli: Cli) -> None:
     app = cli.kreate_files()

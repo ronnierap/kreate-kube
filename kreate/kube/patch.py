@@ -22,12 +22,10 @@ class Patch(JinYamlKomponent):
         super().__init__(target.app, klass=klass, shortname=shortname)
 
     def __str__(self):
-        return (f"<Patch {self.target.id}: {self.id}>")
+        return f"<Patch {self.target.id}: {self.id}>"
 
     def get_filename(self):
-        return (
-            f"patches/{self.target.id}-{self.id}.yaml"
-        )
+        return f"patches/{self.target.id}-{self.id}.yaml"
 
     def _template_vars(self):
         return {**super()._template_vars(), "target": self.target}
@@ -43,6 +41,7 @@ class Patch(JinYamlKomponent):
             return self.target.strukture[fieldname]
         return super()._field(fieldname, default=default)
 
+
 class CustomPatch(Patch):
     def get_template_location(self) -> str:
         return self.strukture.get("template")
@@ -57,7 +56,7 @@ class MultiPatch(Patch):
     def __init__(self, target: Resource, klass: KomponentKlass, shortname: str):
         super().__init__(target, klass, shortname)
         patches = klass.info.get("patches")
-        patches = patches or klass.info.get("template") # TODO remove in kreate 2.0
+        patches = patches or klass.info.get("template")  # TODO remove in kreate 2.0
         for patch_name in patches:
             klass = self.app.klasses[patch_name]
             klass.kreate_komponent(target, "main")

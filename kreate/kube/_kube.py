@@ -9,6 +9,7 @@ from .resource import CustomResource
 
 logger = logging.getLogger(__name__)
 
+
 class KubeModule(Module):
     def init_kontext(self, kontext: Kontext) -> None:
         kontext.packages.append("kreate-kube")
@@ -37,12 +38,13 @@ def build(cli: Cli) -> None:
 def diff(cli: Cli) -> None:
     """diff with current existing resources"""
     app = cli.kreate_files()
-    result = cli.run_command(app, "diff", success_codes=(0,1))
+    result = cli.run_command(app, "diff", success_codes=(0, 1))
     if not result:
         logger.info("no differences found with cluster")
     else:
         logger.info("kreated files differ from cluster")
         print(result)
+
 
 def apply(cli: Cli) -> None:
     """apply the output to kubernetes"""
@@ -71,6 +73,7 @@ def build_output(cli: Cli, app: App) -> str:
     krypt_functions._dekrypt_testdummy = True
     return cli.run_command(app, "build")
 
+
 def truncate_ignores(ignores, lines):
     for idx, line in enumerate(lines):
         for ign in ignores:
@@ -81,9 +84,8 @@ def truncate_ignores(ignores, lines):
     return lines
 
 
-
 def test_result(cli: Cli, app: App, n=0):
-    ignores = [] # cli.konfig().get_path("tests.ignore", [])
+    ignores = []  # cli.konfig().get_path("tests.ignore", [])
     build_lines = build_output(cli, app).splitlines()
     loc = expected_output_location(app.konfig)
     expected_lines = app.konfig.load_repo_file(loc).splitlines()

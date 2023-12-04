@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def deep_update(
-        target: Mapping, other: Mapping, overwrite=True, list_insert_index: dict = None
+    target: Mapping, other: Mapping, overwrite=True, list_insert_index: dict = None
 ) -> None:
     if other.get("_do_not_overwrite", False):
         overwrite = False
@@ -53,7 +53,9 @@ class DictWrapper(UserDict):
 
     def __getattr__(self, attr):
         if attr not in self.data:
-            raise AttributeError(f"could not find attribute {attr} in {self}, {self.data}")
+            raise AttributeError(
+                f"could not find attribute {attr} in {self}, {self.data}"
+            )
         else:
             return wrap(self.data[attr])
 
@@ -162,7 +164,9 @@ class DictWrapper(UserDict):
                     else:
                         return default
                 else:
-                    raise ValueError(f"trying to get [0] in path {path} of non-sequence {type(data)}")
+                    raise ValueError(
+                        f"trying to get [0] in path {path} of non-sequence {type(data)}"
+                    )
             elif key not in data:
                 if mandatory:
                     raise ValueError(f"could not find mandatory field {path}")

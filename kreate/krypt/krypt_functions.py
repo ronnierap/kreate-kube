@@ -62,7 +62,9 @@ def enkrypt_file(filename):
         f.write(fernet._encrypt_from_parts(data.encode(), 0, part))
 
 
-def change_lines(filename: str, func, from_: str, to_: str, dir: str = None, stdout=False):
+def change_lines(
+    filename: str, func, from_: str, to_: str, dir: str = None, stdout=False
+):
     dir = dir or "."
     with open(f"{dir}/{filename}") as f:
         lines = f.readlines()

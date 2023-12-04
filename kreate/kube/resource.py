@@ -14,9 +14,11 @@ __all__ = [
     "Egress",
 ]
 
+
 class MultiDocumentResource(MultiJinYamlKomponent):
     def get_filename(self):
         return f"resources/{self.id}.yaml"
+
 
 class Resource(JinYamlKomponent):
     def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
@@ -34,13 +36,18 @@ class Resource(JinYamlKomponent):
 
     def add_metadata(self):
         for key in self.strukture.get("annotations", {}):
-            self.yaml.get("metadata.annotations")[key] = self.strukture.get("annotations")[key]
+            self.yaml.get("metadata.annotations")[key] = self.strukture.get(
+                "annotations"
+            )[key]
         for key in self.strukture.get("labels", {}):
-            self.yaml._set_path(f"metadata.labels.{key}",  self.strukture._get_path(f"labels.{key}"))
+            self.yaml._set_path(
+                f"metadata.labels.{key}", self.strukture._get_path(f"labels.{key}")
+            )
 
     def load_file(self, filename: str) -> str:
         with open(f"{self.app.konfig.dir}/{filename}") as f:
             return f.read()
+
 
 class CustomResource(Resource):
     def get_template_location(self) -> str:

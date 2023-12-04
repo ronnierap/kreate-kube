@@ -7,7 +7,7 @@ from kreate.kore._cli import Cli
 
 
 def main():
-    kontext : Kontext = Kontext()
+    kontext: Kontext = Kontext()
     kontext.add_module(KoreModule())
     kontext.add_module(KryptModule())
     kontext.add_module(KubeModule())

@@ -26,7 +26,7 @@ class JinYaml:
             trim_blocks=True,
             lstrip_blocks=True,
             loader=RepoLoader(konfig),
-            extensions=['jinja2.ext.debug']
+            extensions=["jinja2.ext.debug"],
         )
         self.env.globals["konfig"] = konfig
         self.env.globals["jinja_extension"] = {

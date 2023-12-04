@@ -16,11 +16,15 @@ class KustomizeModule(Module):
             if isinstance(res, Resource):
                 self.kreate_patches(res)
 
-    def kreate_patch(self, target: Resource, klass: KomponentKlass, shortname: str) -> None:
+    def kreate_patch(
+        self, target: Resource, klass: KomponentKlass, shortname: str
+    ) -> None:
         if issubclass(klass.python_class, Patch):
             klass.kreate_komponent(target, shortname)
         else:
-            raise TypeError(f"class for {klass.name}.{shortname} is not a Patch but {klass.python_class.__name__}")
+            raise TypeError(
+                f"class for {klass.name}.{shortname} is not a Patch but {klass.python_class.__name__}"
+            )
 
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
@@ -37,9 +41,10 @@ class KustomizeModule(Module):
 
 class Kustomization(JinYamlKomponent):
     def resources(self):
-        return [res for res in self.app.komponents if
-            isinstance(res, Resource) or
-            isinstance(res, MultiDocumentResource)
+        return [
+            res
+            for res in self.app.komponents
+            if isinstance(res, Resource) or isinstance(res, MultiDocumentResource)
         ]
 
     def patches(self):

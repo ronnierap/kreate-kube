@@ -37,10 +37,10 @@ class FileGetter:
     def __init__(self, konfig: "Konfig", main_dir_path: Path):
         self.konfig = konfig
         self.repo_prefixes = {
-            #"main_konfig:": FixedDirRepo(dir),
+            # "main_konfig:": FixedDirRepo(dir),
             "cwd": FixedDirRepo(Path.cwd()),
             "home": FixedDirRepo(Path.home()),
-            #"py:": PythonPackageRepo(),
+            # "py:": PythonPackageRepo(),
         }
         self.repo_types = {
             "url-zip:": UrlZipRepo,
@@ -49,7 +49,7 @@ class FileGetter:
             "bitbucket-zip:": BitbucketZipRepo,
             "bitbucket-file:": BitbucketFileRepo,
         }
-        #self.reponame = None # TODO: remove self.split_location(location)
+        # self.reponame = None # TODO: remove self.split_location(location)
         self.main_dir_path = main_dir_path
 
     def __str__(self) -> str:
@@ -57,7 +57,7 @@ class FileGetter:
 
     def konfig_repos(self):
         for repo in self.konfig.get_path("system.repo", []):
-            self.repo_prefixes[repo ] = self.get_repo(repo)
+            self.repo_prefixes[repo] = self.get_repo(repo)
 
     def get_prefix(self, filename: str) -> str:
         if filename.startswith("optional:"):
@@ -74,7 +74,7 @@ class FileGetter:
             reponame = match.group()[:-1]
             if len(reponame) > 1:
                 # length 1 could mean windows drive letter
-                filename = location[len(reponame)+1:]
+                filename = location[len(reponame) + 1 :]
                 while filename.startswith("/"):
                     filename = filename[1:]
                 return reponame, Path(filename)
@@ -91,7 +91,7 @@ class FileGetter:
     def save_repo_file(self, filename: str, data):
         repo, file = self.split_location(filename)
         if repo:
-           self.my_repo(repo).save_repo_file(str(file), data)
+            self.my_repo(repo).save_repo_file(str(file), data)
         elif self.reponame:
             self.my_repo().save_repo_file(str(self.main_dir_path / file), data)
         else:
@@ -114,7 +114,9 @@ class FileGetter:
         if reponame:
             repo = self.my_repo(reponame, optional=optional)
             if not repo and optional:
-                logger.warning(f"WARNING: could not find repo {reponame}, for optional file {file}")
+                logger.warning(
+                    f"WARNING: could not find repo {reponame}, for optional file {file}"
+                )
                 return ""
             data = repo.get_data(path, optional=optional)
         else:
@@ -125,7 +127,9 @@ class FileGetter:
                 logger.debug(f"ignoring missing optional file {orig_file}")
                 return None
             else:
-                raise FileNotFoundError(f"non-optional file {orig_file} does not exist in {self.main_dir_path}")
+                raise FileNotFoundError(
+                    f"non-optional file {orig_file} does not exist in {self.main_dir_path}"
+                )
         logger.debug(f"loaded {file}")
         if dekrypt:
             logger.debug(f"dekrypting {file}")
@@ -169,11 +173,10 @@ class FileGetter:
             raise ValueError(f"Unknown repo type {type} for repo {repo_name}")
 
     def use_local_dir(self, repo_name: str) -> bool:
-         postfix = repo_name.upper().replace("-","_")
-         use = os.getenv("KREATE_REPO_USE_LOCAL_DIR", "False")
-         use = os.getenv("KREATE_REPO_USE_LOCAL_DIR_" + postfix, use)
-         return use == "True"
-
+        postfix = repo_name.upper().replace("-", "_")
+        use = os.getenv("KREATE_REPO_USE_LOCAL_DIR", "False")
+        use = os.getenv("KREATE_REPO_USE_LOCAL_DIR_" + postfix, use)
+        return use == "True"
 
 
 class Repo(Protocol):
@@ -181,7 +184,9 @@ class Repo(Protocol):
         ...
 
     def save_repo_file(self, filename: str) -> Path:
-        raise NotImplementedError(f"not possible to save file in repo {self.__class__}: {filename}")
+        raise NotImplementedError(
+            f"not possible to save file in repo {self.__class__}: {filename}"
+        )
 
 
 class PythonPackageRepo(Repo):
@@ -239,7 +244,7 @@ class KonfigRepo(Repo):
     def get_data(self, filename: Path, optional: bool = False):
         if isinstance(self.version, str) and self.version.startswith("branch."):
             version = self.version[7:]
-            if self.repo_konf.get("show_branch_warning", True)  :
+            if self.repo_konf.get("show_branch_warning", True):
                 warnings.warn(
                     f"Using branch {version} for repo {self.repo_name} is not recommended, use a tag instead"
                 )
@@ -323,19 +328,19 @@ class KonfigRepo(Repo):
 
 class LocalKonfigRepo(KonfigRepo):
     def calc_local_dir(self) -> str:
-         postfix = self.repo_name.upper().replace("-","_")
-         dir = os.getenv("KREATE_REPO_LOCAL_DIR", "..")
-         dir = os.getenv("KREATE_REPO_LOCAL_DIR_" + postfix, dir)
-         self.konfig.tracer.push(f"formatting repo {self.repo_name} dir: {dir}")
-         dir = dir.format(
-             my=self,
-             konfig=self.konfig,
-             app=self.konfig.get_path("app"),
-             env=self.konfig.get_path("app.env"),
-             appname=self.konfig.get_path("app.appname"),
+        postfix = self.repo_name.upper().replace("-", "_")
+        dir = os.getenv("KREATE_REPO_LOCAL_DIR", "..")
+        dir = os.getenv("KREATE_REPO_LOCAL_DIR_" + postfix, dir)
+        self.konfig.tracer.push(f"formatting repo {self.repo_name} dir: {dir}")
+        dir = dir.format(
+            my=self,
+            konfig=self.konfig,
+            app=self.konfig.get_path("app"),
+            env=self.konfig.get_path("app.env"),
+            appname=self.konfig.get_path("app.appname"),
         )
-         self.konfig.tracer.pop()
-         return dir
+        self.konfig.tracer.pop()
+        return dir
 
     def calc_dir(self):
         dir: str = self.calc_local_dir()
@@ -412,7 +417,9 @@ class BitbucketFileRepo(BitbucketZipRepo):
             return False
         if self.download(filename, raise_error=False):
             return True
-        logger.info(f"could not find {self.calc_url(filename)}, marking it to prevent future attempts")
+        logger.info(
+            f"could not find {self.calc_url(filename)}, marking it to prevent future attempts"
+        )
         marker_path.touch()
         return False
 

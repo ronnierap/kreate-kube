@@ -65,7 +65,7 @@ class KoreModule(Module):
         cli.parser.add_argument(
             "-k",
             "--konfig",
-            metavar='file',
+            metavar="file",
             action="store",
             default=None,
             help="konfig file or directory to use (default=KREATE_MAIN_KONFIG_PATH or .)",
@@ -73,7 +73,7 @@ class KoreModule(Module):
         cli.parser.add_argument(
             "-d",
             "--define",
-            metavar='yaml-setting',
+            metavar="yaml-setting",
             action="append",
             default=[],
             help="add yaml (toplevel) element to konfig file",
@@ -81,7 +81,7 @@ class KoreModule(Module):
         cli.parser.add_argument(
             "-i",
             "--inklude",
-            metavar='path',
+            metavar="path",
             action="append",
             default=[],
             help="inklude extra files before parsing main konfig",
@@ -111,7 +111,12 @@ class KoreModule(Module):
             help="do not output any info, just essential output",
         )
         cli.parser.add_argument(
-            "-W", "--warn-filter", action="append", metavar="filter", help="set python warnings filter", default=[],
+            "-W",
+            "--warn-filter",
+            action="append",
+            metavar="filter",
+            help="set python warnings filter",
+            default=[],
         )
 
     def process_kore_options(self, args):
@@ -138,7 +143,9 @@ class KoreModule(Module):
         if warn_setting == "reset":
             warnings.resetwarnings()
             return
-        action, message, cat_name, module, lineno = (warn_setting.split(":") + [None] * 5)[:5]
+        action, message, cat_name, module, lineno = (
+            warn_setting.split(":") + [None] * 5
+        )[:5]
         message = message or ""
         if cat_name is None or cat_name == "":
             category = Warning
@@ -168,11 +175,7 @@ def view_template(cli: Cli, app: App, klass_name: str):
         print(tmpl_text)
     else:
         print("==========================")
-        print(
-            f"{klass_name} "
-            f"{klass.python_class.__name__}: "
-            f"{klass.info}"
-        )
+        print(f"{klass_name} " f"{klass.python_class.__name__}: " f"{klass.info}")
         print("==========================")
         if klass.python_class.__doc__:
             print(inspect.cleandoc(klass.python_class.__doc__))
@@ -181,7 +184,7 @@ def view_template(cli: Cli, app: App, klass_name: str):
             print("Fields:")
             fields = re.findall("{{ *my.field.[^}]*}}", tmpl_text)
             for field in sorted(set(fields)):
-                print(field.replace("{"," ").replace("}"," "))
+                print(field.replace("{", " ").replace("}", " "))
             print(tmpl_text)
         if doc_loc := klass.info.get("doc"):
             print("==========================")
@@ -242,11 +245,11 @@ def view(cli: Cli):
             param = view_aliases().get(param, param)
 
             # Check for View-Parameters
-            if (param == "paths"):
+            if param == "paths":
                 # Change to property view
                 yaml_mode = False
                 continue
-            elif (param == "yamlview"):
+            elif param == "yamlview":
                 yaml_mode = True
                 continue
 
@@ -255,7 +258,7 @@ def view(cli: Cli):
             print_full_config = False
             if param == "template":
                 # View Templates
-                view_templates(cli, cli.params[idx + 1:])
+                view_templates(cli, cli.params[idx + 1 :])
                 break
 
             elif param == "komponent":
@@ -296,7 +299,9 @@ def view(cli: Cli):
                         print_filtered(f"{path}={result}", pattern)
                     else:
                         logger.info("flatten dict found")
-                        pprint_tuple(__flatten_dict(result).items(), prefix=path, pattern=pattern)
+                        pprint_tuple(
+                            __flatten_dict(result).items(), prefix=path, pattern=pattern
+                        )
             print()
 
     if print_full_config:
@@ -311,13 +316,14 @@ def view_warning_filters():
     for w in warnings.filters:
         print(w)
 
+
 def view_komponent(cli: Cli, komp_id: str):
     app = cli.kreate_files()
-    komp : Komponent = app.komponents_by_id[komp_id]
+    komp: Komponent = app.komponents_by_id[komp_id]
     print(komp.id, komp.klass)
     print("Strukture:")
     pprint_map(komp.strukture)
-    #if isinstance(komp.klass.python_class, JinjaKomponent):
+    # if isinstance(komp.klass.python_class, JinjaKomponent):
     template_loc = komp.klass.info.get("template")
     if template_loc:
         tmpl_text = app.konfig.file_getter.get_data(template_loc)
@@ -325,7 +331,7 @@ def view_komponent(cli: Cli, komp_id: str):
         fields = re.findall("{{ *my.field.([a-zA-Z_0-9]*)", tmpl_text)
         for field in sorted(set(fields)):
             print(f"  {field}: " + str(komp.field.get(field)))
-            if (cli.args.verbose > 0):
+            if cli.args.verbose > 0:
                 found = False
                 found = _pfp(app.konfig, f"strukt.{komp.id}.{field}", found)
                 found = _pfp(app.konfig, f"strukt.field.{komp.id}.{field}", found)
@@ -336,7 +342,8 @@ def view_komponent(cli: Cli, komp_id: str):
                 found = _pfp(app.konfig, f"val.generic.{field}", found)
                 found = _pfp(app.konfig, f"val.field.generic.{field}", found)
 
-def _pfp(konfig: Konfig, path: str , found: bool) -> bool:
+
+def _pfp(konfig: Konfig, path: str, found: bool) -> bool:
     result = konfig.get_path(path)
     if result is None and not found:
         print(f"    . {path}: -")
@@ -346,7 +353,6 @@ def _pfp(konfig: Konfig, path: str , found: bool) -> bool:
     else:
         print(f"      {path}: {result}")
     return found
-
 
 
 def version(cli: Cli):
@@ -381,5 +387,5 @@ def __flatten_dict_gen(d, parent_key, sep):
             yield new_key, v
 
 
-def __flatten_dict(d: MutableMapping, parent_key: str = '', sep: str = '.'):
+def __flatten_dict(d: MutableMapping, parent_key: str = "", sep: str = "."):
     return dict(__flatten_dict_gen(d, parent_key, sep))

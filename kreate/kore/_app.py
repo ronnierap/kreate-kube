@@ -53,7 +53,9 @@ class App:
         elif isinstance(naming, str):
             formatstr = naming
         elif naming is not None:
-            raise ValueError(f"Unsupported naming for {klass_name}.{shortname}: {naming}")
+            raise ValueError(
+                f"Unsupported naming for {klass_name}.{shortname}: {naming}"
+            )
         if formatstr:
             return formatstr.format(
                 shortname=shortname,
@@ -98,18 +100,19 @@ class App:
             elif klass_name != "default" and klass_name != "use":
                 logger.warning(f"Unknown toplevel komponent {klass_name}")
 
-####################################################
+    ####################################################
 
     def register_klass(self, python_class, name: str = None, info: Mapping = None):
         name = name or python_class.__name__
         info = info or {}
         self.klasses[name] = KomponentKlass(python_class, name, info)
 
-
     def register_klasses(self):
         self.register_klass(TextFile)
         self.register_klass(JinjaFile)
-        templates = dict(self.konfig.get_path("system.template", {})) # TODO: deprecated after 2.0
+        templates = dict(
+            self.konfig.get_path("system.template", {})
+        )  # TODO: deprecated after 2.0
         templates.update(self.konfig.get_path("system.klasses", {}))
         for klass_name, info in templates.items():
             logger.debug(f"adding klass {klass_name}")

@@ -13,9 +13,14 @@ if TYPE_CHECKING:  # Only imports the below statements during type checking
 
 logging.VERBOSE = 15
 logging.addLevelName(logging.VERBOSE, "VERBOSE")
-logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(logging.VERBOSE, msg, *args, **kwargs)
-logging.verbose = lambda msg, *args, **kwargs: logging.log(logging.VERBOSE, msg, *args, **kwargs)
+logging.Logger.verbose = lambda inst, msg, *args, **kwargs: inst.log(
+    logging.VERBOSE, msg, *args, **kwargs
+)
+logging.verbose = lambda msg, *args, **kwargs: logging.log(
+    logging.VERBOSE, msg, *args, **kwargs
+)
 logger = logging.getLogger(__name__)
+
 
 def load_class(name):
     components = name.split(".")
@@ -32,7 +37,7 @@ class VersionWarning(RuntimeWarning):
 class Kontext:
     def __init__(self) -> None:
         self.tracer = Trace()
-        self.modules : List[Module] = []
+        self.modules: List[Module] = []
         self.packages = []
         self.cleanup_paths: Set[Path] = set()
         self.load_dotenv()
@@ -44,9 +49,13 @@ class Kontext:
     def run_shell(self, cmd: str, success_codes=None) -> subprocess.CompletedProcess:
         self.tracer.push_info(f"running command {cmd}")
         success_codes = success_codes or (0,)
-        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(
+            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         if result.returncode not in success_codes:
-            raise RuntimeError(f"command {cmd} resulted in return code {result.returncode}\n{result.stderr.decode()}")
+            raise RuntimeError(
+                f"command {cmd} resulted in return code {result.returncode}\n{result.stderr.decode()}"
+            )
         self.tracer.pop()
         return result
 
@@ -61,7 +70,6 @@ class Kontext:
                     path.rmdir()
                 else:
                     path.unlink()
-
 
     def load_dotenv(self) -> None:
         # Primitive way to check if to load ENV vars before parsing vars
@@ -84,11 +92,23 @@ class Kontext:
                 f"ERROR loading .env file, " f"remove .env file or specify --no-dotenv"
             )
             raise
+
+
 class Module:
     def init_kontext(self, kontext: Kontext) -> None:
         self.kontext = kontext
-    def init_cli(self, cli: "Cli"): ...
-    def process_cli_options(self, cli: "Cli"): ...
-    def init_konfig(self, konfig: "Konfig"): ...
-    def init_app(self, app: "App"): ...
-    def kreate_app_komponents(self, app: "App"): ...
+
+    def init_cli(self, cli: "Cli"):
+        ...
+
+    def process_cli_options(self, cli: "Cli"):
+        ...
+
+    def init_konfig(self, konfig: "Konfig"):
+        ...
+
+    def init_app(self, app: "App"):
+        ...
+
+    def kreate_app_komponents(self, app: "App"):
+        ...

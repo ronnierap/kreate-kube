@@ -20,7 +20,13 @@ logger = logging.getLogger(__name__)
 
 
 class Konfig:
-    def __init__(self, kontext: Kontext, main_konfig_path: Path, dict_: dict = None, inkludes=None):
+    def __init__(
+        self,
+        kontext: Kontext,
+        main_konfig_path: Path,
+        dict_: dict = None,
+        inkludes=None,
+    ):
         self.kontext = kontext
         self.main_konfig_path = main_konfig_path
         self.tracer = self.kontext.tracer or Trace()
@@ -32,10 +38,15 @@ class Konfig:
         for mod in self.kontext.modules:
             mod.init_konfig(self)
         self.already_inkluded = set()
-        deep_update(self.dict_, {"system": {
-            "main_konfig_path": main_konfig_path,
-            "logger": logger,
-        }})
+        deep_update(
+            self.dict_,
+            {
+                "system": {
+                    "main_konfig_path": main_konfig_path,
+                    "logger": logger,
+                }
+            },
+        )
         self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
         for ink in inkludes or []:
@@ -67,7 +78,7 @@ class Konfig:
 
     def save_repo_file(self, fname: str, data):
         self.tracer.push(f"saving repo file: {fname}")
-        result =  self.file_getter.save_repo_file(fname, data)
+        result = self.file_getter.save_repo_file(fname, data)
         self.tracer.pop()
         return result
 
@@ -101,8 +112,10 @@ class Konfig:
             location, remainder = location.split(None, 1)
             for item in remainder.split():
                 if "=" not in item:
-                    raise ValueError("inklude params should contain = in inklude:{fname}")
-                k,v = item.split("=", 1)
+                    raise ValueError(
+                        "inklude params should contain = in inklude:{fname}"
+                    )
+                k, v = item.split("=", 1)
                 context["args"][k] = v
         val_yaml = self.jinyaml.render_yaml(location, context)
         if val_yaml:  # it can be empty
@@ -116,7 +129,9 @@ class Konfig:
         elif isinstance(location, Sequence):
             locations = location
         else:
-            raise TypeError(f"only str or list is accepted, not {type(location)}: {location}")
+            raise TypeError(
+                f"only str or list is accepted, not {type(location)}: {location}"
+            )
         if len(locations) > 1:
             logger.verbose(f"trying multiple locations {locations}")
         for loc in locations:
@@ -126,7 +141,7 @@ class Konfig:
                 break
             else:
                 logger.verbose(f"ignored   {loc}")
-        #self.load_new_inkludes()
+        # self.load_new_inkludes()
 
     def get_kreate_version(self) -> str:
         try:
@@ -147,7 +162,7 @@ class Konfig:
         if not SpecifierSet(req_version).contains(Version(version)):
             warnings.warn(
                 f"Invalid kreate-kube version {version} for specifier {req_version}",
-                VersionWarning
+                VersionWarning,
             )
 
     def dekrypt_bytes(b: bytes) -> bytes:

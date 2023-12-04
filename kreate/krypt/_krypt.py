@@ -10,18 +10,21 @@ from . import krypt_functions
 
 logger = logging.getLogger(__name__)
 
+
 def dekrypt_bytes(b: bytes) -> bytes:
     return krypt_functions.dekrypt_bytes(b)
+
 
 def dekrypt_str(s: str) -> str:
     return krypt_functions.dekrypt_str(s)
 
+
 class KryptModule(Module):
     def init_konfig(self, konfig: Konfig):
-        self.konfig = konfig # TODO: this is not really how this is intended
+        self.konfig = konfig  # TODO: this is not really how this is intended
         krypt_functions._key_finder = self
         konfig.dekrypt_bytes = dekrypt_bytes
-        konfig.dekrypt_str   = dekrypt_str
+        konfig.dekrypt_str = dekrypt_str
 
     def init_cli(self, cli: Cli):
         jinja2.filters.FILTERS["dekrypt"] = krypt_functions.dekrypt_str
@@ -59,6 +62,7 @@ class KryptModule(Module):
         cli.add_subcommand(dekrypt, aliases=["dek"])
         cli.add_subcommand(enkrypt, aliases=["enk"])
 
+
 def aliases():
     return {
         "f": "file",
@@ -73,7 +77,9 @@ def aliases():
 def dekrypt(cli: Cli):
     """dekrypt lines|string|file <file> (abbrevs l|s|str|f|v)"""
     if len(cli.params) == 0:
-        raise ValueError("dekrypt should have at least a second param: lines, file or string")
+        raise ValueError(
+            "dekrypt should have at least a second param: lines, file or string"
+        )
     subcmd = cli.params[0]
     subcmd = aliases().get(subcmd, subcmd)
     if subcmd == "file":
@@ -91,7 +97,9 @@ def dekrypt(cli: Cli):
 def enkrypt(cli: Cli):
     """enkrypt lines|string|file <file> (abbrevs l|s|str|f)"""
     if len(cli.params) == 0:
-        raise ValueError("dekrypt should have at least a second param: lines, file, view or string")
+        raise ValueError(
+            "dekrypt should have at least a second param: lines, file, view or string"
+        )
     subcmd = cli.params[0]
     subcmd = aliases().get(subcmd, subcmd)
     if subcmd == "file":
@@ -108,7 +116,7 @@ def enkrypt(cli: Cli):
 
 def dek_lines(cli: Cli, stdout=False):
     """dekrypt lines in a text file"""
-    konfig : "Konfig" = cli.kreate_konfig()
+    konfig: "Konfig" = cli.kreate_konfig()
     if len(cli.params) > 1:
         file = cli.params[1]
     else:
@@ -120,7 +128,7 @@ def dek_lines(cli: Cli, stdout=False):
 def dekstr(cli: Cli):
     """dekrypt string value"""
     cli.kreate_konfig()  # init konfig to set the secret value
-    value = None if len(cli.params)==1 else cli.params[1]
+    value = None if len(cli.params) == 1 else cli.params[1]
     if not value:
         if not cli.args.quiet:
             print("Enter string to dekrypt")
@@ -140,7 +148,7 @@ def dekfile(cli: Cli):
 
 def enk_lines(cli: Cli, stdout=False):
     "enkrypt lines in a text file"
-    konfig : "Konfig" = cli.kreate_konfig()
+    konfig: "Konfig" = cli.kreate_konfig()
     if len(cli.params) > 1:
         file = cli.params[1]
     else:
@@ -152,7 +160,7 @@ def enk_lines(cli: Cli, stdout=False):
 def enkfile(cli: Cli):
     "enkrypt an entire file"
     cli.kreate_konfig()
-    file =  cli.params[1]
+    file = cli.params[1]
     logger.info(f"enkrypting file {file}")
     krypt_functions.enkrypt_file(file)
 
@@ -160,7 +168,7 @@ def enkfile(cli: Cli):
 def enkstr(cli: Cli):
     """enkrypt string value"""
     cli.kreate_konfig()
-    value = None if len(cli.params)==1 else cli.params[1]
+    value = None if len(cli.params) == 1 else cli.params[1]
     if not value:
         if not cli.args.quiet:
             print("Enter string to enkrypt")
