@@ -313,8 +313,9 @@ def version(cli: Cli):
 
 def command(cli: Cli):
     """run a predefined command from system.command"""
-    cmd = cli.args.cmd
-    print(cli.run_command(cmd))
+    cmd = cli.params[0]
+    app = cli.kreate_files()
+    print(cli.run_command(app, cmd))
 
 
 def shell(cli: Cli):
