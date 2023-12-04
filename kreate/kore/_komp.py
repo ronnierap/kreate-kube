@@ -61,9 +61,10 @@ class Komponent:
         return f"<{self.__class__.__name__} {self.id} {self.name}>"
 
     def calc_name(self):
+        appname = self.app.konfig.get_path("app.appname")
         if self.shortname == "main":
-            return f"{self.app.appname}-{self.klass.name}"
-        return f"{self.app.appname}-{self.klass.name}-{self.shortname}"
+            return f"{appname}-{self.klass.name}"
+        return f"{appname}-{self.klass.name}-{self.shortname}"
 
     def _find_strukture(self):
         strukt = self.app.strukture._get_path(self.id)

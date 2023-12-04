@@ -28,13 +28,11 @@ class App:
     def __init__(self, konfig: Konfig):
         self.konfig = konfig
         self.kontext = konfig.kontext
-        self.appname = konfig.get_path("app.appname")
-        self.env = konfig.get_path("app.env")
         self.komponents: List[Komponent] = []
         self.komponents_by_id = {}
         self.klasses: Mapping[KomponentKlass] = {}
         self.strukture = wrap(konfig.get_path("strukt"))
-        self.target_path = Path(konfig.get_path("system.target_dir", f"build/{self.appname}-{self.env}"))
+        self.target_path = Path(konfig.get_path("system.target_dir", f"build"))
         for mod in self.kontext.modules:
             mod.init_app(self)
         self.register_klasses()
@@ -59,7 +57,7 @@ class App:
         if formatstr:
             return formatstr.format(
                 shortname=shortname,
-                appname=self.appname,
+                appname=self.konfig.get_path("app.appname"),
             )
         return None
 
