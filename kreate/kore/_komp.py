@@ -57,8 +57,8 @@ class Komponent:
         # Abstract Method, sub-classes may implement this method
         pass
 
-    def __str__(self):
-        return f"<Komponent {self.id} {self.name}>"
+    def __str__(self) -> str:
+        return f"<{self.__class__.__name__} {self.id} {self.name}>"
 
     def calc_name(self):
         if self.shortname == "main":
@@ -180,26 +180,17 @@ class TextFile(Komponent):
     def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
         super().__init__(app, klass, shortname)
         self.from_location = self.strukture.get("from")
-        self.to = self.strukture.get("to")
+        self.filename = self.strukture.get("filename")
 
     def get_filename(self):
-        # TODO: do we want to use to or target_filename?
-        if self.strukture.get("target_filename"):
-            return self.strukture.get("target_filename")
-        return self.to
+        return self.filename
 
     def is_secret(self):
         return "dekrypt:" in self.from_location
 
     def kreate_file_data(self) -> str:
-        text = self.app.konfig.file_getter.get_data(self.from_location)
-        return text
+        return self.app.konfig.file_getter.get_data(self.from_location)
 
-class JinjaFile(TextFile):
-    def kreate_file_data(self) -> str:
-        konfig = self.app.konfig
-        # TODO: pass my to template?
-        return konfig.jinyaml.render_jinja(self.from_location, konfig.yaml)
 
 class JinjaKomponent(Komponent):
     """An object that is parsed from a jinja template and strukture"""
@@ -207,23 +198,28 @@ class JinjaKomponent(Komponent):
     def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
         super().__init__(app, klass, shortname)
         self.data = None
-        self.template = klass.info.get("template")
-        if not self.template:
-            raise KeyError(f"no template defined for {klass.name}.{shortname} in {klass.info}")
 
     def aktivate(self):
         komponent_vars = self._template_vars()
-        self.data = self.app.konfig.jinyaml.render_jinja(self.template, komponent_vars)
+        template = self.get_template_location()
+        if not template:
+            raise KeyError(f"no template defined for {self.id} in {self.klass.info}")
+        self.data = self.app.konfig.jinyaml.render_jinja(template, komponent_vars)
 
-    def kreate_file(self) -> None:
+    def get_template_location(self) -> str:
+        return self.klass.info.get("template")
+
+    def kreate_file_data(self) -> None:
         return self.data
 
     def _template_vars(self):
-        return {
-            "strukt": self.strukture,
-            "app": self.app.konfig.get_path("app", {}),
-            "my": self,
-        }
+        result = dict(self.app.konfig.yaml)
+        result["my"] = self
+        return result
+
+class JinjaFile(JinjaKomponent):
+    def get_template_location(self) -> str:
+        return self.strukture.get("template")
 
 
 class MultiJinYamlKomponent(JinjaKomponent):
@@ -255,7 +251,8 @@ class JinYamlKomponent(JinjaKomponent):
 
     def aktivate(self):
         template_vars = self._template_vars()
-        self.yaml = wrap(self.app.konfig.jinyaml.render_yaml(self.template, template_vars))
+        template = self.get_template_location()
+        self.yaml = wrap(self.app.konfig.jinyaml.render_yaml(template, template_vars))
         self.invoke_options()
         self.add_additions()
         self.remove_deletions()

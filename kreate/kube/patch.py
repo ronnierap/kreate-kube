@@ -33,14 +33,7 @@ class Patch(JinYamlKomponent):
         return {**super()._template_vars(), "target": self.target}
 
     def _find_strukture(self):
-        #root_strukture = super()._find_strukture()
         target_struk = self.target.strukture.get(f"patches.{self.id}", {})
-        #if target_struk:
-        #    logger.debug(f"using embedded strukture {self.id} from {self.target.id}")
-            # The embedded_strukture is first,
-            # since the root_strukture will contain all default values
-            #deep_update(root_strukture, embedded_strukture)
-        #return root_strukture
         return target_struk
 
     def _field(self, fieldname: str, default=None):
@@ -49,6 +42,10 @@ class Patch(JinYamlKomponent):
         if fieldname in self.target.strukture:
             return self.target.strukture[fieldname]
         return super()._field(fieldname, default=default)
+
+class CustomPatch(Patch):
+    def get_template_location(self) -> str:
+        return self.strukture.get("template")
 
 
 class EgressLabels(Patch):

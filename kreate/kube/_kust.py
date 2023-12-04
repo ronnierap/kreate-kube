@@ -2,12 +2,15 @@ import logging
 
 from ..kore import JinYamlKomponent, Module, App, KomponentKlass
 from .resource import Resource, MultiDocumentResource
-from .patch import Patch
+from .patch import Patch, CustomPatch
 
 logger = logging.getLogger(__name__)
 
 
 class KustomizeModule(Module):
+    def init_app(self, app: App) -> None:
+        app.register_klass(CustomPatch)
+
     def kreate_app_komponents(self, app: App):
         for res in app.komponents:
             if isinstance(res, Resource):
@@ -35,7 +38,9 @@ class KustomizeModule(Module):
 class Kustomization(JinYamlKomponent):
     def resources(self):
         return [res for res in self.app.komponents if
-                (isinstance(res, Resource) or isinstance(res, MultiDocumentResource))]
+            isinstance(res, Resource) or
+            isinstance(res, MultiDocumentResource)
+        ]
 
     def patches(self):
         return [res for res in self.app.komponents if isinstance(res, Patch)]

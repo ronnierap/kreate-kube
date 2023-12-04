@@ -102,16 +102,22 @@ class App:
 
 ####################################################
 
+    def register_klass(self, python_class, name: str = None, info: Mapping = None):
+        name = name or python_class.__name__
+        info = info or {}
+        self.klasses[name] = KomponentKlass(python_class, name, info)
+
+
     def register_klasses(self):
-        self.klasses["TextFile"] = KomponentKlass(TextFile, "TextFile", {})
-        self.klasses["JinjaFile"] = KomponentKlass(JinjaFile, "JinjaFile", {})
+        self.register_klass(TextFile)
+        self.register_klass(JinjaFile)
         templates = dict(self.konfig.get_path("system.template", {})) # TODO: deprecated after 2.0
         templates.update(self.konfig.get_path("system.klasses", {}))
         for klass_name, info in templates.items():
             logger.debug(f"adding klass {klass_name}")
             if clsname := info.get("class"):
                 cls = load_class(clsname)
-                self.klasses[klass_name] = KomponentKlass(cls, klass_name, info)
+                self.register_klass(cls, klass_name, info)
             else:
                 raise KeyError(f"No python class defined for Klass {klass_name}")
 

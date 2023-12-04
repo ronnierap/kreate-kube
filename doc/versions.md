@@ -54,13 +54,16 @@ At this moment there are not many versions of kreate-kube:
   - added enk/dek view command, and improved some logging
   - added --local-repo option to easily switch from command line
 - `1.7.0` in progress
-  - added flat/property/path view (name still to be decided)
+  - added path view (name still to be decided)
+  - my.field will now also look in `field` paths
   - added MultiDocumentKomponent and Resource
   - added jinja debug option
   - fixed bug in `command` (e.g. for dry-run)
   - Added `KomponentKlass` to replace/improve the templates
   - got rid of kind, and use klass.name and komp.id instead
   - added `view komponent` command
+  - added CustomResource, CustomPatch, TextFile, JinjaFile
+  - in klass templates all field of konfig are directly accessible, so the old {{ strukt }} needs to be accessed as {{ my.strukture... }}
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

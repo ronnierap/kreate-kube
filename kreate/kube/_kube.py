@@ -5,12 +5,12 @@ import difflib
 
 from ..krypt import krypt_functions
 from ..kore import Kontext, Module, Konfig, App, Cli
+from .resource import CustomResource
 
 logger = logging.getLogger(__name__)
 
 class KubeModule(Module):
     def init_kontext(self, kontext: Kontext) -> None:
-        super().init_kontext(kontext)
         kontext.packages.append("kreate-kube")
 
     def init_cli(self, cli: Cli):
@@ -23,6 +23,10 @@ class KubeModule(Module):
         cli.add_subcommand(test_update, aliases=["tu"])
         cli.add_subcommand(test_diff, aliases=["td"])
         cli.add_subcommand(test_diff_update, aliases=["tdu"])
+
+    def init_app(self, app: App) -> None:
+        app.register_klass(CustomResource)
+
 
 def build(cli: Cli) -> None:
     """output all the resources"""

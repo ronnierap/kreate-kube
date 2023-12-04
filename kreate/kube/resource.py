@@ -1,7 +1,7 @@
 import logging
 
 from ..kore import JinYamlKomponent, wrap, App
-from ..kore._komp import MultiJinYamlKomponent, KomponentKlass
+from ..kore._komp import MultiJinYamlKomponent, KomponentKlass, JinjaFile
 from ..krypt.krypt_functions import dekrypt_str
 
 logger = logging.getLogger(__name__)
@@ -14,14 +14,9 @@ __all__ = [
     "Egress",
 ]
 
-
 class MultiDocumentResource(MultiJinYamlKomponent):
-    def __str__(self):
-        return f"<MultiDocumentResource {self.id} {self.name}>"
-
     def get_filename(self):
         return f"resources/{self.id}.yaml"
-
 
 class Resource(JinYamlKomponent):
     def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
@@ -34,9 +29,6 @@ class Resource(JinYamlKomponent):
         super().aktivate()
         self.add_metadata()
 
-    def __str__(self):
-        return f"<Resource {self.id} {self.name}>"
-
     def get_filename(self):
         return f"resources/{self.id}.yaml"
 
@@ -46,15 +38,13 @@ class Resource(JinYamlKomponent):
         for key in self.strukture.get("labels", {}):
             self.yaml._set_path(f"metadata.labels.{key}",  self.strukture._get_path(f"labels.{key}"))
 
-    #def annotation(self, name: str, val: str) -> None:
-    #    self.yaml._set_path(f"metadata.annotations.{name}", val)
-    #
-    #def label(self, name: str, val: str) -> None:
-    #    self.yaml._set_path(f"metadata.labels.{name}", val)
-
     def load_file(self, filename: str) -> str:
         with open(f"{self.app.konfig.dir}/{filename}") as f:
             return f.read()
+
+class CustomResource(Resource):
+    def get_template_location(self) -> str:
+        return self.strukture.get("template")
 
 
 class Workload(Resource):
