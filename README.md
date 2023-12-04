@@ -7,8 +7,15 @@ This is especially useful if you have many different applications
 that you would like to keep as similar as possible,
 while also having flexibility to tweak each application.
 
-## Installing and running kreate-kube
-### Installing
+More detailed information can be found in the doc subfolder:
+- [summary](doc/summary.md)
+- [Using Python virtual envs](doc/using-python-venv-pip.md)
+- [details for making jinja templates](doc/jinja-templates.md)
+- [How to set default values for your komponents](doc/settings-defaults.md)
+- [History of kreate-kube](doc/history.md)
+
+
+## Installing kreate-kube
 see [versions](doc/versions.md) for available versions.
 
 The `kreate-kube` framework is available on PyPi.
@@ -28,7 +35,7 @@ This will install the kreate-kube package, including a script `kreate` that can 
 Note: For Windows the commands might be slightly different, but `venv` and `pip`
 are well documented in the Python community.
 
-### Running
+## Running kreate
 You can now call the `kreate` command line. Some examples:
 ```
 kreate -h          # show help info
@@ -44,7 +51,7 @@ Note: for `diff` and `apply` your `.kube/config` should be set up correctly
 
 
 By default `kreate` will look for a file `kreate*.konf` in your current directory.
-It is possible to specify a different directory or file using the `--konfig` option.
+It is possible to specify a different directory or file using the `--konfig` or `-k` option.
 If this is a directory it will look for a `kreate*.konf` file in this directory.
 
 
@@ -173,77 +180,49 @@ inklude:
 this is the output of the `kreate-kube --help` command
 ```
 $ kreate --help
-usage: kreate [optional arguments] <konfig> [<subcommand>] [subcommand options]
+usage: kreate [options] [<subcommand> [param ...]]
 
 kreates files for deploying applications on kubernetes
 
 positional arguments:
-  see subcommands
+  param                 parameters for subcommand
 
 optional arguments:
   -h, --help            show this help message and exit
-  --testdummy           do not dekrypt values
+  -v, --verbose         output more details (inluding stacktrace) -vv even more
+  -w, --warn            only output warnings
+  -q, --quiet           do not output any info, just essential output
+  -W filter, --warn-filter filter
+                        set python warnings filter
   -k file, --konfig file
                         konfig file or directory to use (default=KREATE_MAIN_KONFIG_PATH or .)
   -d yaml-setting, --define yaml-setting
                         add yaml (toplevel) element to konfig file
   -i path, --inklude path
                         inklude extra files before parsing main konfig
-  -v, --verbose         output more details (inluding stacktrace) -vv even more
-  -w, --warn            only output warnings
-  -W filter, --warn-filter filter
-                        set python warnings filter
-  -q, --quiet           do not output any info, just essential output
+  -l, --local-repo      use local repo's (force KREATE_REPO_USE_LOCAL_DIR=True)
   -K, --keep-secrets    do not remove secrets dirs
   --no-dotenv           do not load .env file from working dir
   --no-kreate-env       do not load kreate.env file from user home .config dir
+  --testdummy           do not dekrypt values
 
 subcommands:
   files             f   kreate all the files (default command)
+  clear_cache       cc  clear the repo cache
+  version           vr  view the version
+  view              v   view the entire konfig or subkey(s); possible other subcommand arguments: [template, warningfilters, alias]
   command           cmd run a predefined command from system.command
   shell             sh  run one or more shell command including pipes
-  clear_repo_cache  cc  clear the repo cache
-  version           vr  view the version
-  view              v   view the entire konfig or subkey(s)
-  dekrypt           dek
-  enkrypt           enk
+krypt commands:
+  dekrypt           dek dekrypt lines|string|file <file> (abbrevs l|s|str|f|v)
+  enkrypt           enk enkrypt lines|string|file <file> (abbrevs l|s|str|f)
+kube commands:
   build             b   output all the resources
   diff              d   diff with current existing resources
   apply             a   apply the output to kubernetes
+test commands:
   test              t   test output against expected-output-<app>-<env>.out file
-  test_update       tu  test output against expected-output-<app>-<env>.out file
-  test_diff         td  test output against expected-output-<app>-<env>.out file
-  test_diff_update  tdu update expected-output-<app>-<env>.out file
+  test_update       tu  update expected-output-<app>-<env>.out file with new output
+  test_diff         td  test output against expected-diff-<app>-<env>.out file
+  test_diff_update  tdu update expected-diff-<app>-<env>.out file with new diff
 ```
-
-## History
-This is a rewrite of a similar project written as bash scripts.
-The bash scripts have been used for deploying over 30 applications to
-development, acceptance and production environments.
-
-However the bash scripting language was not the best choice, so Python was chosen
-for several reasons:
-- Large bash scripts are difficult to maintain
-  - google coding guidelines demand that bash scripts over 100 lines long are to be rewritten in Python.
-    See https://google.github.io/styleguide/shellguide.html#when-to-use-shell, which states:
-    > if you are writing a script that is more than 100 lines long, or that uses non-straightforward control flow logic,
-    > you should rewrite it in a more structured language now.
-    > Bear in mind that scripts grow.
-    > Rewrite your script early to avoid a more time-consuming rewrite at a later date.
-  - not many devops team members are proficient in bash
-  - no OO and limited var scoping (most vars are global vars)
-- Possibility to run natively on Windows (with Python installed)
-  - no CRLF problems
-  - Windows can recognizes `*.py` extension to prevent Linux file permission problems on Windows filesystems
-- Much cleaner code
-  - yaml parser
-  - jinja templates
-  - modular design, where a team can add team-specific templates and defaults for their set of applications
-  - powerful requirements.txt/pip dependency management
-
-Initially the idea was to use python scripts just like we were doing in bash.
-The yaml konfiguration became so powerful, that scripting was not needed
-at all, and you could specify everything in yaml (and jinja2 templates).
-
-The new approach is to use only yaml and jinja2, even for extending the
-framework with new templates and other behaviour.

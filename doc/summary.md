@@ -1,4 +1,4 @@
-# TL;DR
+# Summary
 A deployment is described in a YAML document that can be split over multiple files,
 that are merged into one YAML document.
 This YAML is called a `konfig`, a configuration with a `k` for `k`ubernetes and `k`ustomize.
@@ -24,13 +24,13 @@ app:
   env: prd
   team: knights
 version:
-  image_version: 2.0.4
+  app_version: 2.0.4
 ```
 
 ## strukt
 This is the main section where you create komponents that will result in files that are kreated.
-Komponents are identified by two strings
-- kind: this is actually a template name, that often is the name of a kubernetes resource, e.g. Deployment or Ingress
+Komponents are identified by an id that is usually of the form `<klass>.<name>`
+- klass: this is often a template name, that is the name of a kubernetes resource, e.g. Deployment or Ingress
 - short_name: this is to have multiple instances of the same kind. Often there is only one and then main is used
 Examples:
 ```yaml
