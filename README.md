@@ -23,17 +23,35 @@ To install it, you will need:
 - `python3`  At least version 3.8 is needed.
 - `venv` virtual environments in Python when you need to use different versions of the framework.
 - `pip` package installer for python, to install packages
+- `kubectl` a recent version is needed. it is tested extensively with v1.28.3,
+  but at lest v1.21 should be used, see [https://github.com/kubernetes-sigs/kustomize]
 
 To create a virtual environment with kreate-kube in a Linux or Unix environment (like MacOs) one should:
 ```
-python3 -m venv .venv         # create a virtual environment in the .venv directory
-. .venv/bin/activate          # activate the virtual environment
-python3 -m pip  kreate-kube   # install the latest version of kreate-kube
+python3 -m venv .venv                # create a virtual environment in the .venv directory
+. .venv/bin/activate                 # activate the virtual environment
+python3 -m pip install kreate-kube   # install the latest version of kreate-kube
 ```
 This will install the kreate-kube package, including a script `kreate` that can be called from the commandline.
 
 Note: For Windows the commands might be slightly different, but `venv` and `pip`
 are well documented in the Python community.
+
+An alternative way to install it, without venv, is to just type
+```
+pip install --user kreate-kube
+```
+This will install the most recent version from pypi.org, that can be used anywhere
+
+If you want to upgrade to a newer version, use:
+```
+pip install --upgrade kreate-kube
+```
+In general you should use the newest version, since they should be backwards compatible for the yaml files
+If you want to use several versions, you should use Python virtual environments.
+See: https://github.com/kisst-org/kreate-kube/blob/main/doc/using-python-venv-pip.md
+
+
 
 ## Running kreate
 You can now call the `kreate` command line. Some examples:
@@ -226,3 +244,46 @@ test commands:
   test_diff         td  test output against expected-diff-<app>-<env>.out file
   test_diff_update  tdu update expected-diff-<app>-<env>.out file with new diff
 ```
+
+
+## configuring kreate
+When kreate is running it will first load some .env files
+- `$HOME/.config/kreate/kreate.env`  This is useful for global setting for all your projects
+- `./.env` in your working directory to make some tweaks
+
+Especially the first one can be very useful to set some of the most important settings, especially some secrets.
+This is an example of mine:
+```
+# The credentials to get to bitbucket for private repo's
+GIT_PSW=...
+GIT_USR=mark
+
+# the credentials needed to automatically kreate a kubeconfig file (mostly used by Jenkins)
+KUBECONFIG_API_TOKEN_ACC=kubeconfig-u-...
+KUBECONFIG_API_TOKEN_DEV=kubeconfig-u-...
+KUBECONFIG_API_TOKEN_PRD=kubeconfig-u-...
+
+# The key used to enkrypt and dekrypt secrets and secret-files
+KREATE_KRYPT_KEY_ACC=...
+KREATE_KRYPT_KEY_DEV=...
+KREATE_KRYPT_KEY_PRD=...
+
+# Ignore certain warnings (especially about using branches)
+# Better to not ignore them :)
+#KREATE_OPTIONS+= -W ignore
+
+# When comparing output with test commands, use this instead of dekrypted values
+KREATE_DUMMY_DEKRYPT_FORMAT=test-dummy
+
+# When working on the framework or templates, you do not want to push and download these
+# from bitbucket all the time. Just use local directories without versioning
+# Note that these can use {...} which is not jinja, but python str.format()
+KREATE_REPO_USE_LOCAL_DIR=True
+KREATE_REPO_LOCAL_DIR=/home/mark/kreate/{my.repo_name}
+
+# You can also
+KREATE_REPO_LOCAL_DIR_KREATE_TEMPLATES=/home/mark/kreate/kreate-kube-templates
+KREATE_REPO_LOCAL_DIR_KOMPANY_TEMPLATES=/home/mark/kreate/kompany-templates
+KREATE_REPO_LOCAL_DIR_SHARED_KONFIG=/home/mark/kreate/shared-konfig
+```
+For more explanation see: https://github.com/kisst-org/kreate-kube/blob/main/doc/environment-vars.md
