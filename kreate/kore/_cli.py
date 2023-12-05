@@ -140,7 +140,8 @@ class Cli:
                 self.params = []
             if self.subcmd not in self.subcommands:
                 raise LookupError(f"Unknown subcommand {self.subcmd}")
-            logger.info(f"running command: {self.subcmd}")
+            if self.subcmd != "view": # view has better, that understands alias
+                logger.info(f"==== {self.subcmd} {' '.join(self.params)} ====")
             self.subcommands[self.subcmd](self)
         except Exception as e:
             if self.args.verbose > 1:
