@@ -300,7 +300,9 @@ def view(cli: Cli):
                     else:
                         logger.info("flatten dict found")
                         pprint_tuple(
-                            __flatten_dict(result).items(), prefix=path, pattern=pattern
+                            __flatten_dict(result).items(),
+                            prefix=path,
+                            pattern=pattern,
                         )
             print()
 

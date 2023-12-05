@@ -118,7 +118,8 @@ class Cli:
                 vcount += 1 if opt == "-v" else 0
             if vcount >= 2:
                 print(
-                    f"DEBUG:prepending KREATE_OPTIONS to get {result}", file=sys.stderr
+                    f"DEBUG:prepending KREATE_OPTIONS to get {result}",
+                    file=sys.stderr,
                 )
             return result
         return sys.argv[1:]

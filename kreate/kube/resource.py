@@ -47,7 +47,8 @@ class Resource(JinYamlKomponent):
             )[key]
         for key in self.strukture.get("labels", {}):
             self.yaml.set_path(
-                f"metadata.labels.{key}", self.strukture.get_path(f"labels.{key}")
+                f"metadata.labels.{key}",
+                self.strukture.get_path(f"labels.{key}"),
             )
 
     def load_file(self, filename: str) -> str:

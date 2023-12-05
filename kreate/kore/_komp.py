@@ -24,6 +24,7 @@ class KomponentKlass:
     def kreate_komponent(self, app: "App", shortname: str) -> "Komponent":
         return self.python_class(app, self, shortname)
 
+
 class Komponent:
     """A base class for other komponents"""
 
@@ -229,9 +230,6 @@ class JinjaKomponent(Komponent):
         result = dict(self.app.konfig.yaml)
         result["my"] = self
         return result
-
-
-
 
 
 class JinjaFile(JinjaKomponent):
