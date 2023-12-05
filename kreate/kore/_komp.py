@@ -1,11 +1,13 @@
 import logging
 import os
+import re
 import jinja2
 
 from collections.abc import Mapping
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Sequence
 
 from ._core import wrap
+from ._konfig import Konfig
 
 if TYPE_CHECKING:
     from ._app import App
@@ -21,7 +23,6 @@ class KomponentKlass:
 
     def kreate_komponent(self, app: "App", shortname: str) -> "Komponent":
         return self.python_class(app, self, shortname)
-
 
 class Komponent:
     """A base class for other komponents"""
@@ -199,6 +200,17 @@ class JinjaKomponent(Komponent):
     def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
         super().__init__(app, klass, shortname)
         self.data = None
+        self._template_text = None
+
+    # caching template content
+    def template_text(self, konfig: Konfig):
+        if not self._template_text:
+            tmpl = self.get_template_location()
+            self._template_text = konfig.file_getter.get_data(tmpl)
+        return self._template_text
+
+    def template_find_text(self, reg_exp: str) -> Sequence[str]:
+        return re.findall(reg_exp, self.klass.template_text(self.app.konfig))
 
     def aktivate(self):
         komponent_vars = self._template_vars()
@@ -217,6 +229,9 @@ class JinjaKomponent(Komponent):
         result = dict(self.app.konfig.yaml)
         result["my"] = self
         return result
+
+
+
 
 
 class JinjaFile(JinjaKomponent):

@@ -30,7 +30,7 @@ class App:
         self.kontext = konfig.kontext
         self.komponents: List[Komponent] = []
         self.komponents_by_id = {}
-        self.klasses: Mapping[KomponentKlass] = {}
+        self.klasses: Mapping[str, KomponentKlass] = {}
         self.strukture = wrap(konfig.get_path("strukt"))
         self.target_path = Path(konfig.get_path("system.target_dir", f"build"))
         for mod in self.kontext.modules:

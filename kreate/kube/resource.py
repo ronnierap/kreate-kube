@@ -27,6 +27,12 @@ class Resource(JinYamlKomponent):
         # It is mostly used for patches, and then apiVersion is needed as well
         self.kind = klass.info.get("kind", klass.name)
 
+    def api_version(self):
+        return self.template_find_text("apiVersion: *(.*)")[0]
+
+    def resource_kind(self):
+        return self.template_find_text("kind: *(.*)")[0]
+
     def aktivate(self):
         super().aktivate()
         self.add_metadata()
