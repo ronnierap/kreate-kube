@@ -244,8 +244,9 @@ class MultiJinYamlKomponent(JinjaKomponent):
 
     def aktivate(self):
         template_vars = self._template_vars()
+        template = self.get_template_location()
         self.documents = self.app.konfig.jinyaml.render_multi_yaml(
-            self.template, template_vars
+            template, template_vars
         )
 
     def kreate_file(self) -> None:
