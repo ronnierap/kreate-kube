@@ -69,7 +69,7 @@ class Komponent:
         return f"{appname}-{self.klass.name}-{self.shortname}"
 
     def _find_strukture(self):
-        strukt = self.app.strukture._get_path(self.id)
+        strukt = self.app.strukture.get_path(self.id)
         if strukt is None:
             logger.debug(f"could not find strukture for {self.id}")
             return {}
@@ -135,7 +135,7 @@ class Komponent:
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
-        if result := self.strukture._get_path(f"field.{fieldname}"):
+        if result := self.strukture.get_path(f"field.{fieldname}"):
             return result
         konf = self.app.konfig
         result = konf.get_path(f"val.{self.id}.{fieldname}")  # deprecated in 2.0.0
@@ -277,10 +277,10 @@ class JinYamlKomponent(JinjaKomponent):
         self.remove_deletions()
 
     def get_path(self, path: str, default=None):
-        return self.yaml._get_path(path, default=default)
+        return self.yaml.get_path(path, default=default)
 
     def set_path(self, path: str, val):
-        return self.yaml._set_path(path, val)
+        return self.yaml.set_path(path, val)
 
     def kreate_file(self) -> None:
         filename = self.get_filename()
@@ -295,12 +295,12 @@ class JinYamlKomponent(JinjaKomponent):
     def add_additions(self):
         additions = self.strukture.get("add", {})
         for path in additions:
-            self.yaml._set_path(path, additions[path])
+            self.yaml.set_path(path, additions[path])
 
     def remove_deletions(self):
         removals = self.strukture.get("remove", [])
         for path in removals:
-            self.yaml._del_path(path)
+            self.yaml.del_path(path)
 
     def optional(self, fieldname: str) -> str:
         if fieldname not in self.field:

@@ -46,8 +46,8 @@ class Resource(JinYamlKomponent):
                 "annotations"
             )[key]
         for key in self.strukture.get("labels", {}):
-            self.yaml._set_path(
-                f"metadata.labels.{key}", self.strukture._get_path(f"labels.{key}")
+            self.yaml.set_path(
+                f"metadata.labels.{key}", self.strukture.get_path(f"labels.{key}")
             )
 
     def load_file(self, filename: str) -> str:
@@ -71,7 +71,7 @@ class Workload(Resource):
         if additions:
             container = wrap(self.get_path("spec.template.spec.containers")[0])
             for path in additions:
-                container._set_path(path, additions[path])
+                container.set_path(path, additions[path])
 
     def remove_container_items(self):
         additions = self.strukture.get("remove_from_container", {})
@@ -117,7 +117,7 @@ class Secret(Resource):
         return True
 
     def secret(self, varname: str):
-        value = self.strukture._get_path(f"vars.{varname}")
+        value = self.strukture.get_path(f"vars.{varname}")
         if not isinstance(value, str):
             value = self.app.konfig.get_path(f"secret.var.{varname}", None)
         if value is None:

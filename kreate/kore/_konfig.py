@@ -58,10 +58,10 @@ class Konfig:
         return self.yaml[key]
 
     def get_path(self, path: str, default=None, mandatory=False):
-        return self.yaml._get_path(path, default=default, mandatory=mandatory)
+        return self.yaml.get_path(path, default=default, mandatory=mandatory)
 
     def set_path(self, path: str, value):
-        return self.yaml._set_path(path, value)
+        return self.yaml.set_path(path, value)
 
     def _jinja_context(self):
         result = {}

@@ -95,7 +95,11 @@ class DictWrapper(UserDict):
         else:
             data[final_key] = value
 
+    # TODO: Will be removed in 2.0
     def _set_path(self, path: str, value):
+        self.set_path(path, value)
+
+    def set_path(self, path: str, value):
         keys = path.split(".")
         data = self.data
         for key in keys[:-1]:
@@ -121,7 +125,11 @@ class DictWrapper(UserDict):
         else:
             data[final_key] = value
 
+    # TODO: Will be removed in 2.0
     def _del_path(self, path: str):
+        self.del_path(path)
+
+    def del_path(self, path: str):
         keys = path.split(".")
         data = self.data
         for key in keys[:-1]:
@@ -145,12 +153,16 @@ class DictWrapper(UserDict):
             logger.warning(f"non existent key {final_key} in del_path {path}")
 
     def get(self, path: str, default=None):
-        return self._get_path(path, default)
+        return self.get_path(path, default)
 
     def set(self, path: str, val):
-        return self._set_path(path, val)
+        return self.set_path(path, val)
 
+    # TODO: Will be removed in 2.0
     def _get_path(self, path: str, default=None, mandatory=False):
+        return self.get_path(path, default, mandatory)
+
+    def get_path(self, path: str, default=None, mandatory=False):
         keys = path.split(".")
         data = self.data
         for key in keys:

@@ -29,7 +29,7 @@ class KustomizeModule(Module):
     def kreate_patches(self, res: Resource) -> None:
         if "patches" in res.strukture:
             for patch_name in sorted(res.strukture.get("patches").keys()):
-                subpatches = res.strukture._get_path(f"patches.{patch_name}")
+                subpatches = res.strukture.get_path(f"patches.{patch_name}")
                 klass = res.app.klasses[patch_name]
                 if not subpatches.keys():
                     subpatches = {"main": {}}
@@ -51,7 +51,7 @@ class Kustomization(JinYamlKomponent):
         return [res for res in self.app.komponents if isinstance(res, Patch)]
 
     def var(self, cm: str, varname: str):
-        value = self.strukture._get_path(f"configmaps.{cm}.vars.{varname}")
+        value = self.strukture.get_path(f"configmaps.{cm}.vars.{varname}")
         if not isinstance(value, str):
             value = self.app.konfig.get_path("var", {}).get(varname, None)
         if value is None:
