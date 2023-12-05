@@ -191,7 +191,7 @@ class TextFile(Komponent):
         return super().is_secret() or "dekrypt:" in self.from_location
 
     def kreate_file_data(self) -> str:
-        return self.app.konfig.file_getter.get_data(self.from_location)
+        return self.app.konfig.load_repo_file(self.from_location)
 
 
 class JinjaKomponent(Komponent):
@@ -206,7 +206,7 @@ class JinjaKomponent(Komponent):
     def template_text(self, konfig: Konfig):
         if not self._template_text:
             tmpl = self.get_template_location()
-            self._template_text = konfig.file_getter.get_data(tmpl)
+            self._template_text = konfig.load_repo_file(tmpl)
         return self._template_text
 
     def template_find_text(self, reg_exp: str) -> Sequence[str]:
