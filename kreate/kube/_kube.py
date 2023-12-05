@@ -2,6 +2,7 @@ import logging
 import os
 import logging
 import difflib
+from pathlib import Path
 
 from ..krypt import krypt_functions
 from ..kore import Kontext, Module, Konfig, App, Cli
@@ -122,7 +123,11 @@ def test_diff(cli: Cli):
     app = cli.kreate_files()
     diff_result = test_result(cli, app)
     loc = expected_diff_location(app.konfig)
-    expected_diff_lines = app.konfig.load_repo_file(loc).splitlines()
+    if Path(loc).exists():
+        expected_diff_lines = app.konfig.load_repo_file(loc).splitlines()
+    else:
+        expected_diff_lines = []
+        logger.warning(f"no expected diff file found {loc}")
     diff2 = difflib.unified_diff(
         expected_diff_lines,
         diff_result,
