@@ -2,7 +2,7 @@ import logging
 import importlib.metadata
 import warnings
 from pathlib import Path
-from typing import List, Sequence, TYPE_CHECKING
+from typing import List, Sequence
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
@@ -11,10 +11,6 @@ from ._core import deep_update, wrap
 from ._repo import FileGetter
 from .trace import Trace
 from ._jinyaml import JinYaml
-
-if TYPE_CHECKING:  # Only imports the below statements during type checking
-    from kreate.kore._app import App
-
 
 logger = logging.getLogger(__name__)
 
