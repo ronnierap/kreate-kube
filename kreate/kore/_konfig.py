@@ -1,12 +1,8 @@
 import logging
-import importlib.metadata
-import warnings
 from pathlib import Path
 from typing import List, Sequence
-from packaging.specifiers import SpecifierSet
-from packaging.version import Version
 
-from ._kontext import Kontext, VersionWarning
+from ._kontext import Kontext, get_package_version
 from ._core import deep_update, wrap
 from ._repo import FileGetter
 from .trace import Trace
@@ -140,26 +136,7 @@ class Konfig:
         # self.load_new_inkludes()
 
     def get_kreate_version(self) -> str:
-        try:
-            return importlib.metadata.version("kreate-kube")
-        except importlib.metadata.PackageNotFoundError:
-            return "Unknown"
-
-    def check_kreate_version(self, force: bool = False):
-        version = self.get_kreate_version()
-        dev_versions = ["Unknown"]  #  , "rc", "editable"]
-        if any(txt in version for txt in dev_versions) and not force:
-            logger.debug(f"skipping check for development version {version}")
-            return
-        req_version: str = self.get_path("version.kreate_kube_version", None)
-        if not req_version:
-            logger.debug(f"skipping check since no kreate_version specified")
-            return
-        if not SpecifierSet(req_version).contains(Version(version)):
-            warnings.warn(
-                f"Invalid kreate-kube version {version} for specifier {req_version}",
-                VersionWarning,
-            )
+        return get_package_version("kreate-kube")
 
     def dekrypt_bytes(b: bytes) -> bytes:
         raise NotImplementedError("dekrypt_bytes not implemented")

@@ -19,6 +19,12 @@ class MultiDocumentResource(MultiJinYamlKomponent):
     def get_filename(self):
         return f"resources/{self.id}.yaml"
 
+    def implements(self, name: str) -> bool:
+        if name == "Resource":
+            return True
+        return super().implements(name)
+
+
 
 class Resource(JinYamlKomponent):
     def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):

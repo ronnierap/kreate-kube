@@ -35,7 +35,7 @@ def dekrypt_bytes(value: bytes) -> bytes:
     return fernet.decrypt(value)
 
 
-def dekrypt_file(filename):
+def dekrypt_file(filename: str):
     fernet = _get_key()
     with open(filename) as f:
         data = f.read()
@@ -43,7 +43,8 @@ def dekrypt_file(filename):
         format = os.getenv("KREATE_DUMMY_DEKRYPT_FORMAT")
         format = format or "testdummy-{value[len(value)//2-4:len(value)//2+4]}"
         return format.format(value=data)
-    print(fernet.decrypt(data.encode()).decode(), end="")
+    with open(filename + ".decrypted", "wb") as out:
+        out.write(fernet.decrypt(data.encode()))
 
 
 def enkrypt_str(value):
@@ -53,13 +54,13 @@ def enkrypt_str(value):
     return fernet._encrypt_from_parts(value.encode(), 0, part).decode()
 
 
-def enkrypt_file(filename):
+def enkrypt_file(filename: str):
     fernet = _get_key()
-    with open(filename) as f:
+    with open(filename, "rb") as f:
         data = f.read()
     with open(filename + ".encrypted", "wb") as f:
         part = b"\xbd\xc0,\x16\x87\xd7G\xb5\xe5\xcc\xdb\xf9\x07\xaf\xa0\xfa"
-        f.write(fernet._encrypt_from_parts(data.encode(), 0, part))
+        f.write(fernet._encrypt_from_parts(data, 0, part))
 
 
 def change_lines(

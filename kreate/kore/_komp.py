@@ -3,11 +3,11 @@ import os
 import re
 from collections.abc import Mapping
 from typing import Any, TYPE_CHECKING, Sequence
-
 import jinja2
 
-from ._core import wrap
+from ._core import wrap, DictWrapper
 from ._konfig import Konfig
+from ._kontext import check_requires
 
 if TYPE_CHECKING:
     from ._app import App
@@ -19,11 +19,13 @@ class KomponentKlass:
     def __init__(self, python_class, name: str, info: Mapping) -> None:
         self.python_class = python_class
         self.name = name
-        self.info = info
+        self.info : DictWrapper = wrap(info)
 
     def kreate_komponent(self, app: "App", shortname: str) -> "Komponent":
         return self.python_class(app, self, shortname)
 
+    def check_requirements(self):
+        check_requires(self.info.get("requires", {}))
 
 class Komponent:
     """A base class for other komponents"""
@@ -55,6 +57,14 @@ class Komponent:
 
     def skip(self):
         return self.strukture.get("ignore", False)
+
+    def implements(self, name: str) -> bool:
+        if self.klass.info.get_path(f"implements.{name}", "True") == "True":
+            return True
+        for cls in self.__class__.__mro__:
+            if cls.__name__ == name:
+                return True
+        return False
 
     def aktivate(self):
         # Abstract Method, sub-classes may implement this method
