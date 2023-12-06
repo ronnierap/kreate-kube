@@ -60,29 +60,46 @@ def vardiff(cli: Cli) -> None:
 
     build_result = cli.run_command(app, "build")
 
+
+    # Step 1. Get a list of generated resources
+    documents = app.konfig.jinyaml.yaml_parser.load_all(build_result)
+    generated_resources = []
+    pattern = r".+-[a-z0-9]{10}$"
+    for doc in documents:
+        metadata_name = doc["metadata"]["name"]
+        if doc["kind"] in ('ConfigMap', 'Secret'):
+            # Config Found
+            generated_resources.append((metadata_name,None if re.search(pattern, metadata_name) else metadata_name))
+
+    # Step 2. Get Current Resource Map
+    resource_tupes = []
+    resource_map = cli.run_command(app, "getresourcemap", output="-o=jsonpath='{range .items[*]}{\"\\n\"}{.kind}{\":\"}{.metadata.name}{\":\"}{.spec.containers[*].envFrom[*].configMapRef.name}{end}'").split("\n")
+    for map_value in resource_map:
+        if ":" in map_value:
+            map_kind, map_parent, map_resource = map_value.split(":", 3)
+
+            for idx, res_x in enumerate(generated_resources):
+                if res_x[1] is not None:
+                    continue
+                res_y = res_x[0][:-10]
+                if map_resource.startswith(res_y):
+                    generated_resources[idx] = (generated_resources[idx][0], map_resource)
+
+    # Step 3. Get the current document
     documents = app.konfig.jinyaml.yaml_parser.load_all(build_result)
     for target_doc in documents:
+        metadata_name = target_doc["metadata"]["name"]
         if target_doc["kind"] in ('ConfigMap', 'Secret'):
-            metadata_name = target_doc["metadata"]["name"]
             pattern = r".+-[a-z0-9]{10}$"
             hash_found = re.search(pattern, metadata_name)
+
             # Check correct label
-            resource_name = ""
-            label_filter = ""
-            if target_doc["kind"] == "ConfigMap" and hash_found:
-                label_filter = f"-l config-map={metadata_name[:metadata_name.rfind('-')]}"
-
-                names = cli.run_command(app, "getname", resource_type=target_doc["kind"],
-                                        label_filter=label_filter).split('\n')
-
-                # Return youngest one
-                resource_name = list(filter(None, names))[-1].split('/', 2)[1]
-
-            else:
-                resource_name = metadata_name
+            resource_names = [item for item in generated_resources if item[0] == metadata_name]
+            if len(resource_names) == 0 or len(resource_names) > 1:
+                raise ValueError(f"No resources or duplicate value resources found in list: {resource_names}")
 
             result = cli.run_command(app, "getyaml", resource_type=target_doc["kind"],
-                                     resource_name=resource_name)
+                                     resource_name=resource_names[0][1])
 
             data = yaml.safe_load(result)
 
