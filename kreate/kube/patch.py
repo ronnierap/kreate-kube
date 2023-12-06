@@ -37,6 +37,8 @@ class Patch(JinYamlKomponent):
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
             return self.strukture[fieldname]
+        if result := self.target.strukture.get_path(f"field.{fieldname}"):
+            return result
         if fieldname in self.target.strukture:
             return self.target.strukture[fieldname]
         return super()._field(fieldname, default=default)
