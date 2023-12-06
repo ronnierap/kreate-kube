@@ -10,6 +10,7 @@ import yaml
 from .resource import CustomResource
 from ..kore import Kontext, Module, Konfig, App, Cli
 from ..krypt import krypt_functions
+from ..kore._core import pprint_map
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +23,9 @@ class KubeModule(Module):
         cli.add_help_section("kube commands:")
         cli.add_subcommand(build, aliases=["b"])
         cli.add_subcommand(diff, aliases=["d"])
-        cli.add_subcommand(vardiff)
+        cli.add_subcommand(vardiff, aliases=["vd"])
         cli.add_subcommand(apply, aliases=["a"])
+        cli.add_subcommand(dump)
         cli.add_help_section("test commands:")
         cli.add_subcommand(test, aliases=["t"])
         cli.add_subcommand(test_update, aliases=["tu"])
@@ -50,6 +52,24 @@ def diff(cli: Cli) -> None:
         logger.info("kreated files differ from cluster")
         print(result)
 
+def dump(cli: Cli) -> None:
+    """dump `kustomize build` output to individual files per resource"""
+    app = cli.kreate_files()
+    build_result = cli.run_command(app, "build")
+    documents = app.konfig.jinyaml.yaml_parser.load_all(build_result)
+    dumpdir = app.target_path / "dump"
+    dumpdir.mkdir(parents=True, exist_ok=True)
+    for doc in documents:
+        kind = doc.get("kind")
+        name = doc.get("metadata").get("name")
+        if len(cli.params) > 0:
+            pattern = cli.params[0]
+            if not pattern in kind + name:
+                continue
+        path = dumpdir / f'{kind}.{name}'
+        logger.info(f"dumping to {path}")
+        with open(path, "w") as f:
+            pprint_map(doc, file=f, use_quotes=True)
 
 
 def vardiff(cli: Cli) -> None:

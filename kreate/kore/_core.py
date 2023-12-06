@@ -212,7 +212,7 @@ def wrap(obj):
     return obj
 
 
-def pprint_map(map, indent="", file=None):
+def pprint_map(map, indent="", file=None, use_quotes=False):
     if file is None:
         file = sys.stdout
     indent_step = "  "
@@ -235,9 +235,12 @@ def pprint_map(map, indent="", file=None):
                 print(f"{indent}{key}: " + "{}", file=file)
             else:
                 print(f"{indent}{key}:", file=file)
-                pprint_map(val, indent=indent + indent_step, file=file)
+                pprint_map(val, indent=indent + indent_step, file=file, use_quotes=use_quotes)
         elif isinstance(val, str):
-            print(f"{indent}{key}: {val}", file=file)
+            if use_quotes:
+                print(f'{indent}{key}: "{val}"', file=file)
+            else:
+                print(f"{indent}{key}: {val}", file=file)
         elif isinstance(val, Sequence):
             print(f"{indent}{key}:", file=file)
             for v in val:
