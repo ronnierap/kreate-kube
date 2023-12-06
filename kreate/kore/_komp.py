@@ -8,6 +8,7 @@ from typing import Any, TYPE_CHECKING, Sequence
 
 from ._core import wrap, DictWrapper
 from ._konfig import Konfig
+from ._kontext import check_requires
 
 if TYPE_CHECKING:
     from ._app import App
@@ -24,6 +25,8 @@ class KomponentKlass:
     def kreate_komponent(self, app: "App", shortname: str) -> "Komponent":
         return self.python_class(app, self, shortname)
 
+    def check_requirements(self):
+        check_requires(self.info.get("requires", {}))
 
 class Komponent:
     """A base class for other komponents"""

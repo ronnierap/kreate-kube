@@ -1,9 +1,15 @@
 import subprocess
 import sys
 import logging
-from . import dotenv
+import warnings
+import importlib.metadata
+
 from pathlib import Path
-from typing import List, Set, TYPE_CHECKING
+from typing import Mapping, List, Set, TYPE_CHECKING
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
+
+from . import dotenv
 from .trace import Trace
 
 if TYPE_CHECKING:  # Only imports the below statements during type checking
@@ -112,3 +118,23 @@ class Module:
 
     def kreate_app_komponents(self, app: "App"):
         ...
+
+
+def get_package_version(package: str) -> str:
+    try:
+        return importlib.metadata.version(package)
+    except importlib.metadata.PackageNotFoundError:
+        return "Unknown"
+
+def check_requires(specifiers: Mapping, force: bool = False):
+    dev_versions = ["Unknown"]  #  , "rc", "editable"]
+    for package, specifier in specifiers:
+        version = get_package_version(package)
+        if any(txt in version for txt in dev_versions) and not force:
+            logger.debug(f"skipping check for development version {version}")
+            break
+        if not SpecifierSet(specifier).contains(Version(version)):
+            warnings.warn(
+                f"Invalid {package} version {version} for specifier {specifier}",
+                VersionWarning,
+        )
