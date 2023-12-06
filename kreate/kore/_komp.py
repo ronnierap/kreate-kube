@@ -1,10 +1,10 @@
 import logging
 import os
 import re
-import jinja2
-
 from collections.abc import Mapping
 from typing import Any, TYPE_CHECKING, Sequence
+
+import jinja2
 
 from ._core import wrap
 from ._konfig import Konfig
@@ -29,10 +29,10 @@ class Komponent:
     """A base class for other komponents"""
 
     def __init__(
-        self,
-        app: "App",
-        klass: KomponentKlass,
-        shortname: str = None,
+            self,
+            app: "App",
+            klass: KomponentKlass,
+            shortname: str = None,
     ):
         self.app = app
         self.klass = klass
@@ -41,9 +41,9 @@ class Komponent:
         self.strukture = wrap(self._find_strukture())
         self.field = Field(self)
         name = (
-            self.strukture.get("name", None)
-            or app.komponent_naming(self.klass.name, self.shortname)
-            or self.calc_name()
+                self.strukture.get("name", None)
+                or app.komponent_naming(self.klass.name, self.shortname)
+                or self.calc_name()
         )
         self.name = name.lower()
         if self.skip():

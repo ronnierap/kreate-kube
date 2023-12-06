@@ -1,12 +1,15 @@
+import difflib
+import io
 import logging
 import os
-import logging
-import difflib
+import re
 from pathlib import Path
 
-from ..krypt import krypt_functions
-from ..kore import Kontext, Module, Konfig, App, Cli
+import yaml
+
 from .resource import CustomResource
+from ..kore import Kontext, Module, Konfig, App, Cli
+from ..krypt import krypt_functions
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +22,7 @@ class KubeModule(Module):
         cli.add_help_section("kube commands:")
         cli.add_subcommand(build, aliases=["b"])
         cli.add_subcommand(diff, aliases=["d"])
+        cli.add_subcommand(vardiff)
         cli.add_subcommand(apply, aliases=["a"])
         cli.add_help_section("test commands:")
         cli.add_subcommand(test, aliases=["t"])
@@ -45,6 +49,73 @@ def diff(cli: Cli) -> None:
     else:
         logger.info("kreated files differ from cluster")
         print(result)
+
+
+
+def vardiff(cli: Cli) -> None:
+    """vardiff with current existing resources"""
+    app = cli.kreate_files()
+    for comp in app.komponents:
+        print(f"  {comp.get_filename()} {comp.klass.python_class} {comp.klass.name} {comp.name}")
+
+    build_result = cli.run_command(app, "build")
+
+    documents = app.konfig.jinyaml.yaml_parser.load_all(build_result)
+    for target_doc in documents:
+        if target_doc["kind"] in ('ConfigMap', 'Secret'):
+            metadata_name = target_doc["metadata"]["name"]
+            pattern = r".+-[a-z0-9]{10}$"
+            hash_found = re.search(pattern, metadata_name)
+            # Check correct label
+            resource_name = ""
+            label_filter = ""
+            if target_doc["kind"] == "ConfigMap" and hash_found:
+                label_filter = f"-l config-map={metadata_name[:metadata_name.rfind('-')]}"
+
+                names = cli.run_command(app, "getname", resource_type=target_doc["kind"],
+                                        label_filter=label_filter).split('\n')
+
+                resource_name = names[0].split('/', 2)[1]
+
+            else:
+                resource_name = metadata_name
+
+            result = cli.run_command(app, "getyaml", resource_type=target_doc["kind"],
+                                     resource_name=resource_name)
+
+            data = yaml.safe_load(result)
+
+            # Remove specified keys
+            if 'metadata' in data:
+                metadata = data['metadata']
+                if 'annotations' in metadata:
+                    annotation = metadata['annotations']
+                    if 'kubectl.kubernetes.io/last-applied-configuration' in annotation:
+                        del annotation['kubectl.kubernetes.io/last-applied-configuration']
+                    if not metadata['annotations']:
+                        del metadata['annotations']
+                if 'creationTimestamp' in metadata:
+                    del metadata['creationTimestamp']
+                if 'resourceVersion' in metadata:
+                    del metadata['resourceVersion']
+                if 'uid' in metadata:
+                    del metadata['uid']
+
+            # Convert data back to YAML string
+            result = yaml.dump(data, default_flow_style=False, width=9999)
+
+            buf = io.BytesIO()
+            app.konfig.jinyaml.yaml_parser.dump(target_doc, buf)
+            buf_getvalue = buf.getvalue()
+            b = str(buf_getvalue, 'UTF-8')
+
+            target_result = yaml.dump(yaml.safe_load(b), default_flow_style=False, width=9999)
+
+            # Compare this target_doc with the resource in Kubernetes
+            diff2 = difflib.unified_diff(result.split('\n'), target_result.split('\n'), fromfile="Current",
+                                         tofile="Target")
+            for line in diff2:
+                print(line.strip())
 
 
 def apply(cli: Cli) -> None:
