@@ -75,7 +75,8 @@ def vardiff(cli: Cli) -> None:
                 names = cli.run_command(app, "getname", resource_type=target_doc["kind"],
                                         label_filter=label_filter).split('\n')
 
-                resource_name = names[0].split('/', 2)[1]
+                # Return youngest one
+                resource_name = names[-1].split('/', 2)[1]
 
             else:
                 resource_name = metadata_name
