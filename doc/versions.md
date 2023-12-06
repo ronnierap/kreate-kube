@@ -71,7 +71,8 @@ At this moment there are not many versions of kreate-kube:
   - The App object does not have a appname or env member. They must be used from konfig
   - added api_version and resource_kind to Resource that is calculated from the template (for patches)
   - fixed bug with missing template attribute
-  -
+  - show what command you are running
+  - added `implements` function for Komponent
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
