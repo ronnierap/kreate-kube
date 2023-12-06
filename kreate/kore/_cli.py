@@ -229,10 +229,13 @@ class Cli:
         app.kreate_files()
         return app
 
-    def run_command(self, app: App, cmd_name: str, success_codes=None) -> str:
+    def run_command(self, app: App, cmd_name: str, success_codes=None, **kwargs) -> str:
         cmd: str = app.konfig.get_path(f"system.command.{cmd_name}.script")
+        if cmd is None:
+            logger.error(f"Command could not be located: {cmd_name}")
+            raise LookupError(f"Unknown command {cmd_name}")
         logger.debug(f"formatting {cmd_name} [{cmd}]")
-        cmd = cmd.format(target_dir=app.target_path, app=app, konfig=app.konfig.yaml)
+        cmd = cmd.format(target_dir=app.target_path, app=app, konfig=app.konfig.yaml, **kwargs)
         result = self.kontext.run_shell(cmd, success_codes=success_codes)
         return result.stdout.decode()
 
