@@ -65,14 +65,18 @@ At this moment there are not many versions of kreate-kube:
   - added CustomResource, CustomPatch, TextFile, JinjaFile
   - in klass templates all field of konfig are directly accessible, so the old {{ strukt }} needs to be accessed as {{ my.strukture... }}
   - a komponent can be marked as secret by it's klass
-- `1.7.1`
+- `1.7.1` in-progress
   - `test diff` now also works if there is no expected-diff file
   - _get_path (and _set and _del) are now also available as get_path. (old versions still available)
   - The App object does not have a appname or env member. They must be used from konfig
   - added api_version and resource_kind to Resource that is calculated from the template (for patches)
   - fixed bug with missing template attribute
   - show what command you are running
-  - added `implements` function for Komponent
+  - added `implements` function for Komponent, to support Marker interfaces
+  - added `dump` command to save all resources in separate files
+  - added first try at `vardiff` command
+  - added check for specific versions of packages for klasses you are using, and in general
+  - fixed dekrypting and enkrypting binary files
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

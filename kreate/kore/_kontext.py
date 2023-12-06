@@ -5,7 +5,7 @@ import warnings
 import importlib.metadata
 
 from pathlib import Path
-from typing import Mapping, List, Set, TYPE_CHECKING
+from typing import Mapping, List, Set, TYPE_CHECKING, Sequence
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
@@ -133,7 +133,9 @@ def check_requires(specifiers: Mapping, force: bool = False, msg: str = ""):
         if any(txt in version for txt in dev_versions) and not force:
             logger.debug(f"skipping check for development version {version}")
             break
-        if not SpecifierSet(str(specifier)).contains(Version(version)):
+        if isinstance(specifier, Sequence) and not isinstance(specifier, str):
+            specifier = ",".join(specifier)
+        if not SpecifierSet(specifier).contains(Version(version)):
             warnings.warn(
                 f"{msg}Invalid {package} version {version} for specifier {specifier}",
                 VersionWarning,
