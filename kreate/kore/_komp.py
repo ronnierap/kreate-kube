@@ -20,12 +20,17 @@ class KomponentKlass:
         self.python_class = python_class
         self.name = name
         self.info : DictWrapper = wrap(info)
+        self._req_check = None
 
     def kreate_komponent(self, app: "App", shortname: str) -> "Komponent":
         return self.python_class(app, self, shortname)
 
-    def check_requirements(self):
-        check_requires(self.info.get("requires", {}))
+    def check_requirements(self) -> bool:
+        if self._req_check is None:
+            self._req_check = check_requires(self.info.get("requires", {}),
+                msg=f"{self.name}: "
+            )
+        return self._req_check
 
 class Komponent:
     """A base class for other komponents"""
@@ -38,6 +43,7 @@ class Komponent:
     ):
         self.app = app
         self.klass = klass
+        klass.check_requirements()
         self.shortname = shortname or "main"
         self.id = f"{klass.name}.{shortname}"
         self.strukture = wrap(self._find_strukture())

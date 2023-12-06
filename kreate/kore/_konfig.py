@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import List, Sequence
 
-from ._kontext import Kontext, get_package_version
+from ._kontext import Kontext, get_package_version, check_requires
 from ._core import deep_update, wrap
 from ._repo import FileGetter
 from .trace import Trace
@@ -45,6 +45,7 @@ class Konfig:
             self.inklude(ink)
         self.inklude(self.main_konfig_path.name)
         self.load_new_inkludes()
+        check_requires(self.get_path("system.requires",{}), msg="system.requires: ")
 
     def __getitem__(self, key: str):
         return self.yaml[key]

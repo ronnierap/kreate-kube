@@ -135,7 +135,7 @@ class KoreModule(Module):
             logging.basicConfig(format=FORMAT, level=logging.VERBOSE)
         else:
             logging.basicConfig(format=FORMAT, level=logging.INFO)
-        warnings.simplefilter("error", VersionWarning)
+        warnings.simplefilter("always", VersionWarning)
         for warn_setting in args.warn_filter:
             self.parse_warning_setting(warn_setting)
 

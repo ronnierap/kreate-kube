@@ -126,15 +126,15 @@ def get_package_version(package: str) -> str:
     except importlib.metadata.PackageNotFoundError:
         return "Unknown"
 
-def check_requires(specifiers: Mapping, force: bool = False):
+def check_requires(specifiers: Mapping, force: bool = False, msg: str = ""):
     dev_versions = ["Unknown"]  #  , "rc", "editable"]
-    for package, specifier in specifiers:
+    for package, specifier in specifiers.items():
         version = get_package_version(package)
         if any(txt in version for txt in dev_versions) and not force:
             logger.debug(f"skipping check for development version {version}")
             break
-        if not SpecifierSet(specifier).contains(Version(version)):
+        if not SpecifierSet(str(specifier)).contains(Version(version)):
             warnings.warn(
-                f"Invalid {package} version {version} for specifier {specifier}",
+                f"{msg}Invalid {package} version {version} for specifier {specifier}",
                 VersionWarning,
         )
