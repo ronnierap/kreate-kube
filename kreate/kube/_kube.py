@@ -76,7 +76,7 @@ def vardiff(cli: Cli) -> None:
                                         label_filter=label_filter).split('\n')
 
                 # Return youngest one
-                resource_name = names[-1].split('/', 2)[1]
+                resource_name = list(filter(None, names))[-1].split('/', 2)[1]
 
             else:
                 resource_name = metadata_name
