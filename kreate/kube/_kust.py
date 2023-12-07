@@ -14,19 +14,9 @@ class KustomizeModule(Module):
     def kreate_app_komponents(self, app: App):
         for res in app.komponents:
             if isinstance(res, Resource):
-                self.kreate_patches(app, res)
+                self.kreate_embedded_patches(app, res)
 
-    def kreate_patch(
-        self, target: Resource, klass: KomponentKlass, shortname: str
-    ) -> None:
-        if issubclass(klass.python_class, Patch):
-            klass.kreate_komponent(target, shortname)
-        else:
-            raise TypeError(
-                f"class for {klass.name}.{shortname} is not a Patch but {klass.python_class.__name__}"
-            )
-
-    def kreate_patches(self, app: App, res: Resource) -> None:
+    def kreate_embedded_patches(self, app: App, res: Resource) -> None:
         if "patches" in res.strukture:
             for patch_name in sorted(res.strukture.get("patches").keys()):
                 subpatches = res.strukture.get_path(f"patches.{patch_name}")
@@ -36,8 +26,7 @@ class KustomizeModule(Module):
                 # use sorted because some patches, e.g. the MountVolumes
                 # result in a list, were the order can be unpredictable
                 for shortname in sorted(subpatches.keys()):
-                    klass.kreate_komponent(app, klass, shortname)
-                    #self.kreate_patch(res.app, klass, shortname)
+                    Patch.from_target(app, klass, shortname, target_id=res.id)
 
 
 class Kustomization(JinYamlKomponent):

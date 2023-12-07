@@ -18,13 +18,26 @@ class Patch(JinYamlKomponent):
     # TODO the signature differs from other komponents, and might not work
     # in KomponentKlass.kreate_komponent. Needs some redesign
     def __init__(self, app: App, klass: KomponentKlass, shortname: str, target_id : str = None):
-        super().__init__(app=app, klass=klass, shortname=shortname)
         # The target_id is to find the target, it can be passed in explicitely,
         # but also provide in the strukture. If both are empty, the shortname is used.
-        target_id = target_id or self.strukture.get("target")
-        self.target_id = target_id or shortname
         # The target will be resolved at aktivation, when all komponents are known
+        target_id = target_id or app.konfig.get_path(f"strukt.{klass.name}.{shortname}.target_id")
+        self.target_id = target_id or shortname
+
+        super().__init__(app=app, klass=klass, shortname=shortname)
         self.target = None
+
+    @classmethod
+    def from_target(
+        cls, app: App, klass: KomponentKlass, shortname: str, target_id: str = None
+    ) -> "Patch":
+        print(111, klass, shortname)
+        if issubclass(klass.python_class, Patch):
+            klass.python_class(app, klass, shortname, target_id)
+        else:
+            raise TypeError(
+                f"class for {klass.name}.{shortname} is not a Patch but {klass.python_class.__name__}"
+            )
 
     def aktivate(self):
         self.target = self.app.komponents_by_id[self.target_id]
@@ -42,7 +55,7 @@ class Patch(JinYamlKomponent):
     def _find_strukture(self):
         if result := super()._find_strukture():
             return result
-        return self.app.konfig.get_path(f"{self.target_id}.patches.{self.id}", {})
+        return self.app.konfig.get_path(f"strukt.{self.target_id}.patches.{self.id}", {})
 
     def _field(self, fieldname: str, default=None):
         if fieldname in self.strukture:
@@ -65,13 +78,13 @@ class EgressLabels(Patch):
 
 
 class MultiPatch(Patch):
-    def __init__(self, target: Resource, klass: KomponentKlass, shortname: str):
-        super().__init__(target, klass, shortname)
+    def __init__(self, app: App, klass: KomponentKlass, shortname: str, target_id=None):
+        super().__init__(app, klass, shortname, target_id=target_id)
         patches = klass.info.get("patches")
         patches = patches or klass.info.get("template")  # TODO remove in kreate 2.0
         for patch_name in patches:
             klass = self.app.klasses[patch_name]
-            klass.kreate_komponent(target, "main")
+            Patch.from_target(app, klass, shortname, target_id=target_id)
 
     def skip(self):
         return True
