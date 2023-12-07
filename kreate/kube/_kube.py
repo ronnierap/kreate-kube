@@ -121,14 +121,14 @@ def vardiff_old(cli: Cli) -> None:
                     del metadata['uid']
 
             # Convert data back to YAML string
-            #result = yaml.dump(data, default_flow_style=False, width=9999)
+            result = None #yaml.dump(data, default_flow_style=False, width=9999)
 
             buf = io.BytesIO()
             app.konfig.jinyaml.yaml_parser.dump(target_doc, buf)
             buf_getvalue = buf.getvalue()
             b = str(buf_getvalue, 'UTF-8')
 
-            #target_result = yaml.dump(yaml.safe_load(b), default_flow_style=False, width=9999)
+            target_result = None #yaml.dump(yaml.safe_load(b), default_flow_style=False, width=9999)
 
             # Compare this target_doc with the resource in Kubernetes
             diff2 = difflib.unified_diff(result.split('\n'), target_result.split('\n'), fromfile="Current",
