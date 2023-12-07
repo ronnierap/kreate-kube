@@ -49,7 +49,10 @@ class Kustomization(JinYamlKomponent):
         return value
 
     def kopy_file(self, filename: str) -> str:
-        location: str = self.app.konfig.yaml["file"][filename]
+        # Note: you can not usu the full get_path, since the filename might contain a dot
+        location: str = self.app.konfig.get_path("file", {}).get(filename)
+        if not location:
+            raise ValueError(f"Could not find file {filename} in file section to kopy")
         if location.startswith("dekrypt:"):
             target = self.app.target_path / "secrets" / "files" / filename
             result = "secrets/files/" + filename
