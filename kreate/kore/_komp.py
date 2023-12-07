@@ -32,6 +32,9 @@ class KomponentKlass:
             )
         return self._req_check
 
+    def __str__(self) -> str:
+        return f"<KomponentKlass {self.name}>"
+
 class Komponent:
     """A base class for other komponents"""
 
