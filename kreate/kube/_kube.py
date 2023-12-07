@@ -5,12 +5,13 @@ import os
 import re
 from pathlib import Path
 
-import yaml
+#import yaml
 
 from .resource import CustomResource
 from ..kore import Kontext, Module, Konfig, App, Cli
 from ..krypt import krypt_functions
 from ..kore._core import pprint_map
+from .vardiff import vardiff, dump
 
 logger = logging.getLogger(__name__)
 
@@ -52,27 +53,7 @@ def diff(cli: Cli) -> None:
         logger.info("kreated files differ from cluster")
         print(result)
 
-def dump(cli: Cli) -> None:
-    """dump `kustomize build` output to individual files per resource"""
-    app = cli.kreate_files()
-    build_result = cli.run_command(app, "build")
-    documents = app.konfig.jinyaml.yaml_parser.load_all(build_result)
-    dumpdir = app.target_path / "dump"
-    dumpdir.mkdir(parents=True, exist_ok=True)
-    for doc in documents:
-        kind = doc.get("kind")
-        name = doc.get("metadata").get("name")
-        if len(cli.params) > 0:
-            pattern = cli.params[0]
-            if not pattern in kind + name:
-                continue
-        path = dumpdir / f'{kind}.{name}'
-        logger.info(f"dumping to {path}")
-        with open(path, "w") as f:
-            pprint_map(doc, file=f, use_quotes=True)
-
-
-def vardiff(cli: Cli) -> None:
+def vardiff_old(cli: Cli) -> None:
     """vardiff with current existing resources"""
     app = cli.kreate_files()
     for comp in app.komponents:
@@ -121,7 +102,7 @@ def vardiff(cli: Cli) -> None:
             result = cli.run_command(app, "getyaml", resource_type=target_doc["kind"],
                                      resource_name=resource_names[0][1])
 
-            data = yaml.safe_load(result)
+            data = None #yaml.safe_load(result)
 
             # Remove specified keys
             if 'metadata' in data:
@@ -140,14 +121,14 @@ def vardiff(cli: Cli) -> None:
                     del metadata['uid']
 
             # Convert data back to YAML string
-            result = yaml.dump(data, default_flow_style=False, width=9999)
+            #result = yaml.dump(data, default_flow_style=False, width=9999)
 
             buf = io.BytesIO()
             app.konfig.jinyaml.yaml_parser.dump(target_doc, buf)
             buf_getvalue = buf.getvalue()
             b = str(buf_getvalue, 'UTF-8')
 
-            target_result = yaml.dump(yaml.safe_load(b), default_flow_style=False, width=9999)
+            #target_result = yaml.dump(yaml.safe_load(b), default_flow_style=False, width=9999)
 
             # Compare this target_doc with the resource in Kubernetes
             diff2 = difflib.unified_diff(result.split('\n'), target_result.split('\n'), fromfile="Current",
