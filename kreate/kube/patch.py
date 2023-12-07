@@ -31,7 +31,6 @@ class Patch(JinYamlKomponent):
     def from_target(
         cls, app: App, klass: KomponentKlass, shortname: str, target_id: str = None
     ) -> "Patch":
-        print(111, klass, shortname)
         if issubclass(klass.python_class, Patch):
             klass.python_class(app, klass, shortname, target_id)
         else:
