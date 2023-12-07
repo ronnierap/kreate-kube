@@ -65,7 +65,7 @@ At this moment there are not many versions of kreate-kube:
   - added CustomResource, CustomPatch, TextFile, JinjaFile
   - in klass templates all field of konfig are directly accessible, so the old {{ strukt }} needs to be accessed as {{ my.strukture... }}
   - a komponent can be marked as secret by it's klass
-- `1.7.1` in-progress
+- `1.7.1`
   - `test diff` now also works if there is no expected-diff file
   - _get_path (and _set and _del) are now also available as get_path. (old versions still available)
   - The App object does not have a appname or env member. They must be used from konfig
