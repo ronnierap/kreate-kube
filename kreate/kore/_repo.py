@@ -239,7 +239,7 @@ class KonfigRepo(Repo):
         return f"{self.__class__.__name__}({self.repo_name}, version={self.version})"
 
     def download(self, filename: str) -> bool:
-        raise NotImplementedError(f"Could not download {self.repo_name}")
+        raise FileNotFoundError(f"Could not find {self.calc_dir()}/{filename} in repo {self.repo_name}")
 
     def get_data(self, filename: Path, optional: bool = False):
         if isinstance(self.version, str) and self.version.startswith("branch."):
