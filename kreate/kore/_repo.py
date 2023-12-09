@@ -440,10 +440,10 @@ def unzip(
         if newname and re.match(select_regexp, fname):
             newpath = dir / newname
             if fname.endswith("/"):
-                logger.debug(f"extracting dir  {newname}")
+                logger.verbose(f"extracting dir  {newname}")
                 newpath.mkdir(parents=True, exist_ok=True)
             else:
-                logger.debug(f"extracting file {newname}")
+                logger.verbose(f"extracting file {newname}")
                 newpath.parent.mkdir(parents=True, exist_ok=True)
                 newpath.write_bytes(zfile.read(fname))
         else:
