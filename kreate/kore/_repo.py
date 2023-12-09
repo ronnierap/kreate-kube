@@ -431,17 +431,19 @@ def unzip(
     select_regexp: str = None,
 ):
     if skip_levels == 0 and not select_regexp:
+        logger.info(f"extracting all files to {dir}")
         zfile.extractall(dir)
         return
+    logger.info(f"extracting files to {dir} with pattern {select_regexp}")
     for fname in zfile.namelist():
         newname = "/".join(fname.split("/")[skip_levels:])
-        if newname and re.match(select_regexp, newname):
+        if newname and re.match(select_regexp, fname):
             newpath = dir / newname
             if fname.endswith("/"):
-                logger.info(f"extracting dir  {newname}")
+                logger.debug(f"extracting dir  {newname}")
                 newpath.mkdir(parents=True, exist_ok=True)
             else:
-                logger.info(f"extracting file {newname}")
+                logger.debug(f"extracting file {newname}")
                 newpath.parent.mkdir(parents=True, exist_ok=True)
                 newpath.write_bytes(zfile.read(fname))
         else:
