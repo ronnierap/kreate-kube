@@ -1,0 +1,78 @@
+inklude:
+- {{my_repo_name}}:kubernetes/kubernetes-defaults.konf
+
+system:
+  requires:
+    kreate-kube:
+      - ">=1.6.1"
+  command:
+    #output: {{ system.command.get('output','find {app.target_path} -type f -name *.yaml -printf ---n -exec cat {{}} \\;') }}
+    output: {{ system.command.get('output','cat {app.target_path}/resources/*.yaml') }}
+    diff:   {{ system.command.get('diff',  'kubectl --context {app.env} -n {app.namespace} diff  -f {app.target_path}/resources/') }} # Secrets should be added as well -f {app.target_path}/secrets/resources/'
+    apply:  {{ system.command.get('apply', 'kubectl --context {app.env} -n {app.namespace} apply -f {app.target_path}/resources/') }} # Secrets should be added as well -f {app.target_path}/secrets/resources/'
+  template:
+    ConfigMap:
+      class: kreate.kube.resource.ConfigMap
+      template:  {{my_repo_name}}:kubernetes/ConfigMap.yaml
+      doc: optional:{{my_repo_name}}:doc/ConfigMap.md
+
+    CronJob:
+      class: kreate.kube.resource.Resource
+      template:  {{my_repo_name}}:kubernetes/CronJob.yaml
+      doc: optional:{{my_repo_name}}:doc/CronJob.md
+
+    Deployment:
+      class: kreate.kube.resource.Workload
+      template:  {{my_repo_name}}:kubernetes/Deployment.yaml
+      doc: optional:{{my_repo_name}}:doc/Deployment.md
+
+    StatefulSet:
+      class: kreate.kube.resource.Workload
+      template:  {{my_repo_name}}:kubernetes/StatefulSet.yaml
+      doc: optional:{{my_repo_name}}:doc/StatefulSet.md
+
+    Egress:
+      class: kreate.kube.resource.Egress
+      template:  {{my_repo_name}}:kubernetes/Egress.yaml
+      doc: optional:{{my_repo_name}}:doc/Egress.md
+
+    HorizontalPodAutoscaler:
+      class: kreate.kube.resource.Resource
+      template:  {{my_repo_name}}:kubernetes/HorizontalPodAutoscaler.yaml
+      doc: optional:{{my_repo_name}}:doc/HorizontalPodAutoscaler.md
+
+    Ingress:
+      class: kreate.kube.resource.Resource
+      template:  {{my_repo_name}}:kubernetes/Ingress.yaml
+      doc: optional:{{my_repo_name}}:doc/Ingress.md
+
+    PodDisruptionBudget:
+      class: kreate.kube.resource.Resource
+      template:  {{my_repo_name}}:kubernetes/PodDisruptionBudget.yaml
+      doc: optional:{{my_repo_name}}:doc/PodDisruptionBudget.md
+
+    Secret:
+      class: kreate.kube.resource.Secret
+      template:  {{my_repo_name}}:kubernetes/Secret.yaml
+      doc: optional:{{my_repo_name}}:doc/Secret.md
+
+    SecretBasicAuth:
+      class: kreate.kube.resource.SecretBasicAuth
+      template:  {{my_repo_name}}:kubernetes/SecretBasicAuth.yaml
+      doc: optional:{{my_repo_name}}:doc/SecretBasicAuth.md
+      kind: Secret
+
+    Service:
+      class: kreate.kube.resource.Resource
+      template:  {{my_repo_name}}:kubernetes/Service.yaml
+      doc: optional:{{my_repo_name}}:doc/Service.md
+
+    ServiceAccount:
+      class: kreate.kube.resource.Resource
+      template:  {{my_repo_name}}:kubernetes/ServiceAccount.yaml
+      doc: optional:{{my_repo_name}}:doc/ServiceAccount.md
+
+    ServiceMonitor:
+      class: kreate.kube.resource.Resource
+      template:  {{my_repo_name}}:kubernetes/ServiceMonitor.yaml
+      doc: optional:{{my_repo_name}}:doc/ServiceMonitor.md

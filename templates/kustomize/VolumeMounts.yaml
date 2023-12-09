@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1
+# The kind can be used for Deployment and StatefulSet
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  template:
+    spec:
+      containers:
+      - name: {{ my.field.container_name }}
+        volumeMounts:
+          {% for path in my.strukture.get("files", []) %}
+         - mountPath: {{ path }}
+           name: {{ my.shortname }}
+           subPath: {{ path.split("/")[-1] }}
+          {% endfor %}
+      volumes:
+      - name: {{ my.shortname }}
+        {% if "secret" in strukt and my.strukture.secret %}
+        secret:
+          secretName: {{ my.shortname }}
+        {% else %}
+        configMap:
+          name: {{ my.shortname }}
+        {% endif %}

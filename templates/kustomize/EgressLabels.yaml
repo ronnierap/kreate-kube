@@ -1,0 +1,12 @@
+---
+apiVersion: apps/v1
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  template:
+    metadata:
+      labels:
+      {% for egress in my.egresses() %}
+        networking/egress-to-{{ egress.shortname }}: enabled
+      {% endfor %}

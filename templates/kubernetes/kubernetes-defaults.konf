@@ -1,0 +1,50 @@
+# this is a default file. It does not define any toplevel Objects
+
+val:
+  generic:
+    container_name: app
+    servicePort: 8080
+    containerPort: 8080
+    replicas: 1
+    image_name: {{ app.appname }}.app
+    image_version: {{ version.image_version }}
+    restartPolicy: "" # if not specfied explicetly defaults to Always
+    imagePullPolicy: Always
+    runAsUser: 1000
+    runAsGroup: 1000
+    cpu_limit:   1
+    cpu_request: 1
+    memory_limit:   "512M"
+    memory_request: "512M"
+
+  CronJob:
+    schedule: "* * 31 2 *"   # February 31st, will never happen
+    successfulJobsHistoryLimit: 3
+    backoffLimit: 6
+    concurrencyPolicy: Allow
+
+  Deployment:
+    protocol: TCP
+    revisionHistoryLimit: 1
+    terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
+
+  HorizontalPodAutoscaler:
+    minReplicas: 1
+    maxReplicas: 3
+    cpu_averageUtilization: 70
+    memory_averageUtilization: 70
+
+  Ingress:
+    service: {{ app.appname }}-service
+
+  KubernetesAnnotations:
+    component: webservice
+    managed_by: kustomize
+
+  PodDisruptionBudget:
+    minAvailable: 1
+
+  StatefulSet:
+    protocol: TCP
+    revisionHistoryLimit: 1
+    terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30

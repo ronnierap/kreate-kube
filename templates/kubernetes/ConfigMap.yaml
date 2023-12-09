@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    config-map: {{ my.name }}
+  name: {{ my.name }}
+data:
+  {% for key in my.strukture.get("vars", []) %}
+    {{key}}: {{ my.var(key) }}
+  {% endfor %}
+  {% for key in my.strukture.get("files", []) %}
+    {{key}}: {{ my.load_file(my.strukture.files[key])  | b64encode }}
+  {% endfor %}

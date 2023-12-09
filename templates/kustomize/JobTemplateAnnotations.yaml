@@ -1,0 +1,17 @@
+---
+apiVersion: batch/v1
+# The kind can be used for Deployment and StatefulSet
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            app.kubernetes.io/name: {{ app.appname }}
+            app.kubernetes.io/version: "{{ my.field.image_version }}"
+            app.kubernetes.io/component: {{ my.field.component }}
+            app.kubernetes.io/part-of: {{ my.field.project }}
+            app.kubernetes.io/managed-by: {{ my.field.managed_by }}

@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ my.name }}
+spec:
+  podSelector:
+    matchLabels:
+      networking/egress-to-{{ my.shortname }}: enabled
+  policyTypes:
+    - Egress
+  egress:
+    {% if my.strukture.get("cidr_list", "") == "allow-all" %}
+    - {}
+    {% else %}
+    {% for port in my.field.port_list.split(",") %}
+    {% for addr in my.field.cidr_list.split(",") %}
+    - to:
+        - ipBlock:
+            cidr: {{ addr }}
+      ports:
+        - port: {{ port }}
+          protocol: TCP
+    {% endfor %}
+    {% endfor %}
+    {% endif %}

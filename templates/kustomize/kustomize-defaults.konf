@@ -1,0 +1,45 @@
+# this is a default file. It does not define any toplevel Objects
+
+val:
+  AntiAffinity:
+    selector_key: app
+
+  HttpProbes:
+    probe_path: /actuator/info
+
+    startup_initialDelaySeconds: 10
+    startup_periodSeconds: 2
+    startup_timeoutSeconds: 1
+    startup_successThreshold: 1
+    startup_failureThreshold: 30
+    startup_scheme: HTTP
+    startup_path: "" # use probe_path
+    startup_port: 8080
+
+    readiness_periodSeconds: 2
+    readiness_timeoutSeconds: 1
+    readiness_successThreshold: 1
+    readiness_failureThreshold: 1
+    readiness_scheme: HTTP
+    readiness_path: "" # use probe_path
+    readiness_port: 8080
+
+    liveness_periodSeconds: 2
+    liveness_timeoutSeconds: 1
+    liveness_successThreshold: 1
+    liveness_failureThreshold: 3
+    liveness_scheme: HTTP
+    liveness_path: "" # use probe_path
+    liveness_port: 8080
+
+  KubernetesAnnotations:
+    component: webservice
+    managed_by: kustomize
+
+  JobTemplateAnnotations:
+    component: cronjob
+    managed_by: kustomize
+
+  SidecarContainer:
+    containerPort: 8888  # different from 8080
+    protocol: TCP

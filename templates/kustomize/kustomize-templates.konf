@@ -1,0 +1,35 @@
+inklude:
+  - {{my_repo_name}}:kustomize/kustomize-defaults.konf
+  - {{my_repo_name}}:kubernetes/kubernetes-templates.konf
+
+system:
+  command:
+    build: {{system.command.get('build','kustomize build {app.target_path}')}}
+    diff: {{system.command.get('diff','kustomize build  {app.target_path} | kubectl --context {app.env} -n {app.namespace} diff  -f -')}}
+    apply: {{system.command.get('apply','kustomize build {app.target_path} | kubectl --context {app.env} -n {app.namespace} apply -f -')}}
+
+  template:
+    AntiAffinity:
+      class: kreate.kube.patch.Patch
+      template: {{my_repo_name}}:kustomize/AntiAffinity.yaml
+    EgressLabels:
+      class: kreate.kube.patch.EgressLabels
+      template: {{my_repo_name}}:kustomize/EgressLabels.yaml
+    HttpProbes:
+      class: kreate.kube.patch.Patch
+      template: {{my_repo_name}}:kustomize/HttpProbes.yaml
+    KubernetesAnnotations:
+      class: kreate.kube.patch.Patch
+      template: {{my_repo_name}}:kustomize/KubernetesAnnotations.yaml
+    JobTemplateAnnotations:
+      class: kreate.kube.patch.Patch
+      template: {{my_repo_name}}:kustomize/JobTemplateAnnotations.yaml
+    Kustomization:
+      class: kreate.kube.Kustomization
+      template: {{my_repo_name}}:kustomize/Kustomization.yaml
+    SidecarContainer:
+      class: kreate.kube.patch.Patch
+      template: {{my_repo_name}}:kustomize/SidecarContainer.yaml
+    VolumeMounts:
+      class: kreate.kube.patch.Patch
+      template: {{my_repo_name}}:kustomize/VolumeMounts.yaml

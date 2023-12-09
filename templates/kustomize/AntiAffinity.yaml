@@ -1,0 +1,18 @@
+---
+apiVersion: apps/v1
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  template:
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: {{ my.field.selector_key }}
+                    operator: In
+                    values:
+                      - {{ app.appname }}
+              topologyKey: "kubernetes.io/hostname"

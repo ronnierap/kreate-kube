@@ -1,0 +1,17 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ my.name }}
+  labels:
+    app: {{ app.appname }}
+spec:
+  selector:
+    app: {{ app.appname }}
+  ports:
+{% for port in my.strukture.get("ports", [{"name": "http"}]) %}
+  - protocol: TCP
+    port: {{ my.field.servicePort }}
+    targetPort: {{ port.targetPort | default(my.field.containerPort) }}
+    name: {{ port.name | default("http") }}
+{% endfor %}

@@ -1,0 +1,54 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: {{ app.namespace }}
+
+resources:
+{% for res in my.resources() | sort(attribute='name') %}
+- {{ res.get_filename() }}
+{% endfor %}
+
+patches:
+{% for pat in my.patches() | sort(attribute='name') %}
+- path: {{ pat.get_filename() }}
+{% endfor %}
+
+configMapGenerator:
+{% for cm in my.strukture.get("configmaps",{}).keys()  %}
+- name: {{ cm }}
+  options:
+    labels:
+      config-map: {{ cm }}
+  {% if my.strukture.configmaps[cm].get("vars",{}) %}
+  literals:
+    {% for varname in my.strukture.configmaps[cm].get("vars",{}).keys() %}
+     - {{ varname }}={{ my.var(cm, varname) }}
+    {% endfor %}
+  {% endif %}
+  {% if my.strukture.configmaps[cm].get("files",{}) %}
+  files:
+    {% for filename in my.strukture.configmaps[cm].get("files",[]) %}
+     - {{ my.kopy_file(filename) }}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+secretGenerator:
+{% for cm in my.strukture.get("secrets",{}).keys()  %}
+- name: {{ cm }}
+  options:
+    labels:
+      secret: {{ cm }}
+  {% if my.strukture.secrets[cm].get("vars",{}) %}
+  literals:
+    {% for varname in my.strukture.secrets[cm].get("vars",{}).keys() %}
+     - {{ varname }}={{ my.secret(varname)  }}
+    {% endfor %}
+  {% endif %}
+  {% if my.strukture.secrets[cm].get("files",{}) %}
+  files:
+    {% for filename in my.strukture.secrets[cm].get("files",[]) %}
+     - {{ my.kopy_file(filename) }}
+    {% endfor %}
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  template:
+    spec:
+      containers:
+      - name: {{ my.shortname }}
+        image: {{ my.strukture.image }}
+        {{ my.optional("imagePullPolicy") }}
+        securityContext:
+          runAsUser: {{ my.field.runAsUser }}
+        envFrom:
+        - secretRef:
+        {% for secr in my.strukture.get("secret-vars",[]) %}
+            name: {{ secr }}
+        {% endfor %}
+        - configMapRef:
+        {% for cm in my.strukture.get("vars",[]) %}
+            name: {{ cm }}
+        {% endfor %}
+        ports:
+        - containerPort: {{ my.field.containerPort }}
+          protocol: {{ my.field.protocol }}
+        resources:
+          limits:
+            cpu: {{ my.field.cpu_limit }}
+            memory: {{ my.field.memory_limit }}
+          requests:
+            cpu: {{ my.field.cpu_request }}
+            memory: {{ my.field.memory_request }}

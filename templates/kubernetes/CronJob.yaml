@@ -1,0 +1,61 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ my.name }}
+spec:
+  schedule: {{ my.field.schedule }}
+  successfulJobsHistoryLimit: {{ my.field.successfulJobsHistoryLimit }}
+  concurrencyPolicy: {{ my.field.concurrencyPolicy}}
+  jobTemplate:
+    spec:
+      backoffLimit: {{my.field.backoffLimit}} # 6 By Default
+      template:
+        metadata:
+          name: {{ my.name }}
+        {% for item in my.strukture.get("job",{}).keys()  %}
+        {{ item }}: {{ my.strukture.job[item] | yaml(indent=12) }}
+        {% endfor %}
+        spec:
+          restartPolicy: OnFailure
+          # add all remaining pod.items, except for the labels
+          {% for item in my.strukture.get("pod",{}).keys()  %}
+          {{ item }}: {{ my.strukture.pod[item] | yaml(indent=12) }}
+          {% endfor %}
+          containers:
+          - name: {{ my.field.container_name }}
+            image: {% if 'image_repo' in my.field %}{{ my.field.image_repo }}/{% endif %}{{ my.field.image_name }}:{{ my.field.image_version }}
+            imagePullPolicy: {{ my.field.imagePullPolicy }}
+            {% for item in my.strukture.get("container",{}).keys()  %}
+            {{ item }}: {{ my.strukture.container[item] | yaml(indent=18) }}
+            {% endfor %}
+            resources:
+              limits:
+                cpu: {{ my.field.cpu_limit }}
+                memory: {{ my.field.memory_limit }}
+              requests:
+                cpu: {{ my.field.cpu_request }}
+                memory: {{ my.field.memory_request }}
+            env:
+            {% for var in jinja_extension.sorted(my.strukture.get("env",{})) %}
+            - name: {{ var }}
+              value: {{ my.strukture.get("env."+var,{}) or konfig.var[var] }}
+            {% endfor %}
+            envFrom:
+              - configMapRef:
+              {% for cm in my.strukture.get("vars",[]) %}
+                  name: {{ cm }}
+              {% endfor %}
+                {% if strukt.get("secret-vars", []) is defined and strukt.get("secret-vars", []) | length > 0 %}
+              - secretRef:
+              {% for secr in my.strukture.get("secret-vars",[]) %}
+                  name: {{ secr }}
+                {% endfor %}
+              {% endif %}
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: {{ my.field.runAsUser }}
+              runAsGroup: {{ my.field.runAsGroup }}
+            command: ["/bin/sh"]
+            args: ["-c", "{{ my.field.command }}"]
+          serviceAccountName: {{ my.strukture.get("serviceAccountName", "")}}

@@ -1,0 +1,18 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ my.name }}
+spec:
+  endpoints:
+  {% for ep in my.strukture.get("endpoints", []) %}
+  - interval: {{ ep.interval | default('15s', true) }}
+    path: {{ ep.path }}
+    port: {{ ep.port | default('http', true) }}
+  {% endfor %}
+  namespaceSelector:
+    matchNames:
+    - {{ app.namespace }}
+  selector:
+    matchLabels:
+      app: {{ app.appname }}

@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: {{ my.target.kind }}
+metadata:
+  name: {{ my.target.name }}
+spec:
+  template:
+    spec:
+      containers:
+      - name: {{ my.field.container_name }}
+        startupProbe:
+          initialDelaySeconds: {{ my.field.startup_initialDelaySeconds }}
+          periodSeconds: {{ my.field.startup_periodSeconds }}
+          timeoutSeconds: {{ my.field.startup_timeoutSeconds }}
+          successThreshold: {{ my.field.startup_successThreshold }}
+          failureThreshold: {{ my.field.startup_failureThreshold }}
+          httpGet:
+            scheme: {{ my.field.startup_scheme }}
+            path: {{ my.field.startup_path or my.field.probe_path }}
+            port: {{ my.field.startup_port }}
+        readinessProbe:
+          periodSeconds: {{ my.field.readiness_periodSeconds }}
+          timeoutSeconds: {{ my.field.readiness_timeoutSeconds }}
+          failureThreshold: {{ my.field.readiness_failureThreshold }}
+          successThreshold: {{ my.field.readiness_successThreshold }}
+          httpGet:
+            scheme: {{ my.field.readiness_scheme }}
+            path: {{ my.field.readiness_path or my.field.probe_path }}
+            port: {{ my.field.readiness_port }}
+        livenessProbe:
+          periodSeconds: {{ my.field.liveness_periodSeconds }}
+          timeoutSeconds: {{ my.field.liveness_timeoutSeconds }}
+          failureThreshold: {{ my.field.liveness_failureThreshold }}
+          successThreshold: {{ my.field.liveness_successThreshold }}
+          httpGet:
+            scheme: {{ my.field.liveness_scheme }}
+            path: {{ my.field.liveness_path or my.field.probe_path }}
+            port: {{ my.field.liveness_port }}
