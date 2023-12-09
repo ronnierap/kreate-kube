@@ -1,0 +1,27 @@
+
+system:
+  command:
+    kubeconfig:
+      help: create a kubeconfig file
+    build:
+      help: run kubectl kustomize
+      script: kubectl kustomize {target_dir}
+    diff:
+      help: run kubectl diff
+      script:  kubectl --context {konfig.app.env} -n {konfig.app.namespace} diff  -k {target_dir}
+    diff-file:
+      help: run kubectl diff for a specific file
+      script:  kubectl --context {konfig.app.env} -n {konfig.app.namespace} diff -f {file}
+    getyaml:
+        help: run kubectl get
+        script:  kubectl --context {konfig.app.env} -n {konfig.app.namespace} get {resource_type} {resource_name} -o yaml
+    apply:
+      help: run kubectl apply
+      script: kubectl --context {konfig.app.env} -n {konfig.app.namespace} apply -k {target_dir}
+    dry-run:
+      help: run kubectl apply --dry-run=server
+      script: kubectl --context {konfig.app.env} -n {konfig.app.namespace} apply --dry-run=server -k {target_dir}
+    # example of a new command, that can be run with the run subcommand
+    ls:
+      help: list all files that are kreated
+      script: ls -laR {target_dir}

@@ -1,0 +1,9 @@
+version:
+  # The image_version is the app_version, unless otherwise defined
+  image_version: "{{ version.image_version | default(version.app_version) }}"
+  kreate_kube_templates_version: "{{ version.kreate_kube_templates_version | default('0.7') }}"
+  kompany_templates_version: "{{ version.kompany_templates_version | default('0.1') }}"
+  shared_konfig_version: "{{ version.shared_konfig_version | default('branch.master') }}"
+
+  # check for a specific kreate-kube version
+  kreate_kube_version: "{{ version.get("kreate_kube_version", ">=1.7.0") }}"

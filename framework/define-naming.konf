@@ -1,0 +1,4 @@
+system:
+  naming:
+    Egress: "egress-to-{shortname}"
+    PodDisruptionBudget: "{appname}-pdb"

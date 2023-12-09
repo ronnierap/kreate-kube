@@ -1,0 +1,9 @@
+{% if not konfig.get_path("system.repo.shared-konfig.type") %}
+system:
+  repo:
+    shared-konfig:
+      version: '{{ version.shared_konfig_version }}'
+      type: {{ system.kompany.repo_type }}
+      show_branch_warning: False  # master branch should be backward compatible
+      url: {{ system.kompany.repo_url_shared_konfig }}
+{% endif %}

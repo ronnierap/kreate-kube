@@ -1,0 +1,52 @@
+# These variables are used at several places in this file, so they are set here as jinja vars
+# and can be used in this file
+{% set common_parent = konfig.get_path("app.common_parent") %}
+{% set kompany_name = konfig.get_path("system.kompany.name") %}
+{% set kompany_repo = konfig.get_path("system.kompany.repo") %}
+
+app:
+  namespace: {{ konfig.get_path("app.namespace", app.appname + "-" + app.env) }}
+system:
+  target_dir: build/{{app.appname}}-{{app.env}}
+
+inklude:
+###################################################
+# definitions and templates
+- {{my_repo_name}}:define-naming.konf
+- {{my_repo_name}}:define-versions.konf
+- kreate-kube-templates:kustomize/kustomize-templates.konf
+# A company can add their own templates
+{% if kompany_repo %}
+- optional:{{kompany_repo}}:{{kompany_name}}-definitions.konf
+{% endif %}
+
+###################################################
+# shared values globally, for env and team
+- shared-konfig:init/shared-values-{{app.env}}.konf
+- shared-konfig:init/team-{{app.team}}.konf
+
+###################################################
+# other services or definitions that are used
+{% for sys in app.get("uses", []) %}
+- {{sys}}
+{% endfor %}
+
+###################################################
+# values for this application and optionally a common parent
+{% if common_parent %}
+- optional:../common/common-values-{{common_parent}}.konf
+- optional:../common/common-values-{{common_parent}}-{{app.env}}.konf
+- optional:../common/common-secrets-{{common_parent}}-{{app.env}}.konf
+{% endif %}
+
+- optional:default-values-{{app.appname}}.konf | optional:../common/default-values-{{app.appname}}.konf
+- optional:values-{{app.appname}}-{{app.env}}.konf
+- optional:secrets-{{app.appname}}-{{app.env}}.konf
+
+###################################################
+# strukt file for this application and optionally a common parent
+{% if common_parent %}
+- optional:../common/common-strukt-{{common_parent}}.konf
+- optional:../common/common-strukt-{{common_parent}}-{{app.env}}.konf
+{% endif %}
+- optional:{{app.appname}}-strukt.konf | optional:../common/{{app.appname}}-strukt.konf
