@@ -1,0 +1,9 @@
+{% if  not konfig.get_path("system.repo.kreate-kube-templates") %}
+system:
+  repo:
+    kreate-kube-templates:
+      version: not-relevant
+      type: python-package
+      package: kreate.kube
+      path: templates/
+{% endif %}

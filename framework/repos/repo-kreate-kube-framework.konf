@@ -1,9 +1,0 @@
-{% if  not konfig.get_path("system.repo.kreate-kube-framework") %}
-system:
-  repo:
-    kreate-kube-framework:
-      #version: '{{ version.kreate_kube_templates_version }}'
-      type: python-package  # This does not work yet
-      package: kreate-kube
-      path: framework
-{% endif %}

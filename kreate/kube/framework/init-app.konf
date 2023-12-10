@@ -15,15 +15,13 @@ inklude:
 - {{my_repo_name}}:define-naming.konf
 - {{my_repo_name}}:define-versions.konf
 - kreate-kube-templates:kustomize/kustomize-templates.konf
-# A company can add their own templates
-{% if kompany_repo %}
-- optional:{{kompany_repo}}:{{kompany_name}}-definitions.konf
-{% endif %}
 
 ###################################################
-# shared values globally, for env and team
-- shared-konfig:init/shared-values-{{app.env}}.konf
-- shared-konfig:init/team-{{app.team}}.konf
+# A company can add their own templates, naming conventions, commands, etc
+# They are added here, so that they can override earlier konfig
+{% if kompany_repo %}
+- optional:{{kompany_repo}}:{{kompany_name}}-additions.konf
+{% endif %}
 
 ###################################################
 # other services or definitions that are used
