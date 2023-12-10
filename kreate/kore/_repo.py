@@ -40,7 +40,6 @@ class FileGetter:
             # "main_konfig:": FixedDirRepo(dir),
             "cwd": FixedDirRepo(Path.cwd()),
             "home": FixedDirRepo(Path.home()),
-            # "py:": PythonPackageRepo(),
         }
         self.repo_types = {
             "url-zip:": UrlZipRepo,
@@ -48,6 +47,7 @@ class FileGetter:
             "local-zip:": LocalZipRepo,
             "bitbucket-zip:": BitbucketZipRepo,
             "bitbucket-file:": BitbucketFileRepo,
+            "python-package:" : PythonPackageRepo,
         }
         # self.reponame = None # TODO: remove self.split_location(location)
         self.main_dir_path = main_dir_path
@@ -169,6 +169,8 @@ class FileGetter:
             return BitbucketZipRepo(self.konfig, repo_name)
         elif type == "bitbucket-file":
             return BitbucketFileRepo(self.konfig, repo_name)
+        elif type == "python-package":
+            return PythonPackageRepo(self.konfig, repo_name)
         else:
             raise ValueError(f"Unknown repo type {type} for repo {repo_name}")
 
@@ -187,16 +189,6 @@ class Repo(Protocol):
         raise NotImplementedError(
             f"not possible to save file in repo {self.__class__}: {filename}"
         )
-
-
-class PythonPackageRepo(Repo):
-    def get_data(self, filename: str, optional: bool = False) -> str:
-        package_name = filename.split(":")[0]
-        filename = filename[len(package_name) + 1 :]
-        package = importlib.import_module(package_name)
-        logger.debug(f"loading file {filename} from package {package_name}")
-        data = pkgutil.get_data(package.__package__, filename)
-        return data.decode("utf-8")
 
 
 class FixedDirRepo(Repo):
@@ -226,7 +218,7 @@ class FixedDirRepo(Repo):
 
 
 class KonfigRepo(Repo):
-    def __init__(self, konfig, repo_name: str):
+    def __init__(self, konfig: "Konfig", repo_name: str):
         self.konfig = konfig
         self.repo_name = repo_name
         self.repo_konf = konfig.get_path("system.repo." + repo_name)
@@ -324,6 +316,24 @@ class KonfigRepo(Repo):
                 f"status {response.status_code} while downloading {url} with message {response.content}"
             )
         return response
+
+
+class PythonPackageRepo(KonfigRepo):
+    def get_data(self, filename: Path, optional: bool = False):
+        package_name = self.konfig.get_path(f"system.repo.{self.repo_name}.package", mandatory=True)
+        path = Path(self.konfig.get_path(f"system.repo.{self.repo_name}.path",))
+        filename = str(path / filename)
+        package = importlib.import_module(package_name)
+        logger.debug(f"loading file {filename} from package {package_name}")
+        try:
+            data : bytes = pkgutil.get_data(package.__package__, filename)
+        except FileNotFoundError as e:
+            if optional:
+                return ""
+            raise
+        if data is None:
+            raise FileNotFoundError(f"could not find {filename} in module {package_name}")
+        return data.decode()
 
 
 class LocalKonfigRepo(KonfigRepo):
