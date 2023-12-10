@@ -15,15 +15,12 @@ __all__ = [
 
 
 class Patch(JinYamlKomponent):
-    # TODO the signature differs from other komponents, and might not work
-    # in KomponentKlass.kreate_komponent. Needs some redesign
     def __init__(self, app: App, klass: KomponentKlass, shortname: str, target_id : str = None):
         # The target_id is to find the target, it can be passed in explicitely,
         # but also provide in the strukture. If both are empty, the shortname is used.
         # The target will be resolved at aktivation, when all komponents are known
         target_id = target_id or app.konfig.get_path(f"strukt.{klass.name}.{shortname}.target_id")
         self.target_id = target_id or shortname
-
         super().__init__(app=app, klass=klass, shortname=shortname)
         self.target = None
 
