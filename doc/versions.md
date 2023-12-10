@@ -77,6 +77,11 @@ At this moment there are not many versions of kreate-kube:
   - added first try at `vardiff` command
   - added check for specific versions of packages for klasses you are using, and in general
   - fixed dekrypting and enkrypting binary files
+- `1.8`
+  - kreate-kube now contains two embedded repositories:
+    - kreate-kube-framework: this contains a reference framework to tie everything together
+    - kreate-kube-templates: this used to be a separate git repo on GitHub
+  - several small fixes and improvements, especially for handlig repo's and error messages
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
