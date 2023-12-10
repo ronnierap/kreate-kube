@@ -13,7 +13,7 @@ inklude:
 ###################################################
 # definitions and templates
 - {{my_repo_name}}:define-naming.konf
-- {{my_repo_name}}:define-versions.konf
+#- {{my_repo_name}}:define-versions.konf
 - kreate-kube-templates:kustomize/kustomize-templates.konf
 
 ###################################################
