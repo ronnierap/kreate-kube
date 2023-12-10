@@ -2,6 +2,6 @@
 {% set target = konfig.get_path("system.target",konfig.get_path("system.cli.subcmd","app")) %}
 
 inklude:
-- {{my_repo_name}}:repo-kreate-kube-templates.konf
+#- {{my_repo_name}}:repo-kreate-kube-templates.konf
 - {{my_repo_name}}:define-commands.konf
 - optional:{{my_repo_name}}:init-{{target}}.konf | {{my_repo_name}}:init-app.konf

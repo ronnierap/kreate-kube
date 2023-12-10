@@ -27,6 +27,7 @@ class Konfig:
         self.dict_ = dict_ or {}
         self.yaml = wrap(self.dict_)
         self.jinyaml = JinYaml(self)
+        self.file_getter = FileGetter(self, main_konfig_path.parent)
         for mod in self.kontext.modules:
             mod.init_konfig(self)
         self.already_inkluded = set()
@@ -39,7 +40,6 @@ class Konfig:
                 }
             },
         )
-        self.file_getter = FileGetter(self, main_konfig_path.parent)
         logger.debug(self.file_getter)
         for ink in inkludes or []:
             self.inklude(ink)

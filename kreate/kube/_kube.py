@@ -11,6 +11,7 @@ from .resource import CustomResource
 from ..kore import Kontext, Module, Konfig, App, Cli
 from ..krypt import krypt_functions
 from ..kore._core import pprint_map
+from ..kore._repo import PythonPackageRepo
 from .vardiff import vardiff, dump
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,23 @@ class KubeModule(Module):
         cli.add_subcommand(test_update, aliases=["tu"])
         cli.add_subcommand(test_diff, aliases=["td"])
         cli.add_subcommand(test_diff_update, aliases=["tdu"])
+
+    def init_konfig(self, konfig: Konfig):
+        konfig.file_getter.repo_prefixes["kreate-kube-framework"] = (
+            PythonPackageRepo(konfig, "kreate-kube-framework", {
+                "package": "kreate.kube",
+                "path" : "framework",
+                "version": "dummy",  # TODO: remove when version is not mandatory
+            })
+        )
+        konfig.file_getter.repo_prefixes["kreate-kube-templates"] = (
+            PythonPackageRepo(konfig, "kreate-kube-templates", {
+                "package": "kreate.kube",
+                "path" : "templates",
+                "version": "dummy",  # TODO: remove when version is not mandatory
+            })
+        )
+
 
     def init_app(self, app: App) -> None:
         app.register_klass(CustomResource)
