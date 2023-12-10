@@ -1,4 +1,4 @@
-from typing import Protocol, Union, TYPE_CHECKING
+from typing import Protocol, Union, TYPE_CHECKING, Mapping
 import requests
 import requests.auth
 import zipfile
@@ -12,6 +12,8 @@ import logging
 import importlib
 import warnings
 from pathlib import Path
+from ._core import wrap
+
 
 if TYPE_CHECKING:  # Only imports the below statements during type checking
     from kreate.kore._konfig import Konfig
@@ -156,21 +158,22 @@ class FileGetter:
         return path.read_text()
 
     def get_repo(self, repo_name: str):
-        type = self.konfig.get_path(f"system.repo.{repo_name}.type", None)
+        repo_konf : Mapping = self.konfig.get_path(f"system.repo.{repo_name}", {})
+        type = repo_konf.get("type", None)
         if type == "local-dir":
-            return LocalKonfigRepo(self.konfig, repo_name)
+            return LocalKonfigRepo(self.konfig, repo_name, repo_konf)
         elif type == "local-zip":
-            return LocalZipRepo(self.konfig, repo_name)
+            return LocalZipRepo(self.konfig, repo_name, repo_konf)
         elif self.use_local_dir(repo_name):
-            return LocalKonfigRepo(self.konfig, repo_name)
+            return LocalKonfigRepo(self.konfig, repo_name, repo_konf)
         elif type == "url-zip":
-            return UrlZipRepo(self.konfig, repo_name)
+            return UrlZipRepo(self.konfig, repo_name, repo_konf)
         elif type == "bitbucket-zip":
-            return BitbucketZipRepo(self.konfig, repo_name)
+            return BitbucketZipRepo(self.konfig, repo_name, repo_konf)
         elif type == "bitbucket-file":
-            return BitbucketFileRepo(self.konfig, repo_name)
+            return BitbucketFileRepo(self.konfig, repo_name, repo_konf)
         elif type == "python-package":
-            return PythonPackageRepo(self.konfig, repo_name)
+            return PythonPackageRepo(self.konfig, repo_name, repo_konf)
         else:
             raise ValueError(f"Unknown repo type {type} for repo {repo_name}")
 
@@ -218,10 +221,12 @@ class FixedDirRepo(Repo):
 
 
 class KonfigRepo(Repo):
-    def __init__(self, konfig: "Konfig", repo_name: str):
+    def __init__(self, konfig: "Konfig", repo_name: str, repo_konf: Mapping):
         self.konfig = konfig
         self.repo_name = repo_name
-        self.repo_konf = konfig.get_path("system.repo." + repo_name)
+        self.repo_konf = wrap(
+            repo_konf or konfig.get_path("system.repo." + repo_name)
+        )
         self.version = self.repo_konf.get("version", None)
         if not self.version:
             raise ValueError(f"no version given for repo {repo_name}")
@@ -320,8 +325,8 @@ class KonfigRepo(Repo):
 
 class PythonPackageRepo(KonfigRepo):
     def get_data(self, filename: Path, optional: bool = False):
-        package_name = self.konfig.get_path(f"system.repo.{self.repo_name}.package", mandatory=True)
-        path = Path(self.konfig.get_path(f"system.repo.{self.repo_name}.path",))
+        package_name = self.repo_konf.get_path("package", mandatory=True)
+        path = Path(self.repo_konf.get("path"))
         filename = str(path / filename)
         package = importlib.import_module(package_name)
         logger.debug(f"loading file {filename} from package {package_name}")
