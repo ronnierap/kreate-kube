@@ -1,13 +1,5 @@
-import difflib
-import io
 import logging
-import os
-import re
-from pathlib import Path
-
-from .resource import CustomResource
-from ..kore import Kontext, Module, Konfig, App, Cli
-from ..krypt import krypt_functions
+from ..kore import App, Cli
 from ..kore._core import pprint_map
 from .resource import Resource
 
@@ -95,6 +87,8 @@ def dump_helper(cli: Cli, app: App,  kind_filter: str = None, name_mapper: dict 
         path = dumpdir / f'{kind}.{name}'
         logger.info(f"dumping to {path}")
         dumped_files.append(path)
+        # TODO: not using dump, because some value might need quotes?
+        #app.konfig.jinyaml.yaml_parser.dump(doc, path)
         with open(path, "w") as f:
             pprint_map(doc, file=f, use_quotes=True)
     return dumped_files
