@@ -5,7 +5,7 @@ metadata:
   name: {{ my.name }}
 spec:
   replicas: {{ my.field.replicas }}
-  #revisionHistoryLimit: {{ my.field.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ my.field.revisionHistoryLimit }}
   selector:
     matchLabels:
       statefull-app: {{ my.name }}

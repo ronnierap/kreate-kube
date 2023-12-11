@@ -18,6 +18,7 @@ val:
     cpu_request: 1
     memory_limit:   "512M"
     memory_request: "512M"
+    revisionHistoryLimit: 1
 
   CronJob:
     schedule: "* * 31 2 *"   # February 31st, will never happen
@@ -27,7 +28,6 @@ val:
 
   Deployment:
     protocol: TCP
-    revisionHistoryLimit: 1
     terminationGracePeriodSeconds: "" # Defaults in kubernetes to 30
 
   HorizontalPodAutoscaler:
