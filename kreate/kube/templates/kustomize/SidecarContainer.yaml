@@ -13,12 +13,12 @@ spec:
         securityContext:
           runAsUser: {{ my.field.runAsUser }}
         envFrom:
-        - secretRef:
         {% for secr in my.strukture.get("secret-vars",[]) %}
+        - secretRef:
             name: {{ secr }}
         {% endfor %}
-        - configMapRef:
         {% for cm in my.strukture.get("vars",[]) %}
+        - configMapRef:
             name: {{ cm }}
         {% endfor %}
         ports:

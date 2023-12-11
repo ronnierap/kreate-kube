@@ -82,6 +82,13 @@ At this moment there are not many versions of kreate-kube:
     - kreate-kube-framework: this contains a reference framework to tie everything together
     - kreate-kube-templates: this used to be a separate git repo on GitHub
   - several small fixes and improvements, especially for handlig repo's and error messages
+- `1.8.1`
+  - Use sane defaults for securityContext on Container level
+    - runAsNonRoot defaults to "true"
+    - runAsUser and runAs group, only set these if set
+  - Always set timezone on CronJob. Has to be set explicitely, since no global default makes sense
+  - fixed bug with empty EgressLabels patch
+  - fixed bug in Sidecar if there were no vars for envFrom
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
