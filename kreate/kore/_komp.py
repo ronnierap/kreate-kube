@@ -324,4 +324,7 @@ class JinYamlKomponent(JinjaKomponent):
         if fieldname not in self.field:
             return ""
         val = self._field(fieldname)
-        return f"{fieldname}: {val}"
+        if val:
+            return f"{fieldname}: {val}"
+        else:
+            return ""
