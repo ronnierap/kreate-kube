@@ -89,6 +89,8 @@ At this moment there are not many versions of kreate-kube:
   - Always set timezone on CronJob. Has to be set explicitely, since no global default makes sense
   - fixed bug with empty EgressLabels patch
   - fixed bug in Sidecar if there were no vars for envFrom
+  - new syntax: cm-files, and secret-files for mounting files in Workload
+  - sorted certain loops to be more predictable in order
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

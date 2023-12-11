@@ -14,20 +14,20 @@ spec:
       template:
         metadata:
           name: {{ my.name }}
-        {% for item in my.strukture.get("job",{}).keys()  %}
+        {% for item in my.strukture.get("job",{}).keys() | sort  %}
         {{ item }}: {{ my.strukture.job[item] | yaml(indent=12) }}
         {% endfor %}
         spec:
           restartPolicy: OnFailure
           # add all remaining pod.items, except for the labels
-          {% for item in my.strukture.get("pod",{}).keys()  %}
+          {% for item in my.strukture.get("pod",{}).keys() | sort %}
           {{ item }}: {{ my.strukture.pod[item] | yaml(indent=12) }}
           {% endfor %}
           containers:
           - name: {{ my.field.container_name }}
             image: {% if 'image_repo' in my.field %}{{ my.field.image_repo }}/{% endif %}{{ my.field.image_name }}:{{ my.field.image_version }}
             imagePullPolicy: {{ my.field.imagePullPolicy }}
-            {% for item in my.strukture.get("container",{}).keys()  %}
+            {% for item in my.strukture.get("container",{}).keys() | sort %}
             {{ item }}: {{ my.strukture.container[item] | yaml(indent=18) }}
             {% endfor %}
             resources:

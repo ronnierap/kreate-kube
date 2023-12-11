@@ -14,14 +14,14 @@ patches:
 {% endfor %}
 
 configMapGenerator:
-{% for cm in my.strukture.get("configmaps",{}).keys()  %}
+{% for cm in my.strukture.get("configmaps",{}).keys() | sort %}
 - name: {{ cm }}
   options:
     labels:
       config-map: {{ cm }}
   {% if my.strukture.configmaps[cm].get("vars",{}) %}
   literals:
-    {% for varname in my.strukture.configmaps[cm].get("vars",{}).keys() %}
+    {% for varname in my.strukture.configmaps[cm].get("vars",{}).keys() | sort %}
      - {{ varname }}={{ my.var(cm, varname) }}
     {% endfor %}
   {% endif %}
@@ -34,14 +34,14 @@ configMapGenerator:
 {% endfor %}
 
 secretGenerator:
-{% for cm in my.strukture.get("secrets",{}).keys()  %}
+{% for cm in my.strukture.get("secrets",{}).keys() | sort %}
 - name: {{ cm }}
   options:
     labels:
       secret: {{ cm }}
   {% if my.strukture.secrets[cm].get("vars",{}) %}
   literals:
-    {% for varname in my.strukture.secrets[cm].get("vars",{}).keys() %}
+    {% for varname in my.strukture.secrets[cm].get("vars",{}).keys() | sort %}
      - {{ varname }}={{ my.secret(varname)  }}
     {% endfor %}
   {% endif %}
