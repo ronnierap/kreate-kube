@@ -59,4 +59,4 @@ spec:
               {{ my.optional("runAsGroup") }}
             command: ["/bin/sh"]
             args: ["-c", "{{ my.field.command }}"]
-          serviceAccountName: {{ my.strukture.get("serviceAccountName", "")}}
+          {{ my.optional("serviceAccountName") }}
