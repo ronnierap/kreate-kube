@@ -53,9 +53,9 @@ spec:
                 {% endfor %}
               {% endif %}
             securityContext:
-              runAsNonRoot: true
-              runAsUser: {{ my.field.runAsUser }}
-              runAsGroup: {{ my.field.runAsGroup }}
+              runAsNonRoot: {{ my.field.runAsNonRoot }}
+              {{ my.optional("runAsUser") }}
+              {{ my.optional("runAsGroup") }}
             command: ["/bin/sh"]
             args: ["-c", "{{ my.field.command }}"]
           serviceAccountName: {{ my.strukture.get("serviceAccountName", "")}}

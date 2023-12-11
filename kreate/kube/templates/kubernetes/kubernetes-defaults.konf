@@ -10,8 +10,10 @@ val:
     image_version: {{ version.image_version }}
     restartPolicy: "" # if not specfied explicetly defaults to Always
     imagePullPolicy: Always
-    runAsUser: 1000
-    runAsGroup: 1000
+    runAsNonRoot: "true"  # this is best practice, and often enforced by the cluster
+    # The runAs values are empty. using my.optional they will only be set if with a value
+    runAsUser: ""
+    runAsGroup: ""
     cpu_limit:   1
     cpu_request: 1
     memory_limit:   "512M"
