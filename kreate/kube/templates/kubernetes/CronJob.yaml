@@ -4,9 +4,10 @@ kind: CronJob
 metadata:
   name: {{ my.name }}
 spec:
+  timeZone: {{ my.field.timezone }}
   schedule: {{ my.field.schedule }}
   successfulJobsHistoryLimit: {{ my.field.successfulJobsHistoryLimit }}
-  concurrencyPolicy: {{ my.field.concurrencyPolicy}}
+  concurrencyPolicy: {{ my.field.concurrencyPolicy }}
   jobTemplate:
     spec:
       backoffLimit: {{my.field.backoffLimit}} # 6 By Default
