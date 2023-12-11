@@ -87,15 +87,15 @@ spec:
 #############################################################
 # new syntax: cm-files, and secret-files, will be preferred in >=1.8.1
 {% for cm in my.strukture.get("cm-files", {}).keys() | sort %}
-{% for filename in my.strukture.get("cm-files", {}).keys() | sort %}
-         - mountPath: {{ my.strukture.get("cm-files")[filename] }}
+{% for filename in my.strukture.get("cm-files")[cm].keys() | sort %}
+         - mountPath: {{ my.strukture.get("cm-files")[cm][filename] }}
            name: {{ cm }}
            subPath: {{ filename }}
 {% endfor %}
 {% endfor %}
 {% for secr in my.strukture.get("secret-files", {}).keys() | sort %}
-{% for filename in my.strukture.get("secret-files", {}).keys() | sort %}
-         - mountPath: {{ my.strukture.get("secret-files")[filename] }}
+{% for filename in my.strukture.get("secret-files")[secr].keys() | sort %}
+         - mountPath: {{ my.strukture.get("secret-files")[secr][filename] }}
            name: {{ secr }}
            subPath: {{ filename }}
 {% endfor %}
