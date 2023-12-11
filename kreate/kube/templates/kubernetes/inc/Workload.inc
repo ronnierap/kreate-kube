@@ -39,23 +39,19 @@ spec:
         {{ item }}: {{ my.strukture.container[item] | yaml(indent="          ") }}
         {% endfor %}
         env:
-        {% for var in jinja_extension.sorted(my.strukture.get("env",{})) %}
+{% for var in my.strukture.get("env",{}) | sort %}
         - name: {{ var }}
           value: {{ my.strukture.get("env."+var,{}) or konfig.var[var] }}
-        {% endfor %}
+{% endfor %}
         envFrom:
-{% if my.strukture.get("secret-vars",[]) %}
+{% for secr in my.strukture.get("secret-vars",[]) %}
         - secretRef:
-        {% for secr in my.strukture.get("secret-vars",[]) %}
             name: {{ secr }}
-        {% endfor %}
-{% endif %}
-{% if my.strukture.get("vars",[]) %}
+{% endfor %}
+{% for cm in my.strukture.get("vars",[]) %}
         - configMapRef:
-        {% for cm in my.strukture.get("vars",[]) %}
             name: {{ cm }}
-        {% endfor %}
-{% endif %}
+{% endfor %}
         securityContext:
           runAsNonRoot: {{ my.field.runAsNonRoot }}
           {{ my.optional("runAsUser") }}
