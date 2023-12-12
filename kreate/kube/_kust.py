@@ -57,13 +57,12 @@ class Kustomization(JinYamlKomponent):
             data = data.decode()
         target.write_text(data)
 
-    def _find_and_kopy_file(self, filename: str, target: Path) -> str:
+    def _find_and_kopy_file(self, filename: str, target: Path, search_path) -> str:
         if loc := self.app.konfig.get_path("file", {}).get(filename):
                 logger.info(f"kopying file {loc} to {target}")
                 data = self.app.konfig.file_getter.get_data(loc)
                 self._write_data(data, target)
                 return
-        search_path = (self.app.konfig.get_path("system.file_search_path", []))
         logger.verbose(f"looking for {filename} in {search_path}")
         for path in search_path:
             logger.verbose(f"looking for {filename} to kopy in {path}")
@@ -76,15 +75,17 @@ class Kustomization(JinYamlKomponent):
         raise ValueError(f"Could not find file {filename} in {search_path}, add it to file: section")
 
     def kopy_file(self, filename: str, dest: str = "files") -> str:
+        search_path = self.app.konfig.get_path("system.search_path.kopy_file", [])
         target = self.app.target_path / Path(dest) / filename
         result = Path(dest) / filename
-        self._find_and_kopy_file(filename, target)
+        self._find_and_kopy_file(filename, target, search_path)
         return str(result)
 
     def kopy_secret_file(self, filename: str, dest: str = "secrets/files") -> str:
+        search_path = self.app.konfig.get_path("system.search_path.kopy_secret_file", [])
         target = self.app.target_path / Path(dest) / filename
         result = Path(dest) / filename
-        self._find_and_kopy_file(filename, target)
+        self._find_and_kopy_file(filename, target, search_path)
         self.app.kontext.add_cleanup_path(target)
         return str(result)
 
