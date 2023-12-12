@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from ..kore import JinYamlKomponent, Module, App, KomponentKlass
 from .resource import Resource, MultiDocumentResource
@@ -48,19 +49,44 @@ class Kustomization(JinYamlKomponent):
             raise ValueError(f"var {varname} should not be None")
         return value
 
-    def kopy_file(self, filename: str) -> str:
-        # Note: you can not usu the full get_path, since the filename might contain a dot
-        location: str = self.app.konfig.get_path("file", {}).get(filename)
-        if not location:
-            raise ValueError(f"Could not find file {filename} in file section to kopy")
-        if location.startswith("dekrypt:"):
-            target = self.app.target_path / "secrets" / "files" / filename
-            result = "secrets/files/" + filename
-        else:
-            target = self.app.target_path / "files" / filename
-            result = "files/" + filename
-        self.app.konfig.file_getter.kopy_file(location, target)
-        return result
+
+    def _write_data(self, data: str, target: Path) -> None:
+        dir = target.parent
+        dir.mkdir(parents=True, exist_ok=True)
+        if isinstance(data, bytes):
+            data = data.decode()
+        target.write_text(data)
+
+    def _find_and_kopy_file(self, filename: str, target: Path) -> str:
+        if loc := self.app.konfig.get_path("file", {}).get(filename):
+                logger.info(f"kopying file {loc} to {target}")
+                data = self.app.konfig.file_getter.get_data(loc)
+                self._write_data(data, target)
+                return
+        search_path = (self.app.konfig.get_path("system.file_search_path", []))
+        logger.verbose(f"looking for {filename} in {search_path}")
+        for path in search_path:
+            logger.verbose(f"looking for {filename} to kopy in {path}")
+            p =  str(Path(path) / filename)
+            data = self.app.konfig.file_getter.get_data(p)
+            if data:
+                logger.info(f"kopying file {path} to {target}")
+                self._write_data(data, target)
+                return
+        raise ValueError(f"Could not find file {filename} in {search_path}, add it to file: section")
+
+    def kopy_file(self, filename: str, dest: str = "files") -> str:
+        target = self.app.target_path / Path(dest) / filename
+        result = Path(dest) / filename
+        self._find_and_kopy_file(filename, target)
+        return str(result)
+
+    def kopy_secret_file(self, filename: str, dest: str = "secrets/files") -> str:
+        target = self.app.target_path / Path(dest) / filename
+        result = Path(dest) / filename
+        self._find_and_kopy_file(filename, target)
+        self.app.kontext.add_cleanup_path(target)
+        return str(result)
 
     def get_filename(self):
         return "kustomization.yaml"

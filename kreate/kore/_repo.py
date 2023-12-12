@@ -138,17 +138,6 @@ class FileGetter:
             data = self.konfig.dekrypt_str(data)
         return data
 
-    def kopy_file(self, loc: str, target: Path) -> None:
-        logger.info(f"kopying file {loc} to {target}")
-        data = self.get_data(loc)
-        if data is None:
-            raise ValueError(f"could not find file {loc} to kopy to {target}")
-        dir = target.parent
-        dir.mkdir(parents=True, exist_ok=True)
-        if isinstance(data, bytes):
-            data = data.decode()
-        target.write_text(data)
-
     def load_file_data(self, filename: Path) -> str:
         path = self.main_dir_path / filename
         if not path.exists():
