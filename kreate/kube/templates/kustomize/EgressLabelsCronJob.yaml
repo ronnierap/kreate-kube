@@ -1,0 +1,18 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ my.target.name }}
+# Only include when there are egresses.
+# Otherwise the patch will see empty labels, and remove existing labels
+{% if my.egresses() != [] %}
+spec:
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+          {% for egress in my.egresses() %}
+            networking/egress-to-{{ egress.shortname }}: enabled
+          {% endfor %}
+{% endif %}

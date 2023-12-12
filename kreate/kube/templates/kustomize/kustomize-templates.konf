@@ -15,6 +15,9 @@ system:
     EgressLabels:
       class: kreate.kube.patch.EgressLabels
       template: {{my_repo_name}}:kustomize/EgressLabels.yaml
+    EgressLabelsCronJob:
+      class: kreate.kube.patch.EgressLabels
+      template: {{my_repo_name}}:kustomize/EgressLabelsCronJob.yaml
     HttpProbes:
       class: kreate.kube.patch.Patch
       template: {{my_repo_name}}:kustomize/HttpProbes.yaml
