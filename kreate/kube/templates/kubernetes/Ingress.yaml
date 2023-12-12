@@ -41,3 +41,9 @@ spec:
                 name: {{ my.field.service }}
                 port:
                   number: {{ my.field.containerPort }}
+{% if "tls_certificate_secret" in my.field %}
+  tls:
+  - hosts:
+    - {{ my.field.host }}
+    secretName: {{ my.field.tls_certificate_secret }}
+{% endif %}
