@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 kinds = {
     "Deployment": "spec.template.spec.containers",
     "StatefulSet": "spec.template.spec.containers",
-    "CronJob": ""
+    "CronJob": "spec.jobTemplate.spec.template.spec.containers",
 }
 
 def vardiff(cli: Cli) -> None:
