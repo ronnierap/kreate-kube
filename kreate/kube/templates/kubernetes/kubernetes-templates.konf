@@ -67,11 +67,6 @@ system:
       template:  {{my_repo_name}}:kubernetes/Service.yaml
       doc: optional:{{my_repo_name}}:doc/Service.md
 
-    ServiceAccount:
-      class: kreate.kube.resource.Resource
-      template:  {{my_repo_name}}:kubernetes/ServiceAccount.yaml
-      doc: optional:{{my_repo_name}}:doc/ServiceAccount.md
-
     ServiceMonitor:
       class: kreate.kube.resource.Resource
       template:  {{my_repo_name}}:kubernetes/ServiceMonitor.yaml
