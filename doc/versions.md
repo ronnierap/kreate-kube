@@ -93,6 +93,8 @@ At this moment there are not many versions of kreate-kube:
   - sorted certain loops to be more predictable in order
   - made serviceAccountName in CronJob optional
   - added search path for kopying files
+  - removed ServiceAccount class because it was not generic
+  - added inklude_args, as alias for args that are passed with an inklude
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

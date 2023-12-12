@@ -110,6 +110,8 @@ class Konfig:
                     )
                 k, v = item.split("=", 1)
                 context["args"][k] = v
+        # new name inklude_args is more specific. args will be removed in version 2.0
+        context["inklude_args"] = context["args"]
         val_yaml = self.jinyaml.render_yaml(location, context)
         if val_yaml:  # it can be empty
             deep_update(self.yaml, val_yaml, list_insert_index={"inklude": idx})
