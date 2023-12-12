@@ -6,7 +6,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      networking/egress-to-{{ my.shortname }}: enabled
+      networking/{{my.name}}: enabled
   policyTypes:
     - Egress
   egress:

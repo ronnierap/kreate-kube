@@ -11,6 +11,6 @@ spec:
     metadata:
       labels:
       {% for egress in my.egresses() %}
-        networking/egress-to-{{ egress.shortname }}: enabled
+        networking/{{egress.name}}: enabled
       {% endfor %}
 {% endif %}
