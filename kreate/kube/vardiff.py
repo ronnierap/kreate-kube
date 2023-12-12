@@ -76,7 +76,10 @@ def dump_helper(cli: Cli, app: App,  kind_filter: str = None, name_mapper: dict 
         if name_mapper:
             if len(name) > 11:
                 trunc_name = name[:-11]
-                old_name =  name_mapper[trunc_name]
+                if trunc_name not in name_mapper:
+                    logger.warning(f"Could not find {trunc_name} in mapper list, skipping...")
+                    continue
+                old_name = name_mapper[trunc_name]
                 logger.info(f"changing name from {name} to {old_name}")
                 doc.get("metadata")["name"] = old_name
                 name = old_name
