@@ -98,7 +98,7 @@ class App:
                     logger.debug(f"kreating komponent {klass_name}.{shortname}")
                     self.kreate_komponent(klass_name, shortname)
             elif klass_name != "default" and klass_name != "use":
-                logger.warning(f"Unknown toplevel komponent {klass_name}")
+                raise ValueError    (f"Unknown toplevel komponent {klass_name}")
 
     ####################################################
 
