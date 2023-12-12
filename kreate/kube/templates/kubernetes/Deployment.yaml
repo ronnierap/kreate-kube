@@ -1,4 +1,4 @@
 ---
 {% set kind="Deployment" %}
 {% set match_label="app" %}
-{% include 'kreate-kube-templates:kubernetes/inc/Workload.inc' %}
+{% include 'kreate-kube-templates:lib/workload.inc' %}

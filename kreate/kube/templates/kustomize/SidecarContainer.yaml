@@ -31,3 +31,4 @@ spec:
           requests:
             cpu: {{ my.field.cpu_request }}
             memory: {{ my.field.memory_request }}
+{% include 'kreate-kube-templates:lib/volume-mounts.inc' %}
