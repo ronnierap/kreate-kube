@@ -17,7 +17,7 @@ spec:
           {% endfor %}
       volumes:
       - name: {{ my.shortname }}
-        {% if "secret" in strukt and my.strukture.secret %}
+        {% if "secret" in my.strukture and my.strukture.secret %}
         secret:
           secretName: {{ my.shortname }}
         {% else %}
