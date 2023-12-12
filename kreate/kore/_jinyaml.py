@@ -1,6 +1,7 @@
 import base64
 import logging
 import os
+import re
 import traceback
 import warnings
 from collections.abc import Mapping
@@ -105,6 +106,17 @@ class JinYaml:
 
     def dump(self, data, output_file):
         self.yaml_parser.dump(data, output_file)
+
+    def load_with_jinja_includes(self, loc, lines):
+        data : str = self.konfig.load_repo_file(loc)
+        for line in data.splitlines():
+            exp = r'^ *{% *include +[\'"](.*)[\'"] *%} *'
+            if match := re.search(exp, line):
+                inc_loc = match.group(1)
+                logger.verbose(f"jinja including {inc_loc}")
+                self.load_with_jinja_includes(inc_loc, lines)
+            else:
+                lines.append(line)
 
 
 def raise_error_if_none(thing):

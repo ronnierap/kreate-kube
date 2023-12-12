@@ -170,7 +170,9 @@ def view_template(cli: Cli, app: App, klass_name: str):
     klass = app.klasses[klass_name]
     template_loc = klass.info.get("template")
     if template_loc:
-        tmpl_text = app.konfig.load_repo_file(template_loc)
+        lines = []
+        app.konfig.jinyaml.load_with_jinja_includes(template_loc, lines)
+        tmpl_text = "\n".join(lines)
     if cli.args.quiet:
         print(tmpl_text)
     else:
