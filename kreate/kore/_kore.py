@@ -181,17 +181,26 @@ def view_template(cli: Cli, app: App, klass_name: str):
         print("==========================")
         if klass.python_class.__doc__:
             print(inspect.cleandoc(klass.python_class.__doc__))
-            print("==========================")
         if template_loc:
-            print("Fields:")
+            print("==========================")
+            print("=== Template ===")
+            print(tmpl_text)
+            print("==========================")
+            print("=== Fields ===")
             fields = re.findall("{{ *my.field.[^}]*}}", tmpl_text)
             for field in sorted(set(fields)):
                 print(field.replace("{", " ").replace("}", " "))
-            print(tmpl_text)
-        if doc_loc := klass.info.get("doc"):
             print("==========================")
+            print("=== Optionals ===")
+            fields = re.findall("{{ *my.optional\(['\"]([a-zA-Z_0-9]*)['\"]\)", tmpl_text)
+            for field in sorted(set(fields)):
+                print(field)
+        if doc_loc := klass.info.get("doc"):
             doc = app.konfig.load_repo_file(doc_loc)
-            print(doc)
+            if doc:
+                print("==========================")
+                print("=== doc ===")
+                print(doc)
 
 
 def view_templates(cli: Cli, templates):
@@ -256,7 +265,8 @@ def view(cli: Cli):
                 continue
 
             # Regular Parameters
-            print(f"==== view {param} =======")
+            if not cli.args.quiet:
+                print(f"==== view {param} =======")
             print_full_config = False
             if param == "template":
                 # View Templates
@@ -325,16 +335,33 @@ def view_komponent(cli: Cli, komp_id: str):
     app = cli.kreate_files()
     komp: Komponent = app.komponents_by_id[komp_id]
     print(komp.id, komp.klass)
-    print("Strukture:")
+    print("=== Strukture ===")
     pprint_map(komp.strukture)
     # if isinstance(komp.klass.python_class, JinjaKomponent):
     template_loc = komp.klass.info.get("template")
     if template_loc:
-        tmpl_text = app.konfig.load_repo_file(template_loc)
-        print("Fields:")
+        lines = []
+        app.konfig.jinyaml.load_with_jinja_includes(template_loc, lines)
+        tmpl_text = "\n".join(lines)
+        #tmpl_text = app.konfig.load_repo_file(template_loc)
+        print("=== Fields ===")
         fields = re.findall("{{ *my.field.([a-zA-Z_0-9]*)", tmpl_text)
         for field in sorted(set(fields)):
-            print(f"  {field}: " + str(komp.field.get(field)))
+            print(f"  {field}: " + str(komp._field(field, "**not-set**")))
+            if cli.args.verbose > 0:
+                found = False
+                found = _pfp(app.konfig, f"strukt.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"strukt.field.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"val.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"val.field.{komp.id}.{field}", found)
+                found = _pfp(app.konfig, f"val.{komp.klass.name}.{field}", found)
+                found = _pfp(app.konfig, f"val.field.{komp.klass.name}.{field}", found)
+                found = _pfp(app.konfig, f"val.generic.{field}", found)
+                found = _pfp(app.konfig, f"val.field.generic.{field}", found)
+        fields = re.findall("{{ *my.optional\(['\"]([a-zA-Z_0-9]*)['\"]\)", tmpl_text)
+        print("=== Optionals ===")
+        for field in sorted(set(fields)):
+            print(f"  {field}: " + str(komp._field(field, "**not-set**")))
             if cli.args.verbose > 0:
                 found = False
                 found = _pfp(app.konfig, f"strukt.{komp.id}.{field}", found)

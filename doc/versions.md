@@ -102,6 +102,9 @@ At this moment there are not many versions of kreate-kube:
   - add cm-files and secret-files to SidecarContainer
   - raise an error if you use an unknow klass in the strukt
   - added support for tls certificate in Ingress
+  - in view template see the template with jinja includes resolved
+  - fixed bug in `view komp` when a field was not defined
+  - added optionals to `view komp` and `view templ`
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
