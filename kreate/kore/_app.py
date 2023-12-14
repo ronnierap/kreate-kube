@@ -70,7 +70,7 @@ class App:
         self.komponents_by_id[komp.id] = komp
 
     def aktivate_komponents(self):
-        for komp in self.komponents:
+        for komp in sorted(self.komponents, key = lambda komp: komp.id):
             logger.debug(f"aktivating {komp.id}")
             komp.aktivate()
 
@@ -80,7 +80,7 @@ class App:
             shutil.rmtree(self.target_path)
         os.makedirs(self.target_path, exist_ok=True)
         self.aktivate_komponents()
-        for komp in self.komponents:
+        for komp in sorted(self.komponents, key = lambda komp: komp.id):
             if komp.get_filename():
                 logger.info(f"kreating file {komp.get_filename()}")
                 komp.kreate_file()
@@ -98,7 +98,7 @@ class App:
                     logger.debug(f"kreating komponent {klass_name}.{shortname}")
                     self.kreate_komponent(klass_name, shortname)
             elif klass_name != "default" and klass_name != "use":
-                raise ValueError    (f"Unknown toplevel komponent {klass_name}")
+                raise ValueError(f"Unknown toplevel komponent {klass_name}")
 
     ####################################################
 
