@@ -105,6 +105,8 @@ At this moment there are not many versions of kreate-kube:
   - in view template see the template with jinja includes resolved
   - fixed bug in `view komp` when a field was not defined
   - added optionals to `view komp` and `view templ`
+- `1.8.3`
+  - set default CronJob concurrencyPolicy to Forbid (was Allow). This seems to be more safe and general desirable
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

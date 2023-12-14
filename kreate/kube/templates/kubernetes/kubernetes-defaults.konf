@@ -24,7 +24,7 @@ val:
     schedule: "* * 31 2 *"   # February 31st, will never happen
     successfulJobsHistoryLimit: 3
     backoffLimit: 6
-    concurrencyPolicy: Allow
+    concurrencyPolicy: Forbid  # This is the most safe and should be the default
 
   Deployment:
     protocol: TCP
