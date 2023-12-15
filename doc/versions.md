@@ -107,6 +107,10 @@ At this moment there are not many versions of kreate-kube:
   - added optionals to `view komp` and `view templ`
 - `1.8.3`
   - set default CronJob concurrencyPolicy to Forbid (was Allow). This seems to be more safe and general desirable
+  - aktivate and kreate_files in order of komp.id, to be more predictable
+  - make it possible to use shortnames with period (e.g. filename or komponent.id as target)
+  - make JinjaFiles by default go to {target_dir}/files/{shortname}
+  - do not let Kustomization template kopy files in aktivate, but do that before the kreate_file
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

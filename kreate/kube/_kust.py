@@ -57,7 +57,10 @@ class Kustomization(JinYamlKomponent):
             data = data.decode()
         target.write_text(data)
 
-    def _find_and_kopy_file(self, filename: str, target: Path, search_path) -> str:
+    def _find_and_kopy_file(self, filename: str, target: Path, search_path):
+        if target.exists():
+            logger.verbose(f"kust file {filename} already kreated in {target}")
+            return
         if loc := self.app.konfig.get_path("file", {}).get(filename):
                 logger.info(f"kopying file {loc} to {target}")
                 data = self.app.konfig.file_getter.get_data(loc)
@@ -69,12 +72,12 @@ class Kustomization(JinYamlKomponent):
             p =  str(Path(path) / filename)
             data = self.app.konfig.file_getter.get_data(p)
             if data:
-                logger.info(f"kopying file {path} to {target}")
+                logger.info(f"kust file {path} kopied to {target}")
                 self._write_data(data, target)
                 return
         raise ValueError(f"Could not find file {filename} in {search_path}, add it to file: section")
 
-    def kopy_file(self, filename: str, dest: str = "files") -> str:
+    def kopy_file(self, filename: str, dest: str = "files"):
         search_path = self.app.konfig.get_path("system.search_path.kopy_file", [])
         target = self.app.target_path / Path(dest) / filename
         result = Path(dest) / filename
@@ -112,3 +115,9 @@ class Kustomization(JinYamlKomponent):
                             logger.warning(
                                 f"could not find var to remove {cm_to_remove}.{var}"
                             )
+
+    def kreate_file(self) -> None:
+        for cm in self.strukture.get_path("configmaps"):
+            for file in self.strukture.get_path(f"configmaps.{cm}.files", []):
+                self.kopy_file(file)
+        return super().kreate_file()

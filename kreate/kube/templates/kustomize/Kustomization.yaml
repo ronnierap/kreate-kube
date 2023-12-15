@@ -28,7 +28,7 @@ configMapGenerator:
   {% if my.strukture.configmaps[cm].get("files",{}) %}
   files:
     {% for filename in my.strukture.configmaps[cm].get("files",[]) %}
-     - {{ my.kopy_file(filename) }}
+     - files/{{filename}}
     {% endfor %}
   {% endif %}
 {% endfor %}

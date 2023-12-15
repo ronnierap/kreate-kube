@@ -89,7 +89,8 @@ class Komponent:
         return f"{appname}-{self.klass.name}-{self.shortname}"
 
     def _find_strukture(self):
-        strukt = self.app.strukture.get_path(self.id)
+        # do not use get_path, because shortname, might contain periods
+        strukt = self.app.strukture.get(self.klass.name, {}).get(self.shortname)
         if strukt is None:
             logger.debug(f"could not find strukture for {self.id}")
             return {}
@@ -255,6 +256,10 @@ class JinjaFile(JinjaKomponent):
     def get_template_location(self) -> str:
         return self.strukture.get("template")
 
+    def get_filename(self):
+        if self.strukture.get("target_filename"):
+            return self.strukture.get("target_filename")
+        return f"files/{self.shortname}"
 
 class MultiJinYamlKomponent(JinjaKomponent):
     def __init__(self, app: "App", klass: KomponentKlass, shortname: str = None):
