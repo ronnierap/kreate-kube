@@ -112,6 +112,7 @@ At this moment there are not many versions of kreate-kube:
   - make JinjaFiles by default go to {target_dir}/files/{shortname}
   - do not let Kustomization template kopy files in aktivate, but do that before the kreate_file
   - fixed bug where a port_list was interpreted as an int
+  - added LifecycleHookCommand patch
 
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.

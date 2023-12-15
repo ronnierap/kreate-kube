@@ -24,6 +24,9 @@ system:
     KubernetesAnnotations:
       class: kreate.kube.patch.Patch
       template: {{my_repo_name}}:kustomize/KubernetesAnnotations.yaml
+    LifecycleHookCommand:
+      class: kreate.kube.patch.Patch
+      template: {{my_repo_name}}:kustomize/LifecycleHookCommand.yaml
     JobTemplateAnnotations:
       class: kreate.kube.patch.Patch
       template: {{my_repo_name}}:kustomize/JobTemplateAnnotations.yaml
