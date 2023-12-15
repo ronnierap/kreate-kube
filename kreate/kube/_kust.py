@@ -72,7 +72,7 @@ class Kustomization(JinYamlKomponent):
             p =  str(Path(path) / filename)
             data = self.app.konfig.file_getter.get_data(p)
             if data:
-                logger.info(f"kust file {path} kopied to {target}")
+                logger.info(f"kust file {filename} kopied to {target}")
                 self._write_data(data, target)
                 return
         raise ValueError(f"Could not find file {filename} in {search_path}, add it to file: section")
