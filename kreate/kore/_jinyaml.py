@@ -65,7 +65,12 @@ class JinYaml:
                 logger.debug(f"did not find {filename}")
                 return None
             tmpl = self.env.from_string(data)  # self.env.get_template(filename)
-            return tmpl.render(vars)
+            result = tmpl.render(vars)
+            # TODO: Somehow the trailing newline sometimes disappears, this can be a problem
+            # so this is an ugly hack
+            if not result.endswith("\n"):
+                result += "\n"
+            return result
         except jinja2.exceptions.TemplateSyntaxError as e:
             logger.error(
                 f"Syntax Error in jinja2 template {e.filename}:{e.lineno} {e.message}"
