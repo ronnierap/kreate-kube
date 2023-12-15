@@ -21,6 +21,8 @@ class KustomizeModule(Module):
         if "patches" in res.strukture:
             for patch_name in sorted(res.strukture.get("patches").keys()):
                 subpatches = res.strukture.get_path(f"patches.{patch_name}")
+                if patch_name not in res.app.klasses:
+                    raise KeyError(f"Unknown embedded patch name {patch_name} for {res.id}")
                 klass = res.app.klasses[patch_name]
                 if not subpatches.keys():
                     subpatches = {"main": {}}
