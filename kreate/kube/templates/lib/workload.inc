@@ -5,6 +5,7 @@ metadata:
 spec:
   replicas: {{ my.field.replicas }}
   revisionHistoryLimit: {{ my.field.revisionHistoryLimit }}
+  {{ my.optional("serviceName") }}
   selector:
     matchLabels:
       {{ match_label }}: {{ my.name }}
@@ -27,7 +28,6 @@ spec:
       restartPolicy: {{ my.field.restartPolicy }}
       {{ my.optional("serviceAccount") }}
       {{ my.optional("serviceAccountName") }}
-      {{ my.optional("serviceName") }}
       {{ my.optional("terminationGracePeriodSeconds") }}
 
       containers:
