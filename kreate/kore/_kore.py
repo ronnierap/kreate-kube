@@ -341,7 +341,20 @@ def view_komponents(cli: Cli):
 
 def view_komponent(cli: Cli, komp_id: str):
     app = cli.kreate_app()
-    komp: Komponent = app.komponents_by_id[komp_id]
+    if komp := app.komponents_by_id.get(komp_id) is None:
+        found = []
+        for id in sorted(app.komponents_by_id.keys()):
+            if id.lower().startswith(komp_id.lower()):
+                found.append(id)
+        if len(found) == 0:
+            raise ValueError(f"No komponent found that starts with {komp_id}")
+        elif len(found) > 1:
+            print("Multiple komponents found, be more specific")
+            for id in found:
+                print(f"  found: {id}")
+            return
+        else:
+            komp = app.komponents_by_id.get(found[0])
     print(komp.id, komp.klass)
     print("=== Strukture ===")
     pprint_map(komp.strukture)
