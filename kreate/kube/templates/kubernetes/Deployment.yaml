@@ -1,4 +1,4 @@
 ---
 {% set kind="Deployment" %}
-{% set match_label="app" %}
+{% set match_label=my.strukture.get("match_label", "app") %}
 {% include 'kreate-kube-templates:lib/workload.inc' %}

@@ -1,4 +1,4 @@
 ---
 {% set kind="StatefulSet" %}
-{% set match_label="statefull-app" %}
+{% set match_label=my.strukture.get("match_label", "statefull-app") %}
 {% include 'kreate-kube-templates:lib/workload.inc' %}

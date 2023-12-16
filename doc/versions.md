@@ -113,7 +113,7 @@ At this moment there are not many versions of kreate-kube:
   - do not let Kustomization template kopy files in aktivate, but do that before the kreate_file
   - fixed bug where a port_list was interpreted as an int
   - added LifecycleHookCommand patch
-
+  - made match_label overridable for StatefulSet and Deployment
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
