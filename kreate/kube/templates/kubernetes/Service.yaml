@@ -8,10 +8,11 @@ metadata:
 spec:
   selector:
     app: {{ app.appname }}
+  {{ my.optional("clusterIP") }}
   ports:
 {% for port in my.strukture.get("ports", [{"name": "http"}]) %}
-  - protocol: TCP
-    port: {{ my.field.servicePort }}
+  - protocol: {{ port.protocol | default("TCP") }}
+    port: {{ port.port | default(my.field.servicePort) }}
     targetPort: {{ port.targetPort | default(my.field.containerPort) }}
     name: {{ port.name | default("http") }}
 {% endfor %}
