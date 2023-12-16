@@ -99,14 +99,6 @@ class Egress(Resource):
 
 
 class ConfigMap(Resource):
-    def var(self, varname: str):
-        value = self.strukture.vars[varname]
-        if not isinstance(value, str):
-            value = self.app.konfig.get_path(f"var.{varname}", None)
-        if value is None:
-            raise ValueError(f"var {varname} should not be None")
-        return value
-
     def file_data(self, filename: str) -> str:
         location: str = self.app.konfig.yaml["file"][filename]
         return self.app.konfig.load_repo_file(location)
@@ -122,21 +114,6 @@ class Secret(Resource):
 
     def is_secret(self) -> bool:
         return True
-
-    def secret(self, varname: str):
-        value = self.strukture.get_path(f"vars.{varname}")
-        if not isinstance(value, str):
-            value = self.app.konfig.get_path(f"secret.var.{varname}", None)
-        if value is None:
-            raise ValueError(f"missing secret.var.{varname}")
-        if value.startswith("escape:"):
-            # escape mechanism is a value needs to start with dekrypt:
-            value = value[7:]
-        elif value.startswith("dekrypt:"):
-            value = dekrypt_str(value[8:])
-        if value is None:
-            raise ValueError(f"secret {varname} should not be None")
-        return value
 
 
 class SecretBasicAuth(Resource):

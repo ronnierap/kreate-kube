@@ -67,6 +67,22 @@ class Komponent:
     def skip(self):
         return self.strukture.get("ignore", False)
 
+    def var(self, varname: str, konfig_path="var"):
+        value = self.strukture.get_path(f"vars.{varname}")
+        if not isinstance(value, str):
+            value = self.app.konfig.get_path(f"{konfig_path}.{varname}", None)
+        if value is None:
+            raise ValueError(f"missing {konfig_path}.{varname}")
+        if value.startswith("escape:"):
+            # escape mechanism is a value needs to start with dekrypt:
+            value = value[7:]
+        elif value.startswith("dekrypt:"):
+            # TODO: mark the komponent as secret?
+            value = self.app.konfig.dekrypt_str(value[8:])
+        if value is None:
+            raise ValueError(f"secret {varname} should not be None")
+        return value
+
     def implements(self, name: str) -> bool:
         if self.klass.info.get_path(f"implements.{name}", "True") == "True":
             return True

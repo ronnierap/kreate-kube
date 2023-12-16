@@ -116,6 +116,7 @@ At this moment there are not many versions of kreate-kube:
   - made match_label overridable for StatefulSet and Deployment
   - put optional serviceName at the right level in workload
   - added optional clusterIP, protocol and port to Service
+  - moved my.var to Komponent, and made it flexible to also handle secrets
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
