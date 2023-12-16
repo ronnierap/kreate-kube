@@ -117,6 +117,7 @@ At this moment there are not many versions of kreate-kube:
   - put optional serviceName at the right level in workload
   - added optional clusterIP, protocol and port to Service
   - moved my.var to Komponent, and made it flexible to also handle secrets
+  - show all komponent id's when `view komp` is called with no argument
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,

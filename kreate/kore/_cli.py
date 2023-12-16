@@ -220,12 +220,16 @@ class Cli:
             help="inklude extra files before parsing main konfig",
         )
 
-    def kreate_files(self) -> App:
+    def kreate_app(self) -> App:
         args = vars(self.args).get("cli_args", [])
         konfig = self.kreate_konfig()
         konfig.set_path("system.cli_args", args)
         app = App(konfig)
         app.kreate_komponents()
+        return app
+
+    def kreate_files(self) -> App:
+        app = self.kreate_app()
         app.kreate_files()
         return app
 

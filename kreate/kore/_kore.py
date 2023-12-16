@@ -275,7 +275,10 @@ def view(cli: Cli):
 
             elif param == "komponent":
                 # View komponent details
-                view_komponent(cli, cli.params[idx + 1])
+                if len(cli.params) > idx + 1:
+                    view_komponent(cli, cli.params[idx + 1])
+                else:
+                    view_komponents(cli)
                 break
 
             elif param == "warningfilters":
@@ -330,9 +333,14 @@ def view_warning_filters():
     for w in warnings.filters:
         print(w)
 
+def view_komponents(cli: Cli):
+    app = cli.kreate_app()
+    for komp_id in sorted(app.komponents_by_id.keys()):
+        print("  ", komp_id)
+
 
 def view_komponent(cli: Cli, komp_id: str):
-    app = cli.kreate_files()
+    app = cli.kreate_app()
     komp: Komponent = app.komponents_by_id[komp_id]
     print(komp.id, komp.klass)
     print("=== Strukture ===")
