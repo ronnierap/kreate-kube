@@ -7,7 +7,7 @@
 app:
   namespace: {{ konfig.get_path("app.namespace", app.appname + "-" + app.env) }}
 system:
-  target_dir: build/{{app.appname}}-{{app.env}}
+  target_dir: {{ system.target_dir | default("build/"+app.appname+"-"+app.env) }}
 
 inklude:
 ###################################################

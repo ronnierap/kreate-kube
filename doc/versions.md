@@ -119,6 +119,7 @@ At this moment there are not many versions of kreate-kube:
   - moved my.var to Komponent, and made it flexible to also handle secrets
   - show all komponent id's when `view komp` is called with no argument
   - select the komponent that starts with a string in `view komp`
+  - make it possible to override target_dir in framework
 
 Since the `1.0.0` release a semantic versioning for backward compatibilty will be used.
 - There is no garantuee that python code will be backward compatible,
