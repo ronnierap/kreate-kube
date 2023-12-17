@@ -119,7 +119,7 @@ class Kustomization(JinYamlKomponent):
                             )
 
     def kreate_file(self) -> None:
-        for cm in self.strukture.get_path("configmaps"):
+        for cm in self.strukture.get_path("configmaps", {}):
             for file in self.strukture.get_path(f"configmaps.{cm}.files", []):
                 self.kopy_file(file)
         return super().kreate_file()
