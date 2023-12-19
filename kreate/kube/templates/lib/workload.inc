@@ -4,7 +4,7 @@ metadata:
   name: {{ my.name }}
 spec:
   replicas: {{ my.field.replicas }}
-  revisionHistoryLimit: {{ my.field.revisionHistoryLimit }}
+  {{ my.optional("revisionHistoryLimit") }}
   {{ my.optional("serviceName") }}
   selector:
     matchLabels:

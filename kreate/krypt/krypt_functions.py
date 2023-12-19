@@ -23,7 +23,7 @@ def _get_key():
 
 
 def dekrypt_str(value: str) -> str:
-    return dekrypt_bytes(value).decode()
+    return dekrypt_bytes(value.encode()).decode()
 
 
 def dekrypt_bytes(value: bytes) -> bytes:
